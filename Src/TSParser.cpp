@@ -8,8 +8,7 @@
 #include "UniConv.h"
 #include "TSParser.h"
 #include "VFStream.h"
-#include "TreeViewItem.h"
-#include "MemoSelectView.h"
+#include "VFManager.h"
 
 ///////////////////////////////////////
 // UCS2 -> MBCS conversion libs.
@@ -279,19 +278,16 @@ BOOL TSVFolderTag::EndElement(ParseInfo *p)
 {
 	if (pHead == NULL || pTail == NULL) return FALSE;
 
-	TreeViewVirtualFolder *pVF = new TreeViewVirtualFolder();
-	if (!pVF) return FALSE;
+	// add VFStore
 	VFStore *pStore = new VFStore(VFStore::ORDER_TITLE);
 	if (!pStore || !pStore->Init()) {
-		delete pVF;
 		delete pStore;
 		return FALSE;
 	}
-
 	pTail->SetNext(pStore);
 
-	pVF->SetGenerator((VFDirectoryGenerator*)pHead);
-	pVF->SetStore(pStore);
+	// convert Node name
+	// TOMBO uses expat UNICODE version, so convert MBCS if platform is win32.
 
 #ifdef _WIN32_WCE
 	LPTSTR pConved = pName;
@@ -301,7 +297,8 @@ BOOL TSVFolderTag::EndElement(ParseInfo *p)
 	LPTSTR pConved = conv.Get();
 #endif
 
-	p->InsertTree(pConved, pVF);
+	p->pListener->ProcessStream(pConved, (VFDirectoryGenerator*)pHead, pStore);
+
 	return TRUE;
 }
 
@@ -464,10 +461,10 @@ ParseInfo::~ParseInfo()
 	}
 }
 
-BOOL ParseInfo::Init(MemoSelectView *p, HTREEITEM h)
+BOOL ParseInfo::Init(VirtualFolderEnumListener *pLsnr)
 {
-	pView =p;
-	hItem = h;
+	pListener = pLsnr;
+
 	TSParseTagItem *pTag = new TSParseTagItem(TAGID_INITIAL);
 	if (pTag == NULL) return FALSE;
 	Push(pTag);
@@ -535,11 +532,6 @@ BOOL ParseInfo::IsValidParent(DWORD nTag)
 	return ((nAllowParent[nTag] & (1 << pTop->GetTagID())) != 0);
 }
 
-BOOL ParseInfo::InsertTree(LPCTSTR pName, TreeViewVirtualFolder *pVF)
-{
-	return pView->InsertFolder(hItem, pName, pVF, TRUE) != NULL;
-}
-
 ///////////////////////////////////////
 // expat callback funcs.
 ///////////////////////////////////////
@@ -581,12 +573,12 @@ static void EndElement(void *userData, const XML_Char *name)
 // parser main
 ///////////////////////////////////////
 
-BOOL TSParser::Parse(LPCTSTR pFileName, MemoSelectView *pView, HTREEITEM hItem)
+BOOL TSParser::Parse(LPCTSTR pFileName, VirtualFolderEnumListener *pLsnr)
 {
 	XML_Parser pParser;
 	ParseInfo info;
 
-	if (!info.Init(pView, hItem)) return FALSE;
+	if (!info.Init(pLsnr)) return FALSE;
 
 	HANDLE hFile = CreateFile(pFileName, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 	if (hFile == INVALID_HANDLE_VALUE) return FALSE;

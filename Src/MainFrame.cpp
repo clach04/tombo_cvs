@@ -16,6 +16,7 @@
 #include "TreeViewItem.h"
 #include "GrepDialog.h"
 #include "FilterCtlDlg.h"
+#include "VFManager.h"
 
 #ifdef _WIN32_WCE
 #if defined(PLATFORM_PKTPC)
@@ -473,6 +474,9 @@ BOOL MainFrame::Create(LPCTSTR pWndName, HINSTANCE hInst, int nCmdShow)
 	msView.Init(&mmMemoManager);
 	mdView.Init(&mmMemoManager);
 
+	pVFManager = new VFManager();
+	if (!pVFManager || !pVFManager->Init()) return FALSE;
+
 #ifdef _WIN32_WCE
 	hMainWnd = CreateWindow(pClassName, pWndName,
 						WS_VISIBLE,
@@ -842,7 +846,7 @@ void MainFrame::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	// Create tree view
 	hSelectViewImgList = CreateSelectViewImageList(hInstance);
 	msView.Create(TEXT("MemoSelect"), r, hWnd, IDC_MEMOSELECTVIEW, hInstance, g_Property.SelectViewFont(), hSelectViewImgList);
-	msView.InitTree();
+	msView.InitTree(pVFManager);
 
 	if (g_Property.IsUseTwoPane()) {
 		// 自動切換えモードに設定
@@ -1890,7 +1894,7 @@ void MainFrame::OnProperty()
 
 	// メモフォルダの再構成
 	msView.DeleteAllItem();
-	msView.InitTree();
+	msView.InitTree(pVFManager);
 #if defined(PLATFORM_WIN32) || defined(PLATFORM_PKTPC)
 	if (!g_Property.SwitchWindowTitle()) {
 		SetWindowText(hMainWnd, TOMBO_APP_NAME);
@@ -2414,7 +2418,12 @@ void MainFrame::OnGrep()
 	GrepDialog gd;
 	if (!gd.Init(sPath.Get())) return;
 	if (gd.Popup(hInstance, hMainWnd) == IDOK) {
-		if (!msView.InsertVirtualFolder(&gd)) {
+		const VFInfo *pInfo;
+		pInfo = pVFManager->GetGrepVFInfo(gd.GetPath(), gd.GetMatchString(),
+				gd.IsCaseSensitive(), gd.IsCheckCryptedMemo(),
+				gd.IsCheckFileName(), gd.IsNegate());
+		if (pInfo == NULL) return;
+		if (!msView.InsertVirtualFolder(pInfo)) {
 			MessageBox(MSG_INSERTVFOLDER_FAIL, TOMBO_APP_NAME, MB_OK | MB_ICONERROR);
 		}
 	}

@@ -17,7 +17,6 @@
 #include "TString.h"
 #include "TreeViewItem.h"
 #include "Message.h"
-#include "GrepDialog.h"
 
 void SelectViewSetWndProc(WNDPROC wp, HWND hParent, HINSTANCE h, MemoSelectView *p);
 LRESULT CALLBACK NewSelectViewProc( HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam );
@@ -209,7 +208,7 @@ HTREEITEM MemoSelectView::InsertFolder(HTREEITEM hParent, LPCTSTR pName, TreeVie
 // Initialize tree
 /////////////////////////////////////////
 
-BOOL MemoSelectView::InitTree()
+BOOL MemoSelectView::InitTree(VFManager *pManager)
 {
 	DeleteAllItem();
 
@@ -230,7 +229,7 @@ BOOL MemoSelectView::InitTree()
 
 	// Insert virtual tree
 	TreeViewVirtualFolderRoot *pVFRoot = new TreeViewVirtualFolderRoot();
-	if (!pVFRoot || !pVFRoot->Init()) return FALSE;
+	if (!pVFRoot || !pVFRoot->Init(pManager)) return FALSE;
 	hSearchRoot = InsertFolder(TVI_ROOT, MSG_VIRTUAL_FOLDER, pVFRoot, TRUE);
 
 	return TRUE;
@@ -1395,38 +1394,10 @@ HTREEITEM MemoSelectView::ShowItem(LPCTSTR pPath, BOOL bSelChange)
 // Insert grep result
 /////////////////////////////////////////////
 
-BOOL MemoSelectView::InsertVirtualFolder(GrepDialog *pGrepDlg)
+BOOL MemoSelectView::InsertVirtualFolder(const VFInfo *pInfo)
 {
-	VFInfo vfInfo;
-
-	DWORD nFlg = 0;
-	if (pGrepDlg->IsCaseSensitive()) { nFlg |= VFINFO_FLG_CASESENSITIVE; }
-	if (pGrepDlg->IsCheckCryptedMemo()) { nFlg |= VFINFO_FLG_CHECKCRYPTED; }
-	if (pGrepDlg->IsCheckFileName()) { nFlg |= VFINFO_FLG_FILENAMEONLY; }
-	if (pGrepDlg->IsNegate()) { nFlg |= VFINFO_FLG_NEGATE; }
-	vfInfo.nFlag = nFlg;
-
-	if (pGrepDlg->GetPath()) {
-		vfInfo.pPath = new TCHAR[_tcslen(pGrepDlg->GetPath()) + 2];
-		if (vfInfo.pPath == NULL) return FALSE;
-		*(vfInfo.pPath) = TEXT('\\');
-		_tcscpy(vfInfo.pPath + 1, pGrepDlg->GetPath());
-	} else {
-		return FALSE;
-	}
-	if (pGrepDlg->GetMatchString()) {
-		vfInfo.pRegex = StringDup(pGrepDlg->GetMatchString());
-	}
-	if (pGrepDlg->GetName()) {
-		vfInfo.pName = StringDup(pGrepDlg->GetName());
-	} else {
-		vfInfo.pName = new TCHAR[_tcslen(MSG_GREP_NONAME_LABEL) + 10];
-		if (vfInfo.pName == NULL) return FALSE;
-		wsprintf(vfInfo.pName, TEXT("%s%03d"), MSG_GREP_NONAME_LABEL, ++nGrepCount);
-	}
-
 	TreeViewVirtualFolderRoot *pVFRoot = (TreeViewVirtualFolderRoot*)GetTVItem(hSearchRoot);
-	return pVFRoot->AddSearchResult(this, &vfInfo);
+	return pVFRoot->AddSearchResult(this, pInfo);
 }
 
 /////////////////////////////////////////////

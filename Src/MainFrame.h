@@ -9,6 +9,7 @@
 
 class MemoNote;
 class TreeViewItem;
+class VFManager;
 
 ///////////////////////////////////////
 // メインフレームウィンドウ
@@ -44,6 +45,8 @@ class MainFrame {
 	MemoDetailsView mdView;
 
 	MemoManager mmMemoManager;
+
+	VFManager *pVFManager;
 
 	PasswordManager pmPasswordMgr;
 

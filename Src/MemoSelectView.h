@@ -6,8 +6,9 @@ class MemoNote;
 class TString;
 class TreeViewItem;
 class MemoLocator;
-class GrepDialog;
 class TreeViewVirtualFolderRoot;
+class VFManager;
+class VFInfo;
 
 class MemoSelectView {
 
@@ -21,10 +22,6 @@ class MemoSelectView {
 	HTREEITEM hSearchRoot;
 
 	MemoManager *pMemoMgr;
-
-	/////////////////////////////
-	// Grep related members
-	DWORD nGrepCount;
 
 	/////////////////////////////
 	// for Cut/Copy/Paste
@@ -52,7 +49,7 @@ public:
 	/////////////////////////////
 	// Initialize functions
 
-	MemoSelectView() : hViewWnd(NULL), pMemoMgr(NULL), bAutoLoadMode(FALSE), bSingleClickMode(FALSE), hMemoRoot(NULL), hSearchRoot(NULL), nGrepCount(0) {}
+	MemoSelectView() : hViewWnd(NULL), pMemoMgr(NULL), bAutoLoadMode(FALSE), bSingleClickMode(FALSE), hMemoRoot(NULL), hSearchRoot(NULL) {}
 	BOOL Init(MemoManager *p) { pMemoMgr = p; bCut = FALSE; pClipItem = NULL; return TRUE; }
 	BOOL Create(LPCTSTR pName, RECT &r, HWND hParent, DWORD nID, HINSTANCE hInst, HFONT hFont, HIMAGELIST hList);
 
@@ -99,7 +96,7 @@ public:
 	/////////////////////////////
 	// ビューアイテム操作関連
 
-	BOOL InitTree();
+	BOOL InitTree(VFManager *pManager);
 	BOOL DeleteAllItem();
 
 	/////////////////////////////
@@ -156,7 +153,8 @@ public:
 
 	/////////////////////////////
 	// Virtual folder
-	BOOL InsertVirtualFolder(GrepDialog *pGrepDlg);
+	BOOL InsertVirtualFolder(const VFInfo *pInfo);
+
 	TreeViewVirtualFolderRoot *GetVirtualFolderRoot();
 
 	/////////////////////////////

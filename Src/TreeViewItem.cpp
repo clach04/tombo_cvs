@@ -17,6 +17,7 @@
 #include "TSParser.h"
 #include "VarBuffer.h"
 #include "DirList.h"
+#include "VFManager.h"
 
 #define ITEM_ORDER_FILE		1
 #define ITEM_ORDER_FOLDER	0
@@ -771,18 +772,12 @@ TreeViewVirtualFolderRoot::TreeViewVirtualFolderRoot()
 
 TreeViewVirtualFolderRoot::~TreeViewVirtualFolderRoot()
 {
-	// delete vbInfo's items memory
-	DWORD n = vbInfo.NumItems();
-	VFInfo *p;
-	for (DWORD i = 0; i < n; i++) {
-		p = vbInfo.GetUnit(i);
-		p->Release();
-	}
 }
 
-BOOL TreeViewVirtualFolderRoot::Init()
+BOOL TreeViewVirtualFolderRoot::Init(VFManager *p)
 {
-	return vbInfo.Init(5, 5);
+	pManager = p;
+	return TRUE;
 }
 
 DWORD TreeViewVirtualFolderRoot::GetIcon(MemoSelectView *pView, DWORD nStatus)
@@ -814,95 +809,53 @@ DWORD TreeViewVirtualFolderRoot::GetIcon(MemoSelectView *pView, DWORD nStatus)
 	}
 }
 
+BOOL TreeViewVirtualFolderRoot::InsertVirtualFolder(MemoSelectView *pView, LPCTSTR pName, VFDirectoryGenerator *pGen, VFStore *pStore)
+{
+	HTREEITEM hParent = GetViewItem();
+
+	TreeViewVirtualFolder *pVf = new TreeViewVirtualFolder();
+	if (pVf == NULL) return FALSE;
+
+	pVf->SetGenerator(pGen);
+	pVf->SetStore(pStore);
+
+	if (!pView->InsertFolder(hParent, pName, pVf, TRUE)) return FALSE;
+	return TRUE;
+}
+
+class VFExpandListener : public VirtualFolderEnumListener {
+	TreeViewVirtualFolderRoot *pRoot;
+	MemoSelectView *pView;
+public:
+	VFExpandListener(MemoSelectView *pv, TreeViewVirtualFolderRoot *pr) : pView(pv), pRoot(pr) {}
+
+	BOOL ProcessStream(LPCTSTR pName, VFDirectoryGenerator *pGen, VFStore *pStore);
+};
+
+BOOL VFExpandListener::ProcessStream(LPCTSTR pName, VFDirectoryGenerator *pGen, VFStore *pStore)
+{
+	return pRoot->InsertVirtualFolder(pView, pName, pGen, pStore); 
+}
+
 BOOL TreeViewVirtualFolderRoot::Expand(MemoSelectView *pView)
 {
-	HTREEITEM hParent = GetViewItem();
-
-	/// Add virtual folders.
-	TCHAR buf[MAX_PATH + 1];
-	TCHAR buf2[MAX_PATH + 1];
-	GetModuleFileName(NULL, buf, MAX_PATH);
-	GetFilePath(buf2, buf);
-
-	TString sVFpath;
-	if (!sVFpath.Join(buf2, TOMBO_VFOLDER_DEF_FILE)) return FALSE;
-
-	TSParser tp;
-	tp.Parse(sVFpath.Get(), pView, hParent);
-
-	// Add grep results
-	TreeViewVirtualFolder *pVf;
-	VFDirectoryGenerator *pGen;
-	VFStore *pStore;
-	VFInfo *pInfo;
-	DWORD n = vbInfo.NumItems();
-	for (DWORD i = 0; i < n; i++) {
-		pInfo = vbInfo.GetUnit(i);
-		if (!StreamObjectsFactory(pInfo, &pVf, &pGen, &pStore)) return FALSE;
-
-		if (pVf == NULL) return FALSE;
-		pView->InsertFolder(hParent, pInfo->pName, pVf, TRUE);
-	}
+	VFExpandListener vfel(pView, this);
+	pManager->Enum(&vfel);
 
 	return TRUE;
 }
 
-BOOL TreeViewVirtualFolderRoot::StreamObjectsFactory(VFInfo *pInfo, TreeViewVirtualFolder **ppVf, VFDirectoryGenerator **ppGen, VFStore **ppStore)
+
+BOOL TreeViewVirtualFolderRoot::AddSearchResult(MemoSelectView *pView, const VFInfo *pInfo)
 {
-	// Initialize regex filter
-	VFRegexFilter *pRegex = new VFRegexFilter();
-	if (!pRegex->Init(pInfo->pRegex,
-					pInfo->nFlag & VFINFO_FLG_CASESENSITIVE,
-					pInfo->nFlag & VFINFO_FLG_CHECKCRYPTED,
-					pInfo->nFlag & VFINFO_FLG_FILENAMEONLY,
-					pInfo->nFlag & VFINFO_FLG_NEGATE,
-					g_pPasswordManager)) { // Password Manager
-		return FALSE;
-	}
-
-	// Initialize other objects
-	*ppVf = new TreeViewVirtualFolder();
-	*ppGen = new VFDirectoryGenerator();
-	*ppStore = new VFStore(VFStore::ORDER_TITLE);
-	LPTSTR pPath = StringDup(pInfo->pPath);
-	if (!pRegex || !*ppVf || !*ppGen || !*ppStore || !pPath ||
-		!(*ppGen)->Init(pPath, pInfo->nFlag & VFINFO_FLG_CHECKCRYPTED) ||
-		!(*ppStore)->Init()) { // pPassMgr
-		delete pRegex;
-		delete *ppVf;
-		delete *ppGen;
-		delete *ppStore;
-		delete [] pPath;
-		SetLastError(ERROR_NOT_ENOUGH_MEMORY);
-		return FALSE;
-	}
-
-	(*ppGen)->SetNext(pRegex);
-	pRegex->SetNext(*ppStore);
-	(*ppVf)->SetGenerator(*ppGen);
-	(*ppVf)->SetStore(*ppStore);
-
-	return TRUE;
-}
-
-BOOL TreeViewVirtualFolderRoot::AddSearchResult(MemoSelectView *pView, VFInfo *pInfo)
-{
-
 	HTREEITEM hParent = GetViewItem();
-	if (!vbInfo.Add(pInfo)) return FALSE;
-
 	if (!pView->IsExpand(hParent)) {
 		pView->ToggleExpandFolder(hParent, 0);
 	} else {
 		// insert tree manually
-		TreeViewVirtualFolder *pVf;
-		VFDirectoryGenerator *pGen;
-		VFStore *pStore;
-		if (!StreamObjectsFactory(pInfo, &pVf, &pGen, &pStore)) return FALSE;
-
-		if (!pView->InsertFolder(hParent, pInfo->pName, pVf, TRUE)) return FALSE;
+		VFExpandListener vfel(pView, this);
+		pManager->RetrieveInfo(pInfo, &vfel);
 	}
-
 	return TRUE;
 }
 

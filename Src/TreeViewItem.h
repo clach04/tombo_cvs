@@ -10,6 +10,8 @@ class VFStream;
 class MemoLoctor;
 class TreeViewVirtualFolder;
 class TString;
+class VFManager;
+class VFInfo;
 
 #include "MemoManager.h"
 #include "VarBuffer.h"
@@ -155,27 +157,6 @@ public:
 
 };
 
-/////////////////////////////////////////////
-//  Virtual folder definition
-/////////////////////////////////////////////
-
-#define VFINFO_FLG_CASESENSITIVE	1
-#define VFINFO_FLG_CHECKCRYPTED		2
-#define VFINFO_FLG_FILENAMEONLY		4
-#define VFINFO_FLG_PERSISTENT		8
-#define VFINFO_FLG_NEGATE			16
-
-class VFInfo {
-public:
-	VFInfo() : pName(NULL), pPath(NULL), pRegex(NULL) {}
-
-	void Release() { delete[] pName; delete[] pPath; delete[] pRegex; }
-
-	LPTSTR pName;
-	LPTSTR pPath;
-	LPTSTR pRegex;
-	DWORD nFlag;
-};
 
 /////////////////////////////////////////////
 //  File link
@@ -201,11 +182,11 @@ public:
 /////////////////////////////////////////////
 
 class TreeViewVirtualFolderRoot : public TreeViewFolderItem {
-	TVector<VFInfo> vbInfo;
+	VFManager *pManager;
 public:
 	TreeViewVirtualFolderRoot();
 	~TreeViewVirtualFolderRoot();
-	BOOL Init();
+	BOOL Init(VFManager *pManager);
 
 	DWORD GetIcon(MemoSelectView *pView, DWORD nStatus);
 
@@ -213,8 +194,8 @@ public:
 
 	////////////////////////////
 	// Virtual folder operator 
-	BOOL AddSearchResult(MemoSelectView *pView, VFInfo *p);
-	BOOL StreamObjectsFactory(VFInfo *pInfo, TreeViewVirtualFolder **ppVf, VFDirectoryGenerator **ppGen, VFStore **ppStore);
+	BOOL AddSearchResult(MemoSelectView *pView, const VFInfo *p);
+	BOOL InsertVirtualFolder(MemoSelectView *pView, LPCTSTR pName, VFDirectoryGenerator *pGen, VFStore *pStore);
 
 	class ItemIterator {
 		TreeViewVirtualFolderRoot *pRoot;

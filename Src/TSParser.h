@@ -5,6 +5,7 @@ class MemoSelectView;
 class ParseInfo;
 class VFStream;
 class TreeViewVirtualFolder;
+class VirtualFolderEnumListener;
 
 ////////////////////////////////////
 // TOMBO script parser
@@ -15,7 +16,7 @@ public:
 	TSParser();
 	~TSParser();
 
-	BOOL Parse(LPCTSTR pFileName, MemoSelectView *pView, HTREEITEM hItem);
+	BOOL Parse(LPCTSTR pFileName, VirtualFolderEnumListener *pListener);
 };
 
 ///////////////////////////////////////
@@ -62,18 +63,19 @@ public:
 ///////////////////////////////////////
 
 class ParseInfo {
-	MemoSelectView *pView;
-	HTREEITEM hItem;
-
 	BOOL bError;
 	TSParseTagItem *pTop;
 public:
 	////////////////////////
 	// ctor & dtor
 
-	ParseInfo() : bError(FALSE), pTop(NULL) {}
+	ParseInfo() : bError(FALSE), pTop(NULL), pListener(NULL) {}
 	~ParseInfo();
-	BOOL Init(MemoSelectView *p, HTREEITEM h);
+	BOOL Init(VirtualFolderEnumListener *pLsnr);
+
+	////////////////////////
+	// public vars
+	VirtualFolderEnumListener *pListener;
 
 	////////////////////////
 	// Error info
@@ -97,10 +99,6 @@ public:
 	////////////////////////
 	// Tag validation
 	BOOL IsValidParent(DWORD nTag);
-
-	////////////////////////
-	// insert tree
-	BOOL InsertTree(LPCTSTR pName, TreeViewVirtualFolder *pVF);
 };
 
 

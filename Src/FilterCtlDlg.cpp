@@ -8,6 +8,7 @@
 #include "TreeViewItem.h"
 #include "MemoSelectView.h"
 #include "FilterCtlDlg.h"
+#include "VFManager.h"
 
 static LRESULT CALLBACK FilterCtlDlgProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 
