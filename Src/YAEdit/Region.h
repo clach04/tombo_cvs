@@ -31,5 +31,6 @@ public:
 
 };
 
+inline int operator==(const Region &r1, const Region &r2) { return (r1.posStart == r2.posStart) && (r1.posEnd == r2.posEnd); }
 
 #endif
