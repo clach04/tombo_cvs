@@ -339,6 +339,8 @@ public:
 	void GetCurrentSelectedPath(MemoDetailsView *pView, TString *pPath);
 
 	void SetSearchFlg(BOOL bFlg);
+
+	void SetModifyStatus(BOOL bFlg);
 };
 
 void MFDetailsViewCallback::GetFocusCallback(MemoDetailsView *pView)
@@ -388,6 +390,12 @@ void MFDetailsViewCallback::SetSearchFlg(BOOL bFlg)
 {
 	pMainFrame->GetManager()->SetMDSearchFlg(bFlg);
 }
+
+void MFDetailsViewCallback::SetModifyStatus(BOOL bFlg)
+{
+	pMainFrame->SetModifyStatus(bFlg);
+}
+
 
 ///////////////////////////////////////////////////
 // Create main window
@@ -505,7 +513,6 @@ void MainFrame::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	pmPasswordMgr.Init(hMainWnd, hInstance);
 	g_pPassManager = &pmPasswordMgr;
 
-	mmMemoManager.SetPasswordManager(&pmPasswordMgr);
 	g_pPasswordManager = &pmPasswordMgr;
 
 	pPlatform = PLATFORM_TYPE::PlatformFactory();
@@ -1116,7 +1123,7 @@ void MainFrame::OpenDetailsView(LPCTSTR pURI, DWORD nSwitchView)
 		// ƒƒ‚‚ÍŠJ‚©‚È‚¢
 		return;
 	}
-	mmMemoManager.SetMemo(&uri);
+	pDetailsView->LoadNote(&uri);
 	SetNewMemoStatus(FALSE);
 
 	SetWindowTitle(&uri);
@@ -1146,7 +1153,7 @@ void MainFrame::LoadMemo(LPCTSTR pURI, BOOL bAskPass)
 		// and caller don't want to ask password, nothing to do
 		return;
 	}
-	mmMemoManager.SetMemo(&uri);
+	pDetailsView->LoadNote(&uri);
 	SetNewMemoStatus(FALSE);
 
 	SetWindowTitle(&uri);

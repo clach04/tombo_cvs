@@ -89,6 +89,7 @@ public:
 #ifdef _WIN32_WCE
 	static void WipeOutAndDelete(char *pMemo);
 #endif
+	static BOOL WipeOutAndDeleteFile(LPCTSTR pFile);
 
 	static DWORD IsNote(LPCTSTR pFile);
 

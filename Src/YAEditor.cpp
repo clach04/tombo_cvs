@@ -59,6 +59,12 @@ void YAEditor::SetFocus()
 	if (pEdit) pEdit->SetFocus();
 }
 
+void YAEditor::OnGetFocus()
+{
+	pCallback->GetFocusCallback(this);
+}
+
+
 LPTSTR YAEditor::GetMemo()
 {
 	DWORD nLen;

@@ -917,3 +917,9 @@ Finding and encrypting to the folder may not work.
 
 * Merge YAE module.
 * Only win32 version. other version will not be worked.
+
+////////////////////////////////
+// B176
+////////////////////////////////
+
+* Fix: Resource leak around YAE.

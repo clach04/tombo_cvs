@@ -6,6 +6,7 @@ class MemoManager;
 class MemoDetailsView;
 class SearchEngineA;
 class TString;
+class TomboURI;
 
 ///////////////////////////////////////
 // Callback handler
@@ -18,6 +19,8 @@ public:
 	virtual void SetReadOnlyStatusCallback(MemoDetailsView *pView) = 0;
 
 	virtual void SetSearchFlg(BOOL bFlg) = 0;
+
+	virtual void SetModifyStatus(BOOL bFlg) = 0;
 
 	virtual SearchEngineA *GetSearchEngine(MemoDetailsView *pView) = 0;
 	virtual void GetCurrentSelectedPath(MemoDetailsView *pView, TString *pPath) = 0;
@@ -68,10 +71,14 @@ public:
 
 	virtual BOOL Search(BOOL bFirstSearch, BOOL bForward, BOOL bNFMsg, BOOL bSearchFromTop) = 0;
 
+	BOOL Save(const TomboURI *pCurrentURI, TomboURI *pNewURI, TString *pNewHeadLine, LPCTSTR pText);
+
 	LPCTSTR GetCurrentURI();
 	void SetCurrentNote(LPCTSTR pURI);
 
+	BOOL StoreCursorPos();
 	BOOL ClearMemo();
+	BOOL LoadNote(const TomboURI *pURI);
 };
 
 //////////////////////////////////////////

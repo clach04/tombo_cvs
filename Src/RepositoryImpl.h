@@ -25,7 +25,7 @@ public:
 
 	virtual BOOL Create(const TomboURI *pTemplate, LPCTSTR pData, TString *pRealHeadLine, TomboURI *pAllocedURI) = 0;
 
-	virtual BOOL Update(TomboURI *pCurrentURI, LPCTSTR pData, TomboURI *pNewURI, TString *pNewHeadLine) = 0;
+	virtual BOOL Update(const TomboURI *pCurrentURI, LPCTSTR pData, TomboURI *pNewURI, TString *pNewHeadLine) = 0;
 	virtual BOOL Delete(const TomboURI *pURI, URIOption *pOption) = 0;
 	virtual BOOL Copy(const TomboURI *pCopyFrom, const TomboURI *pCopyTo, URIOption *pOption) = 0;
 	virtual BOOL Move(const TomboURI *pMoveFrom, const TomboURI *pMoveTo, URIOption *pOption) = 0;
@@ -42,6 +42,11 @@ public:
 	virtual BOOL GetList(const TomboURI *pFolder, DirList *pList, BOOL bSkipEncrypt) = 0;
 
 	virtual BOOL RequestAllocateURI(LPCTSTR pMemoPath, LPCTSTR pText, TString *pHeadLine, TomboURI *pURI, const TomboURI *pTemplateURI) = 0;
+
+	virtual BOOL GetAttribute(const TomboURI *pURI, NoteAttribute *pAttribute) = 0;
+	virtual BOOL SetAttribute(const TomboURI *pURI, const NoteAttribute *pAttribute) = 0;
+
+	virtual LPTSTR GetNoteData(const TomboURI *pURI) = 0;
 
 	////////////////////////////
 	// helper function
@@ -93,7 +98,7 @@ public:
 	// impliment RepositoryImpl methods
 
 	BOOL Create(const TomboURI *pTemplate, LPCTSTR pData, TString *pRealHeadLine, TomboURI *pAllocedURI);
-	BOOL Update(TomboURI *pCurrentURI, LPCTSTR pData, TomboURI *pNewURI, TString *pNewHeadLine);
+	BOOL Update(const TomboURI *pCurrentURI, LPCTSTR pData, TomboURI *pNewURI, TString *pNewHeadLine);
 	BOOL Delete(const TomboURI *pURI, URIOption *pOption);
 	BOOL Copy(const TomboURI *pCopyFrom, const TomboURI *pCopyTo, URIOption *pOption);
 	BOOL Move(const TomboURI *pMoveFrom, const TomboURI *pMoveTo, URIOption *pOption);
@@ -111,6 +116,12 @@ public:
 	BOOL GetList(const TomboURI *pFolder, DirList *pList, BOOL bSkipEncrypt);
 
 	BOOL RequestAllocateURI(LPCTSTR pMemoPath, LPCTSTR pText, TString *pHeadLine, TomboURI *pURI, const TomboURI *pTemplateURI);
+
+	BOOL GetAttribute(const TomboURI *pURI, NoteAttribute *pAttribute);
+	BOOL SetAttribute(const TomboURI *pURI, const NoteAttribute *pAttribute);
+
+	LPTSTR GetNoteData(const TomboURI *pURI);
+
 };
 
 #endif

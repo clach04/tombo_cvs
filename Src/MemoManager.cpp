@@ -82,26 +82,6 @@ BOOL MemoManager::GetCurrentSelectedPath(TString *pPath)
 	return TRUE;
 }
 
-/////////////////////////////////////////////
-// ファイルのWipeOutと削除
-/////////////////////////////////////////////
-
-BOOL MemoManager::WipeOutAndDeleteFile(LPCTSTR pFile)
-{
-	File delf;
-	if (!delf.Open(pFile, GENERIC_WRITE, 0, OPEN_ALWAYS)) return FALSE;
-
-	DWORD nSize = delf.FileSize() / 64 + 1;
-	BYTE buf[64];
-	for (DWORD i = 0; i < 64; i++) buf[i] = 0;
-
-	for (i = 0; i < nSize; i++) {
-		delf.Write(buf, 64);
-	}
-	delf.Close();
-	return DeleteFile(pFile);
-}
-
 ////////////////////////////////////////////////////////
 // フォルダの新規作成
 ////////////////////////////////////////////////////////
@@ -154,7 +134,7 @@ BOOL MemoManager::SaveIfModify(LPDWORD pYNC, BOOL bDupMode)
 
 	// skip saving if not modified or read only
 	if (!pMemoDetailsView->IsModify() || pMemoDetailsView->IsReadOnly()) {
-		StoreCursorPos();
+		pMemoDetailsView->StoreCursorPos();
 		return TRUE;
 	}
 
@@ -194,24 +174,20 @@ BOOL MemoManager::SaveIfModify(LPDWORD pYNC, BOOL bDupMode)
 	TomboURI sCurrentURI;
 	if (!sCurrentURI.Init(pMemoDetailsView->pCurrentURI)) return FALSE;
 
+
 	TomboURI sNewURI;
 	TString sNewHeadLine;
 
-	if (!g_Repository.Update(&sCurrentURI, pText, &sNewURI, &sNewHeadLine)) return FALSE;
+	// save note contents
+	if (!pMemoDetailsView->Save(&sCurrentURI, &sNewURI, &sNewHeadLine, pText)) return FALSE;
 
-	pMemoDetailsView->ResetModify();
 	// UpdateHeadLine causes TVN_SELCHANGING and call SaveIfModify.
 	// So if not ResetModify is called, infinite calling causes GPF.
+	// update treeview headline string
+	pMemoSelectView->UpdateHeadLine(sCurrentURI.GetFullURI(), &sNewURI, sNewHeadLine.Get());
 
-	// update headline string
-	pMemoSelectView->UpdateHeadLine(pMemoDetailsView->pCurrentURI, &sNewURI, sNewHeadLine.Get());
-
-	pMainFrame->SetModifyStatus(FALSE);
-	pMemoDetailsView->SetCurrentNote(sNewURI.GetFullURI());
-
+	// update window title
 	pMainFrame->SetWindowTitle(&sNewURI);
-	// save caret position
-	StoreCursorPos();
 
 	return TRUE;
 }
@@ -267,55 +243,6 @@ BOOL MemoManager::AllocNewMemo(LPCTSTR pText, LPCTSTR pTemplateURI)
 }
 
 ////////////////////////////////////////////////////////
-// メモ内容の表示
-////////////////////////////////////////////////////////
-
-BOOL MemoManager::SetMemo(TomboURI *pURI)
-{
-	MemoNote *pNote = MemoNote::MemoNoteFactory(pURI);
-	if (pNote == NULL) return FALSE;
-
-	BOOL bLoop = FALSE;
-	LPTSTR p;
-
-	do {
-		bLoop = FALSE;
-		p = pNote->GetMemoBody(pPassMgr);
-		if (p == NULL) {
-			DWORD nError = GetLastError();
-			if (nError == ERROR_INVALID_PASSWORD) {
-				bLoop = TRUE;
-			} else {
-				pMemoDetailsView->SetMemo(MSG_CANT_OPEN_MEMO, 0, TRUE);
-				delete pNote;
-				return TRUE;
-			}
-		}
-	} while (bLoop);
-
-	MemoInfo mi(g_Property.TopDir());
-	DWORD nPos = 0;
-	if (pNote && pNote->MemoPath()) {
-		if (!mi.ReadInfo(pNote->MemoPath(), &nPos)) nPos = 0;
-	}
-	BOOL bReadOnly;
-	if (!g_Property.OpenReadOnly()) {
-		if (!pNote->IsReadOnly(&bReadOnly)) {
-			delete pNote;
-			return FALSE;
-		}
-	} else {
-		bReadOnly = TRUE;
-	}
-	pMemoDetailsView->SetMemo(p, nPos, bReadOnly);
-	MemoNote::WipeOutAndDelete(p);
-	pMemoDetailsView->SetCurrentNote(pURI->GetFullURI());
-
-	delete pNote;
-	return TRUE;
-}
-
-////////////////////////////////////////////////////////
 // 新規メモの作成
 ////////////////////////////////////////////////////////
 
@@ -334,28 +261,6 @@ BOOL MemoManager::NewMemo()
 BOOL MemoManager::ClearMemo()
 {
 	return pMemoDetailsView->ClearMemo();
-}
-
-////////////////////////////////////////////////////////
-// Save cursor position
-////////////////////////////////////////////////////////
-
-BOOL MemoManager::StoreCursorPos()
-{
-	if (g_Property.KeepCaret()) {
-
-		DWORD nPos = pMemoDetailsView->GetCursorPos();
-		DWORD nInitPos = pMemoDetailsView->GetInitialPos();
-
-		MemoInfo mi(g_Property.TopDir());
-		if (pMemoDetailsView->pCurrentURI && nPos != nInitPos) {
-			MemoNote *pNote = MemoNote::MemoNoteFactory(pMemoDetailsView->pCurrentURI);
-			if (pNote == NULL) return FALSE;
-			mi.WriteInfo(pNote->MemoPath(), nPos);
-			delete pNote;
-		}
-	}
-	return TRUE;
 }
 
 ////////////////////////////////////////////////////////

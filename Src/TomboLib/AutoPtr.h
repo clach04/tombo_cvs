@@ -12,4 +12,15 @@ public:
 	void releaseAndSet(T* p) { delete pPtr; pPtr = p; }
 };
 
+class SecureBufferAutoPointerT {
+	LPTSTR pPtr;
+public:
+	SecureBufferAutoPointerT(LPTSTR p) : pPtr(p) {}
+	~SecureBufferAutoPointerT() {
+		if (pPtr == NULL) return;
+		LPTSTR q = pPtr;
+		while(*q) *q++ = TEXT('\0');
+		delete [] pPtr;
+	}
+};
 #endif

@@ -45,7 +45,7 @@ BOOL Repository::Create(const TomboURI *pTemplate, LPCTSTR pData,
 	return pDefaultImpl->Create(pTemplate, pData, pRealHeadLine, pAllocedURI);
 }
 
-BOOL Repository::Update(TomboURI *pCurrentURI, LPCTSTR pData, 
+BOOL Repository::Update(const TomboURI *pCurrentURI, LPCTSTR pData, 
 						TomboURI *pNewURI, TString *pNewHeadLine)
 {
 	return pDefaultImpl->Update(pCurrentURI, pData, pNewURI, pNewHeadLine);
@@ -104,6 +104,21 @@ BOOL Repository::GetList(const TomboURI *pFolder, DirList *pList, BOOL bSkipEncr
 BOOL Repository::RequestAllocateURI(LPCTSTR pMemoPath, LPCTSTR pText, TString *pHeadLine, TomboURI *pURI, const TomboURI *pTemplateURI)
 {
 	return pDefaultImpl->RequestAllocateURI(pMemoPath, pText, pHeadLine, pURI, pTemplateURI);
+}
+
+BOOL Repository::GetAttribute(const TomboURI *pURI, NoteAttribute *pAttribute)
+{
+	return pDefaultImpl->GetAttribute(pURI, pAttribute);
+}
+
+BOOL Repository::SetAttribute(const TomboURI *pURI, const NoteAttribute *pAttribute)
+{
+	return pDefaultImpl->SetAttribute(pURI, pAttribute);
+}
+
+LPTSTR Repository::GetNoteData(const TomboURI *pURI)
+{
+	return pDefaultImpl->GetNoteData(pURI);
 }
 
 /////////////////////////////////////////

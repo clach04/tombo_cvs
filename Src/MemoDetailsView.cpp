@@ -5,6 +5,7 @@
 #include <aygshell.h>
 #endif
 #include "Tombo.h"
+#include "AutoPtr.h"
 #include "MemoManager.h"
 #include "VarBuffer.h"
 #include "MainFrame.h"
@@ -15,7 +16,8 @@
 #include "Property.h"
 #include "SearchEngine.h"
 #include "Message.h"
-
+#include "TomboURI.h"
+#include "Repository.h"
 
 static BOOL GetDateText(TString *pInsStr, LPCTSTR pFormat, TString *pPath);
 
@@ -68,6 +70,56 @@ BOOL MemoDetailsView::ClearMemo()
 {
 	SetMemo(TEXT(""), 0, FALSE);
 	SetCurrentNote(NULL);
+	return TRUE;
+}
+
+BOOL MemoDetailsView::StoreCursorPos()
+{
+	if (g_Property.KeepCaret()) {
+
+		DWORD nPos = GetCursorPos();
+		DWORD nInitPos = GetInitialPos();
+
+		if (pCurrentURI && nPos != nInitPos) {
+			NoteAttribute attr;
+			attr.nCursorPos = nPos;
+
+			TomboURI sCurrentURI;
+			if (!sCurrentURI.Init(pCurrentURI)) return FALSE;
+
+			if (!g_Repository.SetAttribute(&sCurrentURI, &attr)) return FALSE;
+		}
+	}
+	return TRUE;
+}
+
+BOOL MemoDetailsView::LoadNote(const TomboURI *pURI)
+{
+	// load note data and attribute
+	LPTSTR p = g_Repository.GetNoteData(pURI);
+	if (p == NULL) {
+		SetMemo(MSG_CANT_OPEN_MEMO, 0, TRUE);
+		return TRUE;
+	}
+	SecureBufferAutoPointerT sp(p);
+
+	NoteAttribute attr;
+	if (!g_Repository.GetAttribute(pURI, &attr)) return FALSE;
+
+	// set memo to view
+	SetMemo(p, attr.nCursorPos, attr.bReadOnly);
+	SetCurrentNote(pURI->GetFullURI());
+
+	return TRUE;
+}
+
+BOOL MemoDetailsView::Save(const TomboURI *pCurrentURI, TomboURI *pNewURI, TString *pNewHeadLine, LPCTSTR pText)
+{
+	if (!g_Repository.Update(pCurrentURI, pText, pNewURI, pNewHeadLine)) return FALSE;
+	ResetModify();
+	StoreCursorPos();
+	pCallback->SetModifyStatus(FALSE);
+	SetCurrentNote(pNewURI->GetFullURI());
 	return TRUE;
 }
 

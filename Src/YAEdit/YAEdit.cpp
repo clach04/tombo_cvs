@@ -33,6 +33,7 @@
 #define CHARA_CTRL_X 24
 #define CHARA_BS 8
 #define CHARA_ENTER 13
+#define CHARA_ESC 27
 
 /////////////////////////////////////////////////////////////////////////////
 // static funcs/vars declarations
@@ -444,6 +445,10 @@ void YAEdit::OnChar(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	}
 	if (ch == CHARA_CTRL_S) {
 		// nop
+		return;
+	}
+	if (ch == CHARA_ESC) {
+		Sleep(1);
 		return;
 	}
 

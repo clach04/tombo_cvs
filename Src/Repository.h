@@ -9,6 +9,8 @@ class URIOption;
 class RepositoryOption;
 class DirList;
 
+class NoteAttribute;
+
 /////////////////////////////////////////
 // Option flag definitions
 /////////////////////////////////////////
@@ -67,7 +69,7 @@ public:
 
 	BOOL Create(const TomboURI *pTemplate, LPCTSTR pData, TString *pRealHeadLine, TomboURI *pAllocedURI);
 
-	BOOL Update(TomboURI *pCurrentURI, LPCTSTR pData, TomboURI *pNewURI, TString *pNewHeadLine);
+	BOOL Update(const TomboURI *pCurrentURI, LPCTSTR pData, TomboURI *pNewURI, TString *pNewHeadLine);
 	BOOL GetHeadLine(const TomboURI *pURI, TString *pHeadLine);
 
 	BOOL Delete(const TomboURI *pURI, URIOption *pOption);
@@ -99,12 +101,6 @@ public:
 	// This method may be not supported by some RepositoryImpl type.
 	BOOL GetPhysicalPath(const TomboURI *pURI, TString *pFullPath);
 
-	/////////////////////////////
-	// helper function
-
-	// Check the URI data is encrypted
-	BOOL IsEncrypted(const TomboURI *pURI);
-
 	// Get URI the a item attached to.
 	// ex. :  tombo://repo/a/b/c/ -> tombo://repo/a/b/c/
 	//     :  tombo://repo/a/b/c/d.txt -> tombo://repo/a/b/c/
@@ -113,8 +109,22 @@ public:
 	// Get notes under the url.
 	BOOL GetList(const TomboURI *pFolder, DirList *pList, BOOL bSkipEncrypt);
 
-	// 
+	// Decide URI
 	BOOL RequestAllocateURI(LPCTSTR pMemoPath, LPCTSTR pText, TString *pHeadLine, TomboURI *pURI, const TomboURI *pTemplateURI);
+
+	////////////////////////////
+	// File attribute functions
+
+	BOOL GetAttribute(const TomboURI *pURI, NoteAttribute *pAttribute);
+	BOOL SetAttribute(const TomboURI *pURI, const NoteAttribute *pAttribute);
+
+	LPTSTR GetNoteData(const TomboURI *pURI);
+
+	/////////////////////////////
+	// helper function
+
+	// Check the URI data is encrypted
+	BOOL IsEncrypted(const TomboURI *pURI);
 };
 
 //////////////////////////////////////////////////////////////
@@ -137,6 +147,16 @@ public:
 	// if these value is not set by NULL, delete when NoteOption is deleted.
 	TString *pNewHeadLine;
 	TomboURI *pNewURI;
+};
+
+//////////////////////////////////////////////////////////////
+// File Attribute
+//////////////////////////////////////////////////////////////
+
+class NoteAttribute {
+public:
+	DWORD nCursorPos;
+	BOOL bReadOnly;
 };
 
 

@@ -5,6 +5,7 @@
 #include "UniConv.h"
 #include "TString.h"
 #include "TomboURI.h"
+#include "Property.h"
 #include "Repository.h"
 #include "RepositoryImpl.h"
 
@@ -77,7 +78,7 @@ BOOL LocalFileRepository::Create(const TomboURI *pTemplate, LPCTSTR pData, TStri
 // Update note
 /////////////////////////////////////////
 
-BOOL LocalFileRepository::Update(TomboURI *pCurrentURI, LPCTSTR pData, 
+BOOL LocalFileRepository::Update(const TomboURI *pCurrentURI, LPCTSTR pData, 
 								 TomboURI *pNewURI, TString *pNewHeadLine)
 {
 	if (!Save(pCurrentURI, pData, pNewURI, pNewHeadLine)) {
@@ -808,4 +809,68 @@ BOOL LocalFileRepository::RequestAllocateURI(LPCTSTR pMemoPath, LPCTSTR pText, T
 	if (!pNote->GetURI(pURI)) return FALSE;
 
 	return TRUE;
+}
+
+BOOL LocalFileRepository::GetAttribute(const TomboURI *pURI, NoteAttribute *pAttribute)
+{
+	MemoNote *pNote = MemoNote::MemoNoteFactory(pURI);
+	if (pNote == NULL) return FALSE;
+	AutoPointer<MemoNote> ap(pNote);
+
+	MemoInfo mi(pTopDir);
+	DWORD nPos = 0;
+	if (pNote->MemoPath()) {
+		if (!mi.ReadInfo(pNote->MemoPath(), &nPos)) nPos = 0;
+	}
+	pAttribute->nCursorPos = nPos;
+
+	BOOL bReadOnly;
+	if (!g_Property.OpenReadOnly()) {
+		if (!pNote->IsReadOnly(&bReadOnly)) {
+			return FALSE;
+		}
+	} else {
+		bReadOnly = TRUE;
+	}
+	pAttribute->bReadOnly = bReadOnly;
+
+	return TRUE;
+}
+
+BOOL LocalFileRepository::SetAttribute(const TomboURI *pURI, const NoteAttribute *pAttribute)
+{
+	MemoNote *pNote = MemoNote::MemoNoteFactory(pURI);
+	if (pNote == NULL) return FALSE;
+	AutoPointer<MemoNote> ap(pNote);
+
+	MemoInfo mi(pTopDir);
+
+	if (pNote == NULL) return FALSE;
+	mi.WriteInfo(pNote->MemoPath(), pAttribute->nCursorPos);
+
+	return TRUE;
+}
+
+LPTSTR LocalFileRepository::GetNoteData(const TomboURI *pURI)
+{
+	MemoNote *pNote = MemoNote::MemoNoteFactory(pURI);
+	if (pNote == NULL) return FALSE;
+	AutoPointer<MemoNote> ap(pNote);
+
+	BOOL bLoop = FALSE;
+	LPTSTR p;
+
+	do {
+		bLoop = FALSE;
+		p = pNote->GetMemoBody(g_pPassManager);
+		if (p == NULL) {
+			DWORD nError = GetLastError();
+			if (nError == ERROR_INVALID_PASSWORD) {
+				bLoop = TRUE;
+			} else {
+				return NULL;
+			}
+		}
+	} while (bLoop);
+	return p;
 }

@@ -279,7 +279,7 @@ MemoNote *CryptedMemoNote::Decrypt(PasswordManager *pMgr, TString *pHeadLine, BO
 	// 新しいMemoNoteインスタンスを生成
 	PlainMemoNote *p = new PlainMemoNote();
 	if (!p->Init(pNotePath)) {
-		MemoManager::WipeOutAndDeleteFile(sFullPath.Get());
+		MemoNote::WipeOutAndDeleteFile(sFullPath.Get());
 		return NULL;
 	}
 
@@ -310,7 +310,7 @@ BOOL MemoNote::DeleteMemoData() const
 		mi.DeleteInfo(MemoPath());
 	}
 
-	return MemoManager::WipeOutAndDeleteFile(sFileName.Get());
+	return MemoNote::WipeOutAndDeleteFile(sFileName.Get());
 }
 
 /////////////////////////////////////////////
@@ -628,6 +628,26 @@ DWORD MemoNote::IsNote(LPCTSTR pFile)
 		nType = NOTE_TYPE_NO;
 	}
 	return nType;
+}
+
+/////////////////////////////////////////////
+// Clear file contents and delete it
+/////////////////////////////////////////////
+
+BOOL MemoNote::WipeOutAndDeleteFile(LPCTSTR pFile)
+{
+	File delf;
+	if (!delf.Open(pFile, GENERIC_WRITE, 0, OPEN_ALWAYS)) return FALSE;
+
+	DWORD nSize = delf.FileSize() / 64 + 1;
+	BYTE buf[64];
+	for (DWORD i = 0; i < 64; i++) buf[i] = 0;
+
+	for (i = 0; i < nSize; i++) {
+		delf.Write(buf, 64);
+	}
+	delf.Close();
+	return DeleteFile(pFile);
 }
 
 /////////////////////////////////////////////

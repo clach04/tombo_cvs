@@ -43,7 +43,7 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /YX /FD /c
-# ADD CPP /nologo /W3 /GX /O2 /I "../../Src" /I "../../Src/regex" /I "./res" /I "../../expat/include/" /I "../../Src/TomboLib" /I "." /D "NDEBUG" /D "TOMBO" /D "PLATFORM_WIN32" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /YX /FD /c
+# ADD CPP /nologo /W3 /GX /O2 /I "../../lib/" /I "../../Src" /I "../../Src/regex" /I "./res" /I "../../expat/include/" /I "../../Src/TomboLib" /I "../../Src/YAEdit" /I "." /D "NDEBUG" /D "TOMBO" /D "PLATFORM_WIN32" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /YX /FD /c
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x411 /d "NDEBUG"
@@ -53,7 +53,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /machine:I386
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib comctl32.lib /nologo /subsystem:windows /machine:I386 /nodefaultlib:"LIBCMT.LIB"
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib comctl32.lib imm32.lib /nologo /subsystem:windows /machine:I386 /nodefaultlib:"LIBCMT.LIB"
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 Debug"
 
@@ -136,14 +136,6 @@ SOURCE=..\..\Src\DirList.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\Src\TomboLib\File.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\TomboLib\FileInputStream.cpp
-# End Source File
-# Begin Source File
-
 SOURCE=..\..\Src\FileSelector.cpp
 # End Source File
 # Begin Source File
@@ -168,26 +160,6 @@ SOURCE=..\..\Src\GrepDialog.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\Src\YAEdit\LineManager.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\YAEdit\LineWrapper.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\YAEdit\LineWrapperImpl.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\TomboLib\List.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\TomboLib\Logger.cpp
-# End Source File
-# Begin Source File
-
 SOURCE=..\..\Src\main.cpp
 # End Source File
 # Begin Source File
@@ -197,10 +169,6 @@ SOURCE=..\..\Src\MainFrame.cpp
 # Begin Source File
 
 SOURCE=..\..\Src\gnupg\md5.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\YAEdit\MemManager.cpp
 # End Source File
 # Begin Source File
 
@@ -346,22 +314,6 @@ SOURCE=..\..\Src\VFStream.cpp
 
 SOURCE=..\..\Src\Win32Platform.cpp
 # End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\YAEdit\YAEdit.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\YAEdit\YAEditDoc.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\YAEditor.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\YAEdit\YAEditView.cpp
-# End Source File
 # End Group
 # Begin Group "Header Files"
 
@@ -369,10 +321,6 @@ SOURCE=..\..\Src\YAEdit\YAEditView.cpp
 # Begin Source File
 
 SOURCE=..\..\Src\AboutDialog.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\TomboLib\AutoPtr.h
 # End Source File
 # Begin Source File
 
@@ -420,14 +368,6 @@ SOURCE=..\..\expat\include\expat.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\Src\TomboLib\File.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\TomboLib\FileInputStream.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\..\Src\FileSelector.h
 # End Source File
 # Begin Source File
@@ -452,31 +392,7 @@ SOURCE=..\..\Src\GrepDialog.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\Src\YAEdit\LineManager.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\YAEdit\LineWrapper.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\YAEdit\LineWrapperImpl.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\TomboLib\List.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\TomboLib\Logger.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\..\Src\MainFrame.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\YAEdit\MemManager.h
 # End Source File
 # Begin Source File
 
@@ -618,22 +534,6 @@ SOURCE=..\..\Src\VFStream.h
 
 SOURCE=..\..\Src\Win32Platform.h
 # End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\YAEdit\YAEdit.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\YAEdit\YAEditDoc.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\YAEditor.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\YAEdit\YAEditView.h
-# End Source File
 # End Group
 # Begin Group "Resource Files"
 
@@ -693,6 +593,114 @@ SOURCE=.\res\toolbar.bmp
 # Begin Source File
 
 SOURCE=.\toolbar.bmp
+# End Source File
+# End Group
+# Begin Group "YAEdit"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\..\Src\YAEdit\LineManager.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\YAEdit\LineManager.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\YAEdit\LineWrapper.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\YAEdit\LineWrapper.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\YAEdit\LineWrapperImpl.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\YAEdit\LineWrapperImpl.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\YAEdit\MemManager.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\YAEdit\MemManager.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\YAEdit\YAEdit.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\YAEdit\YAEdit.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\YAEdit\YAEditDoc.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\YAEdit\YAEditDoc.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\YAEditor.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\YAEditor.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\YAEdit\YAEditView.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\YAEdit\YAEditView.h
+# End Source File
+# End Group
+# Begin Group "utils"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\..\Src\TomboLib\AutoPtr.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\TomboLib\File.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\TomboLib\File.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\TomboLib\FileInputStream.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\TomboLib\FileInputStream.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\TomboLib\List.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\TomboLib\List.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\TomboLib\Logger.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\TomboLib\Logger.h
 # End Source File
 # End Group
 # Begin Source File

@@ -48,7 +48,7 @@ public:
 
 	BOOL OnCommand(HWND hWnd, WPARAM wParam, LPARAM lParam);
 	BOOL OnHotKey(HWND hWnd, WPARAM wParam) { return TRUE; }
-	void OnGetFocus() {}
+	void OnGetFocus();
 
 	DWORD GetCursorPos() { return 0; }
 	DWORD GetInitialPos() { return 0; }

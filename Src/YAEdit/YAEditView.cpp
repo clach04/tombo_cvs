@@ -97,6 +97,7 @@ static void DrawZenkakuSpace(HDC hDC, RECT *pRect, COLORREF color)
 	Polyline(hDC, pt, 5);
 
 	SelectObject(hDC, hOld);
+	DeleteObject(hPen);
 }
 
 static void DrawTab(HDC hDC, RECT *pRect, COLORREF color)
@@ -158,6 +159,7 @@ static void DrawEOL(HDC hDC, LPRECT pRect, COLORREF color)
 		}
 	}
 	SelectObject(hDC, hOld);
+	DeleteObject(hPen);
 }
 
 static void DrawLEOL(HDC hDC, LPRECT pRect, COLORREF color)
@@ -182,6 +184,7 @@ static void DrawLEOL(HDC hDC, LPRECT pRect, COLORREF color)
 		}
 	}
 	SelectObject(hDC, hOld);
+	DeleteObject(hPen);
 }
 
 void YAEditView::DrawEndLineMark(HDC hDC, DWORD wStartPos, DWORD nMaxLine, RECT *pRect, LineChunk *pChunk)

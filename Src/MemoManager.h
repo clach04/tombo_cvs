@@ -21,7 +21,6 @@ protected:
 	MemoDetailsView *pMemoDetailsView;
 	MemoSelectView *pMemoSelectView;
 	MainFrame *pMainFrame;
-	PasswordManager *pPassMgr;
 
 	BOOL AllocNewMemo(LPCTSTR pText, LPCTSTR pTemplateURI = NULL);
 
@@ -41,12 +40,8 @@ public:
 	// 初期化関連
 
 	BOOL Init(MainFrame *p, MemoDetailsView *md, MemoSelectView *ms);
-	void SetPasswordManager(PasswordManager *p) { pPassMgr = p; }
 
 	/////////////////////////////////////
-
-	// ファイルを削除する。削除時に元の内容を0クリアする
-	static BOOL WipeOutAndDeleteFile(LPCTSTR pFile);
 
 	// 新規メモの作成
 	BOOL NewMemo();
@@ -60,15 +55,10 @@ public:
 	//				  bDupModeがFALSEの場合には通常動作
 	BOOL SaveIfModify(LPDWORD pYNC, BOOL bDupMode);
 
-	// メモのロード
-	BOOL SetMemo(TomboURI *pURI);
-
 	// メモのクリア
 	BOOL ClearMemo();
 
 	BOOL MakeNewFolder(HWND hWnd, TreeViewItem *pItem);	// フォルダの新規作成
-
-	BOOL StoreCursorPos();
 
 	// 指定したメモが現在詳細ビューで表示されているか
 	BOOL IsNoteDisplayed(LPCTSTR pURI);
@@ -85,8 +75,6 @@ public:
 
 	/////////////////////////////////////
 	// data accessor
-
-	PasswordManager *GetPasswordManager() { return pPassMgr; }
 
 	MainFrame *GetMainFrame() { return pMainFrame; }
 

@@ -153,6 +153,7 @@ public:
 	// forcus window
 	void OnSetFocus();
 	void OnKillFocus();
+	void OnGetFocus();
 
 	////////////////////////////////////////////////////
 	// Region related members
