@@ -32,6 +32,7 @@
 #define IDD_SEARCHING                   123
 #define IDD_GREPTAB_MAIN                124
 #define IDD_GREPTAB_PERSIST             125
+#define IDD_FILTERCTL                   126
 #define IDM_MAIN_MENUITEM1              401
 #define IDM_MAIN_MENUITEM2              402
 #define IDS_MAIN_MENUITEM1              410
@@ -77,6 +78,11 @@
 #define IDC_GREPTAB_MAIN_FILENAME       1038
 #define IDC_GREPTAB_MAIN_STARTDIR       1039
 #define IDC_PROP_READONLY               1040
+#define IDC_FILTERCTL_LIST              1041
+#define IDC_FILTERCTL_KEEP              1042
+#define IDC_FILTERCTL_UP                1043
+#define IDC_FILTERCTL_DOWN              1044
+#define IDC_FILTERCTL_NEW               1045
 #define IDM_ACTIONBUTTON                30001
 #define IDM_FILE_EXIT                   40002
 #define IDM_HELP_ABOUT                  40003
@@ -132,14 +138,15 @@
 #define IDM_TOGGLEREADONLY              40054
 #define IDM_UNDO                        40055
 #define IDM_GREP                        40056
+#define IDM_VFOLDER_DEF                 40057
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        126
-#define _APS_NEXT_COMMAND_VALUE         40057
-#define _APS_NEXT_CONTROL_VALUE         1041
+#define _APS_NEXT_RESOURCE_VALUE        127
+#define _APS_NEXT_COMMAND_VALUE         40058
+#define _APS_NEXT_CONTROL_VALUE         1046
 #define _APS_NEXT_SYMED_VALUE           108
 #endif
 #endif

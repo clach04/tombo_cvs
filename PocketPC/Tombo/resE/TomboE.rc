@@ -108,6 +108,7 @@ BEGIN
         MENUITEM "Find Prev",                   IDM_SEARCH_PREV
         MENUITEM SEPARATOR
         MENUITEM "Grep",                        IDM_GREP
+        MENUITEM "Virtual folder",              IDM_VFOLDER_DEF
         MENUITEM SEPARATOR
         MENUITEM "Encrypt",                     IDM_ENCRYPT, GRAYED
         MENUITEM "Decrypt",                     IDM_DECRYPT, GRAYED
@@ -378,6 +379,22 @@ FONT 9, "System"
 BEGIN
 END
 
+IDD_DIALOG1 DIALOG DISCARDABLE  0, 0, 139, 96
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Dialog"
+FONT 9, "System"
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,5,80,40,14
+    PUSHBUTTON      "Cancel",IDCANCEL,50,80,40,14
+    CONTROL         "List1",IDC_FILTERCTL_LIST,"SysListView32",LVS_REPORT | 
+                    LVS_SHOWSELALWAYS | WS_BORDER | WS_TABSTOP,0,5,95,65
+    CONTROL         "Save",IDC_FILTERCTL_KEEP,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,100,5,31,10
+    PUSHBUTTON      "Up",IDC_FILTERCTL_UP,100,20,20,14
+    PUSHBUTTON      "DN",IDC_FILTERCTL_DOWN,100,40,20,14
+    PUSHBUTTON      "New",IDC_FILTERCTL_NEW,100,60,35,14
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -497,6 +514,14 @@ BEGIN
         RIGHTMARGIN, 114
         TOPMARGIN, 7
         BOTTOMMARGIN, 114
+    END
+
+    IDD_DIALOG1, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 132
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 89
     END
 END
 #endif    // APSTUDIO_INVOKED

@@ -52,6 +52,7 @@ BEGIN
         MENUITEM "前を検索\tShift+F3",          IDM_SEARCH_PREV
         MENUITEM SEPARATOR
         MENUITEM "Grep\tCtrl+G",                IDM_GREP
+        MENUITEM "仮想フォルダ",                IDM_VFOLDER_DEF
         MENUITEM SEPARATOR
         MENUITEM "日付1\tCtrl+1",               IDM_INSDATE1, GRAYED
         MENUITEM "日付2\tCtrl+2",               IDM_INSDATE2, GRAYED
@@ -345,6 +346,22 @@ BEGIN
                     BS_AUTOCHECKBOX | WS_TABSTOP,5,5,42,10
 END
 
+IDD_FILTERCTL DIALOG DISCARDABLE  0, 0, 163, 119
+STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "仮想フォルダの設定"
+FONT 9, "ＭＳ Ｐゴシック"
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,20,100,50,14
+    PUSHBUTTON      "ｷｬﾝｾﾙ",IDCANCEL,75,100,50,14
+    CONTROL         "List1",IDC_FILTERCTL_LIST,"SysListView32",LVS_REPORT | 
+                    LVS_SHOWSELALWAYS | WS_BORDER | WS_TABSTOP,5,5,120,90
+    PUSHBUTTON      "↑",IDC_FILTERCTL_UP,130,35,15,15
+    PUSHBUTTON      "↓",IDC_FILTERCTL_DOWN,130,55,15,14
+    PUSHBUTTON      "新規",IDC_FILTERCTL_NEW,130,80,25,14
+    CONTROL         "保存",IDC_FILTERCTL_KEEP,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,130,15,30,10
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -440,6 +457,14 @@ BEGIN
         RIGHTMARGIN, 174
         TOPMARGIN, 7
         BOTTOMMARGIN, 103
+    END
+
+    IDD_FILTERCTL, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 156
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 112
     END
 END
 #endif    // APSTUDIO_INVOKED

@@ -227,6 +227,22 @@ FONT 9, "System"
 BEGIN
 END
 
+IDD_FILTERCTL DIALOG DISCARDABLE  0, 0, 139, 96
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Virtual folder"
+FONT 9, "System"
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,5,75,40,14
+    PUSHBUTTON      "Cancel",IDCANCEL,50,75,40,14
+    CONTROL         "List1",IDC_FILTERCTL_LIST,"SysListView32",LVS_REPORT | 
+                    LVS_SHOWSELALWAYS | WS_BORDER | WS_TABSTOP,0,5,95,65
+    CONTROL         "Save",IDC_FILTERCTL_KEEP,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,100,5,31,10
+    PUSHBUTTON      "Up",IDC_FILTERCTL_UP,100,20,20,14
+    PUSHBUTTON      "DN",IDC_FILTERCTL_DOWN,100,40,20,14
+    PUSHBUTTON      "New",IDC_FILTERCTL_NEW,100,60,35,14
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -258,6 +274,7 @@ BEGIN
         MENUITEM "Find prev",                   IDM_SEARCH_PREV
         MENUITEM SEPARATOR
         MENUITEM "Grep",                        IDM_GREP
+        MENUITEM "Virtual folder",              IDM_VFOLDER_DEF
         MENUITEM SEPARATOR
         MENUITEM "Delete",                      IDM_DELETEITEM
         MENUITEM SEPARATOR
@@ -364,6 +381,14 @@ BEGIN
         RIGHTMARGIN, 134
         TOPMARGIN, 7
         BOTTOMMARGIN, 124
+    END
+
+    IDD_FILTERCTL, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 132
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 89
     END
 END
 #endif    // APSTUDIO_INVOKED
