@@ -19,7 +19,6 @@ CFG=Tombo - Win32 Debug
 !MESSAGE 
 !MESSAGE "Tombo - Win32 Release" ("Win32 (x86) Application" —p)
 !MESSAGE "Tombo - Win32 Debug" ("Win32 (x86) Application" —p)
-!MESSAGE "Tombo - Win32 ReleaseE" ("Win32 (x86) Application" —p)
 !MESSAGE 
 
 # Begin Project
@@ -82,40 +81,12 @@ LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /debug /machine:I386 /pdbtype:sept
 # ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib comctl32.lib /nologo /subsystem:windows /debug /machine:I386 /nodefaultlib:"LIBCMT.LIB" /pdbtype:sept
 
-!ELSEIF  "$(CFG)" == "Tombo - Win32 ReleaseE"
-
-# PROP BASE Use_MFC 0
-# PROP BASE Use_Debug_Libraries 0
-# PROP BASE Output_Dir "Tombo___Win32_ReleaseE"
-# PROP BASE Intermediate_Dir "Tombo___Win32_ReleaseE"
-# PROP BASE Ignore_Export_Lib 0
-# PROP BASE Target_Dir ""
-# PROP Use_MFC 0
-# PROP Use_Debug_Libraries 0
-# PROP Output_Dir "ReleaseE"
-# PROP Intermediate_Dir "ReleaseE"
-# PROP Ignore_Export_Lib 0
-# PROP Target_Dir ""
-# ADD BASE CPP /nologo /W3 /GX /O2 /I "../../Src/regex" /I "./res" /I "." /D "NDEBUG" /D "TOMBO" /D "PLATFORM_WIN32" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /YX /FD /c
-# ADD CPP /nologo /W3 /GX /O2 /I "./resE" /I "../../Src" /I "../../Src/regex" /I "./res" /I "../../expat/include/" /I "../../Src/TomboLib" /I "." /D "NDEBUG" /D "TOMBO" /D "PLATFORM_WIN32" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /D "TOMBO_LANG_ENGLISH" /YX /FD /c
-# ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
-# ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
-# ADD BASE RSC /l 0x411 /d "NDEBUG"
-# ADD RSC /l 0x411 /d "NDEBUG"
-BSC32=bscmake.exe
-# ADD BASE BSC32 /nologo
-# ADD BSC32 /nologo
-LINK32=link.exe
-# ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib comctl32.lib /nologo /subsystem:windows /machine:I386
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib comctl32.lib /nologo /subsystem:windows /machine:I386 /nodefaultlib:"LIBCMT.LIB"
-
 !ENDIF 
 
 # Begin Target
 
 # Name "Tombo - Win32 Release"
 # Name "Tombo - Win32 Debug"
-# Name "Tombo - Win32 ReleaseE"
 # Begin Group "Source Files"
 
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
@@ -290,34 +261,6 @@ SOURCE=..\..\Src\StatusBar.cpp
 # Begin Source File
 
 SOURCE=.\res\Tombo.rc
-
-!IF  "$(CFG)" == "Tombo - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "Tombo - Win32 Debug"
-
-!ELSEIF  "$(CFG)" == "Tombo - Win32 ReleaseE"
-
-# PROP Exclude_From_Build 1
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
-SOURCE=.\resE\TomboE.rc
-
-!IF  "$(CFG)" == "Tombo - Win32 Release"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "Tombo - Win32 Debug"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "Tombo - Win32 ReleaseE"
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
@@ -506,32 +449,6 @@ SOURCE=..\..\Src\regex\regex.h
 # Begin Source File
 
 SOURCE=.\res\resource.h
-
-!IF  "$(CFG)" == "Tombo - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "Tombo - Win32 Debug"
-
-!ELSEIF  "$(CFG)" == "Tombo - Win32 ReleaseE"
-
-# PROP Exclude_From_Build 1
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
-SOURCE=.\resE\resource.h
-
-!IF  "$(CFG)" == "Tombo - Win32 Release"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "Tombo - Win32 Debug"
-
-!ELSEIF  "$(CFG)" == "Tombo - Win32 ReleaseE"
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
