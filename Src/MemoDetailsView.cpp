@@ -211,6 +211,7 @@ void MemoDetailsView::OnGetFocus()
 		pMf->EnableEncrypt(FALSE);
 		pMf->EnableDecrypt(FALSE);
 		pMf->EnableNewFolder(FALSE);
+		pMf->EnableGrep(FALSE);
 
 		pMf->EnableCut(TRUE);
 		pMf->EnableCopy(TRUE);

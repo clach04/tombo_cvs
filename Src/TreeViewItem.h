@@ -58,6 +58,7 @@ public:
 	virtual BOOL CanCut(MemoSelectView *pView);
 	virtual BOOL CanCopy(MemoSelectView *pView);
 	virtual BOOL CanPaste(MemoSelectView *pView);
+	virtual BOOL CanGrep(MemoSelectView *pVIew);
 
 	///////////////////////////////////////////////////////
 	// ÉAÉCÉRÉìèÓïÒÇÃéÊìæ
@@ -105,6 +106,7 @@ public:
 	virtual BOOL CanCut(MemoSelectView *pView);
 	virtual BOOL CanCopy(MemoSelectView *pView);
 	virtual BOOL CanPaste(MemoSelectView *pView);
+	virtual BOOL CanGrep(MemoSelectView *pVIew);
 
 	DWORD ItemOrder();
 
@@ -139,6 +141,7 @@ public:
 	virtual BOOL CanCut(MemoSelectView *pView);
 	virtual BOOL CanCopy(MemoSelectView *pView);
 	virtual BOOL CanPaste(MemoSelectView *pView);
+	virtual BOOL CanGrep(MemoSelectView *pVIew);
 
 	DWORD GetIcon(MemoSelectView *pView, DWORD nStatus);
 	DWORD ItemOrder();
@@ -183,6 +186,7 @@ public:
 	virtual BOOL CanCut(MemoSelectView *pView);
 	virtual BOOL CanCopy(MemoSelectView *pView);
 	virtual BOOL CanPaste(MemoSelectView *pView);
+	virtual BOOL CanGrep(MemoSelectView *pVIew);
 
 	virtual BOOL GetFolderPath(MemoSelectView *pView, TString *pPath);
 };
@@ -215,6 +219,7 @@ public:
 	virtual BOOL CanCut(MemoSelectView *pView);
 	virtual BOOL CanCopy(MemoSelectView *pView);
 	virtual BOOL CanPaste(MemoSelectView *pView);
+	virtual BOOL CanGrep(MemoSelectView *pVIew);
 
 	virtual BOOL GetFolderPath(MemoSelectView *pView, TString *pPath);
 };
@@ -242,6 +247,7 @@ public:
 	virtual BOOL CanCut(MemoSelectView *pView);
 	virtual BOOL CanCopy(MemoSelectView *pView);
 	virtual BOOL CanPaste(MemoSelectView *pView);
+	virtual BOOL CanGrep(MemoSelectView *pVIew);
 
 	virtual BOOL GetFolderPath(MemoSelectView *pView, TString *pPath);
 

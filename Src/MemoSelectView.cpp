@@ -564,18 +564,6 @@ LRESULT MemoSelectView::OnNotify(HWND hWnd, WPARAM wParam, LPARAM lParam)
 			ControlSubMenu(hMenu, IDM_DELETEITEM, pItem->CanDelete(this));
 			ControlSubMenu(hMenu, IDM_NEWFOLDER, pItem->CanNewMemo(this));
 
-#ifdef COMMENT
-			if (!pItem->HasMultiItem()) {
-				if (((TreeViewFileItem*)pItem)->GetNote()->IsEncrypted()) {
-					EnableMenuItem(hMenu, IDM_ENCRYPT, MF_BYCOMMAND | MF_GRAYED);
-					EnableMenuItem(hMenu, IDM_DECRYPT, MF_BYCOMMAND | MF_ENABLED);
-				} else {
-					EnableMenuItem(hMenu, IDM_ENCRYPT, MF_BYCOMMAND | MF_ENABLED);
-					EnableMenuItem(hMenu, IDM_DECRYPT, MF_BYCOMMAND | MF_GRAYED);
-				}
-			}
-#endif
-
 			DWORD id = TrackPopupMenuEx(hMenu, TPM_RETURNCMD, pt.x, pt.y, hWnd, NULL);
 			DestroyMenu(hContextMenu);
 
@@ -1195,6 +1183,7 @@ void MemoSelectView::ControlMenu()
 		pMf->EnableCopy(pItem->CanCopy(this));
 		pMf->EnablePaste(pItem->CanPaste(this));
 
+		pMf->EnableGrep(pItem->CanGrep(this));
 	} else {
 		pMf->EnableDelete(FALSE);
 		pMf->EnableRename(FALSE);
