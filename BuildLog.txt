@@ -545,10 +545,14 @@ PG: Notify MemoSelectView to MemoManager when insert/delete nodes.
 PG: Keep HTREEITEM in MemoManager for support notify.
 PG: lParam changed on message MWM_OPEN_REQUEST: TreeViewFileItem to MemoLocator.
 
-TODO: 
+■ B071 2002/10/27
 
-●PostMessageしている部分についてSendMessageでOKかの確認(統一したい)
-●PostMessage時のMemoLocatorのメモリリーク
+* NEW:#611 Encrypt/Decrypt files under a folder.
+
+PG: If message posted from MemoSelectView's NM_DBLCLK handler, MainFrame::RequestOpenMemo deletes MemoLocator object.
+PG: Debug logwrite code removed.
+
+TODO: 
 
 == around virtual folder
 
@@ -567,4 +571,5 @@ TSファイル指定Property I/F
 MemoInfoについてMemoManager管理からMemoNote管理になるように修正する
 OpenRequestをMemoSelectViewからTreeViewItemに移動
 MemoManager::MakeNewFolderをどーにかする
+InactivateDetailsViewをなんとかする
 
