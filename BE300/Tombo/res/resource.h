@@ -43,6 +43,7 @@
 #define IDB_FINDPREV                    131
 #define IDD_SEARCH                      132
 #define IDB_FIND                        133
+#define IDD_PROPTAB_CODEPAGE            134
 #define IDM_MAIN_MENUITEM1              401
 #define IDM_MAIN_MENUITEM2              402
 #define IDS_MAIN_MENUITEM1              410
@@ -78,6 +79,7 @@
 #define IDC_COPYRIGHT                   1025
 #define IDC_FILENAMEONLY                1026
 #define IDC_DATEFORMAT_DESC             1028
+#define IDC_CODEPAGE                    1030
 #define IDM_ACTIONBUTTON                30001
 #define IDM_FILE_EXIT                   40002
 #define IDM_HELP_ABOUT                  40003
@@ -119,6 +121,7 @@
 #define IDS_PROPTAB_DATE                40042
 #define IDM_CUT                         40043
 #define IDS_PROPTAB_KEEPCARET           40043
+#define IDS_PROPTAB_CODEPAGE            40044
 #define IDM_SAVE                        40045
 #define IDM_INSDATE1                    40046
 #define IDM_INSDATE2                    40047
@@ -133,9 +136,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        134
+#define _APS_NEXT_RESOURCE_VALUE        136
 #define _APS_NEXT_COMMAND_VALUE         40054
-#define _APS_NEXT_CONTROL_VALUE         1029
+#define _APS_NEXT_CONTROL_VALUE         1031
 #define _APS_NEXT_SYMED_VALUE           112
 #endif
 #endif

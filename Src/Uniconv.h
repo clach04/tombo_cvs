@@ -14,6 +14,14 @@ LPTSTR ConvSJIS2UnicodeWithByte(const char *p, DWORD nByte);
 // strdupのUNICODE版。領域はnew [] で確保するため、delete[] で開放すること。
 LPTSTR StringDup(LPCTSTR pStr);
 
+#ifdef _WIN32_WCE
+// count number of MBCS strings. return value are number of letters insted of bytes.
+DWORD CountMBStrings(const char *pStr, DWORD nBytes);
+
+// count number of UNICODE bytes. return value are number of bytes when pStr converts to MBCS.
+DWORD CountWCBytes(LPCTSTR pStr, DWORD nChar);
+#endif
+
 //////////////////////////////////
 // JIS -> SJIS
 //////////////////////////////////
