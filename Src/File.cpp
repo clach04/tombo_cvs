@@ -83,3 +83,12 @@ BOOL File::Write(const LPBYTE pBuf, DWORD nSize)
 	if (!WriteFile(hFile, pBuf, nSize, &n, NULL)) return FALSE;
 	return TRUE;
 }
+
+//////////////////////////////////////////////////////////////////////
+// Set EOF
+//////////////////////////////////////////////////////////////////////
+
+BOOL File::SetEOF()
+{
+	return SetEndOfFile(hFile);
+}
