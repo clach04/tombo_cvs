@@ -19,7 +19,6 @@
 
 Property g_Property;
 HINSTANCE g_hInstance;
-Logger g_Logger;
 Logger *g_pLogger;
 
 BOOL bDisableHotKey;

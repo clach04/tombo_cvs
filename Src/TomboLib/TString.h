@@ -23,7 +23,7 @@ public:
 
 
 	// TOMBOROOT\\pPath なる文字列を生成
-	BOOL AllocFullPath(LPCTSTR pPath);
+//	BOOL AllocFullPath(LPCTSTR pPath);
 
 	// pFullPathからディレクトリ部のみを取得
 	// XX\YY\ZZ => XX\YY

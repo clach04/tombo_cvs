@@ -14,6 +14,8 @@ LPTSTR ConvSJIS2UnicodeWithByte(const char *p, DWORD nByte);
 // TCHAR version of strdup
 // allocation does new[], so use delete[] for free memoy. 
 LPTSTR StringDup(LPCTSTR pStr);
+LPWSTR StringDupW(LPCWSTR pStr);
+char *StringDupA(const char *pStr);
 
 #ifdef _WIN32_WCE
 // count number of MBCS strings. return value are number of letters insted of bytes.

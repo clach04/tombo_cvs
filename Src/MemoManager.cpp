@@ -189,7 +189,9 @@ BOOL MemoManager::MakeNewFolder(HWND hWnd, TreeViewItem *pItem)
 		hItem = pMemoSelectView->GetPathForNewItem(&sPartPath, pItem);
 		if (hItem == NULL) return FALSE;
 
-		if (!sPath.AllocFullPath(sPartPath.Get())) return FALSE;
+//		if (!sPath.AllocFullPath(sPartPath.Get())) return FALSE;
+		if (!sPath.Join(g_Property.TopDir(), TEXT("\\"), sPartPath.Get())) return FALSE;		
+
 		if (!sPath.StrCat(pFolder)) return FALSE;
 		TrimRight(sPath.Get());
 		ChopFileSeparator(sPath.Get());

@@ -451,3 +451,11 @@ Changes
 ////////////////////////////////
 
 * Move some common libraries to folder 'TomboLib'. You should "build all" when compiling.
+
+////////////////////////////////
+// B115
+////////////////////////////////
+
+* Remove TString::AllocFullPath().
+* Merge to YAE's TomboLib.
+

@@ -1,8 +1,8 @@
 #include <windows.h>
 #include <tchar.h>
-#include "Tombo.h"
 #include "Logger.h"
-#include "UniConv.h"
+
+Logger g_Logger;
 
 Logger::Logger() : bLogActive(FALSE)
 {
@@ -18,10 +18,7 @@ BOOL Logger::Init(LPCTSTR pFile)
 BOOL Logger::WriteLog(LPCTSTR pStr)
 {
 	if (!bLogActive) return TRUE;
-	char *p = ConvUnicode2SJIS(pStr);
-	fLogFile.Write((LPBYTE)p, strlen(p));
-	delete [] p;
-
+	fLogFile.Write((LPBYTE)pStr, _tcslen(pStr) * sizeof(TCHAR));
 	return TRUE;
 }
 

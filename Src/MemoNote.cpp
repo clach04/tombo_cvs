@@ -196,7 +196,8 @@ BOOL MemoNote::InitNewMemo(LPCTSTR pMemoPath, LPCTSTR pText, TString *pHeadLine)
 char *PlainMemoNote::GetMemoBodyA(PasswordManager*)
 {
 	TString sFileName;
-	if (!sFileName.AllocFullPath(pPath)) return NULL;
+//	if (!sFileName.AllocFullPath(pPath)) return NULL;
+	if (!sFileName.Join(g_Property.TopDir(), TEXT("\\"), pPath)) return NULL;
 
 	File inf;
 	if (!inf.Open(sFileName.Get(), GENERIC_READ, FILE_SHARE_READ, OPEN_EXISTING)) return NULL;
@@ -232,7 +233,8 @@ LPBYTE CryptedMemoNote::GetMemoBodySub(PasswordManager *pMgr, LPDWORD pSize)
 	BOOL bRegistedPassword = TRUE;
 
 	TString sFileName;
-	if (!sFileName.AllocFullPath(pPath)) return NULL;
+//	if (!sFileName.AllocFullPath(pPath)) return NULL;
+	if (!sFileName.Join(g_Property.TopDir(), TEXT("\\"), pPath)) return NULL;
 
 	BOOL bCancel;
 	const char *pPassword = pMgr->Password(&bCancel, FALSE);
@@ -291,7 +293,8 @@ LPTSTR CryptedMemoNote::GetMemoBody(PasswordManager *pMgr)
 BOOL MemoNote::Save(PasswordManager *pMgr, LPCTSTR pMemo, TString *pHeadLine)
 {
 	TString sOrigFile;
-	if (!sOrigFile.AllocFullPath(pPath)) return FALSE;
+//	if (!sOrigFile.AllocFullPath(pPath)) return FALSE;
+	if (!sOrigFile.Join(g_Property.TopDir(), TEXT("\\"), pPath)) return FALSE;
 
 	BOOL bResult;
 	TString sHeadLine;
@@ -555,7 +558,8 @@ MemoNote *CryptedMemoNote::Decrypt(PasswordManager *pMgr, TString *pHeadLine, BO
 BOOL MemoNote::DeleteMemoData()
 {
 	TString sFileName;
-	if (!sFileName.AllocFullPath(pPath)) return FALSE;
+//	if (!sFileName.AllocFullPath(pPath)) return FALSE;
+	if (!sFileName.Join(g_Property.TopDir(), TEXT("\\"), pPath)) return FALSE;
 
 	// 付加情報を保持していた場合にはその情報も削除
 	if (MemoPath()) {
@@ -794,7 +798,8 @@ MemoNote *MemoNote::CopyMemo(MemoNote *pOrig, LPCTSTR pMemoPath, TString *pHeadL
 	}
 
 	TString sOrigPath;
-	if (!sOrigPath.AllocFullPath(pOrig->MemoPath())) {
+//	if (!sOrigPath.AllocFullPath(pOrig->MemoPath())) {
+	if (!sOrigPath.Join(g_Property.TopDir(), TEXT("\\"), pOrig->MemoPath())) {
 		delete pNote;
 		return NULL;
 	}
@@ -833,8 +838,10 @@ BOOL MemoNote::Rename(LPCTSTR pNewName)
 	// ファイル名リネーム用パス生成
 	TString sOldFullPath;
 	TString sNewFullPath;
-	if (!sOldFullPath.AllocFullPath(pPath) ||
-		!sNewFullPath.AllocFullPath(pNewPath)) {
+//	if (!sOldFullPath.AllocFullPath(pPath) ||
+//		!sNewFullPath.AllocFullPath(pNewPath)) {
+	if (!sOldFullPath.Join(g_Property.TopDir(), TEXT("\\"), pPath) ||
+		!sNewFullPath.Join(g_Property.TopDir(), TEXT("\\"), pNewPath)) {
 		delete [] pNewPath;
 		return FALSE;
 	}

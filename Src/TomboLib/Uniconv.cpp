@@ -1,8 +1,10 @@
 #include <windows.h>
 #include <tchar.h>
+#if defined(TOMBO)
 #include "Tombo.h"
-#include "Uniconv.h"
 #include "Property.h"
+#endif
+#include "Uniconv.h"
 
 #ifndef ESC
 #define ESC 0x1B
@@ -1082,7 +1084,7 @@ static LPTSTR GetTail(LPTSTR pBuf)
 	LPTSTR p = pBuf;
 	LPTSTR pTail = pBuf;
 	while(*p) {
-		if (IsDBCSLeadByte(*p)) {
+		if (iskanji(*p)) {
 			pTail = p++;
 			if (*p) p++;
 		} else {
@@ -1123,6 +1125,7 @@ void TrimRight(LPTSTR pStr)
 		*pLastSpc = TEXT('\0');
 	}
 }
+
 ////////////////////////////////////////////////////
 // 領域を確保してコピー
 ////////////////////////////////////////////////////
@@ -1139,18 +1142,43 @@ LPTSTR StringDup(LPCTSTR pStr)
 	return p;
 }
 
+LPWSTR StringDupW(LPCWSTR pStr)
+{
+	DWORD l = wcslen(pStr);
+	LPWSTR p = new WCHAR[l + 1];
+	if (p == NULL) {
+		SetLastError(ERROR_NOT_ENOUGH_MEMORY);
+		return NULL;
+	}
+	wcscpy(p, pStr);
+	return p;
+}
+
+char *StringDupA(const char *pStr)
+{
+	DWORD l = strlen(pStr);
+	char *p = new char[l + 1];
+	if (p == NULL) {
+		SetLastError(ERROR_NOT_ENOUGH_MEMORY);
+		return NULL;
+	}
+	strcpy(p, pStr);
+	return p;
+}
+
+
 ////////////////////////////////////////////////////
 // 文字列を漢字としてコピー
 ////////////////////////////////////////////////////
 
 void CopyKanjiString(LPTSTR pDst, LPCTSTR pSrc, DWORD nLen)
 {
-#ifndef _WIN32_WCE
+#ifdef WIN32_WCE
 	LPCTSTR p = pSrc;
 	LPTSTR q = pDst;
 	DWORD n = 0;
 	while(*p) {
-		if (IsDBCSLeadByte(*p)) {
+		if (iskanji(*p)) {
 			if (n < nLen - 1) {
 				*q++ = *p++;
 				*q++ = *p++;

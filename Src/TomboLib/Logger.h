@@ -14,5 +14,7 @@ public:
 	void Close();
 };
 
+extern Logger g_Logger;
+#define DEBUGWRITE(str) (g_Logger.WriteLog(str))
 
 #endif

@@ -380,12 +380,14 @@ BOOL TreeViewFolderItem::Move(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR 
 	TString sCurrentPath;
 	HTREEITEM hItem = GetViewItem();
 	LPTSTR pCurrentPath = pView->GeneratePath(hItem, buf, MAX_PATH);
-	if (!sCurrentPath.AllocFullPath(pCurrentPath)) return FALSE;
+//	if (!sCurrentPath.AllocFullPath(pCurrentPath)) return FALSE;
+	if (!sCurrentPath.Join(g_Property.TopDir(), TEXT("\\"), pCurrentPath)) return FALSE;
 
 	// Dstパスの取得
 	TString sDstPath, sDstFullPath;
 	HTREEITEM hParent = pView->GetPathForNewItem(&sDstPath);
-	if (!sDstFullPath.AllocFullPath(sDstPath.Get())) return FALSE;
+//	if (!sDstFullPath.AllocFullPath(sDstPath.Get())) return FALSE;
+	if (!sDstFullPath.Join(g_Property.TopDir(), TEXT("\\"), sDstPath.Get())) return FALSE;
 
 	if (IsSubFolder(pCurrentPath, sDstPath.Get())) {
 		*ppErr = MSG_DST_FOLDER_IS_SRC_SUBFOLDER;
@@ -419,12 +421,14 @@ BOOL TreeViewFolderItem::Copy(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR 
 	TString sCurrentPath;
 	HTREEITEM hItem = GetViewItem();
 	LPTSTR pCurrentPath = pView->GeneratePath(hItem, buf, MAX_PATH);
-	if (!sCurrentPath.AllocFullPath(pCurrentPath)) return FALSE;
+//	if (!sCurrentPath.AllocFullPath(pCurrentPath)) return FALSE;
+	if (!sCurrentPath.Join(g_Property.TopDir(), TEXT("\\"), pCurrentPath)) return FALSE;
 
 	// Dstパスの取得
 	TString sDstPath, sDstFullPath;
 	HTREEITEM hParent = pView->GetPathForNewItem(&sDstPath);
-	if (!sDstFullPath.AllocFullPath(sDstPath.Get())) return FALSE;
+//	if (!sDstFullPath.AllocFullPath(sDstPath.Get())) return FALSE;
+	if (!sDstFullPath.Join(g_Property.TopDir(), TEXT("\\"), sDstPath.Get())) return FALSE;
 
 	if (IsSubFolder(pCurrentPath, sDstPath.Get())) {
 		*ppErr = MSG_DST_FOLDER_IS_SRC_SUBFOLDER;
@@ -464,7 +468,8 @@ BOOL TreeViewFolderItem::Delete(MemoManager *pMgr, MemoSelectView *pView)
 	TString sCurrentPath;
 	HTREEITEM hItem = GetViewItem();
 	LPTSTR pCurrentPath = pView->GeneratePath(hItem, buf, MAX_PATH);
-	if (!sCurrentPath.AllocFullPath(pCurrentPath)) return FALSE;
+//	if (!sCurrentPath.AllocFullPath(pCurrentPath)) return FALSE;
+	if (!sCurrentPath.Join(g_Property.TopDir(), TEXT("\\"), pCurrentPath)) return FALSE;
 
 	if (_tcslen(pCurrentPath) == 0 ||
 		TomboMessageBox(NULL, MSG_CONFIRM_DEL_FOLDER, MSG_DEL_FOLDER_TTL, MB_ICONQUESTION | MB_OKCANCEL) != IDOK) return FALSE;
@@ -493,7 +498,8 @@ BOOL TreeViewFolderItem::Encrypt(MemoManager *pMgr, MemoSelectView *pView)
 	TString sCurrentPath;
 	HTREEITEM hItem = GetViewItem();
 	LPTSTR pCurrentPath = pView->GeneratePath(hItem, buf, MAX_PATH);
-	if (!sCurrentPath.AllocFullPath(pCurrentPath)) return FALSE;
+//	if (!sCurrentPath.AllocFullPath(pCurrentPath)) return FALSE;
+	if (!sCurrentPath.Join(g_Property.TopDir(), TEXT("\\"), pCurrentPath)) return FALSE;
 
 	if (_tcslen(pCurrentPath) == 0 ||
 		TomboMessageBox(NULL, MSG_CONFIRM_ENCRYPT_FOLDER, MSG_CONFIRM_ENCRYPT_FOLDER_TTL, MB_ICONQUESTION | MB_OKCANCEL) != IDOK) return TRUE;
@@ -517,7 +523,8 @@ BOOL TreeViewFolderItem::Decrypt(MemoManager *pMgr, MemoSelectView *pView)
 	TString sCurrentPath;
 	HTREEITEM hItem = GetViewItem();
 	LPTSTR pCurrentPath = pView->GeneratePath(hItem, buf, MAX_PATH);
-	if (!sCurrentPath.AllocFullPath(pCurrentPath)) return FALSE;
+//	if (!sCurrentPath.AllocFullPath(pCurrentPath)) return FALSE;
+	if (!sCurrentPath.Join(g_Property.TopDir(), TEXT("\\"), pCurrentPath)) return FALSE;
 
 	if (_tcslen(pCurrentPath) == 0 ||
 		TomboMessageBox(NULL, MSG_CONFIRM_DECRYPT_FOLDER, MSG_CONFIRM_DECRYPT_FOLDER_TTL, MB_ICONQUESTION | MB_OKCANCEL) != IDOK) return TRUE;
@@ -623,7 +630,8 @@ BOOL TreeViewFolderItem::Rename(MemoManager *pMgr, MemoSelectView *pView, LPCTST
 	// If root node, disable changing.
 	if (_tcslen(pCurrentPath) == 0) return FALSE;
 
-	if (!sCurrentPath.AllocFullPath(pCurrentPath)) return FALSE;
+//	if (!sCurrentPath.AllocFullPath(pCurrentPath)) return FALSE;
+	if (!sCurrentPath.Join(g_Property.TopDir(), TEXT("\\"), pCurrentPath)) return FALSE;
 
 	pMgr->InactiveDetailsView();
 	pView->TreeCollapse(GetViewItem());
