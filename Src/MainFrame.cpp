@@ -2000,8 +2000,17 @@ BOOL MainFrame::EnableApplicationButton(HWND hWnd)
 void MainFrame::SaveWinSize()
 {
 #if defined(PLATFORM_HPC) || defined(PLATFORM_WIN32)
+
 	RECT r;
+#if defined(PLATFORM_HPC)
 	GetWindowRect(hMainWnd,&r);
+#else
+	WINDOWPLACEMENT wpl;
+	wpl.length = sizeof(wpl);
+	GetWindowPlacement(hMainWnd, &wpl);
+	r = wpl.rcNormalPosition;
+#endif
+
 	WORD nWidth;
 	if (g_Property.IsUseTwoPane()) {
 		WORD nHeight;

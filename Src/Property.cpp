@@ -1586,7 +1586,7 @@ static BOOL SetMultiSZToReg(HKEY hKey, LPCTSTR pAttr, LPCTSTR pValue, DWORD nSiz
 }
 
 ///////////////////////////////////////////////////
-// フォントの取得
+// get font
 ///////////////////////////////////////////////////
 
 static BOOL MakeFont(HFONT *phFont, LPCTSTR pName, DWORD nSize, BYTE bQuality)
@@ -1617,23 +1617,16 @@ static BOOL MakeFont(HFONT *phFont, LPCTSTR pName, DWORD nSize, BYTE bQuality)
 }
 
 ///////////////////////////////////////////////////
-// ウィンドウサイズ保存
+// save window size
 ///////////////////////////////////////////////////
 
 BOOL Property::SaveWinSize(LPRECT pWinRect, WORD nSelectViewWidth)
 {
 #if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
-	DWORD sam, res;
-	HKEY hTomboRoot;
-
 	TCHAR buf[1024];
 
-	res = RegCreateKeyEx(HKEY_CURRENT_USER, TOMBO_MAIN_KEY, 0, NULL, REG_OPTION_NON_VOLATILE,
-				KEY_ALL_ACCESS, NULL, &hTomboRoot, &sam);
-	if (res != ERROR_SUCCESS) {
-		SetLastError(res);
-		return FALSE;
-	}
+	HKEY hTomboRoot = GetTomboRootKey();
+	if (!hTomboRoot) return FALSE;
 
 	wsprintf(buf, TEXT("%d,%d,%d,%d,%d"), 
 		pWinRect->left, pWinRect->top, 
@@ -1641,15 +1634,17 @@ BOOL Property::SaveWinSize(LPRECT pWinRect, WORD nSelectViewWidth)
 		nSelectViewWidth);
 
 	if (!SetSZToReg(hTomboRoot, TOMBO_WINSIZE_ATTR_NAME, buf)) {
+		RegCloseKey(hTomboRoot);
 		return FALSE;
 	}
+
 	RegCloseKey(hTomboRoot);
 #endif
 	return TRUE;
 }
 
 ///////////////////////////////////////////////////
-// ウィンドウサイズ取得
+// get window size
 ///////////////////////////////////////////////////
 
 BOOL Property::GetWinSize(LPRECT pWinRect, LPWORD pSelectViewWidth)
@@ -1668,18 +1663,18 @@ BOOL Property::GetWinSize(LPRECT pWinRect, LPWORD pSelectViewWidth)
 		RegCloseKey(hTomboRoot);
 		return FALSE;
 	}
-#if defined(PLATFORM_WIN32)
-	if (sscanf(buf, TEXT("%d,%d,%d,%d,%d"),
-#endif
-#if defined(PLATFORM_HPC)
-	if (swscanf(buf, TEXT("%d,%d,%d,%d,%d"),
-#endif
+	if (_stscanf(buf, TEXT("%d,%d,%d,%d,%d"),
 			&(pWinRect->left), &(pWinRect->top), &(pWinRect->right), &(pWinRect->bottom),
 			pSelectViewWidth) != 5) {
 		SetLastError(ERROR_INVALID_DATA);
 		RegCloseKey(hTomboRoot);
 		return FALSE;
 	}
+
+	// check and modify window position
+	if (pWinRect->left < 0) pWinRect->left = 0;
+	if (pWinRect->top < 0) pWinRect->top = 0;
+
 	RegCloseKey(hTomboRoot);
 #endif
 	return TRUE;
