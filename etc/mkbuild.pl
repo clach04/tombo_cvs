@@ -8,7 +8,7 @@ use File::Glob ':glob';
 # Data definition
 ##########################################################################
 
-$version = "Tombo1_4";
+$version = "Tombo1_5";
 $buildroot = "R:\\work2\\SF\\TOMBO";
 $docroot = "R:\\work2\\SF\\Docs";
 $builddir  = "R:\\temp\\Tombo-Rel";
