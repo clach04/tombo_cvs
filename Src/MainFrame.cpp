@@ -559,81 +559,6 @@ HWND CreateToolBar(HWND hParent, HINSTANCE hInst);
 // ウィンドウ初期化
 ///////////////////////////////////////////////////
 
-#include "DirectoryScanner.h"
-#include "File.h"
-
-extern "C" {
-void* Regex_Compile(const char *pPattern, BOOL bIgnoreCase, const char **ppReason);
-void Regex_Free(void *p);
-int Regex_Search(void *p, int iStart, int iRange, const char *pTarget, int *pStart, int *pEnd);
-}
-
-class TestScan : public DirectoryScanner {
-	void *pRegex;
-	int x, numfile;
-public:
-	void Init();
-	void InitialScan();	// スキャン開始前
-	void AfterScan();  // スキャン処理後
-	void PreDirectory(LPCTSTR p){} // ディレクトリ走査前
-	void PostDirectory(LPCTSTR p){} // ディレクトリ走査後
-	void File(LPCTSTR p); // ファイル
-};
-
-
-void TestScan::Init()
-{
-	const char *p;
-	pRegex = Regex_Compile("Tombo", TRUE, &p);
-	x = 0; numfile = 0;
-	LPCTSTR pDir = g_Property.TopDir();
-	DirectoryScanner::Init(pDir, 0);
-}
-
-void TestScan::InitialScan()
-{
-}
-
-void TestScan::AfterScan()
-{
-	TCHAR buf[1024];
-	wsprintf(buf, TEXT("Result = %d/%d"), x, numfile);
-//	MessageBox(NULL, buf, TEXT("DEBUG"), MB_OK);
-	Regex_Free(pRegex);
-}
-
-void TestScan::File(LPCTSTR p)
-{
-	int n = _tcslen(p);
-	int s, e, r;
-	numfile++;
-	if (n < 4 || _tcscmp(p + n - 4, TEXT(".txt"))) return;
-
-	class File inf;
-	if (!inf.Open(CurrentPath(), GENERIC_READ, FILE_SHARE_READ, OPEN_EXISTING)) return;
-
-	char *pText = new char[inf.FileSize() + 1];
-	if (pText == NULL) return;
-
-	DWORD nSize = inf.FileSize();
-	if (!inf.Read((LPBYTE)pText, &nSize)) return;
-	pText[nSize] = TEXT('\0');
-
-	r = Regex_Search(pRegex, 0, nSize, pText, &s, &e);
-	delete [] pText;
-
-	if (r > 0) {
-		x++;
-	}
-}
-
-void f()
-{
-	TestScan s;
-	s.Init();
-	s.Scan();
-}
-
 void MainFrame::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
 	LPCREATESTRUCT pcs = (LPCREATESTRUCT)lParam;
@@ -899,7 +824,6 @@ void MainFrame::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		mmMemoManager.NewMemo();
 	}
 
-//	f();	// for TESTING TODO: 削除する
 	ActivateView(TRUE);
 }
 
@@ -1528,15 +1452,11 @@ void MainFrame::ActivateView(BOOL bList)
 	// メニューのコントロール
 #if defined(PLATFORM_WIN32)
 	HMENU hMenu = GetMenu(hMainWnd);
-#endif
-#if defined(PLATFORM_HPC)
-	HMENU hMenu = CommandBar_GetMenu(GetCommandBar(hMSCmdBar, ID_CMDBAR_MAIN), 0);
-#endif
-#if defined(PLATFORM_WIN32)
 	ControlMenu(hMenu, bSelectViewActive);
 	ControlToolbar(hToolBar, bSelectViewActive);
 #endif
 #if defined(PLATFORM_HPC)
+	HMENU hMenu = CommandBar_GetMenu(GetCommandBar(hMSCmdBar, ID_CMDBAR_MAIN), 0);
 	ControlMenu(hMenu, bSelectViewActive);
 	ControlToolbar(GetCommandBar(hMSCmdBar, ID_BUTTONBAND), bSelectViewActive);
 #endif
