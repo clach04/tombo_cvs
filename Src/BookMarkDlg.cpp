@@ -36,11 +36,11 @@ void BookMarkDlg::InitDialog(HWND hDlg)
 	lvc.fmt = LVCFMT_LEFT;
 
 	lvc.cx = 100;
-	lvc.pszText = MSG_BMDLG_TITLE_NAME;
+	lvc.pszText = (LPTSTR)MSG_BMDLG_TITLE_NAME;
 	ListView_InsertColumn(hList, 0, &lvc);
 
 	lvc.cx = 150;
-	lvc.pszText = MSG_BMDLG_TITLE_PATH;
+	lvc.pszText = (LPTSTR)MSG_BMDLG_TITLE_PATH;
 	ListView_InsertColumn(hList, 1, &lvc);
 	
 	// Insert item

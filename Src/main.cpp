@@ -13,6 +13,7 @@
 #include "Property.h"
 #include "Logger.h"
 #include "PasswordManager.h"
+#include "Message.h"
 
 //////////////////////////////////////
 // Global variables
@@ -25,6 +26,8 @@ Logger *g_pLogger;
 BOOL bDisableHotKey;
 
 PasswordManager *g_pPasswordManager = NULL;
+
+TomboMessage g_mMsgRes;
 
 //////////////////////////////////////
 // Declarations
@@ -43,6 +46,9 @@ extern "C" {
 #ifndef UNIT_TEST
 int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPTSTR pCmdLine, int nCmdShow)
 {
+	// load message resources.
+	g_mMsgRes.Init();
+
 	// Check other Tombo.exe is executed
 	if (CheckAndRaiseAnotherTombo()) {
 		return 0;
@@ -121,11 +127,14 @@ static BOOL CALLBACK EnumProc(HWND hWnd, LPARAM lParam)
 }
 
 //////////////////////////////////////
-// 二重起動チェック
+// Check mutual execution
 //////////////////////////////////////
 //
-// ウィンドウを列挙してTomoboの二重起動をチェック、
-// 二重起動しているようであればそれをRaiseして終了する。
+// Enum window and check Tombo's window.
+// Raise window and exit if exists.
+//
+// statically say, we should use Mutex but...
+
 static BOOL CheckAndRaiseAnotherTombo()
 {
 	BOOL bExist = FALSE;
@@ -134,10 +143,10 @@ static BOOL CheckAndRaiseAnotherTombo()
 }
 
 //////////////////////////////////////
-// メッセージボックス
+// Message box
 //////////////////////////////////////
 //
-// HotKeyをDisableする版
+// Disable hotkey version
 
 int TomboMessageBox(HWND hWnd, LPCTSTR pText, LPCTSTR pCaption, UINT uType) 
 {

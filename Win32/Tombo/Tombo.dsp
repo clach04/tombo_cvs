@@ -233,6 +233,10 @@ SOURCE=..\..\Src\MemoSelectView.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\Src\Message.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\Src\NewFolderDialog.cpp
 # End Source File
 # Begin Source File

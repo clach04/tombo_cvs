@@ -57,7 +57,7 @@ extern BOOL bDisableHotKey;
 
 extern PasswordManager *g_pPasswordManager;
 
-// アプリケーションボタンの定義
+// application button defintions
 #define APP_BUTTON1 (0xC1)
 #define APP_BUTTON2 (0xC2)
 #define APP_BUTTON3 (0xC3)
@@ -70,6 +70,9 @@ extern PasswordManager *g_pPasswordManager;
 // Virtual folder definition file name
 // path is defind by user(Property).
 #define TOMBO_VFOLDER_DEF_FILE TEXT("vfolder.xml")
+
+// message definition file
+#define TOMBO_MSG_DEF_FILE TEXT("TomboMsg.txt")
 
 // Number of preserving history about search string.
 #define NUM_SEARCH_HISTORY 10

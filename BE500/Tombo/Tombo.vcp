@@ -611,6 +611,7 @@ DEP_CPP_BOOKMA=\
 	"..\..\Src\BookMark.h"\
 	"..\..\Src\BookMarkDlg.h"\
 	"..\..\Src\Message.h"\
+	"..\..\Src\MsgRes\MsgDef.h"\
 	"..\..\Src\TomboLib\DialogTemplate.h"\
 	"..\..\Src\TomboLib\TString.h"\
 	"..\..\Src\TomboLib\VarBuffer.h"\
@@ -909,6 +910,9 @@ DEP_CPP_DETAI=\
 	"..\..\Src\MemoDetailsView.h"\
 	"..\..\Src\MemoManager.h"\
 	"..\..\Src\Property.h"\
+	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboLib\File.h"\
+	"..\..\Src\TomboLib\Logger.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
@@ -1361,6 +1365,7 @@ SOURCE=..\..\Src\FilterAddDlg.cpp
 DEP_CPP_FILTE=\
 	"..\..\Src\FilterAddDlg.h"\
 	"..\..\Src\Message.h"\
+	"..\..\Src\MsgRes\MsgDef.h"\
 	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
 	"..\..\Src\TomboLib\DialogTemplate.h"\
@@ -1512,6 +1517,7 @@ DEP_CPP_FILTER=\
 	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoSelectView.h"\
 	"..\..\Src\Message.h"\
+	"..\..\Src\MsgRes\MsgDef.h"\
 	"..\..\Src\Tombo.h"\
 	"..\..\Src\TomboLib\File.h"\
 	"..\..\Src\TomboLib\Logger.h"\
@@ -1641,6 +1647,7 @@ DEP_CPP_FILTERD=\
 	"..\..\Src\FilterAddDlg.h"\
 	"..\..\Src\FilterDefDlg.h"\
 	"..\..\Src\Message.h"\
+	"..\..\Src\MsgRes\MsgDef.h"\
 	"..\..\Src\Tombo.h"\
 	"..\..\Src\TomboLib\DialogTemplate.h"\
 	"..\..\Src\TomboLib\File.h"\
@@ -1804,6 +1811,7 @@ SOURCE=..\..\Src\GrepDialog.cpp
 DEP_CPP_GREPD=\
 	"..\..\Src\GrepDialog.h"\
 	"..\..\Src\Message.h"\
+	"..\..\Src\MsgRes\MsgDef.h"\
 	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
 	"..\..\Src\TomboLib\File.h"\
@@ -1908,7 +1916,9 @@ SOURCE=..\..\Src\LagendaPlatform.cpp
 DEP_CPP_LAGEN=\
 	"..\..\Src\LagendaPlatform.h"\
 	"..\..\Src\Message.h"\
+	"..\..\Src\MsgRes\MsgDef.h"\
 	"..\..\Src\PlatformLayer.h"\
+	"..\..\Src\TomboLib\SipControl.h"\
 	{$(INCLUDE)}"CSO.h"\
 	{$(INCLUDE)}"CSOBar.h"\
 	{$(INCLUDE)}"CSOButton.h"\
@@ -1921,10 +1931,12 @@ DEP_CPP_LAGEN=\
 	"..\..\Src\LagendaPlatform.h"\
 	"..\..\Src\Message.h"\
 	"..\..\Src\PlatformLayer.h"\
-	{$(INCLUDE)}"CSO.h"\
-	{$(INCLUDE)}"CSOBar.h"\
-	{$(INCLUDE)}"CSOButton.h"\
-	{$(INCLUDE)}"CWind.h"\
+	
+NODEP_CPP_LAGEN=\
+	".\SO.h"\
+	".\SOBar.h"\
+	".\SOButton.h"\
+	".\Wind.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Release"
@@ -2085,18 +2097,25 @@ SOURCE=..\..\Src\main.cpp
 !IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
 
 DEP_CPP_MAIN_=\
+	"..\..\Src\HPCPlatform.h"\
+	"..\..\Src\LagendaPlatform.h"\
 	"..\..\Src\MainFrame.h"\
 	"..\..\Src\MemoDetailsView.h"\
 	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoSelectView.h"\
 	"..\..\Src\Message.h"\
+	"..\..\Src\MsgRes\MsgDef.h"\
 	"..\..\Src\PasswordManager.h"\
+	"..\..\Src\PlatformLayer.h"\
+	"..\..\Src\PocketPCPlatform.h"\
 	"..\..\Src\Property.h"\
+	"..\..\Src\PsPCPlatform.h"\
 	"..\..\Src\Tombo.h"\
 	"..\..\Src\TomboLib\File.h"\
 	"..\..\Src\TomboLib\Logger.h"\
 	"..\..\Src\TomboLib\Uniconv.h"\
 	"..\..\Src\TomboLib\VarBuffer.h"\
+	"..\..\Src\Win32Platform.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
@@ -2209,6 +2228,7 @@ DEP_CPP_MAINF=\
 	"..\..\Src\AboutDialog.h"\
 	"..\..\Src\BookMark.h"\
 	"..\..\Src\BookMarkDlg.h"\
+	"..\..\Src\DetailsViewDlg.h"\
 	"..\..\Src\FilterCtlDlg.h"\
 	"..\..\Src\GrepDialog.h"\
 	"..\..\Src\HPCPlatform.h"\
@@ -2219,6 +2239,7 @@ DEP_CPP_MAINF=\
 	"..\..\Src\MemoNote.h"\
 	"..\..\Src\MemoSelectView.h"\
 	"..\..\Src\Message.h"\
+	"..\..\Src\MsgRes\MsgDef.h"\
 	"..\..\Src\PasswordManager.h"\
 	"..\..\Src\PlatformLayer.h"\
 	"..\..\Src\PocketPCPlatform.h"\
@@ -2435,13 +2456,19 @@ SOURCE=..\..\Src\MemoDetailsView.cpp
 !IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
 
 DEP_CPP_MEMOD=\
+	"..\..\Src\HPCPlatform.h"\
+	"..\..\Src\LagendaPlatform.h"\
 	"..\..\Src\MainFrame.h"\
 	"..\..\Src\MemoDetailsView.h"\
 	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoSelectView.h"\
 	"..\..\Src\Message.h"\
+	"..\..\Src\MsgRes\MsgDef.h"\
 	"..\..\Src\PasswordManager.h"\
+	"..\..\Src\PlatformLayer.h"\
+	"..\..\Src\PocketPCPlatform.h"\
 	"..\..\Src\Property.h"\
+	"..\..\Src\PsPCPlatform.h"\
 	"..\..\Src\SearchEngine.h"\
 	"..\..\Src\Tombo.h"\
 	"..\..\Src\TomboLib\File.h"\
@@ -2449,6 +2476,7 @@ DEP_CPP_MEMOD=\
 	"..\..\Src\TomboLib\TString.h"\
 	"..\..\Src\TomboLib\Uniconv.h"\
 	"..\..\Src\TomboLib\VarBuffer.h"\
+	"..\..\Src\Win32Platform.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
@@ -2539,6 +2567,7 @@ DEP_CPP_MEMOF=\
 	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoNote.h"\
 	"..\..\Src\Message.h"\
+	"..\..\Src\MsgRes\MsgDef.h"\
 	"..\..\Src\PasswordManager.h"\
 	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
@@ -2762,6 +2791,8 @@ SOURCE=..\..\Src\MemoManager.cpp
 !IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
 
 DEP_CPP_MEMOM=\
+	"..\..\Src\HPCPlatform.h"\
+	"..\..\Src\LagendaPlatform.h"\
 	"..\..\Src\MainFrame.h"\
 	"..\..\Src\MemoDetailsView.h"\
 	"..\..\Src\MemoInfo.h"\
@@ -2769,9 +2800,13 @@ DEP_CPP_MEMOM=\
 	"..\..\Src\MemoNote.h"\
 	"..\..\Src\MemoSelectView.h"\
 	"..\..\Src\Message.h"\
+	"..\..\Src\MsgRes\MsgDef.h"\
 	"..\..\Src\NewFolderDialog.h"\
 	"..\..\Src\PasswordManager.h"\
+	"..\..\Src\PlatformLayer.h"\
+	"..\..\Src\PocketPCPlatform.h"\
 	"..\..\Src\Property.h"\
+	"..\..\Src\PsPCPlatform.h"\
 	"..\..\Src\SearchEngine.h"\
 	"..\..\Src\Tombo.h"\
 	"..\..\Src\TomboLib\File.h"\
@@ -2781,6 +2816,7 @@ DEP_CPP_MEMOM=\
 	"..\..\Src\TomboLib\VarBuffer.h"\
 	"..\..\Src\TomboURI.h"\
 	"..\..\Src\TreeViewItem.h"\
+	"..\..\Src\Win32Platform.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
@@ -2905,6 +2941,7 @@ DEP_CPP_MEMON=\
 	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoNote.h"\
 	"..\..\Src\Message.h"\
+	"..\..\Src\MsgRes\MsgDef.h"\
 	"..\..\Src\PasswordManager.h"\
 	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
@@ -3034,14 +3071,20 @@ SOURCE=..\..\Src\MemoSelectView.cpp
 !IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
 
 DEP_CPP_MEMOS=\
+	"..\..\Src\HPCPlatform.h"\
+	"..\..\Src\LagendaPlatform.h"\
 	"..\..\Src\MainFrame.h"\
 	"..\..\Src\MemoDetailsView.h"\
 	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoNote.h"\
 	"..\..\Src\MemoSelectView.h"\
 	"..\..\Src\Message.h"\
+	"..\..\Src\MsgRes\MsgDef.h"\
 	"..\..\Src\PasswordManager.h"\
+	"..\..\Src\PlatformLayer.h"\
+	"..\..\Src\PocketPCPlatform.h"\
 	"..\..\Src\Property.h"\
+	"..\..\Src\PsPCPlatform.h"\
 	"..\..\Src\Tombo.h"\
 	"..\..\Src\TomboLib\File.h"\
 	"..\..\Src\TomboLib\Logger.h"\
@@ -3050,6 +3093,7 @@ DEP_CPP_MEMOS=\
 	"..\..\Src\TomboLib\VarBuffer.h"\
 	"..\..\Src\TomboURI.h"\
 	"..\..\Src\TreeViewItem.h"\
+	"..\..\Src\Win32Platform.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
@@ -3130,6 +3174,117 @@ DEP_CPP_MEMOS=\
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\Src\Message.cpp
+
+!IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
+
+DEP_CPP_MESSA=\
+	"..\..\Src\Message.h"\
+	"..\..\Src\MsgRes\DefaultMsg.cpp"\
+	"..\..\Src\MsgRes\MsgDef.h"\
+	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboLib\File.h"\
+	"..\..\Src\TomboLib\Logger.h"\
+	"..\..\Src\TomboLib\TString.h"\
+	"..\..\Src\TomboLib\Uniconv.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
+
+DEP_CPP_MESSA=\
+	"..\..\Src\Message.h"\
+	"..\..\Src\MsgRes\DefaultMsg.cpp"\
+	"..\..\Src\MsgRes\MsgDef.h"\
+	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboLib\File.h"\
+	"..\..\Src\TomboLib\Logger.h"\
+	"..\..\Src\TomboLib\TString.h"\
+	"..\..\Src\TomboLib\Uniconv.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Release"
+
+DEP_CPP_MESSA=\
+	"..\..\Src\Message.h"\
+	"..\..\Src\MsgRes\DefaultMsg.cpp"\
+	"..\..\Src\MsgRes\MsgDef.h"\
+	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboLib\File.h"\
+	"..\..\Src\TomboLib\Logger.h"\
+	"..\..\Src\TomboLib\TString.h"\
+	"..\..\Src\TomboLib\Uniconv.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Debug"
+
+DEP_CPP_MESSA=\
+	"..\..\Src\Message.h"\
+	"..\..\Src\MsgRes\DefaultMsg.cpp"\
+	"..\..\Src\MsgRes\MsgDef.h"\
+	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboLib\File.h"\
+	"..\..\Src\TomboLib\Logger.h"\
+	"..\..\Src\TomboLib\TString.h"\
+	"..\..\Src\TomboLib\Uniconv.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Release"
+
+DEP_CPP_MESSA=\
+	"..\..\Src\Message.h"\
+	"..\..\Src\MsgRes\DefaultMsg.cpp"\
+	"..\..\Src\MsgRes\MsgDef.h"\
+	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboLib\File.h"\
+	"..\..\Src\TomboLib\Logger.h"\
+	"..\..\Src\TomboLib\TString.h"\
+	"..\..\Src\TomboLib\Uniconv.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Debug"
+
+DEP_CPP_MESSA=\
+	"..\..\Src\Message.h"\
+	"..\..\Src\MsgRes\DefaultMsg.cpp"\
+	"..\..\Src\MsgRes\MsgDef.h"\
+	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboLib\File.h"\
+	"..\..\Src\TomboLib\Logger.h"\
+	"..\..\Src\TomboLib\TString.h"\
+	"..\..\Src\TomboLib\Uniconv.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Release"
+
+DEP_CPP_MESSA=\
+	"..\..\Src\Message.h"\
+	"..\..\Src\MsgRes\DefaultMsg.cpp"\
+	"..\..\Src\MsgRes\MsgDef.h"\
+	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboLib\File.h"\
+	"..\..\Src\TomboLib\Logger.h"\
+	"..\..\Src\TomboLib\TString.h"\
+	"..\..\Src\TomboLib\Uniconv.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Debug"
+
+DEP_CPP_MESSA=\
+	"..\..\Src\Message.h"\
+	"..\..\Src\MsgRes\DefaultMsg.cpp"\
+	"..\..\Src\MsgRes\MsgDef.h"\
+	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboLib\File.h"\
+	"..\..\Src\TomboLib\Logger.h"\
+	"..\..\Src\TomboLib\TString.h"\
+	"..\..\Src\TomboLib\Uniconv.h"\
+	
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\Src\NewFolderDialog.cpp
 
 !IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
@@ -3200,6 +3355,7 @@ DEP_CPP_PASSW=\
 	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoNote.h"\
 	"..\..\Src\Message.h"\
+	"..\..\Src\MsgRes\MsgDef.h"\
 	"..\..\Src\PasswordDialog.h"\
 	"..\..\Src\Tombo.h"\
 	"..\..\Src\TomboLib\File.h"\
@@ -3293,6 +3449,7 @@ DEP_CPP_PASSWO=\
 	"..\..\Src\Crypt.h"\
 	"..\..\Src\CryptManager.h"\
 	"..\..\Src\Message.h"\
+	"..\..\Src\MsgRes\MsgDef.h"\
 	"..\..\Src\PasswordDialog.h"\
 	"..\..\Src\PasswordManager.h"\
 	"..\..\Src\Property.h"\
@@ -3465,6 +3622,7 @@ DEP_CPP_PROPE=\
 	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoNote.h"\
 	"..\..\Src\Message.h"\
+	"..\..\Src\MsgRes\MsgDef.h"\
 	"..\..\Src\PasswordManager.h"\
 	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
@@ -3891,6 +4049,7 @@ DEP_CPP_SEARCHT=\
 	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoNote.h"\
 	"..\..\Src\Message.h"\
+	"..\..\Src\MsgRes\MsgDef.h"\
 	"..\..\Src\SearchEngine.h"\
 	"..\..\Src\SearchTree.h"\
 	"..\..\Src\Tombo.h"\
@@ -4033,6 +4192,9 @@ SOURCE=..\..\Src\SelectViewWndProc.cpp
 DEP_CPP_SELEC=\
 	"..\..\Src\MemoSelectView.h"\
 	"..\..\Src\Property.h"\
+	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboLib\File.h"\
+	"..\..\Src\TomboLib\Logger.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
@@ -4326,6 +4488,8 @@ SOURCE=..\..\Src\TreeViewItem.cpp
 
 DEP_CPP_TREEV=\
 	"..\..\Src\DirList.h"\
+	"..\..\Src\HPCPlatform.h"\
+	"..\..\Src\LagendaPlatform.h"\
 	"..\..\Src\MainFrame.h"\
 	"..\..\Src\MemoDetailsView.h"\
 	"..\..\Src\MemoFolder.h"\
@@ -4333,8 +4497,12 @@ DEP_CPP_TREEV=\
 	"..\..\Src\MemoNote.h"\
 	"..\..\Src\MemoSelectView.h"\
 	"..\..\Src\Message.h"\
+	"..\..\Src\MsgRes\MsgDef.h"\
 	"..\..\Src\PasswordManager.h"\
+	"..\..\Src\PlatformLayer.h"\
+	"..\..\Src\PocketPCPlatform.h"\
 	"..\..\Src\Property.h"\
+	"..\..\Src\PsPCPlatform.h"\
 	"..\..\Src\Tombo.h"\
 	"..\..\Src\TomboLib\DirectoryScanner.h"\
 	"..\..\Src\TomboLib\File.h"\
@@ -4346,6 +4514,7 @@ DEP_CPP_TREEV=\
 	"..\..\Src\TSParser.h"\
 	"..\..\Src\VFManager.h"\
 	"..\..\Src\VFStream.h"\
+	"..\..\Src\Win32Platform.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
@@ -4906,6 +5075,7 @@ SOURCE=..\..\Src\VFManager.cpp
 
 DEP_CPP_VFMAN=\
 	"..\..\Src\Message.h"\
+	"..\..\Src\MsgRes\MsgDef.h"\
 	"..\..\Src\PasswordManager.h"\
 	"..\..\Src\Tombo.h"\
 	"..\..\Src\TomboLib\File.h"\
@@ -5059,6 +5229,7 @@ DEP_CPP_VFSTR=\
 	"..\..\Src\MemoNote.h"\
 	"..\..\Src\MemoSelectView.h"\
 	"..\..\Src\Message.h"\
+	"..\..\Src\MsgRes\MsgDef.h"\
 	"..\..\Src\Property.h"\
 	"..\..\Src\SearchEngine.h"\
 	"..\..\Src\Tombo.h"\

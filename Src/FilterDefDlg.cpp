@@ -96,11 +96,11 @@ void FilterDlgFilterTab::Init(HWND hDlg)
 	lvc.fmt = LVCFMT_LEFT;
 
 	lvc.cx = 100;
-	lvc.pszText = MSG_FILTERDEFPROPTTL_FILTERTYPE_HDR;
+	lvc.pszText = (LPTSTR)MSG_FILTERDEFPROPTTL_FILTERTYPE_HDR;
 	ListView_InsertColumn(hList, 0, &lvc);
 
 	lvc.cx = 150;
-	lvc.pszText = MSG_FILTERDEFPROPTTL_FILTERVAL_HDR;
+	lvc.pszText = (LPTSTR)MSG_FILTERDEFPROPTTL_FILTERVAL_HDR;
 	ListView_InsertColumn(hList, 1, &lvc);
 
 	/////////////////////////////////////////

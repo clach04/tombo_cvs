@@ -14,7 +14,7 @@
 #define NUM_SV_CMDBAR_BUTTONS 10
 CSOBAR_BUTTONINFO	aSVCSOBarButtons[NUM_SV_CMDBAR_BUTTONS] = 
 {
-	IDM_SV_MENU_1,  CSOBAR_BUTTON_SUBMENU_DOWN,  CSO_BUTTON_DISP, (-1),         NULL, MSG_MEMO, NULL,   CSOBAR_CODEPOS_CENTER, 1, (-1), (-1), (-1), (-1), 0, CLR_INVALID, CLR_INVALID, CLR_INVALID, FALSE, FALSE,
+	IDM_SV_MENU_1,  CSOBAR_BUTTON_SUBMENU_DOWN,  CSO_BUTTON_DISP, (-1),         NULL, NULL,     NULL,   CSOBAR_CODEPOS_CENTER, 1, (-1), (-1), (-1), (-1), 0, CLR_INVALID, CLR_INVALID, CLR_INVALID, FALSE, FALSE,
 	IDM_SV_MENU_2,  CSOBAR_BUTTON_SUBMENU_DOWN,  CSO_BUTTON_DISP, IDB_TOOL,     NULL, NULL,     NULL,   CSOBAR_CODEPOS_CENTER, 1, (-1), (-1), (-1), (-1), 0, CLR_INVALID, CLR_INVALID, CLR_INVALID, FALSE, FALSE,
 	0,              CSOBAR_SEP,                  CSO_BUTTON_DISP, (-1),         NULL, NULL,     NULL,   0,                     1, (-1), (-1), (-1), (-1), 0, CLR_INVALID, CLR_INVALID, CLR_INVALID, FALSE, FALSE,
 	IDM_SV_MENU_3,  CSOBAR_BUTTON_SUBMENU_DOWN,  CSO_BUTTON_DISP, IDB_BOOKMARK, NULL, NULL,     NULL,   CSOBAR_CODEPOS_CENTER, 1, (-1), (-1), (-1), (-1), 0, CLR_INVALID, CLR_INVALID, CLR_INVALID, FALSE, FALSE,
@@ -35,7 +35,7 @@ CSOBAR_BUTTONINFO	aDVCSOBarButtons[NUM_DV_CMDBAR_BUTTONS] =
 {
 	IDM_RETURNLIST, CSOBAR_COMMON_BUTTON,       CSO_BUTTON_DISP, (-1),            NULL, NULL,     NULL,   CSOBAR_CODEPOS_CENTER, 1, (-1), (-1), (-1), (-1), CSO_ID_BACK, CLR_INVALID, CLR_INVALID, CLR_INVALID, FALSE, FALSE,
 	0,              CSOBAR_SEP,                 CSO_BUTTON_DISP, (-1),            NULL, NULL,     NULL,   0,                     1, (-1), (-1), (-1), (-1), 0,           CLR_INVALID, CLR_INVALID, CLR_INVALID, FALSE, FALSE,
-	IDM_DV_MENU_1,  CSOBAR_BUTTON_SUBMENU_DOWN, CSO_BUTTON_DISP, (-1),            NULL, MSG_EDIT, NULL,   CSOBAR_CODEPOS_CENTER, 1, (-1), (-1), (-1), (-1), 0,           CLR_INVALID, CLR_INVALID, CLR_INVALID, FALSE, FALSE,
+	IDM_DV_MENU_1,  CSOBAR_BUTTON_SUBMENU_DOWN, CSO_BUTTON_DISP, (-1),            NULL, NULL,     NULL,   CSOBAR_CODEPOS_CENTER, 1, (-1), (-1), (-1), (-1), 0,           CLR_INVALID, CLR_INVALID, CLR_INVALID, FALSE, FALSE,
 	0,              CSOBAR_SEP,                 CSO_BUTTON_DISP, (-1),            NULL, NULL,     NULL,   0,                     1, (-1), (-1), (-1), (-1), 0,           CLR_INVALID, CLR_INVALID, CLR_INVALID, FALSE, FALSE,
 	IDM_SAVE,       CSOBAR_BUTTON_NORM,         CSO_BUTTON_DISP, IDB_SAVE,        NULL, NULL,     NULL,   CSOBAR_CODEPOS_CENTER, 1, (-1), (-1), (-1), (-1), 0,           CLR_INVALID, CLR_INVALID, CLR_INVALID, FALSE, FALSE,
 	0,              CSOBAR_SEP,                 CSO_BUTTON_DISP, (-1),            NULL, NULL,     NULL,   0,                     1, (-1), (-1), (-1), (-1), 0,           CLR_INVALID, CLR_INVALID, CLR_INVALID, FALSE, FALSE,
@@ -70,18 +70,23 @@ static HWND MakeCSOBar(HINSTANCE hInst, HWND hWnd,
 
 void LagendaPlatform::Create(HWND hWnd, HINSTANCE hInst)
 {
-	// 一覧ビュー
+	// Tree view 
 	hMSCmdBar = MakeCSOBar(hInst, hWnd, ID_CMDBAR_MAIN);
 	HMENU hMSMenu = LoadMenu(hInst, MAKEINTRESOURCE(IDR_MENU_MAIN));
 	hMSMemoMenu     = aSVCSOBarButtons[0].SubMenu = GetSubMenu(hMSMenu, 0);
 	hMSToolMenu     = aSVCSOBarButtons[1].SubMenu = GetSubMenu(hMSMenu, 1);
 	hMSBookMarkMenu = aSVCSOBarButtons[3].SubMenu = GetSubMenu(hMSMenu, 2);
+
+	aSVCSOBarButtons[0].FaceText = (LPTSTR)MSG_MEMO;
+
 	for (int i = 0; i < NUM_SV_CMDBAR_BUTTONS; i++) {
 		aSVCSOBarButtons[i].reshInst = hInst;
 	}
 	CSOBar_AddButtons(hMSCmdBar, hInst, NUM_SV_CMDBAR_BUTTONS, &aSVCSOBarButtons[0]);
 
-	// 詳細ビュー
+	// Edit view
+	aDVCSOBarButtons[2].FaceText = (LPTSTR)MSG_EDIT;
+
 	hMDCmdBar = MakeCSOBar(hInst, hWnd, ID_CMDBAR_DETAILS);
 	HMENU hMDMenu = LoadMenu(hInst, MAKEINTRESOURCE(IDR_MENU_DETAILS));
 	hMDEditMenu = aDVCSOBarButtons[2].SubMenu	= GetSubMenu(hMDMenu, 0);

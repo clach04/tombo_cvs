@@ -1197,3 +1197,56 @@ void CopyKanjiString(LPTSTR pDst, LPCTSTR pSrc, DWORD nLen)
 	_tcsncpy(pDst, pSrc, nLen);
 #endif
 }
+
+////////////////////////////////////////////////////
+// Convert UTF-8 to UCS2
+////////////////////////////////////////////////////
+// Windows CE's WideCharToMultiByte is not support UTF-8... sigh..
+
+// Allocate and convert to UCS2 code. Caller should delete[] the buffer returned.
+// if invalid UTF-8 data, return NULL and set GetLastError() to ERROR_INVALID_DATA.
+
+LPWSTR ConvUTF8ToUCS2(const char *pUTFData)
+{
+	LPWSTR pData = new WCHAR[strlen(pUTFData) + 1];
+
+	const char *p = pUTFData;
+	LPWSTR q = pData;
+
+	WORD w1, w2, w3;
+	WCHAR c;
+
+	while(*p) {
+		if ((*p & 0xF0) == 0xE0 && (*(p+1) & 0xC0) == 0x80 && (*(p+2) & 0xC0) == 0x80) {
+			// 3byte code
+			w1 = *p & 0x0F;
+			w2 = *(p+1) & 0x3F;
+			w3 = *(p+2) & 0x3F;
+			c = (w1 << 12) | (w2 << 6) | w3;
+			*q++ = c;
+			p+= 3;
+		} else if ((*p & 0xE0) == 0xC0 && (*(p+1) & 0xA0) == 0x80) {
+			// 2byte code
+			w1 = *p & 0x1F;
+			w2 = *(p+1) & 0x3F;
+			c = (w1 << 6) | w2;
+			*q++ = c;
+			p+= 2;
+		} else if ((*p & 0x80) == 0x00) {
+			// 1byte code
+			w1 = *p;
+			c = w1;
+			*q++ = c;
+			p++;
+		} else {
+			// illegal code
+			delete [] pData;
+			SetLastError(ERROR_INVALID_DATA);
+			return NULL;
+		}
+
+	}
+	*q = TEXT('\0');
+
+	return pData;
+}

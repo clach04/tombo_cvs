@@ -661,3 +661,11 @@ Not fully tested on both platform, probably it will work.
 // main trunk
 
 * modify menubar width on PocketPC(English).
+
+////////////////////////////////
+// B142
+////////////////////////////////
+// main trunk
+
+* Split message data to message file.
+	This is a part of i18n.

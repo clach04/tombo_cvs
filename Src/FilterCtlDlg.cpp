@@ -97,7 +97,7 @@ void FilterCtlDlg::InitDialog(HWND hDlg)
 	lvc.mask = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT;
 	lvc.fmt = LVCFMT_LEFT;
 	lvc.cx = 200;
-	lvc.pszText = MSG_VFOLDER_NAME_TTL;
+	lvc.pszText = (LPTSTR)MSG_VFOLDER_NAME_TTL;
 	ListView_InsertColumn(hList, 0, &lvc);
 
 	/////////////////////////////////////////

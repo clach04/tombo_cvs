@@ -1,0 +1,119 @@
+New Memo
+Return to list
+Save
+Insert date1
+Insert date2
+Memo
+Tool
+Edit
+Initialize APP button failed.
+New
+Update
+View
+memo
+Save memo failed(%d).
+Get SIP status failed.
+Create folder failed.
+Erase password in memory
+Erase password
+Folding failed.
+Not enough memory.
+Password is not match.
+Can't get password.
+Set timer failed.
+Remove directory failed.
+There are file that is not memo.
+Remove file failed.
+Create directory failed.
+Copy file failed.
+Memo has been modified. Save changes?
+Confirm
+Can't open memo
+Password is not match. Continue?
+Password is not match.
+Password mismatch
+Directory not exists. Create?
+Create directory
+Choose folder
+Register password.
+Change password
+Please set password.
+Get password failed.
+Get fingerprint failed.
+Password has registered.
+Register password failed.
+Save data failed.
+Encryption failed.(%d)
+Decryption faield.(%d)
+Move failed.
+Copy failed.
+String not found
+Delete selected memo?
+Delete memo
+Delete memo failed.
+Delete memo that before encrypted failed. Please delete manually.
+Delete memo that before decrypted failed. Please delete manually.
+No filename.
+Same name file exists.
+Rename file failed(%d).
+Delete selected folder?
+Delete folder
+No foldername.
+Same folder name exists.
+Rename folder failed(%d).
+Get dateformat failed.
+Can't set memo folder as '\\'
+%y\t:Year(2001)\r\n%Y\t:Year(01)\r\n%M\t:Month(01,02,..)\r\n%b\t:Month(Jan,Feb,..)\r\n%d\t:Day(01,02..)\r\n%D\t:Day(1,2,..)\r\n%W\t:WDay(Sun,Mon,..)\r\n%H\t:Hour(12H:00..11)\r\n%I\t:Hour(12H:01..12)\r\n%h\t:Hour(24H)\r\n%a\t:AM,PM\r\n%m\t:Min(01,02,..)\r\n%s\t:Sec(01,02,..)\r\n%%\t:\"%\"\r\n%n\t:newline\r\n%fn\t:file path(n is 0-9)\r\n%Fn\t:file path
+Search result
+Encrypt files under the folder?
+Encrypt files
+Delete some plain file failed.
+Some files are not encrypted.
+Decrypt files under the folder?
+Decrypt files
+Delete some encrypted file failed.
+Some files are not decrypted.
+Self test of encryption libs failed(%s). Encryption are not work correctly.
+Self test failed
+Wait a moment...
+Search failed(%d).
+Search has been canceled.
+Quick filter
+Create virtual folder failed.
+Grep result
+Virtual folder name
+Delete selected virtual folder?
+Delete virtual folder
+Filter settings
+Source
+Filter
+View path
+Filter ype
+Condition
+Find
+Num of items
+Last update
+Sort
+%d item(s)
+Newer than %d day before
+Older than %d day before
+Dictionary order
+Reverse dic order
+Old order of last update
+New order of last update
+Old order of create date
+New order of create date
+Asc order of file size
+Dsc order of file size
+Initialize dialog failed.
+Generate pattern failed
+Please set positive number
+Invalid font size
+Dst folder is subfolder of src folder
+Not display path
+View before file name
+View after file name
+Name
+Path
+Delete bookmarks
+Deleting selected bookmarks. Are you sure?
