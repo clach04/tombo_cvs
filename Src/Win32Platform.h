@@ -23,12 +23,11 @@ public:
 	HMENU GetMSBookMarkMenu() { return GetSubMenu(GetMainMenu(), BOOKMARK_MENU_POS); }
 
 	void EnableMenu(UINT uid, BOOL bEnable);
-
+	void EnableSearchNext();
+	void CheckMenu(UINT uid, BOOL bCheck);
 
 	void OpenDetailsView();
 	void CloseDetailsView();
-
-	void EnableSearchNext();
 
 	void AdjustUserRect(RECT *r);
 

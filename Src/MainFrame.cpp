@@ -471,21 +471,7 @@ void MainFrame::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	}	
 #endif
 
-#if defined(PLATFORM_WIN32)
-	// set button status to pressed when starting one pane mode.
-	if (!g_Property.IsUseTwoPane()) {
-		SendMessage(pPlatform->hToolBar, TB_PRESSBUTTON, IDM_TOGGLEPANE, MAKELONG(TRUE, 0));
-		HMENU hMenu = GetMenu(hWnd);
-		BOOL b = CheckMenuItem(hMenu, IDM_TOGGLEPANE, MF_BYCOMMAND | MF_UNCHECKED);
-	}
-#endif
-#if defined(PLATFORM_HPC)
-	if (!g_Property.IsUseTwoPane()) {
-		HMENU hMenu = CommandBar_GetMenu(GetCommandBar(pPlatform->hMSCmdBar, ID_CMDBAR_MAIN), 0);
-		SendMessage(GetCommandBar(pPlatform->hMSCmdBar, ID_BUTTONBAND), TB_PRESSBUTTON, IDM_TOGGLEPANE, MAKELONG(TRUE, 0));
-		CheckMenuItem(hMenu, IDM_TOGGLEPANE, MF_BYCOMMAND | MF_UNCHECKED);
-	}
-#endif
+	pPlatform->CheckMenu(IDM_TOGGLEPANE, g_Property.IsUseTwoPane());
 
 	// Create edit view
 	pDetailsView->Create(TEXT("MemoDetails"), r, hWnd,  hInstance, g_Property.DetailsViewFont());
@@ -813,9 +799,6 @@ void MainFrame::OnSIPResize(BOOL bImeOn, RECT *pSipRect)
 		GetWindowRect(hMainWnd, &rx);
 		msView.MoveWindow(0, nTop, 240, nClientBottom - rx.top - nTop);
 		pDetailsView->MoveWindow(0, nTop, 240, nClientBottom - rx.top - nTop);
-		
-//		msView.MoveWindow(0, nTop, 240, nBottom - nSipHeight);
-//		mdView.MoveWindow(0, nTop, 240, nBottom - nSipHeight);
 	} else {
 		msView.MoveWindow(0, nTop, 240, nBottom);
 		pDetailsView->MoveWindow(0, nTop, 240, nBottom);
@@ -1457,20 +1440,19 @@ void MainFrame::LoadWinSize(HWND hWnd)
 
 void MainFrame::SetWrapText(BOOL bWrap)
 {
-	UINT uCheckFlg;
-
-	HMENU hMenu = pPlatform->GetMDToolMenu();
-
-	if (bWrap) {
-		uCheckFlg = MF_CHECKED;
-	} else {
-		uCheckFlg = MF_UNCHECKED;
-	}
-
 	// Change edit view status
 	if (!pDetailsView->SetFolding(bWrap)) {
 		TomboMessageBox(NULL, MSG_FOLDING_FAILED, TOMBO_APP_NAME, MB_ICONERROR | MB_OK);
 		return;
+	}
+
+	UINT uCheckFlg;
+
+	HMENU hMenu = pPlatform->GetMDToolMenu();
+	if (bWrap) {
+		uCheckFlg = MF_CHECKED;
+	} else {
+		uCheckFlg = MF_UNCHECKED;
 	}
 
 	// CheckMenuItem is superseded, but CE don't have SetMenuItemInfo.
@@ -1492,46 +1474,14 @@ void MainFrame::SetWrapText(BOOL bWrap)
 void MainFrame::TogglePane()
 {
 #if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
-	MENUITEMINFO mii;
-	mii.cbSize = sizeof(mii);
-	mii.fMask = MIIM_STATE;
+	pPlatform->CheckMenu(IDM_TOGGLEPANE, !g_Property.IsUseTwoPane());
 
-	HMENU hMenu;
-	BOOL bFolding;
-	UINT uCheckFlg;
-
-#if defined(PLATFORM_WIN32)
-	hMenu = GetMenu(hMainWnd);
-#endif
-#if defined(PLATFORM_HPC)
-	hMenu = CommandBar_GetMenu(GetCommandBar(pPlatform->hMSCmdBar, ID_CMDBAR_MAIN), 0);
-#endif
-
-	// get menu status
-	if (!GetMenuItemInfo(hMenu, IDM_TOGGLEPANE, FALSE, &mii)) return;
-	// invert menu status
-	if (mii.fState & MFS_CHECKED) {
-		bFolding = TRUE;
-		uCheckFlg = MF_UNCHECKED;
-	} else {
-		bFolding = FALSE;
-		uCheckFlg = MF_CHECKED;
-	}
-	// CheckMenuItem is superseeded funcs, but in CE, SetMenuItemInfo can't set values, so use it.
-	CheckMenuItem(hMenu, IDM_TOGGLEPANE, MF_BYCOMMAND | uCheckFlg);
-
-	// control toolbar
-#if defined(PLATFORM_WIN32)
-	SendMessage(pPlatform->hToolBar, TB_PRESSBUTTON, IDM_TOGGLEPANE, MAKELONG(!uCheckFlg, 0));
-#endif
-#if defined(PLATFORM_HPC)
-	SendMessage(GetCommandBar(pPlatform->hMSCmdBar, ID_BUTTONBAND), TB_PRESSBUTTON, IDM_TOGGLEPANE, MAKELONG(!uCheckFlg, 0));
-#endif
 	if (g_Property.IsUseTwoPane()) {
 		SaveWinSize();
 	}
 
-	g_Property.SetUseTwoPane(uCheckFlg);
+	g_Property.SetUseTwoPane(g_Property.IsUseTwoPane() ? MF_UNCHECKED : MF_CHECKED);
+
 	RECT r;
 	GetClientRect(hMainWnd, &r);
 

@@ -220,4 +220,23 @@ void HPCPlatform::AdjustUserRect(RECT *r)
 	r->bottom -= nHOffset;
 }
 
+void HPCPlatform::CheckMenu(UINT uid, BOOL bCheck)
+{
+	BOOL bNegButton = FALSE;
+	switch(uid) {
+	case IDM_TOGGLEPANE:
+		bNegButton = TRUE;
+		break;
+	default:
+		break;
+	}
+
+	BOOL bButton = bNegButton ? !bCheck : bCheck;
+
+	HMENU hMenu = GetMainMenu();
+	// CheckMenuItem is superseeded funcs, but in CE, SetMenuItemInfo can't set values, so use it.
+	CheckMenuItem(hMenu, uid, MF_BYCOMMAND | (bCheck ? MF_CHECKED : MF_UNCHECKED));
+	SendMessage(GetCommandBar(hMSCmdBar, ID_BUTTONBAND), TB_PRESSBUTTON, uid, MAKELONG(bButton, 0));
+}
+
 #endif // PLATFORM_HPC

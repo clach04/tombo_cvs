@@ -23,6 +23,7 @@ public:
 
 	void EnableMenu(UINT uid, BOOL bEnable);
 	void EnableSearchNext() { /* nop */ }
+	void CheckMenu(UINT uid, BOOL bCheck) {/* nop */}
 
 	void OpenDetailsView();
 	void CloseDetailsView();
