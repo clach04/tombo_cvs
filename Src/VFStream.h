@@ -171,15 +171,26 @@ public:
 ////////////////////////////////////
 
 class VFTimestampFilter : public VFStream {
-	DWORD nBaseTime;
 	BOOL bNewer;
+	UINT64 uBase;
 public:
 	VFTimestampFilter();
 	~VFTimestampFilter();
-	BOOL Init(DWORD nBaseTime, BOOL bNewer);
+	BOOL Init(DWORD nDeltaDays, BOOL bNewer);
 
 	// BOOL Prepare();
 	BOOL Store(VFNote *p);
+};
+
+////////////////////////////////////
+// Sort 
+////////////////////////////////////
+
+class VFSortFilter : public VFStream {
+public:
+	VFSortFilter();
+	~VFSortFilter();
+	BOOL Init();
 };
 
 #endif

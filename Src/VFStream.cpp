@@ -3,6 +3,7 @@
 #include <commctrl.h>
 #include "Tombo.h"
 #include "UniConv.h"
+#include "TString.h"
 #include "File.h"
 #include "Property.h"
 #include "MemoSelectView.h"
@@ -321,14 +322,41 @@ VFTimestampFilter::~VFTimestampFilter()
 {
 }
 
-BOOL VFTimestampFilter::Init(DWORD nBase, BOOL bNew)
+BOOL VFTimestampFilter::Init(DWORD nDelta, BOOL bNew)
 {
-	nBaseTime = nBase;
+	SYSTEMTIME st;
+	GetLocalTime(&st);
+	FILETIME ft;
+	SystemTimeToFileTime(&st, &ft);
+
+	uBase = ((UINT64)ft.dwHighDateTime << 32) | (UINT64)ft.dwLowDateTime;
+	UINT64 d = 0xc92a69c000;	// 1 day
+	uBase -= d * nDelta;
 	bNewer = bNew;
+
 	return TRUE;
 }
 
 BOOL VFTimestampFilter::Store(VFNote *pNote)
 {
-	return TRUE;
+	MemoNote *pMemo = pNote->GetNote();
+	TString sPath;
+	if (!sPath.AllocFullPath(pMemo->MemoPath())) return FALSE;
+
+	WIN32_FIND_DATA wfd;
+	HANDLE h = FindFirstFile(sPath.Get(), &wfd);
+	if (h != INVALID_HANDLE_VALUE) {
+		UINT64 uUpdate = ((UINT64)wfd.ftLastWriteTime.dwHighDateTime << 32) | (UINT64)wfd.ftLastWriteTime.dwLowDateTime ;
+		BOOL bResult = TRUE;
+		if ((bNewer && uUpdate > uBase) || (!bNewer && uUpdate < uBase)) {
+			bResult = pNext->Store(pNote);
+		} else {
+			delete pNote;
+		}
+		FindClose(h);
+		return bResult;
+	} else {
+		delete pNote;
+		return TRUE;
+	}
 }

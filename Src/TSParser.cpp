@@ -303,6 +303,8 @@ BOOL TSVFolderTag::EndElement(ParseInfo *p)
 ///////////////////////////////////////
 
 class TSTimestampTag : public TSParseTagItem {
+	DWORD nDelta;
+	DWORD nRecent;
 public:
 	TSTimestampTag() : TSParseTagItem(TAGID_TIMESTAMP) {}
 	~TSTimestampTag() {}
@@ -314,11 +316,36 @@ public:
 
 BOOL TSTimestampTag::StartElement(ParseInfo *p, const XML_Char **atts)
 {
+	DWORD i = 0;
+	nRecent = TRUE;
+	nDelta = 0xFFFFFFFF;
+	while(atts[i] != NULL) {
+		if (wcsicmp(atts[i], L"days") == 0) {
+			// atts[i + 1];
+			nDelta = _wtol(atts[i + 1]);
+		}
+		if (wcsicmp(atts[i], L"older") == 0) {
+			nRecent = FALSE;
+		}
+		if (wcsicmp(atts[i], L"newer") == 0) {
+			nRecent = TRUE;
+		}
+		i += 2;
+	}
+	if (nDelta == 0xFFFFFFFF) return FALSE;
 	return TRUE;
 }
 
 BOOL TSTimestampTag::EndElement(ParseInfo *p)
 {
+	if (pHead == NULL) return FALSE;
+
+	VFTimestampFilter *pFilter = new VFTimestampFilter();
+	if (pFilter == NULL || !pFilter->Init(nDelta, nRecent)) return FALSE;
+	TSParseTagItem *pParent = pNext;
+	pTail->SetNext(pFilter);
+	pParent->pHead = pHead;
+	pParent->pTail = pFilter;
 	return TRUE;
 }
 
