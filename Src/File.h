@@ -29,6 +29,8 @@ public:
 	BOOL Read(LPBYTE pBuf, LPDWORD pSize);
 	BOOL Write(const LPBYTE pBuf, DWORD nSize);
 
+	BOOL WriteUnicodeString(LPCWSTR p);
+
 	BOOL SetEOF();
 };
 
