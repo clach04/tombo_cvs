@@ -6,9 +6,12 @@
 #endif
 
 #include "Tombo.h"
+#include "Message.h"
+#include "UniConv.h"
 #include "MainFrame.h"
 #include "Property.h"
 #include "Logger.h"
+
 //////////////////////////////////////
 // グローバル変数
 //////////////////////////////////////
@@ -26,6 +29,10 @@ BOOL bDisableHotKey;
 
 BOOL CheckAndRaiseAnotherTombo();
 
+extern "C" {
+	const char *CheckBlowFish();
+};
+
 //////////////////////////////////////
 // WinMain
 //////////////////////////////////////
@@ -39,6 +46,19 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPSTR pCmdLine, int nCmdSho
 	// 二重起動チェック
 	if (CheckAndRaiseAnotherTombo()) {
 		return 0;
+	}
+
+	const char *p = CheckBlowFish();
+	if (p != NULL) {
+		TCHAR buf[1024];
+		LPTSTR pMsg = ConvSJIS2Unicode(p);
+		if (pMsg) {
+			wsprintf(buf, MSG_CHECKBF_FAILED, pMsg);
+		} else {
+			wsprintf(buf, MSG_CHECKBF_FAILED, TEXT("unknown"));
+		}
+		MessageBox(NULL, buf, MSG_CHECKBF_TTL, MB_ICONWARNING | MB_OK);
+		delete [] pMsg;
 	}
 
 	// Loggerの初期化

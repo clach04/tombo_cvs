@@ -92,6 +92,8 @@
 #define MSG_CRYPT_FILE_DEL_FAILED \
 								MSG("いくつかのファイルについて暗号ファイルの削除に失敗しました", "Delete some encrypted file failed.")
 #define MSG_DECRYPT_FAILED		MSG("いくつかのファイルについて復号化に失敗しました", "Some files are not decrypted.")
+#define MSG_CHECKBF_FAILED		MSG("暗号化ライブラリのセルフテストに失敗しました(%s)。暗号化が正常に行われない可能性があります", "Self test of encryption libs failed(%s). Encryption are not work correctly.")
+#define MSG_CHECKBF_TTL			MSG("セルフテスト失敗", "Self test failed")
 
 #endif
 
