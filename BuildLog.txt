@@ -879,3 +879,8 @@ Finding and encrypting to the folder may not work.
 * Change repository mode for *.vcp, *.vcw, *.dsp, *.dsw to binary. (Thanx Alex!)
 * Move to RepositoryImpl.* about move, copy, rename to folder codes.
 
+////////////////////////////////
+// B170(TOMBO 1.13)
+////////////////////////////////
+
+* Change About Dialog
