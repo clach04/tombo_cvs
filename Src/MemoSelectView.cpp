@@ -1331,7 +1331,7 @@ static HTREEITEM FindItem2(HWND hWnd, HTREEITEM hParent, LPCTSTR pStr, DWORD nLe
 		ti.hItem = hItem;
 		TreeView_GetItem(hWnd, &ti);
 
-		if (_tcsnicmp(buf, pStr, nLen) == 0) {
+		if (_tcsnicmp(buf, pStr, nLen) == 0 && *(buf + nLen) == TEXT('\0')) {
 			return hItem;
 		}
 
