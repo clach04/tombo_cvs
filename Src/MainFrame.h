@@ -127,7 +127,7 @@ public:
 	// ステータス表示制御
 	void SetReadOnlyStatus(BOOL bReadOnly) { SetStatusIndicator(1, MSG_RONLY, bReadOnly); }
 	void SetNewMemoStatus(BOOL bNew) { SetStatusIndicator(2, MSG_NEW, bNew); }
-	void SetModifyStatus(BOOL bModify) { SetStatusIndicator(3, MSG_UPDATE, bModify); }
+	void SetModifyStatus(BOOL bModify);
 
 #if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
 	void ToggleShowStatusBar();
@@ -136,9 +136,11 @@ public:
 	// タイトルの変更
 	void SetTitle(LPCTSTR pTitle);
 
+	// Enable Save button
+	void EnableSaveButton(BOOL bEnable);
+
 	void SendRequestOpen(MemoLocator *pLoc, DWORD nSwitchFlg) { SendMessage(hMainWnd, MWM_OPEN_REQUEST, (WPARAM)nSwitchFlg, (LPARAM)pLoc); }
 	void PostRequestOpen(MemoLocator *pLoc, DWORD nSwitchFlg) { PostMessage(hMainWnd, MWM_OPEN_REQUEST, (WPARAM)nSwitchFlg, (LPARAM)pLoc); }
-
 
 	int MessageBox(LPCTSTR pText, LPCTSTR pCaption, UINT uType); 
 };

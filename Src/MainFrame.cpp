@@ -936,6 +936,12 @@ void MainFrame::SetStatusIndicator(DWORD nPos, LPCTSTR pText, BOOL bDisp)
 #endif
 }
 
+void MainFrame::SetModifyStatus(BOOL bModify)
+{
+	EnableSaveButton(bModify);
+	SetStatusIndicator(3, MSG_UPDATE, bModify);
+}
+
 ///////////////////////////////////////////////////
 // 終了
 ///////////////////////////////////////////////////
@@ -2112,6 +2118,30 @@ void MainFrame::ToggleShowStatusBar()
 	OnResize(0, MAKELPARAM(r.right - r.left, r.bottom - r.top));
 }
 #endif
+
+///////////////////////////////////////////////////
+// コマンドバンドからIDでコマンドバーを取得
+///////////////////////////////////////////////////
+
+void MainFrame::EnableSaveButton(BOOL bEnable)
+{
+	WORD nStat;
+	if (bEnable) {
+		nStat = TBSTATE_ENABLED;
+	} else {
+		nStat = 0;
+	}
+#if defined(PLATFORM_WIN32)
+	SendMessage(hToolBar, TB_SETSTATE, IDM_SAVE, MAKELONG(nStat, 0)); 
+#endif
+#if defined(PLATFORM_HPC)
+	SendMessage(GetCommandBar(hMSCmdBar, ID_BUTTONBAND), TB_ENABLEBUTTON, IDM_SAVE, MAKELONG(nStat, 0)); 
+#endif
+#if defined(PLATFORM_PKTPC) || defined(PLATFORM_PSPC)
+//	SendMessage(hMSCmdBar, TB_ENABLEBUTTON, IDM_SAVE, MAKELONG(nStat, 0)); 
+	SendMessage(hMDCmdBar, TB_ENABLEBUTTON, IDM_SAVE, MAKELONG(nStat, 0)); 
+#endif
+}
 
 ///////////////////////////////////////////////////
 // コマンドバンドからIDでコマンドバーを取得
