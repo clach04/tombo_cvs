@@ -628,7 +628,7 @@ void MainFrame::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	if (!(bResult && bStrict)) {
 		BOOL bPrev = bDisableHotKey;
 		bDisableHotKey = TRUE;
-		DWORD nResult = g_Property.Popup(pcs->hInstance, hWnd);
+		DWORD nResult = g_Property.Popup(pcs->hInstance, hWnd, TEXT(""));
 		bDisableHotKey = bPrev;
 		if (nResult == IDCANCEL) {
 			PostQuitMessage(1);
@@ -892,6 +892,12 @@ void MainFrame::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	SetTopMost();
 #endif
 	ActivateView(TRUE);
+
+
+	// open top page
+	if (_tcslen(g_Property.GetDefaultNote()) != 0) {
+		msView.ShowItem(g_Property.GetDefaultNote());
+	}
 
 	// Raize window for some PocketPC devices.
 //	SetForegroundWindow(hMainWnd);
@@ -1917,7 +1923,7 @@ void MainFrame::OnForgetPass()
 }
 
 ///////////////////////////////////////////////////
-// プロパティの変更
+// change property
 ///////////////////////////////////////////////////
 
 void MainFrame::OnProperty()
@@ -1927,18 +1933,23 @@ void MainFrame::OnProperty()
 
 	mmMemoManager.NewMemo();
 
-	int nResult = g_Property.Popup(hInstance, hMainWnd);
+	TString sPath;
+	if (!msView.GetCurrentItemPath(&sPath)) {
+		sPath.Set(TEXT(""));
+	}
+
+	int nResult = g_Property.Popup(hInstance, hMainWnd, sPath.Get());
 	bDisableHotKey = bPrev;
 	if (nResult != IDOK) return;
 
-	// フォント設定
+	// font setting
 	msView.SetFont(g_Property.SelectViewFont());
 	mdView.SetFont(g_Property.DetailsViewFont());
 
-	// タブストップの設定
+	// tabstop setting
 	mdView.SetTabstop();
 
-	// メモフォルダの再構成
+	// reload notes and folders
 	msView.DeleteAllItem();
 	msView.InitTree(pVFManager);
 #if defined(PLATFORM_WIN32) || defined(PLATFORM_PKTPC)

@@ -81,6 +81,7 @@ public:
 	// Get path information
 	virtual BOOL GetFolderPath(MemoSelectView *pView, TString *pPath) = 0;
 
+	virtual BOOL GetLocationPath(MemoSelectView *pView, TString *pPath) = 0;
 };
 
 /////////////////////////////////////////////
@@ -120,6 +121,7 @@ public:
 
 	MemoLocator ToLocator();
 	BOOL GetFolderPath(MemoSelectView *pView, TString *pPath);
+	BOOL GetLocationPath(MemoSelectView *pView, TString *pPath);
 
 };
 
@@ -155,6 +157,7 @@ public:
 	virtual BOOL CanDelete(MemoSelectView *pView);
 	virtual BOOL Expand(MemoSelectView *pView);
 	BOOL GetFolderPath(MemoSelectView *pView, TString *pPath);
+	BOOL GetLocationPath(MemoSelectView *pView, TString *pPath);
 
 };
 
@@ -177,6 +180,7 @@ public:
 	virtual BOOL CanLink(MemoSelectView *pView);
 
 	virtual BOOL GetFolderPath(MemoSelectView *pView, TString *pPath);
+	BOOL GetLocationPath(MemoSelectView *pView, TString *pPath);
 };
 
 /////////////////////////////////////////////
@@ -214,6 +218,7 @@ public:
 	virtual BOOL CanGrep(MemoSelectView *pVIew);
 
 	virtual BOOL GetFolderPath(MemoSelectView *pView, TString *pPath);
+	BOOL GetLocationPath(MemoSelectView *pView, TString *pPath);
 };
 
 
@@ -244,6 +249,7 @@ public:
 	virtual BOOL CanGrep(MemoSelectView *pVIew);
 
 	virtual BOOL GetFolderPath(MemoSelectView *pView, TString *pPath);
+	BOOL GetLocationPath(MemoSelectView *pView, TString *pPath);
 
 	// pGen's life scope is control under TreeViewVirtualFolder.
 	// don't delete pGen after calling SetGenerator.

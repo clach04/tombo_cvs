@@ -773,6 +773,17 @@ LPTSTR MemoSelectView::GeneratePath(HTREEITEM hItem, LPTSTR pBuf, DWORD nSiz)
 	return pPrev;
 }
 
+BOOL MemoSelectView::GetCurrentItemPath(TString *pPath)
+{
+	HTREEITEM h;
+	TreeViewItem *pItem = GetCurrentItem(&h);
+	if (pItem == NULL) return FALSE;
+
+	TString sPath;
+	if (!pItem->GetLocationPath(this, pPath)) return FALSE;
+	return TRUE;
+}
+
 void MemoSelectView::TreeExpand(HTREEITEM hItem)
 {
 	// delete dummy child nodes.
@@ -1331,12 +1342,13 @@ HTREEITEM MemoSelectView::ShowItem(LPCTSTR pPath, BOOL bSelChange, BOOL bOpenNot
 			bNote = TRUE;
 		}
 
+		if (bSelChange) TreeView_SelectItem(hViewWnd, hTargetItem);
 		// Get Target Item
 		hTargetItem = FindItem(hViewWnd, hTargetItem, pPartPath, bNote);
 		if (hTargetItem == NULL) {
 			return NULL;
 		}
-//		TreeView_SelectItem(hViewWnd, hTargetItem);
+		if (bSelChange) TreeView_SelectItem(hViewWnd, hTargetItem);
 
 		// restore path
 		*p = TEXT('\\');

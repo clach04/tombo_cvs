@@ -33,6 +33,7 @@
 #define IDD_GREPTAB_MAIN                124
 #define IDD_GREPTAB_PERSIST             125
 #define IDD_FILTERCTL                   126
+#define IDD_PROPTAB_DEFNOTE             127
 #define IDD_FILTERDEF_SRC               138
 #define IDD_FILTERDEF_FILTER            139
 #define IDD_FILTERDEF_ADD_REGEX         140
@@ -94,10 +95,13 @@
 #define IDC_FILTERDEF_FILTER_UP         1045
 #define IDC_FILTERDEF_FILTER_DOWN       1046
 #define IDC_FILTERCTL_DELETE            1046
+#define IDC_PROPTAB_DEFNOTE_PATH        1046
 #define IDC_FILTERDEF_FILTER_REGEX      1047
 #define IDC_FILTERCTL_RENAME            1047
+#define IDC_PROPTAB_DEFNOTE_SETCURRENT  1047
 #define IDC_FILTERDEF_REGEX_SEARCHSTR   1048
 #define IDC_FILTERDEF_FILTER_LIMIT      1048
+#define IDC_PROPTAB_DEFNOTE_SETBLANK    1048
 #define IDC_FILTERDEF_REGEX_CASESENSITIVE 1049
 #define IDC_FILTERDEF_FILTER_TIMESTAMP  1049
 #define IDC_FILTERDEF_REGEX_CRYPTMEMO   1050
@@ -157,6 +161,7 @@
 #define IDM_SAVE                        40045
 #define IDS_GREPTAB_PERSIST             40045
 #define IDM_INSDATE1                    40046
+#define IDS_PROPTAB_DEFNOTE             40046
 #define IDM_INSDATE2                    40047
 #define IDM_SELALL                      40048
 #define IDM_DETAILS_HSCROLL             40049

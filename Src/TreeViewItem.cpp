@@ -358,6 +358,12 @@ BOOL TreeViewFileItem::GetFolderPath(MemoSelectView *pView, TString *pPath)
 	return TRUE;
 }
 
+BOOL TreeViewFileItem::GetLocationPath(MemoSelectView *pView, TString *pPath)
+{
+	if (!pPath->Set(pNote->MemoPath())) return FALSE;
+	return TRUE;
+}
+
 /////////////////////////////////////////////
 //  Folder
 /////////////////////////////////////////////
@@ -616,6 +622,10 @@ BOOL TreeViewFolderItem::GetFolderPath(MemoSelectView *pView, TString *pPath)
 	return pView->GetPathForNewItem(pPath, this) != NULL;
 }
 
+BOOL TreeViewFolderItem::GetLocationPath(MemoSelectView *pView, TString *pPath)
+{
+	return GetFolderPath(pView, pPath);
+}
 /////////////////////////////////////////////
 //  –¼Ì•ÏX
 /////////////////////////////////////////////
@@ -790,6 +800,10 @@ BOOL TreeViewFileLink::GetFolderPath(MemoSelectView *pView, TString *pPath)
 	return TRUE;
 }
 
+BOOL TreeViewFileLink::GetLocationPath(MemoSelectView *pView, TString *pPath)
+{
+	return FALSE;
+}
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -949,6 +963,11 @@ BOOL TreeViewVirtualFolderRoot::GetFolderPath(MemoSelectView *pView, TString *pP
 	return pPath->Set(TEXT(""));
 }
 
+BOOL TreeViewVirtualFolderRoot::GetLocationPath(MemoSelectView *pView, TString *pPath)
+{
+	return FALSE;
+}
+
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 //  Virtual folder (non-root)
@@ -1100,4 +1119,9 @@ BOOL TreeViewVirtualFolder::CanGrep(MemoSelectView *pView)
 BOOL TreeViewVirtualFolder::GetFolderPath(MemoSelectView *pView, TString *pPath)
 {
 	return pPath->Set(TEXT(""));
+}
+
+BOOL TreeViewVirtualFolder::GetLocationPath(MemoSelectView *pView, TString *pPath)
+{
+	return FALSE;
 }

@@ -15,6 +15,7 @@
 #define IDS_PROPTAB_SELECTMEMO          11
 #define IDS_GREPTAB_MAIN                12
 #define IDS_GREPTAB_PERSIST             13
+#define IDS_PROPTAB_DEFNOTE             14
 #define ID_MENU_MAIN                    101
 #define ID_CMDBAR_MAIN                  101
 #define IDR_MENU_MAIN                   101
@@ -61,6 +62,7 @@
 #define IDD_FILTERDEF_ADD_LIMIT         141
 #define IDD_FILTERDEF_ADD_TIMESTAMP     142
 #define IDD_FILTERDEF_ADD_SORT          143
+#define IDD_PROPTAB_DEFNOTE             146
 #define IDC_PASS                        1000
 #define IDC_PROP_PASSWORD_DESC          1001
 #define IDC_PASS_TIMEOUT                1002
@@ -123,6 +125,9 @@
 #define IDC_FILTERDEF_SORT_TYPE         1058
 #define IDC_FONT_SELECT_CLEARTYPE       1059
 #define IDC_FONT_DETAILS_CLEARTYPE      1060
+#define IDC_PROPTAB_DEFNOTE_PATH        1061
+#define IDC_PROPTAB_DEFNOTE_SETCURRENT  1062
+#define IDC_PROPTAB_DEFNOTE_SETBLANK    1063
 #define IDM_EXIT                        40001
 #define IDM_NEWMEMO                     40002
 #define IDM_RETURNLIST                  40003

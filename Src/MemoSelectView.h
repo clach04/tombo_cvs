@@ -155,6 +155,7 @@ public:
 	BOOL SetTVItem(HTREEITEM h, TreeViewItem *p);
 
 	LPTSTR GeneratePath(HTREEITEM hItem, LPTSTR pBuf, DWORD nSiz);
+	BOOL GetCurrentItemPath(TString *pPath);
 
 	// Choose specified notes. if tree is collapsed, expand one.
 	HTREEITEM ShowItem(LPCTSTR pPath, BOOL bSelChange = TRUE, BOOL bOpenNotes = TRUE);

@@ -35,6 +35,7 @@
 #define IDD_DIALOG1                     125
 #define IDD_FILTERCTL                   126
 #define IDD_DIALOG2                     127
+#define IDD_PROPTAB_DEFNOTE             127
 #define IDD_PROPTAB_SIP                 128
 #define IDD_FILTERDEF_SRC               138
 #define IDD_FILTERDEF_FILTER            139
@@ -103,10 +104,13 @@
 #define IDC_FILTERDEF_FILTER_UP         1045
 #define IDC_FILTERDEF_FILTER_DOWN       1046
 #define IDC_FILTERCTL_DELETE            1046
+#define IDC_PROPTAB_DEFNOTE_PATH        1046
 #define IDC_FILTERDEF_FILTER_REGEX      1047
 #define IDC_FILTERCTL_RENAME            1047
+#define IDC_PROPTAB_DEFNOTE_SETCURRENT  1047
 #define IDC_FILTERDEF_REGEX_SEARCHSTR   1048
 #define IDC_FILTERDEF_FILTER_LIMIT      1048
+#define IDC_PROPTAB_DEFNOTE_SETBLANK    1048
 #define IDC_FILTERDEF_REGEX_CASESENSITIVE 1049
 #define IDC_FILTERDEF_FILTER_TIMESTAMP  1049
 #define IDC_FILTERDEF_REGEX_CRYPTMEMO   1050
@@ -182,6 +186,7 @@
 #define IDM_SEARCH                      40062
 #define IDS_PROPTAB_SIP                 40062
 #define IDM_SEARCH_NEXT                 40063
+#define IDS_PROPTAB_DEFNOTE             40063
 #define IDM_SEARCH_PREV                 40064
 #define IDM_RENAME                      40065
 #define IDM_UNDO                        40067

@@ -5,10 +5,6 @@
 
 #define MAX_DATEFORMAT_LEN 256
 
-////////////////////////////////////
-// クラス定義
-////////////////////////////////////
-
 class Property {
 	TCHAR aTopDir[MAX_PATH];
 
@@ -60,6 +56,7 @@ class Property {
 	DWORD nWrapText;
 	BOOL bOpenReadOnly;
 
+	TCHAR aDefaultNote[MAX_PATH];
 
 public:
 	Property();
@@ -80,18 +77,18 @@ public:
 	DWORD PassTimeout() { return nPassTimeOut; }
 	BOOL ScrollPage() { return TRUE; }
 
-	// フォント
+	// font
 	HFONT SelectViewFont();
 	HFONT DetailsViewFont();
 
-	// 日付フォーマット
+	// date format
 	LPCTSTR DateFormat1() { return aDateFormat1; }
 	LPCTSTR DateFormat2() { return aDateFormat2; }
 
-	// タブストップ位置
+	// tab stop
 	DWORD Tabstop() { return nTabstop; }
 
-	// カーソル位置の保持
+	// whether keep caret position or not
 	BOOL KeepCaret() { return nKeepCaret; }
 
 	// 選択ビューの挙動
@@ -113,7 +110,7 @@ public:
 	BOOL SwitchWindowTitle() { return nSwitchWindowTitle; }
 
 	// プロパティダイアログの表示
-	DWORD Popup(HINSTANCE hInst, HWND hWnd);
+	DWORD Popup(HINSTANCE hInst, HWND hWnd, LPCTSTR pSelPath);
 
 	// プロパティ値のロード
 	BOOL Load(BOOL *pStrict);
@@ -163,6 +160,8 @@ public:
 	BOOL SaveTopMostStat();
 	BOOL SaveWrapTextStat();
 
+	LPCTSTR GetDefaultNote() { return aDefaultNote; }
+
 	friend class FolderTab;
 	friend class PasswordTab;
 	friend class PassTimeoutTab;
@@ -173,6 +172,7 @@ public:
 	friend class AppButtonTab;
 	friend class CodepageTab;
 	friend class SipTab;
+	friend class DefaultNoteTab;
 };
 
 ////////////////////////////////////

@@ -38,6 +38,7 @@
 #define IDB_SAVE                        125
 #define IDB_CUT                         126
 #define IDB_COPY                        127
+#define IDD_PROPTAB_DEFNOTE             127
 #define IDB_PASTE                       128
 #define IDB_FINDNEXT                    130
 #define IDB_FINDPREV                    131
@@ -113,10 +114,13 @@
 #define IDC_FILTERDEF_FILTER_UP         1045
 #define IDC_FILTERDEF_FILTER_DOWN       1046
 #define IDC_FILTERCTL_DELETE            1046
+#define IDC_PROPTAB_DEFNOTE_PATH        1046
 #define IDC_FILTERDEF_FILTER_REGEX      1047
 #define IDC_FILTERCTL_RENAME            1047
+#define IDC_PROPTAB_DEFNOTE_SETCURRENT  1047
 #define IDC_FILTERDEF_REGEX_SEARCHSTR   1048
 #define IDC_FILTERDEF_FILTER_LIMIT      1048
+#define IDC_PROPTAB_DEFNOTE_SETBLANK    1048
 #define IDC_FILTERDEF_REGEX_CASESENSITIVE 1049
 #define IDC_FILTERDEF_FILTER_TIMESTAMP  1049
 #define IDC_FILTERDEF_REGEX_CRYPTMEMO   1050
@@ -176,6 +180,7 @@
 #define IDM_INSDATE1                    40046
 #define IDS_GREPTAB_PERSIST             40046
 #define IDM_INSDATE2                    40047
+#define IDS_PROPTAB_DEFNOTE             40047
 #define IDM_SELALL                      40048
 #define IDM_DETAILS_HSCROLL             40049
 #define IDM_SEARCH                      40050

@@ -141,11 +141,11 @@ SOURCE=..\..\Src\DetailsViewWndProc.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\Src\DialogTemplate.cpp
+SOURCE=..\..\Src\TomboLib\DialogTemplate.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\Src\DirectoryScanner.cpp
+SOURCE=..\..\Src\TomboLib\DirectoryScanner.cpp
 # End Source File
 # Begin Source File
 
@@ -241,7 +241,7 @@ SOURCE=..\..\Src\Property.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\Src\PropertyPage.cpp
+SOURCE=..\..\Src\TomboLib\PropertyPage.cpp
 # End Source File
 # Begin Source File
 
@@ -357,11 +357,11 @@ SOURCE=..\..\Src\CryptManager.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\Src\DialogTemplate.h
+SOURCE=..\..\Src\TomboLib\DialogTemplate.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\Src\DirectoryScanner.h
+SOURCE=..\..\Src\TomboLib\DirectoryScanner.h
 # End Source File
 # Begin Source File
 
@@ -457,7 +457,7 @@ SOURCE=..\..\Src\Property.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\Src\PropertyPage.h
+SOURCE=..\..\Src\TomboLib\PropertyPage.h
 # End Source File
 # Begin Source File
 

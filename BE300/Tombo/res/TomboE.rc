@@ -348,6 +348,17 @@ BEGIN
     EDITTEXT        IDC_FILTERDEF_SRC_PATH,5,15,110,14,ES_AUTOHSCROLL
 END
 
+IDD_PROPTAB_DEFNOTE DIALOG DISCARDABLE  0, 0, 126, 125
+STYLE WS_CHILD | WS_BORDER
+FONT 9, "‚l‚r ‚oƒSƒVƒbƒN"
+BEGIN
+    EDITTEXT        IDC_PROPTAB_DEFNOTE_PATH,5,25,115,12,ES_AUTOHSCROLL | 
+                    ES_READONLY
+    PUSHBUTTON      "Use current",IDC_PROPTAB_DEFNOTE_SETCURRENT,60,45,60,14
+    PUSHBUTTON      "Use blank",IDC_PROPTAB_DEFNOTE_SETBLANK,60,65,60,14
+    LTEXT           "Top page",IDC_STATIC,5,10,28,8
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -545,6 +556,13 @@ BEGIN
         TOPMARGIN, 7
         BOTTOMMARGIN, 33
     END
+
+    IDD_PROPTAB_DEFNOTE, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 70
+    END
 END
 #endif    // APSTUDIO_INVOKED
 
@@ -615,6 +633,7 @@ BEGIN
     IDS_PROPTAB_CODEPAGE    "Codepage"
     IDS_GREPTAB_MAIN        "Main"
     IDS_GREPTAB_PERSIST     "Save"
+    IDS_PROPTAB_DEFNOTE     "Toppage"
 END
 
 #endif    // Japanese resources

@@ -465,3 +465,10 @@ Changes
 
 * Add rename button to virtual folder dialog(#4137)
 * Add order by file size filter to virtual folder(#4020)
+
+////////////////////////////////
+// B117
+////////////////////////////////
+
+* Add default note option.(part of #4022)
+* Move DialogTemplate, PropertyPage, DirectoryScanner to TomboLib.

@@ -53,6 +53,7 @@
 #define DISABLEEXTRAACTIONBUTTON_ATTR_NAME TEXT("DisableExtraActionButton")
 #define WRAPTEXT_ATTR_NAME TEXT("WrapText")
 #define OPENREADONLY_ATTR_NAME TEXT("OpenReadOnly")
+#define DEFAULTNOTE_ATTR_NAME TEXT("DefaultNote")
 
 // saved each exit time.
 #define HIDESTATUSBAR_ATTR_NAME TEXT("HideStatusBar")
@@ -63,12 +64,12 @@
 
 #if defined(PLATFORM_PKTPC) || (defined(PLATFORM_BE500) && defined(TOMBO_LANG_ENGLISH))
 #if defined(PLATFORM_PKTPC)
-#define PROPTAB_PAGES 7
+#define PROPTAB_PAGES 8
 #else
-#define PROPTAB_PAGES 6
+#define PROPTAB_PAGES 7
 #endif
 #else
-#define PROPTAB_PAGES 5
+#define PROPTAB_PAGES 6
 #endif
 
 #define MAX_PASSWORD_LEN 1024
@@ -139,6 +140,7 @@ LPCTSTR GetString(UINT nID)
 Property::Property() : pDefaultTopDir(NULL)
 {
 	_tcscpy(aTopDir, TEXT(""));
+	_tcscpy(aDefaultNote, TEXT(""));
 }
 
 Property::~Property()
@@ -1042,13 +1044,75 @@ BOOL CodepageTab::Apply(HWND hDlg)
 #endif
 
 //////////////////////////////////////////
-// プロパティダイアログの表示
+// DefaultNote tab
 //////////////////////////////////////////
 
-DWORD Property::Popup(HINSTANCE hInst, HWND hWnd)
+class DefaultNoteTab : public TomboPropertyTab {
+	LPCTSTR pCurrentPath;
+public:
+	DefaultNoteTab(Property *p, LPCTSTR pPath) :
+	  TomboPropertyTab(p, IDD_PROPTAB_DEFNOTE, (DLGPROC)DefaultPageProc, IDS_PROPTAB_DEFNOTE), pCurrentPath(pPath) {}
+	~DefaultNoteTab() {}
+	void Init(HWND hDlg);
+	BOOL Apply(HWND hDlg);
+	BOOL OnCommand(HWND hDlg, WPARAM wParam, LPARAM lParam);
+
+protected:
+	void SetBlank(HWND hDlg);
+	void SetCurrent(HWND hDlg);
+};
+
+void DefaultNoteTab::Init(HWND hDlg)
+{
+	HWND hPath = GetDlgItem(hDlg, IDC_PROPTAB_DEFNOTE_PATH);
+	SetWindowText(hPath, g_Property.GetDefaultNote());
+}
+
+BOOL DefaultNoteTab::Apply(HWND hDlg)
+{
+	HWND hPath = GetDlgItem(hDlg, IDC_PROPTAB_DEFNOTE_PATH);
+	GetWindowText(hPath, g_Property.aDefaultNote, MAX_PATH);
+	return TRUE;
+}
+
+BOOL DefaultNoteTab::OnCommand(HWND hDlg, WPARAM wParam, LPARAM lParam)
+{
+	switch(LOWORD(wParam)) {
+	case IDC_PROPTAB_DEFNOTE_SETCURRENT:
+		SetCurrent(hDlg);
+		break;
+	case IDC_PROPTAB_DEFNOTE_SETBLANK:
+		SetBlank(hDlg);
+		break;
+	}
+	return TRUE;
+}
+
+void DefaultNoteTab::SetBlank(HWND hDlg)
+{
+	HWND hPath = GetDlgItem(hDlg, IDC_PROPTAB_DEFNOTE_PATH);
+	SetWindowText(hPath, TEXT(""));
+}
+
+void DefaultNoteTab::SetCurrent(HWND hDlg)
+{
+	HWND hPath = GetDlgItem(hDlg, IDC_PROPTAB_DEFNOTE_PATH);
+	if (pCurrentPath) {
+		SetWindowText(hPath, pCurrentPath);
+	} else {
+		SetWindowText(hPath, TEXT(""));
+	}
+}
+
+//////////////////////////////////////////
+// Popup property dialog
+//////////////////////////////////////////
+
+DWORD Property::Popup(HINSTANCE hInst, HWND hWnd, LPCTSTR pSelPath)
 {
 	PropertyTab *pages[PROPTAB_PAGES];
 	FolderTab pgFolder(this);
+	DefaultNoteTab pgDefNote(this, pSelPath);
 	PassTimeoutTab pgTimeout(this);
 	FontTab pgFont(this);
 	DateFormatTab pgDate(this);
@@ -1065,19 +1129,17 @@ DWORD Property::Popup(HINSTANCE hInst, HWND hWnd)
 	CodepageTab pgCodepage(this);
 #endif
 	pages[0] = &pgFolder;
-	pages[1] = &pgTimeout;
-	pages[2] = &pgFont;
-	pages[3] = &pgDate;
-	pages[4] = &pgKeepCaret;
-#if defined(PLATFORM_WIN32)
-//	pages[5] = &pgSelectMemo;
-#endif
+	pages[1] = &pgDefNote;
+	pages[2] = &pgTimeout;
+	pages[3] = &pgFont;
+	pages[4] = &pgDate;
+	pages[5] = &pgKeepCaret;
 #if defined(PLATFORM_PKTPC)
-	pages[5] = &pgAppButton;
-	pages[6] = &pgSip;
+	pages[6] = &pgAppButton;
+	pages[7] = &pgSip;
 #endif
 #if defined(PLATFORM_BE500) && defined(TOMBO_LANG_ENGLISH)
-	pages[5] = &pgCodepage;
+	pages[6] = &pgCodepage;
 #endif
 	PropertyPage pp;
 	if (pp.Popup(hInst, hWnd, pages, PROPTAB_PAGES, RESMSG(IDS_PROPTAB_TITLE), MAKEINTRESOURCE(IDI_TOMBO)) == IDOK) {
@@ -1309,6 +1371,12 @@ BOOL Property::Load(BOOL *pStrict)
 	nWrapText = GetDWORDFromReg(hTomboRoot, WRAPTEXT_ATTR_NAME, 1);
 	bOpenReadOnly = GetDWORDFromReg(hTomboRoot, OPENREADONLY_ATTR_NAME, FALSE);
 
+	siz = sizeof(aDefaultNote);
+	res = RegQueryValueEx(hTomboRoot, DEFAULTNOTE_ATTR_NAME, NULL, &typ, (LPBYTE)aDefaultNote, &siz);
+	if (res != ERROR_SUCCESS) {
+		aDefaultNote[0] = TEXT('\0');
+	}
+
 	RegCloseKey(hTomboRoot);
 	return TRUE;
 }
@@ -1406,6 +1474,8 @@ BOOL Property::Save()
 #endif
 
 	if (!SetDWORDToReg(hTomboRoot, OPENREADONLY_ATTR_NAME, bOpenReadOnly)) return FALSE;
+
+	if (!SetSZToReg(hTomboRoot, DEFAULTNOTE_ATTR_NAME, aDefaultNote)) return FALSE;
 
 #if defined(PLATFORM_BE500)
 	CGDFlushRegistry();

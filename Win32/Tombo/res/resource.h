@@ -15,6 +15,7 @@
 #define IDS_PROPTAB_SELECTMEMO          11
 #define IDS_GREPTAB_MAIN                12
 #define IDS_GREPTAB_PERSIST             13
+#define IDS_PROPTAB_DEFNOTE             14
 #define ID_MENU_MAIN                    101
 #define ID_CMDBAR_MAIN                  101
 #define IDR_MENU_MAIN                   101
@@ -62,6 +63,7 @@
 #define IDD_FILTERDEF_ADD_TIMESTAMP     142
 #define IDD_FILTERDEF_ADD_SORT          143
 #define IDD_FILTERDEF_VIEWTYPE          144
+#define IDD_PROPTAB_DEFNOTE             146
 #define IDC_PASS                        1000
 #define IDC_PROP_PASSWORD_DESC          1001
 #define IDC_PASS_TIMEOUT                1002
@@ -127,6 +129,9 @@
 #define IDC_FONT_SELECT_CLEARTYPE       1059
 #define IDC_FONT_DETAILS_CLEARTYPE      1060
 #define IDC_FILTERDEF_VIEW_TYPE         1060
+#define IDC_PROPTAB_DEFNOTE_PATH        1061
+#define IDC_PROPTAB_DEFNOTE_SETCURRENT  1062
+#define IDC_PROPTAB_DEFNOTE_SETBLANK    1063
 #define IDM_EXIT                        40001
 #define IDM_NEWMEMO                     40002
 #define IDM_RETURNLIST                  40003
@@ -166,9 +171,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        146
-#define _APS_NEXT_COMMAND_VALUE         40036
-#define _APS_NEXT_CONTROL_VALUE         1061
+#define _APS_NEXT_RESOURCE_VALUE        147
+#define _APS_NEXT_COMMAND_VALUE         40037
+#define _APS_NEXT_CONTROL_VALUE         1063
 #define _APS_NEXT_SYMED_VALUE           108
 #endif
 #endif
