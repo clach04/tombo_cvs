@@ -4,6 +4,9 @@
 class MemoNote;
 class MemoSelectView;
 class MemoManager;
+class VFDirectoryGenerator;
+class VFStore;
+class VFStream;
 
 /////////////////////////////////////////////
 //  TreeViewのアイテムの抽象化
@@ -55,7 +58,7 @@ public:
 };
 
 /////////////////////////////////////////////
-//  ファイル
+//  File
 /////////////////////////////////////////////
 class TreeViewFileItem : public TreeViewItem {
 protected:
@@ -64,6 +67,7 @@ protected:
 	BOOL DeleteWithoutAsk(MemoManager *pMgr, MemoSelectView *pView);
 public:
 	TreeViewFileItem();
+	~TreeViewFileItem();
 
 	BOOL Move(MemoManager *pMgr, MemoSelectView *pView);
 	BOOL Copy(MemoManager *pMgr, MemoSelectView *pView);
@@ -81,7 +85,7 @@ public:
 };
 
 /////////////////////////////////////////////
-//  フォルダ
+//  Real folder
 /////////////////////////////////////////////
 
 class TreeViewFolderItem : public TreeViewItem {
@@ -96,8 +100,51 @@ public:
 	BOOL Rename(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR pNewName);
 
 	DWORD GetIcon(MemoSelectView *pView, DWORD nStatus);
-
 	DWORD ItemOrder();
+
+	virtual BOOL Expand(MemoSelectView *pView);
 };
+
+/////////////////////////////////////////////
+//  Virtual Folder (Root)
+/////////////////////////////////////////////
+
+class TreeViewVirtualFolderRoot : public TreeViewFolderItem {
+public:
+	TreeViewVirtualFolderRoot();
+	~TreeViewVirtualFolderRoot();
+
+	DWORD GetIcon(MemoSelectView *pView, DWORD nStatus);
+
+	BOOL Expand(MemoSelectView *pView);
+};
+
+/////////////////////////////////////////////
+//  Virtual Folder (Non-root)
+/////////////////////////////////////////////
+
+class TreeViewVirtualFolder : public TreeViewFolderItem {
+protected:
+	VFDirectoryGenerator *pGenerator;
+	VFStore *pStore;
+
+	VFStream *pTail;
+public:
+	TreeViewVirtualFolder();
+	~TreeViewVirtualFolder();
+
+	DWORD GetIcon(MemoSelectView *pView, DWORD nStatus);
+
+	BOOL Expand(MemoSelectView *pView);
+
+	// pGen's life scope is control under TreeViewVirtualFolder.
+	// don't delete pGen after calling SetGenerator.
+	BOOL SetGenerator(VFDirectoryGenerator *pGen);
+
+	// pStore's  life scope is control under TreeViewVirtualFolder.
+	// don't delete pStore after calling SetStore.
+	BOOL SetStore(VFStore *pStore);
+};
+
 
 #endif
