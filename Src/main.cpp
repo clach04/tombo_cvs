@@ -102,15 +102,18 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPTSTR pCmdLine, int nCmdSh
 	return res;
 }
 #endif
+
 //////////////////////////////////////
-// 二重起動チェック列挙関数
+// Mutial execute check function
 //////////////////////////////////////
+
 static BOOL CALLBACK EnumProc(HWND hWnd, LPARAM lParam)
 {
 	TCHAR buf[1024];
 	GetClassName(hWnd, buf, 1024);
 	if (_tcscmp(buf, TOMBO_MAIN_FRAME_WINDOW_CLSS) == 0) {
-//		SetForegroundWindow(hWnd);
+
+		// send message to elder instanse
 		SendMessage(hWnd, MWM_RAISE_MAINFRAME, 0, 0);
 		*(BOOL*)lParam = TRUE;
 	}

@@ -522,73 +522,10 @@ LRESULT MemoSelectView::OnNotify(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		}
 	case TVN_ENDLABELEDIT:
 		return EditLabel(&(((LPNMTVDISPINFO)lParam)->item));
-
 #if defined(PLATFORM_WIN32)
 	case NM_RCLICK:
-		{
-			POINT pt, pth;
-			GetCursorPos(&pt);
-			pth = pt;
-			ScreenToClient(hViewWnd, &pth);
-			TV_HITTESTINFO hti;
-			hti.pt = pth;
-			TreeView_HitTest(hViewWnd, &hti);
-
-			if (hti.hItem == NULL) break;
-
-			TreeViewItem *pItem = GetTVItem(hti.hItem);
-
-			HMENU hContextMenu = LoadMenu(g_hInstance, MAKEINTRESOURCE(IDR_CONTEXTMENU));
-			HMENU hMenu = GetSubMenu(hContextMenu, 0);
-			ControlSubMenu(hMenu, IDM_ENCRYPT, pItem->CanEncrypt(this));
-			ControlSubMenu(hMenu, IDM_DECRYPT, pItem->CanDecrypt(this));
-			ControlSubMenu(hMenu, IDM_CUT, pItem->CanCut(this));
-			ControlSubMenu(hMenu, IDM_COPY, pItem->CanCopy(this));
-			ControlSubMenu(hMenu, IDM_RENAME, pItem->CanRename(this));
-			ControlSubMenu(hMenu, IDM_DELETEITEM, pItem->CanDelete(this));
-			ControlSubMenu(hMenu, IDM_NEWFOLDER, pItem->CanNewMemo(this));
-			ControlSubMenu(hMenu, IDM_SEARCH, pItem->CanGrep(this));
-			ControlSubMenu(hMenu, IDM_TRACELINK, pItem->CanLink(this));
-
-			DWORD id = TrackPopupMenuEx(hMenu, TPM_RETURNCMD, pt.x, pt.y, hWnd, NULL);
-			DestroyMenu(hContextMenu);
-
-			switch(id) {
-			case IDM_CUT:
-				OnCut(pItem);
-				break;
-			case IDM_COPY:
-				OnCopy(pItem);
-				break;
-//			case IDM_PASTE:
-//				OnPaste();
-//				break;
-			case IDM_ENCRYPT:
-				OnEncrypt(pItem);
-				break;
-			case IDM_DECRYPT:
-				OnDecrypt(pItem);
-				break;
-			case IDM_RENAME:
-				OnEditLabel(hti.hItem);
-				break;
-			case IDM_DELETEITEM:
-				OnDelete(hti.hItem, pItem);
-				break;
-			case IDM_NEWFOLDER:
-				pMemoMgr->GetMainFrame()->NewFolder(pItem);
-				break;
-			case IDM_SEARCH:
-				TreeView_SelectItem(hViewWnd, hti.hItem);
-				pMemoMgr->GetMainFrame()->OnSearch();
-				break;
-			case IDM_TRACELINK:
-				TreeViewFileLink *p = (TreeViewFileLink*)pItem;
-				ShowItem(p->GetNote()->MemoPath(), TRUE);
-				break;
-			}
-			break;
-		}
+		OnNotify_RClick();
+		break;
 #endif
 
 	}
@@ -596,6 +533,73 @@ LRESULT MemoSelectView::OnNotify(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	return 0xFFFFFFFF;
 }
 
+#if defined(PLATFORM_WIN32)
+void MemoSelectView::OnNotify_RClick()
+{
+	POINT pt, pth;
+	GetCursorPos(&pt);
+	pth = pt;
+	ScreenToClient(hViewWnd, &pth);
+	TV_HITTESTINFO hti;
+	hti.pt = pth;
+	TreeView_HitTest(hViewWnd, &hti);
+
+	if (hti.hItem == NULL) return;
+
+	TreeViewItem *pItem = GetTVItem(hti.hItem);
+
+	HMENU hContextMenu = LoadMenu(g_hInstance, MAKEINTRESOURCE(IDR_CONTEXTMENU));
+	HMENU hMenu = GetSubMenu(hContextMenu, 0);
+	ControlSubMenu(hMenu, IDM_ENCRYPT, pItem->CanEncrypt(this));
+	ControlSubMenu(hMenu, IDM_DECRYPT, pItem->CanDecrypt(this));
+	ControlSubMenu(hMenu, IDM_CUT, pItem->CanCut(this));
+	ControlSubMenu(hMenu, IDM_COPY, pItem->CanCopy(this));
+	ControlSubMenu(hMenu, IDM_PASTE, pItem->CanPaste(this));
+	ControlSubMenu(hMenu, IDM_RENAME, pItem->CanRename(this));
+	ControlSubMenu(hMenu, IDM_DELETEITEM, pItem->CanDelete(this));
+	ControlSubMenu(hMenu, IDM_NEWFOLDER, pItem->CanNewMemo(this));
+	ControlSubMenu(hMenu, IDM_SEARCH, pItem->CanGrep(this));
+	ControlSubMenu(hMenu, IDM_TRACELINK, pItem->CanLink(this));
+
+	DWORD id = TrackPopupMenuEx(hMenu, TPM_RETURNCMD, pt.x, pt.y, hViewWnd, NULL);
+	DestroyMenu(hContextMenu);
+
+	switch(id) {
+	case IDM_CUT:
+		OnCut(pItem);
+		break;
+	case IDM_COPY:
+		OnCopy(pItem);
+		break;
+	case IDM_PASTE:
+		OnPaste();
+		break;
+	case IDM_ENCRYPT:
+		OnEncrypt(pItem);
+		break;
+	case IDM_DECRYPT:
+		OnDecrypt(pItem);
+		break;
+	case IDM_RENAME:
+		OnEditLabel(hti.hItem);
+		break;
+	case IDM_DELETEITEM:
+		OnDelete(hti.hItem, pItem);
+		break;
+	case IDM_NEWFOLDER:
+		pMemoMgr->GetMainFrame()->NewFolder(pItem);
+		break;
+	case IDM_SEARCH:
+		TreeView_SelectItem(hViewWnd, hti.hItem);
+		pMemoMgr->GetMainFrame()->OnSearch();
+		break;
+	case IDM_TRACELINK:
+		TreeViewFileLink *p = (TreeViewFileLink*)pItem;
+		ShowItem(p->GetNote()->MemoPath(), TRUE, FALSE);
+		break;
+	}
+}
+#endif
 ///////////////////////////////////////////
 // OnCommandƒnƒ“ƒhƒ‰
 ///////////////////////////////////////////
@@ -1260,7 +1264,7 @@ static HTREEITEM FindItem(HWND hWnd, HTREEITEM hParent, LPCTSTR pStr, BOOL bNote
 // ex.
 //	msView.ShowItem(TEXT("temp\\Hello.txt"));
 
-HTREEITEM MemoSelectView::ShowItem(LPCTSTR pPath, BOOL bSelChange)
+HTREEITEM MemoSelectView::ShowItem(LPCTSTR pPath, BOOL bSelChange, BOOL bOpenNotes)
 {
 	while(*pPath == TEXT('\\')) pPath++;
 
@@ -1337,7 +1341,11 @@ HTREEITEM MemoSelectView::ShowItem(LPCTSTR pPath, BOOL bSelChange)
 			if (!ptv->HasMultiItem()) {
 				TreeViewFileItem *p = (TreeViewFileItem*)ptv;
 				MemoLocator loc(p->GetNote(), p->GetViewItem());
-				pMemoMgr->GetMainFrame()->SendRequestOpen(&loc, OPEN_REQUEST_MSVIEW_ACTIVE);
+				if (bOpenNotes) {
+					pMemoMgr->GetMainFrame()->SendRequestOpen(&loc, OPEN_REQUEST_MSVIEW_ACTIVE);
+				} else {
+					pMemoMgr->GetMainFrame()->SendRequestOpen(&loc, OPEN_REQUEST_MDVIEW_ACTIVE);
+				}
 			}
 		}
 	}

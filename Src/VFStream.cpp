@@ -807,10 +807,10 @@ BOOL VFSortFilter::PostActivate()
 		pFunc = SortNotes_LastUpdateNewer;
 		break;
 	case SortFunc_CreateDateAsc:
-		pFunc = SortNotes_LastUpdateOlder;
+		pFunc = SortNotes_CreateDateOlder;
 		break;
 	case SortFunc_CreateDateDsc:
-		pFunc = SortNotes_LastUpdateNewer;
+		pFunc = SortNotes_CreateDateNewer;
 		break;
 	default:
 		return FALSE;

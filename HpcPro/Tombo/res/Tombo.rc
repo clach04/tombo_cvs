@@ -417,6 +417,27 @@ BEGIN
     END
 END
 
+IDR_CONTEXTMENU MENU DISCARDABLE 
+BEGIN
+    POPUP "Menu"
+    BEGIN
+        MENUITEM "切り取り",                    IDM_CUT
+        MENUITEM "コピー",                      IDM_COPY
+        MENUITEM SEPARATOR
+        MENUITEM "暗号化",                      IDM_ENCRYPT
+        MENUITEM "復号化",                      IDM_DECRYPT
+        MENUITEM SEPARATOR
+        MENUITEM "検索",                        IDM_SEARCH
+        MENUITEM SEPARATOR
+        MENUITEM "新規フォルダ",                IDM_NEWFOLDER
+        MENUITEM SEPARATOR
+        MENUITEM "削除",                        IDM_DELETEITEM
+        MENUITEM "名前の変更",                  IDM_RENAME
+        MENUITEM SEPARATOR
+        MENUITEM "リンク元へ移動",              IDM_TRACELINK
+    END
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //

@@ -84,6 +84,7 @@ BEGIN
     BEGIN
         MENUITEM "切り取り",                    IDM_CUT
         MENUITEM "コピー",                      IDM_COPY
+        MENUITEM "貼り付け",                    IDM_PASTE
         MENUITEM SEPARATOR
         MENUITEM "暗号化",                      IDM_ENCRYPT
         MENUITEM "復号化",                      IDM_DECRYPT

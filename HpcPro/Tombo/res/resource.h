@@ -40,6 +40,7 @@
 #define IDD_GREPTAB_MAIN                130
 #define IDD_GREPTAB_PERSIST             131
 #define IDD_FILTERCTL                   132
+#define IDR_CONTEXTMENU                 133
 #define IDD_FILTERDEF_SRC               138
 #define IDD_FILTERDEF_FILTER            139
 #define IDD_FILTERDEF_ADD_REGEX         140
@@ -177,13 +178,14 @@
 #define IDM_SHOWSTATUSBAR               40057
 #define IDM_GREP                        40058
 #define IDM_VFOLDER_DEF                 40059
+#define IDM_TRACELINK                   40060
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        133
-#define _APS_NEXT_COMMAND_VALUE         40060
+#define _APS_NEXT_RESOURCE_VALUE        134
+#define _APS_NEXT_COMMAND_VALUE         40061
 #define _APS_NEXT_CONTROL_VALUE         1039
 #define _APS_NEXT_SYMED_VALUE           113
 #endif

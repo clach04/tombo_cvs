@@ -1938,6 +1938,7 @@ void MainFrame::OnMutualExecute()
 	SetForegroundWindow(hMainWnd);
 #if defined(PLATFORM_WIN32)
 	BringWindowToTop(hMainWnd);
+	ShowWindow(hMainWnd, SW_RESTORE);
 #endif
 	OnSettingChange(NULL);
 }

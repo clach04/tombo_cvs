@@ -84,6 +84,7 @@ BEGIN
     BEGIN
         MENUITEM "Cut",                         IDM_CUT
         MENUITEM "Copy",                        IDM_COPY
+        MENUITEM "Paste",                       IDM_PASTE
         MENUITEM SEPARATOR
         MENUITEM "Encrypt",                     IDM_ENCRYPT
         MENUITEM "Decrypt",                     IDM_DECRYPT

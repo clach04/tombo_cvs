@@ -63,6 +63,10 @@ public:
 	void SetFont(HFONT hFont);
 
 	LRESULT OnNotify(HWND hWnd, WPARAM wParam, LPARAM lParam);
+
+#if defined(PLATFORM_WIN32)
+	void OnNotify_RClick();
+#endif
 	BOOL OnCommand(HWND hWnd, WPARAM wParam, LPARAM lParam);
 
 	void OnActionButton(HWND hWnd);
@@ -147,7 +151,7 @@ public:
 	LPTSTR GeneratePath(HTREEITEM hItem, LPTSTR pBuf, DWORD nSiz);
 
 	// Choose specified notes. if tree is collapsed, expand one.
-	HTREEITEM ShowItem(LPCTSTR pPath, BOOL bSelChange = TRUE);
+	HTREEITEM ShowItem(LPCTSTR pPath, BOOL bSelChange = TRUE, BOOL bOpenNotes = TRUE);
 
 	/////////////////////////////
 	// Virtual folder

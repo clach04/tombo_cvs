@@ -389,6 +389,15 @@ Return to main trunk.
 * sort by create date for virtual folder(#2750)
 * Add jump to original context menu.
 
+////////////////////////////////
+// B110(SNAPSHOT20030824)
+////////////////////////////////
+
+* FIX: Sort filter sort by create date.(#2867, #2868)
+* FIX: Disable forcusing to edit view when choosing "Jump to original" in virtual folder items.(#2792)
+* FIX: Restore window when mutual executing Tombo.exe(#2850)
+* FIX: Add "paste" to context menu(#2851)
+
 /////////////////////////////////////////////////////////////////////////
 // TODO
 /////////////////////////////////////////////////////////////////////////
