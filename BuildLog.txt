@@ -559,9 +559,11 @@ PG: Debug logwrite code removed.
 * #576 can't use Ctrl-Z when IME are KANA mode.(Japanese NEC mobilegear only??)
 PG: fix application error when modify memo -> ESC key -> select "NO"
 
-TODO: 
+■ B073 2002/11/6
 
-* Disable menu to rename/delete root node.
+TOMBO 1.4
+
+* change version dialog to 1.4
 
 == around virtual folder
 
@@ -576,6 +578,7 @@ TSファイル指定Property I/F
 
 == entire
 
+Disable menu to rename/delete root node.
 メニューEnable/Disableの見直し・整理
 MemoInfoについてMemoManager管理からMemoNote管理になるように修正する
 OpenRequestをMemoSelectViewからTreeViewItemに移動

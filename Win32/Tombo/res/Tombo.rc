@@ -147,7 +147,7 @@ FONT 9, "‚l‚r ‚oƒSƒVƒbƒN"
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,195,140,50,14
     ICON            IDI_TOMBO,IDC_STATIC,10,5,20,20
-    LTEXT           "Tombo Version 1.4 pre3",IDC_STATIC,40,10,130,10
+    LTEXT           "Tombo Version 1.4",IDC_STATIC,40,10,130,10
     EDITTEXT        IDC_COPYRIGHT,5,35,240,95,ES_MULTILINE | ES_AUTOVSCROLL | 
                     ES_AUTOHSCROLL | ES_READONLY | WS_VSCROLL | NOT 
                     WS_TABSTOP

@@ -434,10 +434,8 @@ DEP_CPP_ABOUT=\
 	"..\..\Src\File.h"\
 	"..\..\Src\Logger.h"\
 	"..\..\Src\Tombo.h"\
-	
-NODEP_CPP_ABOUT=\
-	".\ipapi.h"\
-	".\ygshell.h"\
+	{$(INCLUDE)}"aygshell.h"\
+	{$(INCLUDE)}"sipapi.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Debug"
@@ -480,10 +478,8 @@ DEP_CPP_ABOUT=\
 	"..\..\Src\File.h"\
 	"..\..\Src\Logger.h"\
 	"..\..\Src\Tombo.h"\
-	
-NODEP_CPP_ABOUT=\
-	".\ipapi.h"\
-	".\ygshell.h"\
+	{$(INCLUDE)}"aygshell.h"\
+	{$(INCLUDE)}"sipapi.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) ReleaseE"
@@ -493,10 +489,8 @@ DEP_CPP_ABOUT=\
 	"..\..\Src\File.h"\
 	"..\..\Src\Logger.h"\
 	"..\..\Src\Tombo.h"\
-	
-NODEP_CPP_ABOUT=\
-	".\ipapi.h"\
-	".\ygshell.h"\
+	{$(INCLUDE)}"aygshell.h"\
+	{$(INCLUDE)}"sipapi.h"\
 	
 
 !ENDIF 
@@ -880,10 +874,10 @@ DEP_CPP_DETAI=\
 
 DEP_CPP_DETAI=\
 	"..\..\Src\MemoDetailsView.h"\
-	
-NODEP_CPP_DETAI=\
-	".\ipapi.h"\
-	".\ygshell.h"\
+	"..\..\Src\MemoManager.h"\
+	"..\..\Src\Property.h"\
+	{$(INCLUDE)}"aygshell.h"\
+	{$(INCLUDE)}"sipapi.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Debug"
@@ -914,10 +908,8 @@ DEP_CPP_DETAI=\
 	"..\..\Src\MemoDetailsView.h"\
 	"..\..\Src\MemoManager.h"\
 	"..\..\Src\Property.h"\
-	
-NODEP_CPP_DETAI=\
-	".\ipapi.h"\
-	".\ygshell.h"\
+	{$(INCLUDE)}"aygshell.h"\
+	{$(INCLUDE)}"sipapi.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) ReleaseE"
@@ -926,10 +918,8 @@ DEP_CPP_DETAI=\
 	"..\..\Src\MemoDetailsView.h"\
 	"..\..\Src\MemoManager.h"\
 	"..\..\Src\Property.h"\
-	
-NODEP_CPP_DETAI=\
-	".\ipapi.h"\
-	".\ygshell.h"\
+	{$(INCLUDE)}"aygshell.h"\
+	{$(INCLUDE)}"sipapi.h"\
 	
 
 !ENDIF 
@@ -1316,6 +1306,8 @@ DEP_CPP_MAIN_=\
 	"..\..\Src\PasswordManager.h"\
 	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
+	{$(INCLUDE)}"aygshell.h"\
+	{$(INCLUDE)}"sipapi.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Debug"
@@ -1369,10 +1361,8 @@ DEP_CPP_MAIN_=\
 	"..\..\Src\PasswordManager.h"\
 	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
-	
-NODEP_CPP_MAIN_=\
-	".\ipapi.h"\
-	".\ygshell.h"\
+	{$(INCLUDE)}"aygshell.h"\
+	{$(INCLUDE)}"sipapi.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) ReleaseE"
@@ -1387,10 +1377,8 @@ DEP_CPP_MAIN_=\
 	"..\..\Src\PasswordManager.h"\
 	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
-	
-NODEP_CPP_MAIN_=\
-	".\ipapi.h"\
-	".\ygshell.h"\
+	{$(INCLUDE)}"aygshell.h"\
+	{$(INCLUDE)}"sipapi.h"\
 	
 
 !ENDIF 
@@ -1478,15 +1466,17 @@ DEP_CPP_MAINF=\
 	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoNote.h"\
 	"..\..\Src\MemoSelectView.h"\
+	"..\..\Src\Message.h"\
 	"..\..\Src\PasswordManager.h"\
 	"..\..\Src\Property.h"\
+	"..\..\Src\SearchDlg.h"\
+	"..\..\Src\SearchEngine.h"\
 	"..\..\Src\SipControl.h"\
 	"..\..\Src\Tombo.h"\
+	"..\..\Src\TreeViewItem.h"\
 	"..\..\Src\Uniconv.h"\
-	
-NODEP_CPP_MAINF=\
-	".\ipapi.h"\
-	".\ygshell.h"\
+	{$(INCLUDE)}"aygshell.h"\
+	{$(INCLUDE)}"sipapi.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Debug"
@@ -1526,7 +1516,6 @@ DEP_CPP_MAINF=\
 
 DEP_CPP_MAINF=\
 	"..\..\Src\AboutDialog.h"\
-	"..\..\Src\DirectoryScanner.h"\
 	"..\..\Src\File.h"\
 	"..\..\Src\Logger.h"\
 	"..\..\Src\MainFrame.h"\
@@ -1543,17 +1532,14 @@ DEP_CPP_MAINF=\
 	"..\..\Src\Tombo.h"\
 	"..\..\Src\TreeViewItem.h"\
 	"..\..\Src\Uniconv.h"\
-	
-NODEP_CPP_MAINF=\
-	".\ipapi.h"\
-	".\ygshell.h"\
+	{$(INCLUDE)}"aygshell.h"\
+	{$(INCLUDE)}"sipapi.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) ReleaseE"
 
 DEP_CPP_MAINF=\
 	"..\..\Src\AboutDialog.h"\
-	"..\..\Src\DirectoryScanner.h"\
 	"..\..\Src\File.h"\
 	"..\..\Src\Logger.h"\
 	"..\..\Src\MainFrame.h"\
@@ -1570,10 +1556,8 @@ DEP_CPP_MAINF=\
 	"..\..\Src\Tombo.h"\
 	"..\..\Src\TreeViewItem.h"\
 	"..\..\Src\Uniconv.h"\
-	
-NODEP_CPP_MAINF=\
-	".\ipapi.h"\
-	".\ygshell.h"\
+	{$(INCLUDE)}"aygshell.h"\
+	{$(INCLUDE)}"sipapi.h"\
 	
 
 !ENDIF 
@@ -1625,6 +1609,8 @@ NODEP_CPP_MD5_C=\
 
 DEP_CPP_MD5_C=\
 	"..\..\Src\gnupg\bithelp.h"\
+	"..\..\Src\regex\config.h"\
+	"..\..\Src\regex\ctypeutil.h"\
 	
 NODEP_CPP_MD5_C=\
 	"..\..\Src\gnupg\dynload.h"\
@@ -1661,6 +1647,8 @@ NODEP_CPP_MD5_C=\
 
 DEP_CPP_MD5_C=\
 	"..\..\Src\gnupg\bithelp.h"\
+	"..\..\Src\regex\config.h"\
+	"..\..\Src\regex\ctypeutil.h"\
 	
 NODEP_CPP_MD5_C=\
 	"..\..\Src\gnupg\dynload.h"\
@@ -1670,6 +1658,8 @@ NODEP_CPP_MD5_C=\
 
 DEP_CPP_MD5_C=\
 	"..\..\Src\gnupg\bithelp.h"\
+	"..\..\Src\regex\config.h"\
+	"..\..\Src\regex\ctypeutil.h"\
 	
 NODEP_CPP_MD5_C=\
 	"..\..\Src\gnupg\dynload.h"\
@@ -1741,15 +1731,15 @@ DEP_CPP_MEMOD=\
 	"..\..\Src\MemoDetailsView.h"\
 	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoSelectView.h"\
+	"..\..\Src\Message.h"\
 	"..\..\Src\PasswordManager.h"\
 	"..\..\Src\Property.h"\
+	"..\..\Src\SearchEngine.h"\
 	"..\..\Src\Tombo.h"\
 	"..\..\Src\TString.h"\
 	"..\..\Src\Uniconv.h"\
-	
-NODEP_CPP_MEMOD=\
-	".\ipapi.h"\
-	".\ygshell.h"\
+	{$(INCLUDE)}"aygshell.h"\
+	{$(INCLUDE)}"sipapi.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Debug"
@@ -1792,10 +1782,8 @@ DEP_CPP_MEMOD=\
 	"..\..\Src\Tombo.h"\
 	"..\..\Src\TString.h"\
 	"..\..\Src\Uniconv.h"\
-	
-NODEP_CPP_MEMOD=\
-	".\ipapi.h"\
-	".\ygshell.h"\
+	{$(INCLUDE)}"aygshell.h"\
+	{$(INCLUDE)}"sipapi.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) ReleaseE"
@@ -1814,10 +1802,8 @@ DEP_CPP_MEMOD=\
 	"..\..\Src\Tombo.h"\
 	"..\..\Src\TString.h"\
 	"..\..\Src\Uniconv.h"\
-	
-NODEP_CPP_MEMOD=\
-	".\ipapi.h"\
-	".\ygshell.h"\
+	{$(INCLUDE)}"aygshell.h"\
+	{$(INCLUDE)}"sipapi.h"\
 	
 
 !ENDIF 
@@ -1834,8 +1820,11 @@ DEP_CPP_MEMOF=\
 	"..\..\Src\File.h"\
 	"..\..\Src\Logger.h"\
 	"..\..\Src\MemoFolder.h"\
+	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoNote.h"\
 	"..\..\Src\Message.h"\
+	"..\..\Src\PasswordManager.h"\
+	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
 	"..\..\Src\TreeViewItem.h"\
 	"..\..\Src\TString.h"\
@@ -1885,7 +1874,13 @@ DEP_CPP_MEMOF=\
 	"..\..\Src\File.h"\
 	"..\..\Src\Logger.h"\
 	"..\..\Src\MemoFolder.h"\
+	"..\..\Src\MemoManager.h"\
+	"..\..\Src\MemoNote.h"\
+	"..\..\Src\Message.h"\
+	"..\..\Src\PasswordManager.h"\
+	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
+	"..\..\Src\TreeViewItem.h"\
 	"..\..\Src\TString.h"\
 	"..\..\Src\Uniconv.h"\
 	
@@ -1933,8 +1928,11 @@ DEP_CPP_MEMOF=\
 	"..\..\Src\File.h"\
 	"..\..\Src\Logger.h"\
 	"..\..\Src\MemoFolder.h"\
+	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoNote.h"\
 	"..\..\Src\Message.h"\
+	"..\..\Src\PasswordManager.h"\
+	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
 	"..\..\Src\TreeViewItem.h"\
 	"..\..\Src\TString.h"\
@@ -1948,8 +1946,11 @@ DEP_CPP_MEMOF=\
 	"..\..\Src\File.h"\
 	"..\..\Src\Logger.h"\
 	"..\..\Src\MemoFolder.h"\
+	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoNote.h"\
 	"..\..\Src\Message.h"\
+	"..\..\Src\PasswordManager.h"\
+	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
 	"..\..\Src\TreeViewItem.h"\
 	"..\..\Src\TString.h"\
@@ -2147,10 +2148,13 @@ DEP_CPP_MEMOM=\
 	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoNote.h"\
 	"..\..\Src\MemoSelectView.h"\
+	"..\..\Src\Message.h"\
 	"..\..\Src\NewFolderDialog.h"\
 	"..\..\Src\PasswordManager.h"\
 	"..\..\Src\Property.h"\
+	"..\..\Src\SearchEngine.h"\
 	"..\..\Src\Tombo.h"\
+	"..\..\Src\TreeViewItem.h"\
 	"..\..\Src\TString.h"\
 	"..\..\Src\Uniconv.h"\
 	
@@ -2308,9 +2312,11 @@ DEP_CPP_MEMON=\
 	"..\..\Src\MemoInfo.h"\
 	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoNote.h"\
+	"..\..\Src\Message.h"\
 	"..\..\Src\PasswordManager.h"\
 	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
+	"..\..\Src\TreeViewItem.h"\
 	"..\..\Src\TString.h"\
 	"..\..\Src\Uniconv.h"\
 	
@@ -2456,11 +2462,16 @@ DEP_CPP_MEMOS=\
 	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoNote.h"\
 	"..\..\Src\MemoSelectView.h"\
+	"..\..\Src\Message.h"\
 	"..\..\Src\PasswordManager.h"\
 	"..\..\Src\Property.h"\
+	"..\..\Src\SearchEngine.h"\
 	"..\..\Src\Tombo.h"\
+	"..\..\Src\TreeViewItem.h"\
 	"..\..\Src\TString.h"\
 	"..\..\Src\Uniconv.h"\
+	{$(INCLUDE)}"aygshell.h"\
+	{$(INCLUDE)}"sipapi.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Debug"
@@ -2505,10 +2516,8 @@ DEP_CPP_MEMOS=\
 	"..\..\Src\TreeViewItem.h"\
 	"..\..\Src\TString.h"\
 	"..\..\Src\Uniconv.h"\
-	
-NODEP_CPP_MEMOS=\
-	".\ipapi.h"\
-	".\ygshell.h"\
+	{$(INCLUDE)}"aygshell.h"\
+	{$(INCLUDE)}"sipapi.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) ReleaseE"
@@ -2529,10 +2538,8 @@ DEP_CPP_MEMOS=\
 	"..\..\Src\TreeViewItem.h"\
 	"..\..\Src\TString.h"\
 	"..\..\Src\Uniconv.h"\
-	
-NODEP_CPP_MEMOS=\
-	".\ipapi.h"\
-	".\ygshell.h"\
+	{$(INCLUDE)}"aygshell.h"\
+	{$(INCLUDE)}"sipapi.h"\
 	
 
 !ENDIF 
@@ -2619,6 +2626,7 @@ SOURCE=..\..\Src\PasswordDialog.cpp
 DEP_CPP_PASSW=\
 	"..\..\Src\File.h"\
 	"..\..\Src\Logger.h"\
+	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoNote.h"\
 	"..\..\Src\Message.h"\
 	"..\..\Src\PasswordDialog.h"\
@@ -2656,10 +2664,13 @@ DEP_CPP_PASSW=\
 DEP_CPP_PASSW=\
 	"..\..\Src\File.h"\
 	"..\..\Src\Logger.h"\
+	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoNote.h"\
+	"..\..\Src\Message.h"\
 	"..\..\Src\PasswordDialog.h"\
 	"..\..\Src\SipControl.h"\
 	"..\..\Src\Tombo.h"\
+	"..\..\Src\TreeViewItem.h"\
 	"..\..\Src\Uniconv.h"\
 	
 
@@ -2689,6 +2700,7 @@ DEP_CPP_PASSW=\
 DEP_CPP_PASSW=\
 	"..\..\Src\File.h"\
 	"..\..\Src\Logger.h"\
+	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoNote.h"\
 	"..\..\Src\Message.h"\
 	"..\..\Src\PasswordDialog.h"\
@@ -2703,6 +2715,7 @@ DEP_CPP_PASSW=\
 DEP_CPP_PASSW=\
 	"..\..\Src\File.h"\
 	"..\..\Src\Logger.h"\
+	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoNote.h"\
 	"..\..\Src\Message.h"\
 	"..\..\Src\PasswordDialog.h"\
@@ -2765,6 +2778,7 @@ DEP_CPP_PASSWO=\
 	"..\..\Src\CryptManager.h"\
 	"..\..\Src\File.h"\
 	"..\..\Src\Logger.h"\
+	"..\..\Src\Message.h"\
 	"..\..\Src\PasswordDialog.h"\
 	"..\..\Src\PasswordManager.h"\
 	"..\..\Src\Property.h"\
@@ -2833,6 +2847,7 @@ DEP_CPP_PROPE=\
 	"..\..\Src\File.h"\
 	"..\..\Src\FileSelector.h"\
 	"..\..\Src\Logger.h"\
+	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoNote.h"\
 	"..\..\Src\Message.h"\
 	"..\..\Src\PasswordManager.h"\
@@ -2875,10 +2890,13 @@ DEP_CPP_PROPE=\
 	"..\..\Src\File.h"\
 	"..\..\Src\FileSelector.h"\
 	"..\..\Src\Logger.h"\
+	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoNote.h"\
+	"..\..\Src\Message.h"\
 	"..\..\Src\PasswordManager.h"\
 	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
+	"..\..\Src\TreeViewItem.h"\
 	"..\..\Src\Uniconv.h"\
 	
 
@@ -2912,6 +2930,7 @@ DEP_CPP_PROPE=\
 	"..\..\Src\File.h"\
 	"..\..\Src\FileSelector.h"\
 	"..\..\Src\Logger.h"\
+	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoNote.h"\
 	"..\..\Src\Message.h"\
 	"..\..\Src\PasswordManager.h"\
@@ -2927,6 +2946,7 @@ DEP_CPP_PROPE=\
 	"..\..\Src\File.h"\
 	"..\..\Src\FileSelector.h"\
 	"..\..\Src\Logger.h"\
+	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoNote.h"\
 	"..\..\Src\Message.h"\
 	"..\..\Src\PasswordManager.h"\
@@ -2988,6 +3008,7 @@ NODEP_CPP_REGEX=\
 
 DEP_CPP_REGEX=\
 	"..\..\Src\regex\config.h"\
+	"..\..\Src\regex\ctypeutil.h"\
 	"..\..\Src\regex\regex.h"\
 	
 NODEP_CPP_REGEX=\
@@ -3209,6 +3230,7 @@ DEP_CPP_SEARCH=\
 
 DEP_CPP_SEARCH=\
 	"..\..\Src\SearchEngine.h"\
+	"..\..\Src\Uniconv.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Debug"
@@ -3285,10 +3307,9 @@ DEP_CPP_SELEC=\
 
 DEP_CPP_SELEC=\
 	"..\..\Src\MemoSelectView.h"\
-	
-NODEP_CPP_SELEC=\
-	".\ipapi.h"\
-	".\ygshell.h"\
+	"..\..\Src\Property.h"\
+	{$(INCLUDE)}"aygshell.h"\
+	{$(INCLUDE)}"sipapi.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Debug"
@@ -3318,10 +3339,8 @@ DEP_CPP_SELEC=\
 DEP_CPP_SELEC=\
 	"..\..\Src\MemoSelectView.h"\
 	"..\..\Src\Property.h"\
-	
-NODEP_CPP_SELEC=\
-	".\ipapi.h"\
-	".\ygshell.h"\
+	{$(INCLUDE)}"aygshell.h"\
+	{$(INCLUDE)}"sipapi.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) ReleaseE"
@@ -3329,10 +3348,8 @@ NODEP_CPP_SELEC=\
 DEP_CPP_SELEC=\
 	"..\..\Src\MemoSelectView.h"\
 	"..\..\Src\Property.h"\
-	
-NODEP_CPP_SELEC=\
-	".\ipapi.h"\
-	".\ygshell.h"\
+	{$(INCLUDE)}"aygshell.h"\
+	{$(INCLUDE)}"sipapi.h"\
 	
 
 !ENDIF 
@@ -3386,11 +3403,9 @@ DEP_CPP_SIPCO=\
 	"..\..\Src\Logger.h"\
 	"..\..\Src\SipControl.h"\
 	"..\..\Src\Tombo.h"\
-	
-NODEP_CPP_SIPCO=\
-	".\ip.h"\
-	".\ipapi.h"\
-	".\ygshell.h"\
+	{$(INCLUDE)}"aygshell.h"\
+	{$(INCLUDE)}"sip.h"\
+	{$(INCLUDE)}"sipapi.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Debug"
@@ -3433,11 +3448,9 @@ DEP_CPP_SIPCO=\
 	"..\..\Src\Logger.h"\
 	"..\..\Src\SipControl.h"\
 	"..\..\Src\Tombo.h"\
-	
-NODEP_CPP_SIPCO=\
-	".\ip.h"\
-	".\ipapi.h"\
-	".\ygshell.h"\
+	{$(INCLUDE)}"aygshell.h"\
+	{$(INCLUDE)}"sip.h"\
+	{$(INCLUDE)}"sipapi.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) ReleaseE"
@@ -3447,11 +3460,9 @@ DEP_CPP_SIPCO=\
 	"..\..\Src\Logger.h"\
 	"..\..\Src\SipControl.h"\
 	"..\..\Src\Tombo.h"\
-	
-NODEP_CPP_SIPCO=\
-	".\ip.h"\
-	".\ipapi.h"\
-	".\ygshell.h"\
+	{$(INCLUDE)}"aygshell.h"\
+	{$(INCLUDE)}"sip.h"\
+	{$(INCLUDE)}"sipapi.h"\
 	
 
 !ENDIF 
@@ -3620,12 +3631,15 @@ DEP_CPP_TREEV=\
 	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoNote.h"\
 	"..\..\Src\MemoSelectView.h"\
+	"..\..\Src\Message.h"\
 	"..\..\Src\PasswordManager.h"\
 	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
 	"..\..\Src\TreeViewItem.h"\
+	"..\..\Src\TSParser.h"\
 	"..\..\Src\TString.h"\
 	"..\..\Src\Uniconv.h"\
+	"..\..\Src\VFStream.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Debug"
@@ -3697,8 +3711,10 @@ DEP_CPP_TREEV=\
 	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
 	"..\..\Src\TreeViewItem.h"\
+	"..\..\Src\TSParser.h"\
 	"..\..\Src\TString.h"\
 	"..\..\Src\Uniconv.h"\
+	"..\..\Src\VFStream.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) ReleaseE"
@@ -3716,8 +3732,10 @@ DEP_CPP_TREEV=\
 	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
 	"..\..\Src\TreeViewItem.h"\
+	"..\..\Src\TSParser.h"\
 	"..\..\Src\TString.h"\
 	"..\..\Src\Uniconv.h"\
+	"..\..\Src\VFStream.h"\
 	
 
 !ENDIF 
@@ -3731,6 +3749,7 @@ SOURCE=..\..\Src\TSParser.cpp
 
 DEP_CPP_TSPAR=\
 	"..\..\Src\File.h"\
+	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoSelectView.h"\
 	"..\..\Src\regex\ctypeutil.h"\
 	"..\..\Src\TreeViewItem.h"\
@@ -3779,6 +3798,7 @@ DEP_CPP_TSPAR=\
 
 DEP_CPP_TSPAR=\
 	"..\..\Src\File.h"\
+	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoSelectView.h"\
 	"..\..\Src\regex\ctypeutil.h"\
 	"..\..\Src\TreeViewItem.h"\
@@ -3827,6 +3847,7 @@ DEP_CPP_TSPAR=\
 
 DEP_CPP_TSPAR=\
 	"..\..\Src\File.h"\
+	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoSelectView.h"\
 	"..\..\Src\regex\ctypeutil.h"\
 	"..\..\Src\TreeViewItem.h"\
@@ -3839,6 +3860,7 @@ DEP_CPP_TSPAR=\
 
 DEP_CPP_TSPAR=\
 	"..\..\Src\File.h"\
+	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoSelectView.h"\
 	"..\..\Src\regex\ctypeutil.h"\
 	"..\..\Src\TreeViewItem.h"\
@@ -3962,6 +3984,10 @@ SOURCE=..\..\Src\Uniconv.cpp
 !IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
 
 DEP_CPP_UNICO=\
+	"..\..\Src\File.h"\
+	"..\..\Src\Logger.h"\
+	"..\..\Src\Property.h"\
+	"..\..\Src\Tombo.h"\
 	"..\..\Src\Uniconv.h"\
 	
 
@@ -3995,6 +4021,10 @@ NODEP_CPP_UNICO=\
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Release"
 
 DEP_CPP_UNICO=\
+	"..\..\Src\File.h"\
+	"..\..\Src\Logger.h"\
+	"..\..\Src\Property.h"\
+	"..\..\Src\Tombo.h"\
 	"..\..\Src\Uniconv.h"\
 	
 
@@ -4028,12 +4058,20 @@ NODEP_CPP_UNICO=\
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) ReleaseE"
 
 DEP_CPP_UNICO=\
+	"..\..\Src\File.h"\
+	"..\..\Src\Logger.h"\
+	"..\..\Src\Property.h"\
+	"..\..\Src\Tombo.h"\
 	"..\..\Src\Uniconv.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) ReleaseE"
 
 DEP_CPP_UNICO=\
+	"..\..\Src\File.h"\
+	"..\..\Src\Logger.h"\
+	"..\..\Src\Property.h"\
+	"..\..\Src\Tombo.h"\
 	"..\..\Src\Uniconv.h"\
 	
 
@@ -4117,6 +4155,7 @@ DEP_CPP_VFSTR=\
 	"..\..\Src\DirectoryScanner.h"\
 	"..\..\Src\File.h"\
 	"..\..\Src\Logger.h"\
+	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoNote.h"\
 	"..\..\Src\MemoSelectView.h"\
 	"..\..\Src\Property.h"\
@@ -4177,6 +4216,7 @@ DEP_CPP_VFSTR=\
 	"..\..\Src\DirectoryScanner.h"\
 	"..\..\Src\File.h"\
 	"..\..\Src\Logger.h"\
+	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoNote.h"\
 	"..\..\Src\MemoSelectView.h"\
 	"..\..\Src\Property.h"\
@@ -4237,6 +4277,7 @@ DEP_CPP_VFSTR=\
 	"..\..\Src\DirectoryScanner.h"\
 	"..\..\Src\File.h"\
 	"..\..\Src\Logger.h"\
+	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoNote.h"\
 	"..\..\Src\MemoSelectView.h"\
 	"..\..\Src\Property.h"\
@@ -4252,6 +4293,7 @@ DEP_CPP_VFSTR=\
 	"..\..\Src\DirectoryScanner.h"\
 	"..\..\Src\File.h"\
 	"..\..\Src\Logger.h"\
+	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoNote.h"\
 	"..\..\Src\MemoSelectView.h"\
 	"..\..\Src\Property.h"\
@@ -4427,6 +4469,10 @@ SOURCE=.\res\Tombo.ICO
 # Begin Source File
 
 SOURCE=.\resE\Tombo.ICO
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\image\Tombo.ICO
 # End Source File
 # Begin Source File
 
