@@ -21,6 +21,17 @@
 #include "Message.h"
 
 /////////////////////////////////////////
+//  defs
+/////////////////////////////////////////
+
+// Size of each image in IDB_MEMOSELECT_IMAGES
+#define IMAGE_CX 16
+#define IMAGE_CY 16
+
+// Number of items in IDB_MEMOSELECT_IMAGES
+#define NUM_MEMOSELECT_BITMAPS 10
+
+/////////////////////////////////////////
 //  static functions
 /////////////////////////////////////////
 
@@ -28,15 +39,19 @@ static void InsertDummyNode(HWND hTree, HTREEITEM hItem);
 static HTREEITEM FindItem2(HWND hWnd, HTREEITEM hParent, LPCTSTR pStr, DWORD nLen);
 void SelectViewSetWndProc(WNDPROC wp, HWND hParent, HINSTANCE h, MemoSelectView *p);
 LRESULT CALLBACK NewSelectViewProc( HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam );
+static HIMAGELIST CreateSelectViewImageList(HINSTANCE hInst);
 
 /////////////////////////////////////////
 // create window
 /////////////////////////////////////////
 
-BOOL MemoSelectView::Create(LPCTSTR pName, RECT &r, HWND hParent, DWORD nID, HINSTANCE hInst, HFONT hFont, HIMAGELIST hImgList)
+BOOL MemoSelectView::Create(LPCTSTR pName, RECT &r, HWND hParent, DWORD nID, HINSTANCE hInst, HFONT hFont)
 {
+	hSelectViewImgList = CreateSelectViewImageList(hInst);
+
 	DWORD nWndStyle;
 	nWndStyle = WS_CHILD | WS_VSCROLL | WS_HSCROLL | TVS_HASLINES | TVS_HASBUTTONS | TVS_SHOWSELALWAYS | TVS_EDITLABELS;
+
 
 #if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
 	hViewWnd = CreateWindowEx(WS_EX_CLIENTEDGE, WC_TREEVIEW, pName, nWndStyle,
@@ -55,7 +70,7 @@ BOOL MemoSelectView::Create(LPCTSTR pName, RECT &r, HWND hParent, DWORD nID, HIN
 	SetWindowLong(hViewWnd, GWL_WNDPROC, (LONG)NewSelectViewProc);
 #endif
 
-	TreeView_SetImageList(hViewWnd, hImgList, TVSIL_NORMAL);
+	TreeView_SetImageList(hViewWnd, hSelectViewImgList, TVSIL_NORMAL);
 
 	if (hFont != NULL) {
 		SendMessage(hViewWnd, WM_SETFONT, (WPARAM)hFont, MAKELPARAM(TRUE, 0));
@@ -1557,4 +1572,19 @@ void MemoSelectView::SelPrevBrother()
 	if (h) {
 		TreeView_SelectItem(hViewWnd, h);
 	}
+}
+
+static HIMAGELIST CreateSelectViewImageList(HINSTANCE hInst)
+{
+	HIMAGELIST hImageList;
+	// Create Imagelist.
+	if ((hImageList = ImageList_Create(IMAGE_CX, IMAGE_CY, ILC_MASK, NUM_MEMOSELECT_BITMAPS, 0)) == NULL) return NULL;
+	HBITMAP hBmp = LoadBitmap(hInst, MAKEINTRESOURCE(IDB_MEMOSELECT_IMAGES));
+
+	// Transparent color is GREEN
+	COLORREF rgbTransparent = RGB(0,255,0);
+	ImageList_AddMasked(hImageList, hBmp, rgbTransparent);
+	DeleteObject(hBmp);
+
+	return hImageList;
 }

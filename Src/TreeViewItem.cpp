@@ -324,7 +324,7 @@ BOOL TreeViewFileItem::OpenMemo(MemoSelectView *pView, DWORD nOption)
 {
 	TString sURI;
 	if (!pView->GetURI(&sURI, GetViewItem())) return FALSE;
-	pView->GetManager()->GetMainFrame()->RequestOpenMemo(sURI.Get(), nOption);
+	pView->GetManager()->GetMainFrame()->OpenDetailsView(sURI.Get(), nOption);
 	return TRUE;
 }
 
@@ -683,7 +683,7 @@ BOOL TreeViewFileLink::OpenMemo(MemoSelectView *pView, DWORD nOption)
 {
 	TString sURI;
 	pNote->GetURI(&sURI);
-	pView->GetManager()->GetMainFrame()->RequestOpenMemo(sURI.Get(), nOption);
+	pView->GetManager()->GetMainFrame()->OpenDetailsView(sURI.Get(), nOption);
 	return TRUE;
 }
 

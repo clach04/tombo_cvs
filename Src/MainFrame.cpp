@@ -73,22 +73,8 @@ static HIMAGELIST CreateSelectViewImageList(HINSTANCE hInst);
 #define BORDER_WIDTH 5
 #endif
 
-// Size of each image in IDB_MEMOSELECT_IMAGES
-#define IMAGE_CX 16
-#define IMAGE_CY 16
-
-// Number of items in IDB_MEMOSELECT_IMAGES
-#define NUM_MEMOSELECT_BITMAPS 10
-
 // Bookmark menu ID base value
 #define BOOKMARK_ID_BASE 41000
-
-///////////////////////////////////////
-// H/PC version
-
-#if defined(PLATFORM_HPC)
-static HWND GetCommandBar(HWND hBand, UINT uBandID);
-#endif
 
 ///////////////////////////////////////
 // ctor
@@ -551,8 +537,8 @@ void MainFrame::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	}
 
 	// Create tree view
-	hSelectViewImgList = CreateSelectViewImageList(hInstance);
-	msView.Create(TEXT("MemoSelect"), r, hWnd, IDC_MEMOSELECTVIEW, hInstance, g_Property.SelectViewFont(), hSelectViewImgList);
+//	hSelectViewImgList = CreateSelectViewImageList(hInstance);
+	msView.Create(TEXT("MemoSelect"), r, hWnd, IDC_MEMOSELECTVIEW, hInstance, g_Property.SelectViewFont());
 	msView.InitTree(pVFManager);
 
 	if (g_Property.IsUseTwoPane()) {
@@ -595,21 +581,6 @@ void MainFrame::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 	// Raize window for some PocketPC devices.
 //	SetForegroundWindow(hMainWnd);
-}
-
-static HIMAGELIST CreateSelectViewImageList(HINSTANCE hInst)
-{
-	HIMAGELIST hImageList;
-	// Create Imagelist.
-	if ((hImageList = ImageList_Create(IMAGE_CX, IMAGE_CY, ILC_MASK, NUM_MEMOSELECT_BITMAPS, 0)) == NULL) return NULL;
-	HBITMAP hBmp = LoadBitmap(hInst, MAKEINTRESOURCE(IDB_MEMOSELECT_IMAGES));
-
-	// Transparent color is GREEN
-	COLORREF rgbTransparent = RGB(0,255,0);
-	ImageList_AddMasked(hImageList, hBmp, rgbTransparent);
-	DeleteObject(hBmp);
-
-	return hImageList;
 }
 
 ///////////////////////////////////////////////////
@@ -708,7 +679,7 @@ void MainFrame::OnCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		About();
 		break;
 	case IDM_RETURNLIST:
-		OnList(TRUE);
+		LeaveDetailsView(TRUE);
 		break;
 	case IDM_PROPERTY:
 		OnProperty();
@@ -1024,15 +995,11 @@ void MainFrame::OnLButtonUp(WPARAM wParam, LPARAM lParam)
 void MainFrame::MovePane(WORD width)
 {
 	if (!g_Property.IsUseTwoPane()) return;
-
-//	RECT r;
-//	GetClientRect(hMainWnd, &r);
-//	SetLayout(r.right - r.left, r.bottom - r.top, width);
 	SetLayout(width);
 }
 
 ///////////////////////////////////////////////////
-// 
+// Focus window
 ///////////////////////////////////////////////////
 
 void MainFrame::SetFocus()
@@ -1057,7 +1024,7 @@ void MainFrame::NewMemo()
 
 	// メモ編集中に新規メモを作成した場合、保存確認して新規メモに移る
 	if (g_Property.IsUseTwoPane()) {
-		OnList(TRUE);
+		LeaveDetailsView(TRUE);
 	}
 	SetNewMemoStatus(TRUE);
 	mmMemoManager.NewMemo();
@@ -1077,10 +1044,10 @@ void MainFrame::NewFolder(TreeViewItem *pItem)
 }
 
 ///////////////////////////////////////////////////
-// メモ一覧に戻る
+// leave edit view and return to treeview
 ///////////////////////////////////////////////////
 
-void MainFrame::OnList(BOOL bAskSave)
+void MainFrame::LeaveDetailsView(BOOL bAskSave)
 {
 	SipControl sc;
 	if (!sc.Init() || !sc.SetSipStat(FALSE)) {
@@ -1107,11 +1074,11 @@ void MainFrame::OnList(BOOL bAskSave)
 	ActivateView(TRUE);
 
 	if (g_Property.IsUseTwoPane()) {
-		// 2Paneの場合、暗号化されたメモのみクリアする
+		// clear encrypted notes if two pane mode
 		if (nYNC == IDNO) {
 			// discard current note and load old one.
 			if (mmMemoManager.GetCurrentURI()) {
-				RequestOpenMemo(mmMemoManager.GetCurrentURI(), OPEN_REQUEST_MDVIEW_ACTIVE);
+				OpenDetailsView(mmMemoManager.GetCurrentURI(), OPEN_REQUEST_MDVIEW_ACTIVE);
 			} else {
 				mmMemoManager.NewMemo();
 			}
@@ -1137,7 +1104,7 @@ void MainFrame::OnList(BOOL bAskSave)
 }
 
 ///////////////////////////////////////////////////
-// バージョン情報表示
+// version dialog
 ///////////////////////////////////////////////////
 
 void MainFrame::About()
@@ -1154,7 +1121,7 @@ void MainFrame::About()
 ///////////////////////////////////////////////////
 // switch edit view when bSwitchView is TRUE
 
-void MainFrame::RequestOpenMemo(LPCTSTR pURI, DWORD nSwitchView)
+void MainFrame::OpenDetailsView(LPCTSTR pURI, DWORD nSwitchView)
 {
 	TomboURI uri;
 	if (!uri.Init(pURI)) return;
@@ -1359,7 +1326,7 @@ void MainFrame::OnTimer(WPARAM nTimerID)
 				TomboURI uri;
 				if (!uri.Init(mmMemoManager.GetCurrentURI())) return;
 				if (uri.IsEncrypted()) {
-					OnList(FALSE);
+					LeaveDetailsView(FALSE);
 				}
 			}
 		}
@@ -1712,11 +1679,7 @@ void MainFrame::ToggleShowStatusBar()
 {
 	g_Property.ToggleShowStatusBar();
 
-#if defined(PLATFORM_WIN32)
-	HMENU hMenu = GetMenu(hMainWnd);
-#else
-	HMENU hMenu = CommandBar_GetMenu(GetCommandBar(pPlatform->hMSCmdBar, ID_CMDBAR_MAIN), 0);
-#endif
+	HMENU hMenu = pPlatform->GetMainMenu();
 
 	if (g_Property.HideStatusBar()) {
 		CheckMenuItem(hMenu, IDM_SHOWSTATUSBAR, MF_BYCOMMAND | MF_UNCHECKED);
@@ -1735,16 +1698,6 @@ void MainFrame::ToggleShowStatusBar()
 ///////////////////////////////////////////////////
 // get command bar from command band by ID
 ///////////////////////////////////////////////////
-
-#if defined(PLATFORM_HPC)
-static HWND GetCommandBar(HWND hBand, UINT uBandID)
-{
-	UINT idx = SendMessage(hBand, RB_IDTOINDEX, uBandID, 0);
-	if (idx == -1) return NULL;
-	HWND hwnd = CommandBands_GetCommandBar(hBand, idx);
-	return hwnd;
-}
-#endif
 
 int MainFrame::MessageBox(LPCTSTR pText, LPCTSTR pCaption, UINT uType)
 {
@@ -1808,7 +1761,7 @@ void MainFrame::OnVFolderDef()
 	FilterCtlDlg dlg;
 	if (!dlg.Init(&msView, pVFManager)) return;
 	msView.CloseVFRoot();
-	dlg.Popup(g_hInstance, hMainWnd, hSelectViewImgList);
+	dlg.Popup(g_hInstance, hMainWnd, msView.GetImageList());
 }
 
 ///////////////////////////////////////////////////

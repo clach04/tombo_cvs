@@ -32,7 +32,7 @@ class MainFrame {
 	HWND hMainWnd;
 	HINSTANCE hInstance;
 
-	HIMAGELIST hSelectViewImgList;
+//	HIMAGELIST hSelectViewImgList;
 
 	PLATFORM_TYPE *pPlatform;
 
@@ -124,11 +124,11 @@ public:
 	//////////////////////////
 	// open notes
 
-	void RequestOpenMemo(LPCTSTR pURI, DWORD nSwitchView);
+	void OpenDetailsView(LPCTSTR pURI, DWORD nSwitchView);
+	void LeaveDetailsView(BOOL bAskSave);
 	void PostSwitchView(DWORD nView) { PostMessage(hMainWnd, MWM_SWITCH_VIEW, (WPARAM)nView, (LPARAM)0); }
 //	void PopupEditViewDlg();
 
-	void OnList(BOOL bAskSave);
 
 	// Activate view
 	// tree view is activated when bList is TRUE, otherwise edit view is activated.

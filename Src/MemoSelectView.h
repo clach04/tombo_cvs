@@ -21,6 +21,8 @@ class MemoSelectView {
 	HTREEITEM hMemoRoot;
 	HTREEITEM hSearchRoot;
 
+	HIMAGELIST hSelectViewImgList;
+
 	MemoManager *pMemoMgr;
 
 	/////////////////////////////
@@ -53,7 +55,7 @@ public:
 
 	MemoSelectView() : hViewWnd(NULL), pMemoMgr(NULL), bAutoLoadMode(FALSE), bSingleClickMode(FALSE), hMemoRoot(NULL), hSearchRoot(NULL) {}
 	BOOL Init(MemoManager *p) { pMemoMgr = p; bCut = FALSE; pClipItem = NULL; return TRUE; }
-	BOOL Create(LPCTSTR pName, RECT &r, HWND hParent, DWORD nID, HINSTANCE hInst, HFONT hFont, HIMAGELIST hList);
+	BOOL Create(LPCTSTR pName, RECT &r, HWND hParent, DWORD nID, HINSTANCE hInst, HFONT hFont);
 
 	/////////////////////////////
 	// display related funcs
@@ -120,6 +122,8 @@ public:
 	void TreeExpand(HTREEITEM hItem);
 	void TreeCollapse(HTREEITEM hItem);
 	BOOL IsExpand(HTREEITEM hItem);
+
+	HIMAGELIST GetImageList() { return hSelectViewImgList; }
 
 	// êVãKÉÅÉÇê∂ê¨éûèàóù
 	HTREEITEM NewMemoCreated(MemoNote *pNote, LPCTSTR pHeadLine, HTREEITEM hItem);

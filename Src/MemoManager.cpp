@@ -404,7 +404,7 @@ void MemoManager::SelectAll()
 
 void MemoManager::InactiveDetailsView()
 {
-	pMainFrame->OnList(TRUE);
+	pMainFrame->LeaveDetailsView(TRUE);
 }
 
 ////////////////////////////////////////////////////////
