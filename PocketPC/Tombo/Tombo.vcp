@@ -1543,7 +1543,6 @@ DEP_CPP_MAINF=\
 
 DEP_CPP_MAINF=\
 	"..\..\Src\AboutDialog.h"\
-	"..\..\Src\DirectoryScanner.h"\
 	"..\..\Src\File.h"\
 	"..\..\Src\Logger.h"\
 	"..\..\Src\MainFrame.h"\
@@ -4060,8 +4059,10 @@ DEP_CPP_TREEV=\
 	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
 	"..\..\Src\TreeViewItem.h"\
+	"..\..\Src\TSParser.h"\
 	"..\..\Src\TString.h"\
 	"..\..\Src\Uniconv.h"\
+	"..\..\Src\VFStream.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Debug"
@@ -4130,6 +4131,112 @@ DEP_CPP_TREEV=\
 	"..\..\Src\Tombo.h"\
 	"..\..\Src\TreeViewItem.h"\
 	"..\..\Src\TString.h"\
+	"..\..\Src\Uniconv.h"\
+	
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\TSParser.cpp
+
+!IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
+
+DEP_CPP_TSPAR=\
+	"..\..\Src\MemoSelectView.h"\
+	"..\..\Src\TreeViewItem.h"\
+	"..\..\Src\TSParser.h"\
+	"..\..\Src\Uniconv.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
+
+DEP_CPP_TSPAR=\
+	"..\..\Src\MemoSelectView.h"\
+	"..\..\Src\TreeViewItem.h"\
+	"..\..\Src\TSParser.h"\
+	"..\..\Src\Uniconv.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Release"
+
+DEP_CPP_TSPAR=\
+	"..\..\Src\MemoSelectView.h"\
+	"..\..\Src\TreeViewItem.h"\
+	"..\..\Src\TSParser.h"\
+	"..\..\Src\Uniconv.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Debug"
+
+DEP_CPP_TSPAR=\
+	"..\..\Src\MemoSelectView.h"\
+	"..\..\Src\TreeViewItem.h"\
+	"..\..\Src\TSParser.h"\
+	"..\..\Src\Uniconv.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Release"
+
+DEP_CPP_TSPAR=\
+	"..\..\Src\MemoSelectView.h"\
+	"..\..\Src\TreeViewItem.h"\
+	"..\..\Src\TSParser.h"\
+	"..\..\Src\Uniconv.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Debug"
+
+DEP_CPP_TSPAR=\
+	"..\..\Src\MemoSelectView.h"\
+	"..\..\Src\TreeViewItem.h"\
+	"..\..\Src\TSParser.h"\
+	"..\..\Src\Uniconv.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Release"
+
+DEP_CPP_TSPAR=\
+	"..\..\Src\MemoSelectView.h"\
+	"..\..\Src\TreeViewItem.h"\
+	"..\..\Src\TSParser.h"\
+	"..\..\Src\Uniconv.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Debug"
+
+DEP_CPP_TSPAR=\
+	"..\..\Src\MemoSelectView.h"\
+	"..\..\Src\TreeViewItem.h"\
+	"..\..\Src\TSParser.h"\
+	"..\..\Src\Uniconv.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) ReleaseE"
+
+DEP_CPP_TSPAR=\
+	"..\..\Src\MemoSelectView.h"\
+	"..\..\Src\TreeViewItem.h"\
+	"..\..\Src\TSParser.h"\
+	"..\..\Src\Uniconv.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) ReleaseE"
+
+DEP_CPP_TSPAR=\
+	"..\..\Src\MemoSelectView.h"\
+	"..\..\Src\TreeViewItem.h"\
+	"..\..\Src\TSParser.h"\
+	"..\..\Src\Uniconv.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) ReleaseE"
+
+DEP_CPP_TSPAR=\
+	"..\..\Src\MemoSelectView.h"\
+	"..\..\Src\TreeViewItem.h"\
+	"..\..\Src\TSParser.h"\
 	"..\..\Src\Uniconv.h"\
 	
 
@@ -4415,6 +4522,79 @@ DEP_CPP_UTIL_=\
 !ENDIF 
 
 # End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\VFStream.cpp
+
+!IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
+
+DEP_CPP_VFSTR=\
+	"..\..\Src\VFStream.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
+
+DEP_CPP_VFSTR=\
+	"..\..\Src\VFStream.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Release"
+
+DEP_CPP_VFSTR=\
+	"..\..\Src\VFStream.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Debug"
+
+DEP_CPP_VFSTR=\
+	"..\..\Src\VFStream.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Release"
+
+DEP_CPP_VFSTR=\
+	"..\..\Src\VFStream.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Debug"
+
+DEP_CPP_VFSTR=\
+	"..\..\Src\VFStream.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Release"
+
+DEP_CPP_VFSTR=\
+	"..\..\Src\VFStream.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Debug"
+
+DEP_CPP_VFSTR=\
+	"..\..\Src\VFStream.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) ReleaseE"
+
+DEP_CPP_VFSTR=\
+	"..\..\Src\VFStream.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) ReleaseE"
+
+DEP_CPP_VFSTR=\
+	"..\..\Src\VFStream.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) ReleaseE"
+
+DEP_CPP_VFSTR=\
+	"..\..\Src\VFStream.h"\
+	
+
+!ENDIF 
+
+# End Source File
 # End Group
 # Begin Group "Header Files"
 
@@ -4549,11 +4729,19 @@ SOURCE=..\..\Src\TreeViewItem.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\Src\TSParser.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\Src\TString.h
 # End Source File
 # Begin Source File
 
 SOURCE=..\..\Src\Uniconv.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\VFStream.h
 # End Source File
 # End Group
 # Begin Group "Resource Files"

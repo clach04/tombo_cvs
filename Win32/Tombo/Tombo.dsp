@@ -273,6 +273,10 @@ SOURCE=..\..\Src\TreeViewItem.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\Src\TSParser.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\Src\TString.cpp
 # End Source File
 # Begin Source File
@@ -282,6 +286,10 @@ SOURCE=..\..\Src\Uniconv.cpp
 # Begin Source File
 
 SOURCE=..\..\Src\regex\util.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\VFStream.cpp
 # End Source File
 # End Group
 # Begin Group "Header Files"
@@ -435,11 +443,19 @@ SOURCE=..\..\Src\TreeViewItem.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\Src\TSParser.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\Src\TString.h
 # End Source File
 # Begin Source File
 
 SOURCE=..\..\Src\Uniconv.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\VFStream.h
 # End Source File
 # End Group
 # Begin Group "Resource Files"
