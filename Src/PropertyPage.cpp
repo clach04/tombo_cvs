@@ -11,7 +11,7 @@ LPCTSTR GetString(UINT nID);
 // PropertyPage popup
 /////////////////////////////////////////////////////
 
-DWORD PropertyPage::Popup(HINSTANCE hInst, HWND hWnd, PPropertyTab *ppPage, DWORD nPage, LPCTSTR pTitle, LPTSTR pIcon)
+DWORD PropertyPage::Popup(HINSTANCE hInst, HWND hWnd, PPropertyTab *ppPage, DWORD nPage, LPCTSTR pTitle, LPTSTR pIcon, DWORD nStartPage)
 {
 	PROPSHEETPAGE *pPsp;
     PROPSHEETHEADER psh;
@@ -36,7 +36,7 @@ DWORD PropertyPage::Popup(HINSTANCE hInst, HWND hWnd, PPropertyTab *ppPage, DWOR
     psh.pszIcon = pIcon;
     psh.pszCaption = pTitle;
     psh.nPages = nPage;
-    psh.nStartPage = 0;
+    psh.nStartPage = nStartPage;
     psh.ppsp = (LPCPROPSHEETPAGE) pPsp;
     psh.pfnCallback = NULL;
 
@@ -53,6 +53,12 @@ PropertyTab::PropertyTab(DWORD id, DWORD nTitleResID, DLGPROC proc)
  : nResourceID(id), pDlgProc(proc) 
 {
 	_tcscpy(aTitle, RESMSG(nTitleResID));
+}
+
+PropertyTab::PropertyTab(DWORD id, LPCTSTR pTitle, DLGPROC proc)
+ : nResourceID(id), pDlgProc(proc) 
+{
+	_tcscpy(aTitle, pTitle);
 }
 
 /////////////////////////////////////////////////////
@@ -95,6 +101,11 @@ BOOL APIENTRY PropertyTab::DefaultPageProc(HWND hDlg, UINT nMessage, WPARAM wPar
 				SetWindowLong(hDlg, DWL_MSGRESULT, TRUE);
 			}
 			return TRUE;
+		case PSN_RESET:
+			pPage->Cancel(hDlg, wParam, lParam);
+			return TRUE;
+		default:
+			pPage->OnNotify(hDlg, wParam, lParam);
 		}
 	}
 	return FALSE;

@@ -12,7 +12,7 @@ typedef PropertyTab *PPropertyTab;
 
 class PropertyPage {
 public:
-	DWORD Popup(HINSTANCE hInst, HWND hWnd, PPropertyTab *ppPage, DWORD nPage, LPCTSTR pTitle, LPTSTR pIcon);
+	DWORD Popup(HINSTANCE hInst, HWND hWnd, PPropertyTab *ppPage, DWORD nPage, LPCTSTR pTitle, LPTSTR pIcon, DWORD nStart = 0);
 };
 
 /////////////////////////////////////////////////
@@ -41,12 +41,16 @@ protected:
 
 	virtual void Init(HWND hDlg) {}
 	virtual BOOL OnCommand(HWND hDlg, WPARAM wParam, LPARAM lParam) { return FALSE; }
+	virtual BOOL OnNotify(HWND hDlg, WPARAM wParam, LPARAM lParam) { return FALSE; }
 
 	// if return FALSE, block exiting dialog.
 	virtual BOOL Apply(HWND hDlg) { return TRUE; } 
+	virtual void Cancel(HWND hDlg, WPARAM wParam, LPARAM lParam) {}
 
 public:
 	PropertyTab(DWORD id, DWORD nTitleResID, DLGPROC proc);
+	PropertyTab(DWORD id, LPCTSTR pTitle, DLGPROC proc);
+
 	virtual ~PropertyTab() {}
 
 	DWORD ResourceID() { return nResourceID; }
