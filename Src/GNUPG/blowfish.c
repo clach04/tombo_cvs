@@ -718,9 +718,6 @@ void BlowFishTest()
 	BF_Dec(&ctx, plain +  8, chipher +  8);
 	BF_Dec(&ctx, plain + 16, chipher + 16);
 	BF_Dec(&ctx, plain + 24, chipher + 24);
-
-
-	Sleep(1);
 }
 
 #endif

@@ -49,6 +49,10 @@ public:
 	BOOL IsModify() { return bModified; }
 	void SetModify(BOOL b);
 
+	////////////////////////////////////////////////////
+	// Data size related functions
+	DWORD GetDataBytes(const Region *pRegion);
+	void ConvertBytesToCoordinate(DWORD nPos, Coordinate *pPos);
 };
 
 ////////////////////////////////////////////////////
@@ -59,5 +63,4 @@ class YAEDocCallbackHandler {
 public:
 	virtual void OnModifyStatusChanged(YAEditDoc *pDoc, BOOL bOld, BOOL bNew) = 0;
 };
-
 #endif

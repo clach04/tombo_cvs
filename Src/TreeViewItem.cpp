@@ -312,17 +312,17 @@ TreeViewFileItem::IsUseDetailsView()
 
 BOOL TreeViewFileItem::OpenMemo(MemoSelectView *pView, DWORD nOption)
 {
-	TString sURI;
+	TomboURI sURI;
 	if (!pView->GetURI(&sURI, GetViewItem())) return FALSE;
-	pView->GetManager()->GetMainFrame()->OpenDetailsView(sURI.Get(), nOption);
+	pView->GetManager()->GetMainFrame()->OpenDetailsView(&sURI, nOption);
 	return TRUE;
 }
 
 BOOL TreeViewFileItem::LoadMemo(MemoSelectView *pView, BOOL bAskPass)
 {
-	TString sURI;
+	TomboURI sURI;
 	if (!pView->GetURI(&sURI, GetViewItem())) return FALSE;
-	pView->GetManager()->GetMainFrame()->LoadMemo(sURI.Get(), bAskPass);
+	pView->GetManager()->GetMainFrame()->LoadMemo(&sURI, bAskPass);
 	return TRUE;
 }
 
@@ -738,13 +738,13 @@ BOOL TreeViewFileLink::IsOperationEnabled(MemoSelectView *pView, OpType op)
 
 BOOL TreeViewFileLink::OpenMemo(MemoSelectView *pView, DWORD nOption)
 {
-	pView->GetManager()->GetMainFrame()->OpenDetailsView(GetRealURI()->GetFullURI(), nOption);
+	pView->GetManager()->GetMainFrame()->OpenDetailsView(GetRealURI(), nOption);
 	return TRUE;
 }
 
 BOOL TreeViewFileLink::LoadMemo(MemoSelectView *pView, BOOL bAskPass)
 {
-	pView->GetManager()->GetMainFrame()->LoadMemo(GetRealURI()->GetFullURI(), bAskPass);
+	pView->GetManager()->GetMainFrame()->LoadMemo(GetRealURI(), bAskPass);
 	return TRUE;
 }
 

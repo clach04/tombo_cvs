@@ -11,6 +11,7 @@ public:
 	MemoInfo(LPCTSTR pTop) : pTopDir(pTop) {}
 	~MemoInfo() {}
 
+	// path should partpath :-<
 	BOOL WriteInfo(LPCTSTR pMemoPath, DWORD nPos);
 	BOOL ReadInfo(LPCTSTR pMemoPath, LPDWORD pPos);
 

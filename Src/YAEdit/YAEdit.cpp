@@ -452,7 +452,6 @@ void YAEdit::OnChar(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		return;
 	}
 	if (ch == CHARA_ESC) {
-		Sleep(1);
 		return;
 	}
 
@@ -944,4 +943,32 @@ void YAEdit::SetFont(HFONT hFont)
 	pLineMgr = new LineManager();
 	if (!pLineMgr->Init(this)) return;
 	SetDoc(pDoc);
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// get caret position
+/////////////////////////////////////////////////////////////////////////////
+
+DWORD YAEdit::GetCaretPos()
+{
+	Coordinate lgCur = pView->GetCaretPosition();
+	Coordinate phCur;
+	pLineMgr->LogicalPosToPhysicalPos(&lgCur, &phCur);
+
+	Region r;
+
+	r.posStart.Set(0, 0);
+	r.posEnd.Set(phCur.col, phCur.row);
+	
+	return pDoc->GetDataBytes(&r);
+}
+
+void YAEdit::SetCaretPos(DWORD n)
+{
+	Coordinate phCur, lgCur;
+	pDoc->ConvertBytesToCoordinate(n, &phCur);
+	pLineMgr->PhysicalPosToLogicalPos(&phCur, &lgCur);
+
+	pView->SetCaretPosition(lgCur);
+	pView->ScrollCaret();
 }

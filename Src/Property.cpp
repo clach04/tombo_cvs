@@ -118,7 +118,6 @@ static BOOL MakeFont(HFONT *phFont, LPCTSTR pName, DWORD nSize, BYTE bQuality);
 //////////////////////////////////////////
 // レジストリ操作
 
-
 static HKEY GetTomboRootKey();
 
 // 値の設定 : 失敗したらhKeyはクローズされる

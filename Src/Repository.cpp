@@ -45,7 +45,8 @@ BOOL Repository::Create(const TomboURI *pTemplate, LPCTSTR pData,
 	return pDefaultImpl->Create(pTemplate, pData, pRealHeadLine, pAllocedURI);
 }
 
-BOOL Repository::Update(const TomboURI *pCurrentURI, LPCTSTR pData, 
+BOOL Repository::Update(const TomboURI *pCurrentURI, 
+						LPCTSTR pData, 
 						TomboURI *pNewURI, TString *pNewHeadLine)
 {
 	return pDefaultImpl->Update(pCurrentURI, pData, pNewURI, pNewHeadLine);

@@ -89,6 +89,15 @@ BOOL MemoDetailsView::StoreCursorPos()
 	return TRUE;
 }
 
+BOOL MemoDetailsView::Save(const TomboURI *pCurrentURI, TomboURI *pNewURI, TString *pNewHeadLine, LPCTSTR pText)
+{
+	if (!g_Repository.Update(pCurrentURI, pText, pNewURI, pNewHeadLine)) return FALSE;
+	ResetModify();
+	pCallback->SetModifyStatus(FALSE);
+	SetCurrentNote(pNewURI);
+	return TRUE;
+}
+
 BOOL MemoDetailsView::LoadNote(const TomboURI *pURI)
 {
 	// load note data and attribute
@@ -106,16 +115,6 @@ BOOL MemoDetailsView::LoadNote(const TomboURI *pURI)
 	SetMemo(p, attr.nCursorPos, attr.bReadOnly);
 	SetCurrentNote(pURI);
 
-	return TRUE;
-}
-
-BOOL MemoDetailsView::Save(const TomboURI *pCurrentURI, TomboURI *pNewURI, TString *pNewHeadLine, LPCTSTR pText)
-{
-	if (!g_Repository.Update(pCurrentURI, pText, pNewURI, pNewHeadLine)) return FALSE;
-	StoreCursorPos();
-	ResetModify();
-	pCallback->SetModifyStatus(FALSE);
-	SetCurrentNote(pNewURI);
 	return TRUE;
 }
 

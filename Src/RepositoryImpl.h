@@ -87,6 +87,7 @@ protected:
 	////////////////////////////////////////
 	// others
 	BOOL GetSafeFileName(const TString *pBasePath, TString *pNewName);
+	BOOL GetTDTFullPath(const TomboURI *pURI, TString *pTdtName);
 
 public:
 	LocalFileRepository();

@@ -75,15 +75,35 @@ BOOL LocalFileRepository::Create(const TomboURI *pTemplate, LPCTSTR pData, TStri
 }
 
 /////////////////////////////////////////
+// get attribute file path from notes URI 
+/////////////////////////////////////////
+
+BOOL LocalFileRepository::GetTDTFullPath(const TomboURI *pURI, TString *pTdtName)
+{
+	TString sPath;
+	if (!pURI->GetFilePath(&sPath)) return FALSE;
+	return pTdtName->Join(pTopDir, TEXT("\\"), sPath.Get(), TEXT(".tdt"));
+}
+
+/////////////////////////////////////////
 // Update note
 /////////////////////////////////////////
 
-BOOL LocalFileRepository::Update(const TomboURI *pCurrentURI, LPCTSTR pData, 
+BOOL LocalFileRepository::Update(const TomboURI *pCurrentURI, LPCTSTR pData,
 								 TomboURI *pNewURI, TString *pNewHeadLine)
 {
+	// Save note data
 	if (!Save(pCurrentURI, pData, pNewURI, pNewHeadLine)) {
 		return FALSE;
 	}
+	
+	// if tdt exists, move one
+	TString sCurrentTdtPath, sNewTdtPath;
+	if (!GetTDTFullPath(pCurrentURI, &sCurrentTdtPath)) return FALSE;
+	if (!GetTDTFullPath(pNewURI, &sNewTdtPath)) return FALSE;
+
+	MemoInfo mi(pTopDir);
+	mi.RenameInfo(sCurrentTdtPath.Get(), sNewTdtPath.Get());
 	return TRUE;
 }
 
@@ -313,7 +333,16 @@ BOOL LocalFileRepository::GetOption(const TomboURI *pURI, URIOption *pOption) co
 		}
 	}
 	if (pOption->nFlg & NOTE_OPTIONMASK_ENCRYPTED) {
-		pOption->bEncrypt = pURI->IsEncrypted();
+		LPCTSTR p = pURI->GetFullURI();
+		DWORD n = _tcslen(p);
+		if (n > 4) {
+			if (_tcscmp(p + n - 4, TEXT(".chi")) == 0 ||
+				_tcscmp(p + n - 4, TEXT(".chs")) == 0) {
+				pOption->bEncrypt = TRUE;
+			} else {
+				pOption->bEncrypt = FALSE;
+			}
+		}
 	}
 
 	if (pOption->nFlg & NOTE_OPTIONMASK_SAFEFILE) {

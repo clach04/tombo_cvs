@@ -5,6 +5,7 @@
 
 #include "Tombo.h"
 #include "UniConv.h"
+#include "Property.h"
 #include "Region.h"
 #include "YAEdit.h"
 #include "YAEditDoc.h"
@@ -126,6 +127,10 @@ BOOL YAEditor::SetMemo(LPCTSTR pMemoW, DWORD nPos, BOOL bReadOnly)
 	YAEditDoc *pOldDoc = pEdit->SetDoc(pDoc);
 	delete pOldDoc;
 
+	if (g_Property.KeepCaret()) {
+		pEdit->SetCaretPos(nPos);
+	}
+
 	return TRUE;
 }
 
@@ -152,4 +157,9 @@ void YAEditor::SetMDSearchFlg(BOOL bFlg)
 void YAEditor::SetFont(HFONT hFont)
 {
 	pEdit->SetFont(hFont);
+}
+
+DWORD YAEditor::GetCursorPos()
+{
+	return pEdit->GetCaretPos();
 }

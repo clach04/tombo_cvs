@@ -10,6 +10,9 @@ class YAEditor : public MemoDetailsView {
 	YAEdit *pEdit;
 	MemoManager *pMemoMgr;
 	DWORD nID;
+
+	BOOL SetMemo(LPCTSTR pMemo, DWORD nPos, BOOL bReadOnly);
+
 public:
 
 	YAEditor(MemoDetailsViewCallback *pCB);
@@ -21,7 +24,6 @@ public:
 	void SetFocus();
 	void MoveWindow(DWORD x, DWORD y, DWORD nWidth, DWORD nHeight);
 
-	BOOL SetMemo(LPCTSTR pMemo, DWORD nPos, BOOL bReadOnly);
 	BOOL IsModify();
 	void ResetModify();
 
@@ -50,7 +52,7 @@ public:
 	BOOL OnHotKey(HWND hWnd, WPARAM wParam) { return TRUE; }
 	void OnGetFocus();
 
-	DWORD GetCursorPos() { return 0; }
+	DWORD GetCursorPos();
 	DWORD GetInitialPos() { return 0; }
 
 	void SelectAll() {}

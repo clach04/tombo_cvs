@@ -160,3 +160,50 @@ void YAEditDoc::SetModify(BOOL b)
 	bModified = b; 
 	if (pHandler) pHandler->OnModifyStatusChanged(this, bOld, bModified);
 }
+
+/////////////////////////////////////////////////////////////////////////////
+// update modify status
+/////////////////////////////////////////////////////////////////////////////
+
+DWORD YAEditDoc::GetDataBytes(const Region *pRegion)
+{
+	if (pRegion->posStart.row == pRegion->posEnd.row) {
+		return pRegion->posEnd.col - pRegion->posStart.col;
+	} else {
+		DWORD nBytes = 0;
+		LineInfo *pInfo;
+		pInfo= pPhLineMgr->GetLineInfo(pRegion->posStart.row);
+
+		// first line
+		nBytes = pInfo->pLine->nUsed - pRegion->posStart.col + 1; // +1 means LF
+
+		for (DWORD i = pRegion->posStart.row + 1; i < pRegion->posEnd.row; i++) {
+			pInfo = pPhLineMgr->GetLineInfo(i);
+			nBytes += pInfo->pLine->nUsed + 1;
+		}
+
+		// last line
+		nBytes += pRegion->posEnd.col;
+
+		return nBytes;
+	}
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// Convert data bytes to physical position
+/////////////////////////////////////////////////////////////////////////////
+
+void YAEditDoc::ConvertBytesToCoordinate(DWORD nPos, Coordinate *pPos)
+{
+	DWORD nBytes = 0;
+	LineInfo *p = NULL;
+	for (DWORD i = 0; i < pPhLineMgr->MaxLine(); i++) {
+		p = pPhLineMgr->GetLineInfo(i);
+		if (nBytes + p->pLine->nUsed + 1 > nPos) {
+			break;
+		}
+		nBytes += p->pLine->nUsed + 1;
+	}
+	pPos->row = i;
+	pPos->col = nPos - nBytes;
+}

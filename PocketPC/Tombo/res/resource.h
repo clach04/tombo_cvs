@@ -24,7 +24,9 @@
 #define IDD_NEWFOLDER                   110
 #define IDM_EXTAPP2                     110
 #define IDD_PROPTAB_PASS_TIMEOUT        111
+#define IDC_TOMBOEDIT                   111
 #define IDD_PROPTAB_FONT                112
+#define IDT_SELSCROLL                   112
 #define IDB_TOOLBAR                     114
 #define IDR_MENUBAR1                    115
 #define IDR_POPUP                       115
@@ -259,6 +261,6 @@
 #define _APS_NEXT_RESOURCE_VALUE        132
 #define _APS_NEXT_COMMAND_VALUE         40085
 #define _APS_NEXT_CONTROL_VALUE         1079
-#define _APS_NEXT_SYMED_VALUE           111
+#define _APS_NEXT_SYMED_VALUE           113
 #endif
 #endif

@@ -140,12 +140,12 @@ public:
 	//////////////////////////
 	// open notes
 
-	void LoadMemo(LPCTSTR pURI, BOOL bAskPass);
+	void LoadMemo(const TomboURI *pURI, BOOL bAskPass);
 
 	//////////////////////////
 	// view control
 
-	void OpenDetailsView(LPCTSTR pURI, DWORD nSwitchView);
+	void OpenDetailsView(const TomboURI *pURI, DWORD nSwitchView);
 	void LeaveDetailsView(BOOL bAskSave);
 	void PostSwitchView(DWORD nView) { PostMessage(hMainWnd, MWM_SWITCH_VIEW, (WPARAM)nView, (LPARAM)0); }
 //	void PopupEditViewDlg();
@@ -191,7 +191,7 @@ public:
 #endif
 
 	// change window title
-	void SetWindowTitle(TomboURI *pURI);
+	void SetWindowTitle(const TomboURI *pURI);
 
 	////////////////////////////////
 	// bookmark related members

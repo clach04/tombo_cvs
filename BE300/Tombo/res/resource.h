@@ -29,7 +29,9 @@
 #define IDM_EXTAPP1                     113
 #define IDM_EXTAPP2                     114
 #define IDB_TOOLBAR                     115
+#define IDC_TOMBOEDIT                   115
 #define IDB_TOOLBAR_DETAILS             116
+#define IDT_SELSCROLL                   116
 #define IDD_PROPTAB_FONT                117
 #define IDD_PROPTAB_INSDATE             118
 #define IDR_ACCEL_SELECT                119
@@ -242,6 +244,6 @@
 #define _APS_NEXT_RESOURCE_VALUE        141
 #define _APS_NEXT_COMMAND_VALUE         40061
 #define _APS_NEXT_CONTROL_VALUE         1064
-#define _APS_NEXT_SYMED_VALUE           115
+#define _APS_NEXT_SYMED_VALUE           117
 #endif
 #endif

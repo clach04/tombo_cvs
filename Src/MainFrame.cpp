@@ -1052,7 +1052,7 @@ void MainFrame::About()
 // Set note's headline to window title
 ///////////////////////////////////////////////////
 
-void MainFrame::SetWindowTitle(TomboURI *pURI)
+void MainFrame::SetWindowTitle(const TomboURI *pURI)
 {
 #if defined(PLATFORM_WIN32) || defined(PLATFORM_PKTPC)
 	if (g_Property.SwitchWindowTitle()) {
@@ -1113,20 +1113,23 @@ void MainFrame::PopupEditViewDlg()
 ///////////////////////////////////////////////////
 // switch edit view when bSwitchView is TRUE
 
-void MainFrame::OpenDetailsView(LPCTSTR pURI, DWORD nSwitchView)
+void MainFrame::OpenDetailsView(const TomboURI *pURI, DWORD nSwitchView)
 {
-	TomboURI uri;
-	if (!uri.Init(pURI)) return;
+//	TomboURI uri;
+//	if (!uri.Init(pURI)) return;
 
-	if (((nSwitchView & OPEN_REQUEST_MSVIEW_ACTIVE) == 0) && (uri.IsEncrypted() && !pmPasswordMgr.IsRememberPassword())) {
+	URIOption opt(NOTE_OPTIONMASK_ENCRYPTED);
+	if (!g_Repository.GetOption(pURI, &opt)) return;
+
+	if (((nSwitchView & OPEN_REQUEST_MSVIEW_ACTIVE) == 0) && (opt.bEncrypt && !pmPasswordMgr.IsRememberPassword())) {
 		// bSwitchViewがFALSEで、メモを開くためにパスワードを問い合わせる必要がある場合には
 		// メモは開かない
 		return;
 	}
-	pDetailsView->LoadNote(&uri);
+	pDetailsView->LoadNote(pURI);
 	SetNewMemoStatus(FALSE);
 
-	SetWindowTitle(&uri);
+	SetWindowTitle(pURI);
 
 	if (g_Property.IsUseTwoPane()) {
 		if (nSwitchView & OPEN_REQUEST_MSVIEW_ACTIVE) {
@@ -1141,22 +1144,22 @@ void MainFrame::OpenDetailsView(LPCTSTR pURI, DWORD nSwitchView)
 // load notes
 ///////////////////////////////////////////////////
 
-void MainFrame::LoadMemo(LPCTSTR pURI, BOOL bAskPass)
+void MainFrame::LoadMemo(const TomboURI *pURI, BOOL bAskPass)
 {
-	TomboURI uri;
-	if (!uri.Init(pURI)) return;
+	URIOption opt(NOTE_OPTIONMASK_ENCRYPTED);
+	if (!g_Repository.GetOption(pURI, &opt)) return;
 
-	if (uri.IsEncrypted() && 
+	if (opt.bEncrypt && 
 		!pmPasswordMgr.IsRememberPassword() &&
 		bAskPass == FALSE) {
 		// if TOMBO doesn't keep password even though it is need
 		// and caller don't want to ask password, nothing to do
 		return;
 	}
-	pDetailsView->LoadNote(&uri);
+	pDetailsView->LoadNote(pURI);
 	SetNewMemoStatus(FALSE);
 
-	SetWindowTitle(&uri);
+	SetWindowTitle(pURI);
 }
 
 ///////////////////////////////////////////////////
@@ -1198,16 +1201,16 @@ void MainFrame::LeaveDetailsView(BOOL bAskSave)
 		if (nYNC == IDNO) {
 			// discard current note and load old one.
 			if (pDetailsView->GetCurrentURI()) {
-				OpenDetailsView(pDetailsView->GetCurrentURI()->GetFullURI(), OPEN_REQUEST_MDVIEW_ACTIVE);
+				OpenDetailsView(pDetailsView->GetCurrentURI(), OPEN_REQUEST_MDVIEW_ACTIVE);
 			} else {
 				mmMemoManager.NewMemo();
 			}
 		} else {
 			// nYNC == YES so note has been saved.
 			if (pDetailsView->GetCurrentURI()) {
-				TomboURI uri;
-				if (!uri.Init(pDetailsView->GetCurrentURI()->GetFullURI())) return;
-				if (uri.IsEncrypted()) {
+				URIOption opt(NOTE_OPTIONMASK_ENCRYPTED);
+				if (!g_Repository.GetOption(pDetailsView->GetCurrentURI(), &opt)) return;
+				if (opt.bEncrypt) {
 					mmMemoManager.NewMemo();
 				}
 			}
@@ -1465,9 +1468,9 @@ void MainFrame::OnTimer(WPARAM nTimerID)
 	if (nTimerID == 0) {
 		if (!SelectViewActive()) {
 			if (pDetailsView->GetCurrentURI()) {
-				TomboURI uri;
-				if (!uri.Init(pDetailsView->GetCurrentURI()->GetFullURI())) return;
-				if (uri.IsEncrypted()) {
+				URIOption opt(NOTE_OPTIONMASK_ENCRYPTED);
+				if (!g_Repository.GetOption(pDetailsView->GetCurrentURI(), &opt)) return;
+				if (opt.bEncrypt) {
 					LeaveDetailsView(FALSE);
 				}
 			}

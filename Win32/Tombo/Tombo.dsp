@@ -152,10 +152,6 @@ SOURCE=..\..\Src\FilterDefDlg.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\Src\YAEdit\FontWidthCache.cpp
-# End Source File
-# Begin Source File
-
 SOURCE=..\..\Src\GrepDialog.cpp
 # End Source File
 # Begin Source File
@@ -209,10 +205,6 @@ SOURCE=..\..\Src\PasswordDialog.cpp
 # Begin Source File
 
 SOURCE=..\..\Src\PasswordManager.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\YAEdit\PhysicalLineManager.cpp
 # End Source File
 # Begin Source File
 
@@ -288,14 +280,6 @@ SOURCE=..\..\Src\TSParser.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\Src\TomboLib\TString.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\TomboLib\Uniconv.cpp
-# End Source File
-# Begin Source File
-
 SOURCE=..\..\Src\regex\util.c
 # End Source File
 # Begin Source File
@@ -313,6 +297,10 @@ SOURCE=..\..\Src\VFStream.cpp
 # Begin Source File
 
 SOURCE=..\..\Src\Win32Platform.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\YAEditor.cpp
 # End Source File
 # End Group
 # Begin Group "Header Files"
@@ -384,10 +372,6 @@ SOURCE=..\..\Src\FilterDefDlg.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\Src\YAEdit\FontWidthCache.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\..\Src\GrepDialog.h
 # End Source File
 # Begin Source File
@@ -433,10 +417,6 @@ SOURCE=..\..\Src\PasswordDialog.h
 # Begin Source File
 
 SOURCE=..\..\Src\PasswordManager.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\YAEdit\PhysicalLineManager.h
 # End Source File
 # Begin Source File
 
@@ -512,14 +492,6 @@ SOURCE=..\..\Src\TSParser.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\Src\TomboLib\TString.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\TomboLib\Uniconv.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\..\Src\TomboLib\VarBuffer.h
 # End Source File
 # Begin Source File
@@ -533,6 +505,10 @@ SOURCE=..\..\Src\VFStream.h
 # Begin Source File
 
 SOURCE=..\..\Src\Win32Platform.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\YAEditor.h
 # End Source File
 # End Group
 # Begin Group "Resource Files"
@@ -600,6 +576,14 @@ SOURCE=.\toolbar.bmp
 # PROP Default_Filter ""
 # Begin Source File
 
+SOURCE=..\..\Src\YAEdit\FontWidthCache.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\YAEdit\FontWidthCache.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\Src\YAEdit\LineManager.cpp
 # End Source File
 # Begin Source File
@@ -632,6 +616,14 @@ SOURCE=..\..\Src\YAEdit\MemManager.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\Src\YAEdit\PhysicalLineManager.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\YAEdit\PhysicalLineManager.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\Src\YAEdit\YAEdit.cpp
 # End Source File
 # Begin Source File
@@ -645,14 +637,6 @@ SOURCE=..\..\Src\YAEdit\YAEditDoc.cpp
 # Begin Source File
 
 SOURCE=..\..\Src\YAEdit\YAEditDoc.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\YAEditor.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\YAEditor.h
 # End Source File
 # Begin Source File
 
@@ -701,6 +685,22 @@ SOURCE=..\..\Src\TomboLib\Logger.cpp
 # Begin Source File
 
 SOURCE=..\..\Src\TomboLib\Logger.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\TomboLib\TString.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\TomboLib\TString.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\TomboLib\Uniconv.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\TomboLib\Uniconv.h
 # End Source File
 # End Group
 # Begin Source File

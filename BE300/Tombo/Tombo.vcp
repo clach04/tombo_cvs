@@ -58,7 +58,7 @@ RSC=rc.exe
 # ADD RSC /l 0x409 /d UNDER_CE=$(CEVersion) /d _WIN32_WCE=$(CEVersion) /d "UNICODE" /d "_UNICODE" /d "NDEBUG" /d "$(CePlatform)" /d "MIPS" /d "_MIPS_" /r
 CPP=clmips.exe
 # ADD BASE CPP /nologo /W3 /D _WIN32_WCE=$(CEVersion) /D "$(CePlatform)" /D "MIPS" /D "_MIPS_" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_UNICODE" /D "NDEBUG" /YX /Oxs /M$(CECrtMT) /c
-# ADD CPP /nologo /W3 /I "../../Src" /I "../expat/include" /I "./res" /I "." /I "../../Src/regex" /I "../../expat/include" /I "../../Src/TomboLib" /D "MIPS" /D "_MIPS_" /D "NDEBUG" /D "TOMBO" /D UNDER_CE=$(CEVersion) /D _WIN32_WCE=$(CEVersion) /D "$(CePlatform)" /D "UNICODE" /D "_UNICODE" /D "PLATFORM_BE500" /D "TOMBO_LANG_ENGLISH" /YX /Oxs /M$(CECrtMT) /c
+# ADD CPP /nologo /W3 /I "../../Src" /I "../expat/include" /I "./res" /I "." /I "../../Src/regex" /I "../../expat/include" /I "../../Src/TomboLib" /I "../../Src/YAEdit" /D "MIPS" /D "_MIPS_" /D "NDEBUG" /D "TOMBO" /D UNDER_CE=$(CEVersion) /D _WIN32_WCE=$(CEVersion) /D "$(CePlatform)" /D "UNICODE" /D "_UNICODE" /D "PLATFORM_BE500" /D "TOMBO_LANG_ENGLISH" /YX /Oxs /M$(CECrtMT) /c
 MTL=midl.exe
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /o "NUL" /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /o "NUL" /win32
@@ -476,15 +476,11 @@ SOURCE=..\..\Src\BookMark.cpp
 
 DEP_CPP_BOOKM=\
 	"..\..\Src\BookMark.h"\
-	"..\..\Src\MemoManager.h"\
-	"..\..\Src\MemoNote.h"\
 	"..\..\Src\Repository.h"\
-	"..\..\Src\RepositoryFactory.h"\
 	"..\..\Src\TomboLib\TString.h"\
 	"..\..\Src\TomboLib\Uniconv.h"\
 	"..\..\Src\TomboLib\VarBuffer.h"\
 	"..\..\Src\TomboURI.h"\
-	"..\..\Src\TreeViewItem.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
@@ -916,7 +912,6 @@ SOURCE=..\..\Src\DetailsViewWndProc.cpp
 
 DEP_CPP_DETAI=\
 	"..\..\Src\MemoDetailsView.h"\
-	"..\..\Src\MemoManager.h"\
 	"..\..\Src\PlatformLayer.h"\
 	"..\..\Src\PocketPCPlatform.h"\
 	"..\..\Src\Property.h"\
@@ -1108,10 +1103,11 @@ SOURCE=..\..\Src\DirList.cpp
 
 DEP_CPP_DIRLI=\
 	"..\..\Src\DirList.h"\
-	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoNote.h"\
+	"..\..\Src\Repository.h"\
+	"..\..\Src\TomboLib\TString.h"\
 	"..\..\Src\TomboLib\VarBuffer.h"\
-	"..\..\Src\TreeViewItem.h"\
+	"..\..\Src\TomboURI.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
@@ -1819,6 +1815,61 @@ NODEP_CPP_FILTERD=\
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\Src\YAEdit\FontWidthCache.cpp
+
+!IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
+
+DEP_CPP_FONTW=\
+	"..\..\Src\YAEdit\FontWidthCache.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
+
+DEP_CPP_FONTW=\
+	"..\..\Src\YAEdit\FontWidthCache.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Release"
+
+DEP_CPP_FONTW=\
+	"..\..\Src\YAEdit\FontWidthCache.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Debug"
+
+DEP_CPP_FONTW=\
+	"..\..\Src\YAEdit\FontWidthCache.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Release"
+
+DEP_CPP_FONTW=\
+	"..\..\Src\YAEdit\FontWidthCache.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Debug"
+
+DEP_CPP_FONTW=\
+	"..\..\Src\YAEdit\FontWidthCache.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Release"
+
+DEP_CPP_FONTW=\
+	"..\..\Src\YAEdit\FontWidthCache.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Debug"
+
+DEP_CPP_FONTW=\
+	"..\..\Src\YAEdit\FontWidthCache.h"\
+	
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\Src\GrepDialog.cpp
 
 !IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
@@ -2021,6 +2072,325 @@ DEP_CPP_LAGEN=\
 	
 NODEP_CPP_LAGEN=\
 	"..\..\Src\resource.h"\
+	
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\YAEdit\LineManager.cpp
+
+!IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
+
+DEP_CPP_LINEM=\
+	"..\..\Src\TomboLib\VarBuffer.h"\
+	"..\..\Src\YAEdit\LineManager.h"\
+	"..\..\Src\YAEdit\LineWrapper.h"\
+	"..\..\Src\YAEdit\MemManager.h"\
+	"..\..\Src\YAEdit\PhysicalLineManager.h"\
+	"..\..\Src\YAEdit\Region.h"\
+	"..\..\Src\YAEdit\YAEdit.h"\
+	"..\..\Src\YAEdit\YAEditDoc.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
+
+DEP_CPP_LINEM=\
+	"..\..\Src\YAEdit\LineManager.h"\
+	"..\..\Src\YAEdit\LineWrapper.h"\
+	"..\..\Src\YAEdit\MemManager.h"\
+	"..\..\Src\YAEdit\PhysicalLineManager.h"\
+	"..\..\Src\YAEdit\Region.h"\
+	"..\..\Src\YAEdit\YAEdit.h"\
+	"..\..\Src\YAEdit\YAEditDoc.h"\
+	
+NODEP_CPP_LINEM=\
+	"..\..\Src\YAEdit\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Release"
+
+DEP_CPP_LINEM=\
+	"..\..\Src\YAEdit\LineManager.h"\
+	"..\..\Src\YAEdit\LineWrapper.h"\
+	"..\..\Src\YAEdit\MemManager.h"\
+	"..\..\Src\YAEdit\PhysicalLineManager.h"\
+	"..\..\Src\YAEdit\Region.h"\
+	"..\..\Src\YAEdit\YAEdit.h"\
+	"..\..\Src\YAEdit\YAEditDoc.h"\
+	
+NODEP_CPP_LINEM=\
+	"..\..\Src\YAEdit\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Debug"
+
+DEP_CPP_LINEM=\
+	"..\..\Src\YAEdit\LineManager.h"\
+	"..\..\Src\YAEdit\LineWrapper.h"\
+	"..\..\Src\YAEdit\MemManager.h"\
+	"..\..\Src\YAEdit\PhysicalLineManager.h"\
+	"..\..\Src\YAEdit\Region.h"\
+	"..\..\Src\YAEdit\YAEdit.h"\
+	"..\..\Src\YAEdit\YAEditDoc.h"\
+	
+NODEP_CPP_LINEM=\
+	"..\..\Src\YAEdit\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Release"
+
+DEP_CPP_LINEM=\
+	"..\..\Src\YAEdit\LineManager.h"\
+	"..\..\Src\YAEdit\LineWrapper.h"\
+	"..\..\Src\YAEdit\MemManager.h"\
+	"..\..\Src\YAEdit\PhysicalLineManager.h"\
+	"..\..\Src\YAEdit\Region.h"\
+	"..\..\Src\YAEdit\YAEdit.h"\
+	"..\..\Src\YAEdit\YAEditDoc.h"\
+	
+NODEP_CPP_LINEM=\
+	"..\..\Src\YAEdit\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Debug"
+
+DEP_CPP_LINEM=\
+	"..\..\Src\YAEdit\LineManager.h"\
+	"..\..\Src\YAEdit\LineWrapper.h"\
+	"..\..\Src\YAEdit\MemManager.h"\
+	"..\..\Src\YAEdit\PhysicalLineManager.h"\
+	"..\..\Src\YAEdit\Region.h"\
+	"..\..\Src\YAEdit\YAEdit.h"\
+	"..\..\Src\YAEdit\YAEditDoc.h"\
+	
+NODEP_CPP_LINEM=\
+	"..\..\Src\YAEdit\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Release"
+
+DEP_CPP_LINEM=\
+	"..\..\Src\YAEdit\LineManager.h"\
+	"..\..\Src\YAEdit\LineWrapper.h"\
+	"..\..\Src\YAEdit\MemManager.h"\
+	"..\..\Src\YAEdit\PhysicalLineManager.h"\
+	"..\..\Src\YAEdit\Region.h"\
+	"..\..\Src\YAEdit\YAEdit.h"\
+	"..\..\Src\YAEdit\YAEditDoc.h"\
+	
+NODEP_CPP_LINEM=\
+	"..\..\Src\YAEdit\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Debug"
+
+DEP_CPP_LINEM=\
+	"..\..\Src\YAEdit\LineManager.h"\
+	"..\..\Src\YAEdit\LineWrapper.h"\
+	"..\..\Src\YAEdit\MemManager.h"\
+	"..\..\Src\YAEdit\PhysicalLineManager.h"\
+	"..\..\Src\YAEdit\Region.h"\
+	"..\..\Src\YAEdit\YAEdit.h"\
+	"..\..\Src\YAEdit\YAEditDoc.h"\
+	
+NODEP_CPP_LINEM=\
+	"..\..\Src\YAEdit\VarBuffer.h"\
+	
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\YAEdit\LineWrapper.cpp
+
+!IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
+
+DEP_CPP_LINEW=\
+	"..\..\Src\TomboLib\VarBuffer.h"\
+	"..\..\Src\YAEdit\LineWrapper.h"\
+	"..\..\Src\YAEdit\Region.h"\
+	"..\..\Src\YAEdit\YAEdit.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
+
+DEP_CPP_LINEW=\
+	"..\..\Src\YAEdit\LineWrapper.h"\
+	"..\..\Src\YAEdit\Region.h"\
+	"..\..\Src\YAEdit\YAEdit.h"\
+	
+NODEP_CPP_LINEW=\
+	"..\..\Src\YAEdit\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Release"
+
+DEP_CPP_LINEW=\
+	"..\..\Src\YAEdit\LineWrapper.h"\
+	"..\..\Src\YAEdit\Region.h"\
+	"..\..\Src\YAEdit\YAEdit.h"\
+	
+NODEP_CPP_LINEW=\
+	"..\..\Src\YAEdit\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Debug"
+
+DEP_CPP_LINEW=\
+	"..\..\Src\YAEdit\LineWrapper.h"\
+	"..\..\Src\YAEdit\Region.h"\
+	"..\..\Src\YAEdit\YAEdit.h"\
+	
+NODEP_CPP_LINEW=\
+	"..\..\Src\YAEdit\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Release"
+
+DEP_CPP_LINEW=\
+	"..\..\Src\YAEdit\LineWrapper.h"\
+	"..\..\Src\YAEdit\Region.h"\
+	"..\..\Src\YAEdit\YAEdit.h"\
+	
+NODEP_CPP_LINEW=\
+	"..\..\Src\YAEdit\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Debug"
+
+DEP_CPP_LINEW=\
+	"..\..\Src\YAEdit\LineWrapper.h"\
+	"..\..\Src\YAEdit\Region.h"\
+	"..\..\Src\YAEdit\YAEdit.h"\
+	
+NODEP_CPP_LINEW=\
+	"..\..\Src\YAEdit\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Release"
+
+DEP_CPP_LINEW=\
+	"..\..\Src\YAEdit\LineWrapper.h"\
+	"..\..\Src\YAEdit\Region.h"\
+	"..\..\Src\YAEdit\YAEdit.h"\
+	
+NODEP_CPP_LINEW=\
+	"..\..\Src\YAEdit\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Debug"
+
+DEP_CPP_LINEW=\
+	"..\..\Src\YAEdit\LineWrapper.h"\
+	"..\..\Src\YAEdit\Region.h"\
+	"..\..\Src\YAEdit\YAEdit.h"\
+	
+NODEP_CPP_LINEW=\
+	"..\..\Src\YAEdit\VarBuffer.h"\
+	
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\YAEdit\LineWrapperImpl.cpp
+
+!IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
+
+DEP_CPP_LINEWR=\
+	"..\..\Src\TomboLib\VarBuffer.h"\
+	"..\..\Src\YAEdit\LineWrapper.h"\
+	"..\..\Src\YAEdit\LineWrapperImpl.h"\
+	"..\..\Src\YAEdit\Region.h"\
+	"..\..\Src\YAEdit\YAEdit.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
+
+DEP_CPP_LINEWR=\
+	"..\..\Src\YAEdit\LineWrapper.h"\
+	"..\..\Src\YAEdit\LineWrapperImpl.h"\
+	"..\..\Src\YAEdit\Region.h"\
+	"..\..\Src\YAEdit\YAEdit.h"\
+	
+NODEP_CPP_LINEWR=\
+	"..\..\Src\YAEdit\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Release"
+
+DEP_CPP_LINEWR=\
+	"..\..\Src\YAEdit\LineWrapper.h"\
+	"..\..\Src\YAEdit\LineWrapperImpl.h"\
+	"..\..\Src\YAEdit\Region.h"\
+	"..\..\Src\YAEdit\YAEdit.h"\
+	
+NODEP_CPP_LINEWR=\
+	"..\..\Src\YAEdit\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Debug"
+
+DEP_CPP_LINEWR=\
+	"..\..\Src\YAEdit\LineWrapper.h"\
+	"..\..\Src\YAEdit\LineWrapperImpl.h"\
+	"..\..\Src\YAEdit\Region.h"\
+	"..\..\Src\YAEdit\YAEdit.h"\
+	
+NODEP_CPP_LINEWR=\
+	"..\..\Src\YAEdit\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Release"
+
+DEP_CPP_LINEWR=\
+	"..\..\Src\YAEdit\LineWrapper.h"\
+	"..\..\Src\YAEdit\LineWrapperImpl.h"\
+	"..\..\Src\YAEdit\Region.h"\
+	"..\..\Src\YAEdit\YAEdit.h"\
+	
+NODEP_CPP_LINEWR=\
+	"..\..\Src\YAEdit\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Debug"
+
+DEP_CPP_LINEWR=\
+	"..\..\Src\YAEdit\LineWrapper.h"\
+	"..\..\Src\YAEdit\LineWrapperImpl.h"\
+	"..\..\Src\YAEdit\Region.h"\
+	"..\..\Src\YAEdit\YAEdit.h"\
+	
+NODEP_CPP_LINEWR=\
+	"..\..\Src\YAEdit\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Release"
+
+DEP_CPP_LINEWR=\
+	"..\..\Src\YAEdit\LineWrapper.h"\
+	"..\..\Src\YAEdit\LineWrapperImpl.h"\
+	"..\..\Src\YAEdit\Region.h"\
+	"..\..\Src\YAEdit\YAEdit.h"\
+	
+NODEP_CPP_LINEWR=\
+	"..\..\Src\YAEdit\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Debug"
+
+DEP_CPP_LINEWR=\
+	"..\..\Src\YAEdit\LineWrapper.h"\
+	"..\..\Src\YAEdit\LineWrapperImpl.h"\
+	"..\..\Src\YAEdit\Region.h"\
+	"..\..\Src\YAEdit\YAEdit.h"\
+	
+NODEP_CPP_LINEWR=\
+	"..\..\Src\YAEdit\VarBuffer.h"\
 	
 
 !ENDIF 
@@ -2285,7 +2655,6 @@ DEP_CPP_MAINF=\
 	"..\..\Src\MainFrame.h"\
 	"..\..\Src\MemoDetailsView.h"\
 	"..\..\Src\MemoManager.h"\
-	"..\..\Src\MemoNote.h"\
 	"..\..\Src\MemoSelectView.h"\
 	"..\..\Src\Message.h"\
 	"..\..\Src\MsgRes\MsgDef.h"\
@@ -2295,7 +2664,6 @@ DEP_CPP_MAINF=\
 	"..\..\Src\Property.h"\
 	"..\..\Src\PsPCPlatform.h"\
 	"..\..\Src\Repository.h"\
-	"..\..\Src\RepositoryFactory.h"\
 	"..\..\Src\SearchDlg.h"\
 	"..\..\Src\SearchEngine.h"\
 	"..\..\Src\SearchTree.h"\
@@ -2312,6 +2680,9 @@ DEP_CPP_MAINF=\
 	"..\..\Src\TreeViewItem.h"\
 	"..\..\Src\VFManager.h"\
 	"..\..\Src\Win32Platform.h"\
+	"..\..\Src\YAEdit\Region.h"\
+	"..\..\Src\YAEdit\YAEdit.h"\
+	"..\..\Src\YAEditor.h"\
 	{$(INCLUDE)}"CSO.h"\
 	{$(INCLUDE)}"CSOBar.h"\
 	{$(INCLUDE)}"CSOButton.h"\
@@ -2526,6 +2897,61 @@ NODEP_CPP_MD5_C=\
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\Src\YAEdit\MemManager.cpp
+
+!IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
+
+DEP_CPP_MEMMA=\
+	"..\..\Src\YAEdit\MemManager.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
+
+DEP_CPP_MEMMA=\
+	"..\..\Src\YAEdit\MemManager.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Release"
+
+DEP_CPP_MEMMA=\
+	"..\..\Src\YAEdit\MemManager.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Debug"
+
+DEP_CPP_MEMMA=\
+	"..\..\Src\YAEdit\MemManager.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Release"
+
+DEP_CPP_MEMMA=\
+	"..\..\Src\YAEdit\MemManager.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Debug"
+
+DEP_CPP_MEMMA=\
+	"..\..\Src\YAEdit\MemManager.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Release"
+
+DEP_CPP_MEMMA=\
+	"..\..\Src\YAEdit\MemManager.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Debug"
+
+DEP_CPP_MEMMA=\
+	"..\..\Src\YAEdit\MemManager.h"\
+	
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\Src\MemoDetailsView.cpp
 
 !IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
@@ -2544,13 +2970,16 @@ DEP_CPP_MEMOD=\
 	"..\..\Src\PocketPCPlatform.h"\
 	"..\..\Src\Property.h"\
 	"..\..\Src\PsPCPlatform.h"\
+	"..\..\Src\Repository.h"\
 	"..\..\Src\SearchEngine.h"\
 	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboLib\AutoPtr.h"\
 	"..\..\Src\TomboLib\File.h"\
 	"..\..\Src\TomboLib\Logger.h"\
 	"..\..\Src\TomboLib\TString.h"\
 	"..\..\Src\TomboLib\Uniconv.h"\
 	"..\..\Src\TomboLib\VarBuffer.h"\
+	"..\..\Src\TomboURI.h"\
 	"..\..\Src\Win32Platform.h"\
 	
 
@@ -2645,20 +3074,18 @@ SOURCE=..\..\Src\MemoFolder.cpp
 
 DEP_CPP_MEMOF=\
 	"..\..\Src\MemoFolder.h"\
-	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoNote.h"\
 	"..\..\Src\Message.h"\
 	"..\..\Src\MsgRes\MsgDef.h"\
 	"..\..\Src\PasswordManager.h"\
-	"..\..\Src\Property.h"\
+	"..\..\Src\Repository.h"\
 	"..\..\Src\Tombo.h"\
 	"..\..\Src\TomboLib\DirectoryScanner.h"\
 	"..\..\Src\TomboLib\File.h"\
 	"..\..\Src\TomboLib\Logger.h"\
 	"..\..\Src\TomboLib\TString.h"\
 	"..\..\Src\TomboLib\Uniconv.h"\
-	"..\..\Src\TomboLib\VarBuffer.h"\
-	"..\..\Src\TreeViewItem.h"\
+	"..\..\Src\TomboURI.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
@@ -2776,7 +3203,6 @@ SOURCE=..\..\Src\MemoInfo.cpp
 
 DEP_CPP_MEMOI=\
 	"..\..\Src\MemoInfo.h"\
-	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
 	"..\..\Src\TomboLib\File.h"\
 	"..\..\Src\TomboLib\Logger.h"\
@@ -2883,7 +3309,6 @@ DEP_CPP_MEMOM=\
 	"..\..\Src\LagendaPlatform.h"\
 	"..\..\Src\MainFrame.h"\
 	"..\..\Src\MemoDetailsView.h"\
-	"..\..\Src\MemoInfo.h"\
 	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoNote.h"\
 	"..\..\Src\MemoSelectView.h"\
@@ -2896,7 +3321,6 @@ DEP_CPP_MEMOM=\
 	"..\..\Src\Property.h"\
 	"..\..\Src\PsPCPlatform.h"\
 	"..\..\Src\Repository.h"\
-	"..\..\Src\RepositoryFactory.h"\
 	"..\..\Src\SearchEngine.h"\
 	"..\..\Src\Tombo.h"\
 	"..\..\Src\TomboLib\AutoPtr.h"\
@@ -3047,9 +3471,7 @@ DEP_CPP_MEMON=\
 	"..\..\Src\TomboLib\Logger.h"\
 	"..\..\Src\TomboLib\TString.h"\
 	"..\..\Src\TomboLib\Uniconv.h"\
-	"..\..\Src\TomboLib\VarBuffer.h"\
 	"..\..\Src\TomboURI.h"\
-	"..\..\Src\TreeViewItem.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
@@ -3188,7 +3610,9 @@ DEP_CPP_MEMOS=\
 	"..\..\Src\PocketPCPlatform.h"\
 	"..\..\Src\Property.h"\
 	"..\..\Src\PsPCPlatform.h"\
+	"..\..\Src\Repository.h"\
 	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboLib\AutoPtr.h"\
 	"..\..\Src\TomboLib\File.h"\
 	"..\..\Src\TomboLib\Logger.h"\
 	"..\..\Src\TomboLib\TString.h"\
@@ -3473,7 +3897,6 @@ SOURCE=..\..\Src\PasswordDialog.cpp
 !IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
 
 DEP_CPP_PASSW=\
-	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoNote.h"\
 	"..\..\Src\Message.h"\
 	"..\..\Src\MsgRes\MsgDef.h"\
@@ -3484,8 +3907,6 @@ DEP_CPP_PASSW=\
 	"..\..\Src\TomboLib\Logger.h"\
 	"..\..\Src\TomboLib\SipControl.h"\
 	"..\..\Src\TomboLib\Uniconv.h"\
-	"..\..\Src\TomboLib\VarBuffer.h"\
-	"..\..\Src\TreeViewItem.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
@@ -3656,6 +4077,123 @@ DEP_CPP_PASSWO=\
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\Src\YAEdit\PhysicalLineManager.cpp
+
+!IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
+
+DEP_CPP_PHYSI=\
+	"..\..\Src\TomboLib\TString.h"\
+	"..\..\Src\TomboLib\Uniconv.h"\
+	"..\..\Src\TomboLib\VarBuffer.h"\
+	"..\..\Src\YAEdit\MemManager.h"\
+	"..\..\Src\YAEdit\PhysicalLineManager.h"\
+	"..\..\Src\YAEdit\Region.h"\
+	"..\..\Src\YAEdit\StringSplitter.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
+
+DEP_CPP_PHYSI=\
+	"..\..\Src\YAEdit\MemManager.h"\
+	"..\..\Src\YAEdit\PhysicalLineManager.h"\
+	"..\..\Src\YAEdit\Region.h"\
+	"..\..\Src\YAEdit\StringSplitter.h"\
+	
+NODEP_CPP_PHYSI=\
+	"..\..\Src\YAEdit\TomboLib\Uniconv.h"\
+	"..\..\Src\YAEdit\TString.h"\
+	"..\..\Src\YAEdit\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Release"
+
+DEP_CPP_PHYSI=\
+	"..\..\Src\YAEdit\MemManager.h"\
+	"..\..\Src\YAEdit\PhysicalLineManager.h"\
+	"..\..\Src\YAEdit\Region.h"\
+	"..\..\Src\YAEdit\StringSplitter.h"\
+	
+NODEP_CPP_PHYSI=\
+	"..\..\Src\YAEdit\TomboLib\Uniconv.h"\
+	"..\..\Src\YAEdit\TString.h"\
+	"..\..\Src\YAEdit\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Debug"
+
+DEP_CPP_PHYSI=\
+	"..\..\Src\YAEdit\MemManager.h"\
+	"..\..\Src\YAEdit\PhysicalLineManager.h"\
+	"..\..\Src\YAEdit\Region.h"\
+	"..\..\Src\YAEdit\StringSplitter.h"\
+	
+NODEP_CPP_PHYSI=\
+	"..\..\Src\YAEdit\TomboLib\Uniconv.h"\
+	"..\..\Src\YAEdit\TString.h"\
+	"..\..\Src\YAEdit\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Release"
+
+DEP_CPP_PHYSI=\
+	"..\..\Src\YAEdit\MemManager.h"\
+	"..\..\Src\YAEdit\PhysicalLineManager.h"\
+	"..\..\Src\YAEdit\Region.h"\
+	"..\..\Src\YAEdit\StringSplitter.h"\
+	
+NODEP_CPP_PHYSI=\
+	"..\..\Src\YAEdit\TomboLib\Uniconv.h"\
+	"..\..\Src\YAEdit\TString.h"\
+	"..\..\Src\YAEdit\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Debug"
+
+DEP_CPP_PHYSI=\
+	"..\..\Src\YAEdit\MemManager.h"\
+	"..\..\Src\YAEdit\PhysicalLineManager.h"\
+	"..\..\Src\YAEdit\Region.h"\
+	"..\..\Src\YAEdit\StringSplitter.h"\
+	
+NODEP_CPP_PHYSI=\
+	"..\..\Src\YAEdit\TomboLib\Uniconv.h"\
+	"..\..\Src\YAEdit\TString.h"\
+	"..\..\Src\YAEdit\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Release"
+
+DEP_CPP_PHYSI=\
+	"..\..\Src\YAEdit\MemManager.h"\
+	"..\..\Src\YAEdit\PhysicalLineManager.h"\
+	"..\..\Src\YAEdit\Region.h"\
+	"..\..\Src\YAEdit\StringSplitter.h"\
+	
+NODEP_CPP_PHYSI=\
+	"..\..\Src\YAEdit\TomboLib\Uniconv.h"\
+	"..\..\Src\YAEdit\TString.h"\
+	"..\..\Src\YAEdit\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Debug"
+
+DEP_CPP_PHYSI=\
+	"..\..\Src\YAEdit\MemManager.h"\
+	"..\..\Src\YAEdit\PhysicalLineManager.h"\
+	"..\..\Src\YAEdit\Region.h"\
+	"..\..\Src\YAEdit\StringSplitter.h"\
+	
+NODEP_CPP_PHYSI=\
+	"..\..\Src\YAEdit\TomboLib\Uniconv.h"\
+	"..\..\Src\YAEdit\TString.h"\
+	"..\..\Src\YAEdit\VarBuffer.h"\
+	
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\Src\PlatformLayer.cpp
 
 !IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
@@ -3765,7 +4303,6 @@ SOURCE=..\..\Src\Property.cpp
 
 DEP_CPP_PROPE=\
 	"..\..\Src\FileSelector.h"\
-	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoNote.h"\
 	"..\..\Src\Message.h"\
 	"..\..\Src\MsgRes\MsgDef.h"\
@@ -3778,8 +4315,6 @@ DEP_CPP_PROPE=\
 	"..\..\Src\TomboLib\PropertyPage.h"\
 	"..\..\Src\TomboLib\TString.h"\
 	"..\..\Src\TomboLib\Uniconv.h"\
-	"..\..\Src\TomboLib\VarBuffer.h"\
-	"..\..\Src\TreeViewItem.h"\
 	{$(INCLUDE)}"GetDisk.h"\
 	{$(INCLUDE)}"notify.h"\
 	
@@ -4009,11 +4544,67 @@ NODEP_CPP_REGEX=\
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\Src\YAEdit\Region.cpp
+
+!IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
+
+DEP_CPP_REGIO=\
+	"..\..\Src\YAEdit\Region.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
+
+DEP_CPP_REGIO=\
+	"..\..\Src\YAEdit\Region.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Release"
+
+DEP_CPP_REGIO=\
+	"..\..\Src\YAEdit\Region.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Debug"
+
+DEP_CPP_REGIO=\
+	"..\..\Src\YAEdit\Region.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Release"
+
+DEP_CPP_REGIO=\
+	"..\..\Src\YAEdit\Region.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Debug"
+
+DEP_CPP_REGIO=\
+	"..\..\Src\YAEdit\Region.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Release"
+
+DEP_CPP_REGIO=\
+	"..\..\Src\YAEdit\Region.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Debug"
+
+DEP_CPP_REGIO=\
+	"..\..\Src\YAEdit\Region.h"\
+	
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\Src\Repository.cpp
 
 !IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
 
 DEP_CPP_REPOS=\
+	"..\..\Src\MemoNote.h"\
 	"..\..\Src\Repository.h"\
 	"..\..\Src\RepositoryImpl.h"\
 	"..\..\Src\TomboLib\TString.h"\
@@ -4142,20 +4733,22 @@ SOURCE=..\..\Src\RepositoryImpl.cpp
 !IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
 
 DEP_CPP_REPOSI=\
+	"..\..\Src\DirList.h"\
+	"..\..\Src\MemoFolder.h"\
 	"..\..\Src\MemoInfo.h"\
-	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoNote.h"\
 	"..\..\Src\Message.h"\
 	"..\..\Src\MsgRes\MsgDef.h"\
 	"..\..\Src\PasswordManager.h"\
+	"..\..\Src\Property.h"\
 	"..\..\Src\Repository.h"\
 	"..\..\Src\RepositoryImpl.h"\
 	"..\..\Src\TomboLib\AutoPtr.h"\
+	"..\..\Src\TomboLib\DirectoryScanner.h"\
 	"..\..\Src\TomboLib\TString.h"\
 	"..\..\Src\TomboLib\Uniconv.h"\
 	"..\..\Src\TomboLib\VarBuffer.h"\
 	"..\..\Src\TomboURI.h"\
-	"..\..\Src\TreeViewItem.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
@@ -4440,7 +5033,6 @@ SOURCE=..\..\Src\SearchEngine.cpp
 !IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
 
 DEP_CPP_SEARCH=\
-	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoNote.h"\
 	"..\..\Src\SearchEngine.h"\
 	"..\..\Src\Tombo.h"\
@@ -4448,8 +5040,6 @@ DEP_CPP_SEARCH=\
 	"..\..\Src\TomboLib\Logger.h"\
 	"..\..\Src\TomboLib\TString.h"\
 	"..\..\Src\TomboLib\Uniconv.h"\
-	"..\..\Src\TomboLib\VarBuffer.h"\
-	"..\..\Src\TreeViewItem.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
@@ -4515,7 +5105,6 @@ SOURCE=..\..\Src\SearchTree.cpp
 
 DEP_CPP_SEARCHT=\
 	"..\..\Src\DirList.h"\
-	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoNote.h"\
 	"..\..\Src\Message.h"\
 	"..\..\Src\MsgRes\MsgDef.h"\
@@ -4528,7 +5117,7 @@ DEP_CPP_SEARCHT=\
 	"..\..\Src\TomboLib\TString.h"\
 	"..\..\Src\TomboLib\Uniconv.h"\
 	"..\..\Src\TomboLib\VarBuffer.h"\
-	"..\..\Src\TreeViewItem.h"\
+	"..\..\Src\TomboURI.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
@@ -4881,6 +5470,83 @@ NODEP_CPP_STATU=\
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\Src\YAEdit\StringSplitter.cpp
+
+!IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
+
+DEP_CPP_STRIN=\
+	"..\..\Src\TomboLib\VarBuffer.h"\
+	"..\..\Src\YAEdit\StringSplitter.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
+
+DEP_CPP_STRIN=\
+	"..\..\Src\YAEdit\StringSplitter.h"\
+	
+NODEP_CPP_STRIN=\
+	"..\..\Src\YAEdit\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Release"
+
+DEP_CPP_STRIN=\
+	"..\..\Src\YAEdit\StringSplitter.h"\
+	
+NODEP_CPP_STRIN=\
+	"..\..\Src\YAEdit\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Debug"
+
+DEP_CPP_STRIN=\
+	"..\..\Src\YAEdit\StringSplitter.h"\
+	
+NODEP_CPP_STRIN=\
+	"..\..\Src\YAEdit\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Release"
+
+DEP_CPP_STRIN=\
+	"..\..\Src\YAEdit\StringSplitter.h"\
+	
+NODEP_CPP_STRIN=\
+	"..\..\Src\YAEdit\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Debug"
+
+DEP_CPP_STRIN=\
+	"..\..\Src\YAEdit\StringSplitter.h"\
+	
+NODEP_CPP_STRIN=\
+	"..\..\Src\YAEdit\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Release"
+
+DEP_CPP_STRIN=\
+	"..\..\Src\YAEdit\StringSplitter.h"\
+	
+NODEP_CPP_STRIN=\
+	"..\..\Src\YAEdit\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Debug"
+
+DEP_CPP_STRIN=\
+	"..\..\Src\YAEdit\StringSplitter.h"\
+	
+NODEP_CPP_STRIN=\
+	"..\..\Src\YAEdit\VarBuffer.h"\
+	
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
 SOURCE=.\res\TomboE.rc
 
 !IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
@@ -5003,7 +5669,6 @@ DEP_CPP_TREEV=\
 	"..\..\Src\Property.h"\
 	"..\..\Src\PsPCPlatform.h"\
 	"..\..\Src\Repository.h"\
-	"..\..\Src\RepositoryFactory.h"\
 	"..\..\Src\Tombo.h"\
 	"..\..\Src\TomboLib\DirectoryScanner.h"\
 	"..\..\Src\TomboLib\File.h"\
@@ -5388,6 +6053,7 @@ DEP_CPP_UNICO=\
 	"..\..\Src\Tombo.h"\
 	"..\..\Src\TomboLib\File.h"\
 	"..\..\Src\TomboLib\Logger.h"\
+	"..\..\Src\TomboLib\TString.h"\
 	"..\..\Src\TomboLib\Uniconv.h"\
 	
 
@@ -5732,7 +6398,6 @@ SOURCE=..\..\Src\VFStream.cpp
 
 DEP_CPP_VFSTR=\
 	"..\..\Src\FilterAddDlg.h"\
-	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoNote.h"\
 	"..\..\Src\MemoSelectView.h"\
 	"..\..\Src\Message.h"\
@@ -5747,7 +6412,6 @@ DEP_CPP_VFSTR=\
 	"..\..\Src\TomboLib\TString.h"\
 	"..\..\Src\TomboLib\Uniconv.h"\
 	"..\..\Src\TomboLib\VarBuffer.h"\
-	"..\..\Src\TreeViewItem.h"\
 	"..\..\Src\VFStream.h"\
 	
 
@@ -5880,6 +6544,729 @@ NODEP_CPP_VFSTR=\
 !ENDIF 
 
 # End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\YAEdit\YAEdit.cpp
+
+!IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
+
+DEP_CPP_YAEDI=\
+	"..\..\Src\TomboLib\Clipboard.h"\
+	"..\..\Src\TomboLib\File.h"\
+	"..\..\Src\TomboLib\Logger.h"\
+	"..\..\Src\TomboLib\TString.h"\
+	"..\..\Src\TomboLib\Uniconv.h"\
+	"..\..\Src\TomboLib\VarBuffer.h"\
+	"..\..\Src\YAEdit\FontWidthCache.h"\
+	"..\..\Src\YAEdit\LineManager.h"\
+	"..\..\Src\YAEdit\LineWrapper.h"\
+	"..\..\Src\YAEdit\LineWrapperImpl.h"\
+	"..\..\Src\YAEdit\Region.h"\
+	"..\..\Src\YAEdit\YAEdit.h"\
+	"..\..\Src\YAEdit\YAEditDoc.h"\
+	"..\..\Src\YAEdit\YAEditView.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
+
+DEP_CPP_YAEDI=\
+	"..\..\Src\YAEdit\FontWidthCache.h"\
+	"..\..\Src\YAEdit\LineManager.h"\
+	"..\..\Src\YAEdit\LineWrapper.h"\
+	"..\..\Src\YAEdit\LineWrapperImpl.h"\
+	"..\..\Src\YAEdit\Region.h"\
+	"..\..\Src\YAEdit\YAEdit.h"\
+	"..\..\Src\YAEdit\YAEditDoc.h"\
+	"..\..\Src\YAEdit\YAEditView.h"\
+	
+NODEP_CPP_YAEDI=\
+	"..\..\Src\YAEdit\Logger.h"\
+	"..\..\Src\YAEdit\TomboLib\Clipboard.h"\
+	"..\..\Src\YAEdit\TomboLib\Uniconv.h"\
+	"..\..\Src\YAEdit\TString.h"\
+	"..\..\Src\YAEdit\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Release"
+
+DEP_CPP_YAEDI=\
+	"..\..\Src\YAEdit\FontWidthCache.h"\
+	"..\..\Src\YAEdit\LineManager.h"\
+	"..\..\Src\YAEdit\LineWrapper.h"\
+	"..\..\Src\YAEdit\LineWrapperImpl.h"\
+	"..\..\Src\YAEdit\Region.h"\
+	"..\..\Src\YAEdit\YAEdit.h"\
+	"..\..\Src\YAEdit\YAEditDoc.h"\
+	"..\..\Src\YAEdit\YAEditView.h"\
+	
+NODEP_CPP_YAEDI=\
+	"..\..\Src\YAEdit\Logger.h"\
+	"..\..\Src\YAEdit\resource.h"\
+	"..\..\Src\YAEdit\TomboLib\Clipboard.h"\
+	"..\..\Src\YAEdit\TomboLib\Uniconv.h"\
+	"..\..\Src\YAEdit\TString.h"\
+	"..\..\Src\YAEdit\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Debug"
+
+DEP_CPP_YAEDI=\
+	"..\..\Src\YAEdit\FontWidthCache.h"\
+	"..\..\Src\YAEdit\LineManager.h"\
+	"..\..\Src\YAEdit\LineWrapper.h"\
+	"..\..\Src\YAEdit\LineWrapperImpl.h"\
+	"..\..\Src\YAEdit\Region.h"\
+	"..\..\Src\YAEdit\YAEdit.h"\
+	"..\..\Src\YAEdit\YAEditDoc.h"\
+	"..\..\Src\YAEdit\YAEditView.h"\
+	
+NODEP_CPP_YAEDI=\
+	"..\..\Src\YAEdit\Logger.h"\
+	"..\..\Src\YAEdit\resource.h"\
+	"..\..\Src\YAEdit\TomboLib\Clipboard.h"\
+	"..\..\Src\YAEdit\TomboLib\Uniconv.h"\
+	"..\..\Src\YAEdit\TString.h"\
+	"..\..\Src\YAEdit\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Release"
+
+DEP_CPP_YAEDI=\
+	"..\..\Src\YAEdit\FontWidthCache.h"\
+	"..\..\Src\YAEdit\LineManager.h"\
+	"..\..\Src\YAEdit\LineWrapper.h"\
+	"..\..\Src\YAEdit\LineWrapperImpl.h"\
+	"..\..\Src\YAEdit\Region.h"\
+	"..\..\Src\YAEdit\YAEdit.h"\
+	"..\..\Src\YAEdit\YAEditDoc.h"\
+	"..\..\Src\YAEdit\YAEditView.h"\
+	
+NODEP_CPP_YAEDI=\
+	"..\..\Src\YAEdit\Logger.h"\
+	"..\..\Src\YAEdit\resource.h"\
+	"..\..\Src\YAEdit\TomboLib\Clipboard.h"\
+	"..\..\Src\YAEdit\TomboLib\Uniconv.h"\
+	"..\..\Src\YAEdit\TString.h"\
+	"..\..\Src\YAEdit\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Debug"
+
+DEP_CPP_YAEDI=\
+	"..\..\Src\YAEdit\FontWidthCache.h"\
+	"..\..\Src\YAEdit\LineManager.h"\
+	"..\..\Src\YAEdit\LineWrapper.h"\
+	"..\..\Src\YAEdit\LineWrapperImpl.h"\
+	"..\..\Src\YAEdit\Region.h"\
+	"..\..\Src\YAEdit\YAEdit.h"\
+	"..\..\Src\YAEdit\YAEditDoc.h"\
+	"..\..\Src\YAEdit\YAEditView.h"\
+	
+NODEP_CPP_YAEDI=\
+	"..\..\Src\YAEdit\Logger.h"\
+	"..\..\Src\YAEdit\resource.h"\
+	"..\..\Src\YAEdit\TomboLib\Clipboard.h"\
+	"..\..\Src\YAEdit\TomboLib\Uniconv.h"\
+	"..\..\Src\YAEdit\TString.h"\
+	"..\..\Src\YAEdit\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Release"
+
+DEP_CPP_YAEDI=\
+	"..\..\Src\YAEdit\FontWidthCache.h"\
+	"..\..\Src\YAEdit\LineManager.h"\
+	"..\..\Src\YAEdit\LineWrapper.h"\
+	"..\..\Src\YAEdit\LineWrapperImpl.h"\
+	"..\..\Src\YAEdit\Region.h"\
+	"..\..\Src\YAEdit\YAEdit.h"\
+	"..\..\Src\YAEdit\YAEditDoc.h"\
+	"..\..\Src\YAEdit\YAEditView.h"\
+	
+NODEP_CPP_YAEDI=\
+	"..\..\Src\YAEdit\Logger.h"\
+	"..\..\Src\YAEdit\resource.h"\
+	"..\..\Src\YAEdit\TomboLib\Clipboard.h"\
+	"..\..\Src\YAEdit\TomboLib\Uniconv.h"\
+	"..\..\Src\YAEdit\TString.h"\
+	"..\..\Src\YAEdit\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Debug"
+
+DEP_CPP_YAEDI=\
+	"..\..\Src\YAEdit\FontWidthCache.h"\
+	"..\..\Src\YAEdit\LineManager.h"\
+	"..\..\Src\YAEdit\LineWrapper.h"\
+	"..\..\Src\YAEdit\LineWrapperImpl.h"\
+	"..\..\Src\YAEdit\Region.h"\
+	"..\..\Src\YAEdit\YAEdit.h"\
+	"..\..\Src\YAEdit\YAEditDoc.h"\
+	"..\..\Src\YAEdit\YAEditView.h"\
+	
+NODEP_CPP_YAEDI=\
+	"..\..\Src\YAEdit\Logger.h"\
+	"..\..\Src\YAEdit\resource.h"\
+	"..\..\Src\YAEdit\TomboLib\Clipboard.h"\
+	"..\..\Src\YAEdit\TomboLib\Uniconv.h"\
+	"..\..\Src\YAEdit\TString.h"\
+	"..\..\Src\YAEdit\VarBuffer.h"\
+	
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\YAEdit\YAEditDoc.cpp
+
+!IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
+
+DEP_CPP_YAEDIT=\
+	"..\..\Src\TomboLib\Uniconv.h"\
+	"..\..\Src\TomboLib\VarBuffer.h"\
+	"..\..\Src\YAEdit\LineManager.h"\
+	"..\..\Src\YAEdit\LineWrapper.h"\
+	"..\..\Src\YAEdit\LineWrapperImpl.h"\
+	"..\..\Src\YAEdit\MemManager.h"\
+	"..\..\Src\YAEdit\PhysicalLineManager.h"\
+	"..\..\Src\YAEdit\Region.h"\
+	"..\..\Src\YAEdit\StringSplitter.h"\
+	"..\..\Src\YAEdit\YAEdit.h"\
+	"..\..\Src\YAEdit\YAEditDoc.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
+
+DEP_CPP_YAEDIT=\
+	"..\..\Src\YAEdit\LineManager.h"\
+	"..\..\Src\YAEdit\LineWrapper.h"\
+	"..\..\Src\YAEdit\LineWrapperImpl.h"\
+	"..\..\Src\YAEdit\MemManager.h"\
+	"..\..\Src\YAEdit\PhysicalLineManager.h"\
+	"..\..\Src\YAEdit\Region.h"\
+	"..\..\Src\YAEdit\StringSplitter.h"\
+	"..\..\Src\YAEdit\YAEdit.h"\
+	"..\..\Src\YAEdit\YAEditDoc.h"\
+	
+NODEP_CPP_YAEDIT=\
+	"..\..\Src\YAEdit\TomboLib\Uniconv.h"\
+	"..\..\Src\YAEdit\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Release"
+
+DEP_CPP_YAEDIT=\
+	"..\..\Src\YAEdit\LineManager.h"\
+	"..\..\Src\YAEdit\LineWrapper.h"\
+	"..\..\Src\YAEdit\LineWrapperImpl.h"\
+	"..\..\Src\YAEdit\MemManager.h"\
+	"..\..\Src\YAEdit\PhysicalLineManager.h"\
+	"..\..\Src\YAEdit\Region.h"\
+	"..\..\Src\YAEdit\StringSplitter.h"\
+	"..\..\Src\YAEdit\YAEdit.h"\
+	"..\..\Src\YAEdit\YAEditDoc.h"\
+	
+NODEP_CPP_YAEDIT=\
+	"..\..\Src\YAEdit\TomboLib\Uniconv.h"\
+	"..\..\Src\YAEdit\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Debug"
+
+DEP_CPP_YAEDIT=\
+	"..\..\Src\YAEdit\LineManager.h"\
+	"..\..\Src\YAEdit\LineWrapper.h"\
+	"..\..\Src\YAEdit\LineWrapperImpl.h"\
+	"..\..\Src\YAEdit\MemManager.h"\
+	"..\..\Src\YAEdit\PhysicalLineManager.h"\
+	"..\..\Src\YAEdit\Region.h"\
+	"..\..\Src\YAEdit\StringSplitter.h"\
+	"..\..\Src\YAEdit\YAEdit.h"\
+	"..\..\Src\YAEdit\YAEditDoc.h"\
+	
+NODEP_CPP_YAEDIT=\
+	"..\..\Src\YAEdit\TomboLib\Uniconv.h"\
+	"..\..\Src\YAEdit\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Release"
+
+DEP_CPP_YAEDIT=\
+	"..\..\Src\YAEdit\LineManager.h"\
+	"..\..\Src\YAEdit\LineWrapper.h"\
+	"..\..\Src\YAEdit\LineWrapperImpl.h"\
+	"..\..\Src\YAEdit\MemManager.h"\
+	"..\..\Src\YAEdit\PhysicalLineManager.h"\
+	"..\..\Src\YAEdit\Region.h"\
+	"..\..\Src\YAEdit\StringSplitter.h"\
+	"..\..\Src\YAEdit\YAEdit.h"\
+	"..\..\Src\YAEdit\YAEditDoc.h"\
+	
+NODEP_CPP_YAEDIT=\
+	"..\..\Src\YAEdit\TomboLib\Uniconv.h"\
+	"..\..\Src\YAEdit\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Debug"
+
+DEP_CPP_YAEDIT=\
+	"..\..\Src\YAEdit\LineManager.h"\
+	"..\..\Src\YAEdit\LineWrapper.h"\
+	"..\..\Src\YAEdit\LineWrapperImpl.h"\
+	"..\..\Src\YAEdit\MemManager.h"\
+	"..\..\Src\YAEdit\PhysicalLineManager.h"\
+	"..\..\Src\YAEdit\Region.h"\
+	"..\..\Src\YAEdit\StringSplitter.h"\
+	"..\..\Src\YAEdit\YAEdit.h"\
+	"..\..\Src\YAEdit\YAEditDoc.h"\
+	
+NODEP_CPP_YAEDIT=\
+	"..\..\Src\YAEdit\TomboLib\Uniconv.h"\
+	"..\..\Src\YAEdit\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Release"
+
+DEP_CPP_YAEDIT=\
+	"..\..\Src\YAEdit\LineManager.h"\
+	"..\..\Src\YAEdit\LineWrapper.h"\
+	"..\..\Src\YAEdit\LineWrapperImpl.h"\
+	"..\..\Src\YAEdit\MemManager.h"\
+	"..\..\Src\YAEdit\PhysicalLineManager.h"\
+	"..\..\Src\YAEdit\Region.h"\
+	"..\..\Src\YAEdit\StringSplitter.h"\
+	"..\..\Src\YAEdit\YAEdit.h"\
+	"..\..\Src\YAEdit\YAEditDoc.h"\
+	
+NODEP_CPP_YAEDIT=\
+	"..\..\Src\YAEdit\TomboLib\Uniconv.h"\
+	"..\..\Src\YAEdit\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Debug"
+
+DEP_CPP_YAEDIT=\
+	"..\..\Src\YAEdit\LineManager.h"\
+	"..\..\Src\YAEdit\LineWrapper.h"\
+	"..\..\Src\YAEdit\LineWrapperImpl.h"\
+	"..\..\Src\YAEdit\MemManager.h"\
+	"..\..\Src\YAEdit\PhysicalLineManager.h"\
+	"..\..\Src\YAEdit\Region.h"\
+	"..\..\Src\YAEdit\StringSplitter.h"\
+	"..\..\Src\YAEdit\YAEdit.h"\
+	"..\..\Src\YAEdit\YAEditDoc.h"\
+	
+NODEP_CPP_YAEDIT=\
+	"..\..\Src\YAEdit\TomboLib\Uniconv.h"\
+	"..\..\Src\YAEdit\VarBuffer.h"\
+	
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\YAEditor.cpp
+
+!IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
+
+DEP_CPP_YAEDITO=\
+	"..\..\Src\HPCPlatform.h"\
+	"..\..\Src\LagendaPlatform.h"\
+	"..\..\Src\MainFrame.h"\
+	"..\..\Src\MemoDetailsView.h"\
+	"..\..\Src\MemoManager.h"\
+	"..\..\Src\MemoSelectView.h"\
+	"..\..\Src\Message.h"\
+	"..\..\Src\MsgRes\MsgDef.h"\
+	"..\..\Src\PasswordManager.h"\
+	"..\..\Src\PlatformLayer.h"\
+	"..\..\Src\PocketPCPlatform.h"\
+	"..\..\Src\Property.h"\
+	"..\..\Src\PsPCPlatform.h"\
+	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboLib\File.h"\
+	"..\..\Src\TomboLib\Logger.h"\
+	"..\..\Src\TomboLib\Uniconv.h"\
+	"..\..\Src\Win32Platform.h"\
+	"..\..\Src\YAEdit\Region.h"\
+	"..\..\Src\YAEdit\YAEdit.h"\
+	"..\..\Src\YAEdit\YAEditDoc.h"\
+	"..\..\Src\YAEdit\YAEditView.h"\
+	"..\..\Src\YAEditor.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
+
+DEP_CPP_YAEDITO=\
+	"..\..\Src\HPCPlatform.h"\
+	"..\..\Src\LagendaPlatform.h"\
+	"..\..\Src\MainFrame.h"\
+	"..\..\Src\MemoDetailsView.h"\
+	"..\..\Src\MemoManager.h"\
+	"..\..\Src\MemoSelectView.h"\
+	"..\..\Src\Message.h"\
+	"..\..\Src\MsgRes\MsgDef.h"\
+	"..\..\Src\PasswordManager.h"\
+	"..\..\Src\PlatformLayer.h"\
+	"..\..\Src\PocketPCPlatform.h"\
+	"..\..\Src\Property.h"\
+	"..\..\Src\PsPCPlatform.h"\
+	"..\..\Src\Tombo.h"\
+	"..\..\Src\Win32Platform.h"\
+	"..\..\Src\YAEditor.h"\
+	
+NODEP_CPP_YAEDITO=\
+	"..\..\Src\Logger.h"\
+	"..\..\Src\Region.h"\
+	"..\..\Src\Uniconv.h"\
+	"..\..\Src\YAEdit.h"\
+	"..\..\Src\YAEditDoc.h"\
+	"..\..\Src\YAEditView.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Release"
+
+DEP_CPP_YAEDITO=\
+	"..\..\Src\HPCPlatform.h"\
+	"..\..\Src\LagendaPlatform.h"\
+	"..\..\Src\MainFrame.h"\
+	"..\..\Src\MemoDetailsView.h"\
+	"..\..\Src\MemoManager.h"\
+	"..\..\Src\MemoSelectView.h"\
+	"..\..\Src\Message.h"\
+	"..\..\Src\MsgRes\MsgDef.h"\
+	"..\..\Src\PasswordManager.h"\
+	"..\..\Src\PlatformLayer.h"\
+	"..\..\Src\PocketPCPlatform.h"\
+	"..\..\Src\Property.h"\
+	"..\..\Src\PsPCPlatform.h"\
+	"..\..\Src\Tombo.h"\
+	"..\..\Src\Win32Platform.h"\
+	"..\..\Src\YAEditor.h"\
+	
+NODEP_CPP_YAEDITO=\
+	"..\..\Src\Logger.h"\
+	"..\..\Src\Region.h"\
+	"..\..\Src\Uniconv.h"\
+	"..\..\Src\YAEdit.h"\
+	"..\..\Src\YAEditDoc.h"\
+	"..\..\Src\YAEditView.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Debug"
+
+DEP_CPP_YAEDITO=\
+	"..\..\Src\HPCPlatform.h"\
+	"..\..\Src\LagendaPlatform.h"\
+	"..\..\Src\MainFrame.h"\
+	"..\..\Src\MemoDetailsView.h"\
+	"..\..\Src\MemoManager.h"\
+	"..\..\Src\MemoSelectView.h"\
+	"..\..\Src\Message.h"\
+	"..\..\Src\MsgRes\MsgDef.h"\
+	"..\..\Src\PasswordManager.h"\
+	"..\..\Src\PlatformLayer.h"\
+	"..\..\Src\PocketPCPlatform.h"\
+	"..\..\Src\Property.h"\
+	"..\..\Src\PsPCPlatform.h"\
+	"..\..\Src\Tombo.h"\
+	"..\..\Src\Win32Platform.h"\
+	"..\..\Src\YAEditor.h"\
+	
+NODEP_CPP_YAEDITO=\
+	"..\..\Src\Logger.h"\
+	"..\..\Src\Region.h"\
+	"..\..\Src\Uniconv.h"\
+	"..\..\Src\YAEdit.h"\
+	"..\..\Src\YAEditDoc.h"\
+	"..\..\Src\YAEditView.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Release"
+
+DEP_CPP_YAEDITO=\
+	"..\..\Src\HPCPlatform.h"\
+	"..\..\Src\LagendaPlatform.h"\
+	"..\..\Src\MainFrame.h"\
+	"..\..\Src\MemoDetailsView.h"\
+	"..\..\Src\MemoManager.h"\
+	"..\..\Src\MemoSelectView.h"\
+	"..\..\Src\Message.h"\
+	"..\..\Src\MsgRes\MsgDef.h"\
+	"..\..\Src\PasswordManager.h"\
+	"..\..\Src\PlatformLayer.h"\
+	"..\..\Src\PocketPCPlatform.h"\
+	"..\..\Src\Property.h"\
+	"..\..\Src\PsPCPlatform.h"\
+	"..\..\Src\Tombo.h"\
+	"..\..\Src\Win32Platform.h"\
+	"..\..\Src\YAEditor.h"\
+	
+NODEP_CPP_YAEDITO=\
+	"..\..\Src\Logger.h"\
+	"..\..\Src\Region.h"\
+	"..\..\Src\Uniconv.h"\
+	"..\..\Src\YAEdit.h"\
+	"..\..\Src\YAEditDoc.h"\
+	"..\..\Src\YAEditView.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Debug"
+
+DEP_CPP_YAEDITO=\
+	"..\..\Src\HPCPlatform.h"\
+	"..\..\Src\LagendaPlatform.h"\
+	"..\..\Src\MainFrame.h"\
+	"..\..\Src\MemoDetailsView.h"\
+	"..\..\Src\MemoManager.h"\
+	"..\..\Src\MemoSelectView.h"\
+	"..\..\Src\Message.h"\
+	"..\..\Src\MsgRes\MsgDef.h"\
+	"..\..\Src\PasswordManager.h"\
+	"..\..\Src\PlatformLayer.h"\
+	"..\..\Src\PocketPCPlatform.h"\
+	"..\..\Src\Property.h"\
+	"..\..\Src\PsPCPlatform.h"\
+	"..\..\Src\Tombo.h"\
+	"..\..\Src\Win32Platform.h"\
+	"..\..\Src\YAEditor.h"\
+	
+NODEP_CPP_YAEDITO=\
+	"..\..\Src\Logger.h"\
+	"..\..\Src\Region.h"\
+	"..\..\Src\Uniconv.h"\
+	"..\..\Src\YAEdit.h"\
+	"..\..\Src\YAEditDoc.h"\
+	"..\..\Src\YAEditView.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Release"
+
+DEP_CPP_YAEDITO=\
+	"..\..\Src\HPCPlatform.h"\
+	"..\..\Src\LagendaPlatform.h"\
+	"..\..\Src\MainFrame.h"\
+	"..\..\Src\MemoDetailsView.h"\
+	"..\..\Src\MemoManager.h"\
+	"..\..\Src\MemoSelectView.h"\
+	"..\..\Src\Message.h"\
+	"..\..\Src\MsgRes\MsgDef.h"\
+	"..\..\Src\PasswordManager.h"\
+	"..\..\Src\PlatformLayer.h"\
+	"..\..\Src\PocketPCPlatform.h"\
+	"..\..\Src\Property.h"\
+	"..\..\Src\PsPCPlatform.h"\
+	"..\..\Src\Tombo.h"\
+	"..\..\Src\Win32Platform.h"\
+	"..\..\Src\YAEditor.h"\
+	
+NODEP_CPP_YAEDITO=\
+	"..\..\Src\Logger.h"\
+	"..\..\Src\Region.h"\
+	"..\..\Src\Uniconv.h"\
+	"..\..\Src\YAEdit.h"\
+	"..\..\Src\YAEditDoc.h"\
+	"..\..\Src\YAEditView.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Debug"
+
+DEP_CPP_YAEDITO=\
+	"..\..\Src\HPCPlatform.h"\
+	"..\..\Src\LagendaPlatform.h"\
+	"..\..\Src\MainFrame.h"\
+	"..\..\Src\MemoDetailsView.h"\
+	"..\..\Src\MemoManager.h"\
+	"..\..\Src\MemoSelectView.h"\
+	"..\..\Src\Message.h"\
+	"..\..\Src\MsgRes\MsgDef.h"\
+	"..\..\Src\PasswordManager.h"\
+	"..\..\Src\PlatformLayer.h"\
+	"..\..\Src\PocketPCPlatform.h"\
+	"..\..\Src\Property.h"\
+	"..\..\Src\PsPCPlatform.h"\
+	"..\..\Src\Tombo.h"\
+	"..\..\Src\Win32Platform.h"\
+	"..\..\Src\YAEditor.h"\
+	
+NODEP_CPP_YAEDITO=\
+	"..\..\Src\Logger.h"\
+	"..\..\Src\Region.h"\
+	"..\..\Src\Uniconv.h"\
+	"..\..\Src\YAEdit.h"\
+	"..\..\Src\YAEditDoc.h"\
+	"..\..\Src\YAEditView.h"\
+	
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\YAEdit\YAEditView.cpp
+
+!IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
+
+DEP_CPP_YAEDITV=\
+	"..\..\Src\TomboLib\Clipboard.h"\
+	"..\..\Src\TomboLib\File.h"\
+	"..\..\Src\TomboLib\Logger.h"\
+	"..\..\Src\TomboLib\TString.h"\
+	"..\..\Src\TomboLib\Uniconv.h"\
+	"..\..\Src\TomboLib\VarBuffer.h"\
+	"..\..\Src\YAEdit\FontWidthCache.h"\
+	"..\..\Src\YAEdit\LineManager.h"\
+	"..\..\Src\YAEdit\LineWrapper.h"\
+	"..\..\Src\YAEdit\Region.h"\
+	"..\..\Src\YAEdit\YAEdit.h"\
+	"..\..\Src\YAEdit\YAEditDoc.h"\
+	"..\..\Src\YAEdit\YAEditView.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
+
+DEP_CPP_YAEDITV=\
+	"..\..\Src\YAEdit\FontWidthCache.h"\
+	"..\..\Src\YAEdit\LineManager.h"\
+	"..\..\Src\YAEdit\LineWrapper.h"\
+	"..\..\Src\YAEdit\Region.h"\
+	"..\..\Src\YAEdit\YAEdit.h"\
+	"..\..\Src\YAEdit\YAEditDoc.h"\
+	"..\..\Src\YAEdit\YAEditView.h"\
+	
+NODEP_CPP_YAEDITV=\
+	"..\..\Src\YAEdit\Logger.h"\
+	"..\..\Src\YAEdit\TomboLib\Clipboard.h"\
+	"..\..\Src\YAEdit\TomboLib\Uniconv.h"\
+	"..\..\Src\YAEdit\TString.h"\
+	"..\..\Src\YAEdit\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Release"
+
+DEP_CPP_YAEDITV=\
+	"..\..\Src\YAEdit\FontWidthCache.h"\
+	"..\..\Src\YAEdit\LineManager.h"\
+	"..\..\Src\YAEdit\LineWrapper.h"\
+	"..\..\Src\YAEdit\Region.h"\
+	"..\..\Src\YAEdit\YAEdit.h"\
+	"..\..\Src\YAEdit\YAEditDoc.h"\
+	"..\..\Src\YAEdit\YAEditView.h"\
+	
+NODEP_CPP_YAEDITV=\
+	"..\..\Src\YAEdit\Logger.h"\
+	"..\..\Src\YAEdit\resource.h"\
+	"..\..\Src\YAEdit\TomboLib\Clipboard.h"\
+	"..\..\Src\YAEdit\TomboLib\Uniconv.h"\
+	"..\..\Src\YAEdit\TString.h"\
+	"..\..\Src\YAEdit\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Debug"
+
+DEP_CPP_YAEDITV=\
+	"..\..\Src\YAEdit\FontWidthCache.h"\
+	"..\..\Src\YAEdit\LineManager.h"\
+	"..\..\Src\YAEdit\LineWrapper.h"\
+	"..\..\Src\YAEdit\Region.h"\
+	"..\..\Src\YAEdit\YAEdit.h"\
+	"..\..\Src\YAEdit\YAEditDoc.h"\
+	"..\..\Src\YAEdit\YAEditView.h"\
+	
+NODEP_CPP_YAEDITV=\
+	"..\..\Src\YAEdit\Logger.h"\
+	"..\..\Src\YAEdit\resource.h"\
+	"..\..\Src\YAEdit\TomboLib\Clipboard.h"\
+	"..\..\Src\YAEdit\TomboLib\Uniconv.h"\
+	"..\..\Src\YAEdit\TString.h"\
+	"..\..\Src\YAEdit\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Release"
+
+DEP_CPP_YAEDITV=\
+	"..\..\Src\YAEdit\FontWidthCache.h"\
+	"..\..\Src\YAEdit\LineManager.h"\
+	"..\..\Src\YAEdit\LineWrapper.h"\
+	"..\..\Src\YAEdit\Region.h"\
+	"..\..\Src\YAEdit\YAEdit.h"\
+	"..\..\Src\YAEdit\YAEditDoc.h"\
+	"..\..\Src\YAEdit\YAEditView.h"\
+	
+NODEP_CPP_YAEDITV=\
+	"..\..\Src\YAEdit\Logger.h"\
+	"..\..\Src\YAEdit\resource.h"\
+	"..\..\Src\YAEdit\TomboLib\Clipboard.h"\
+	"..\..\Src\YAEdit\TomboLib\Uniconv.h"\
+	"..\..\Src\YAEdit\TString.h"\
+	"..\..\Src\YAEdit\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Debug"
+
+DEP_CPP_YAEDITV=\
+	"..\..\Src\YAEdit\FontWidthCache.h"\
+	"..\..\Src\YAEdit\LineManager.h"\
+	"..\..\Src\YAEdit\LineWrapper.h"\
+	"..\..\Src\YAEdit\Region.h"\
+	"..\..\Src\YAEdit\YAEdit.h"\
+	"..\..\Src\YAEdit\YAEditDoc.h"\
+	"..\..\Src\YAEdit\YAEditView.h"\
+	
+NODEP_CPP_YAEDITV=\
+	"..\..\Src\YAEdit\Logger.h"\
+	"..\..\Src\YAEdit\resource.h"\
+	"..\..\Src\YAEdit\TomboLib\Clipboard.h"\
+	"..\..\Src\YAEdit\TomboLib\Uniconv.h"\
+	"..\..\Src\YAEdit\TString.h"\
+	"..\..\Src\YAEdit\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Release"
+
+DEP_CPP_YAEDITV=\
+	"..\..\Src\YAEdit\FontWidthCache.h"\
+	"..\..\Src\YAEdit\LineManager.h"\
+	"..\..\Src\YAEdit\LineWrapper.h"\
+	"..\..\Src\YAEdit\Region.h"\
+	"..\..\Src\YAEdit\YAEdit.h"\
+	"..\..\Src\YAEdit\YAEditDoc.h"\
+	"..\..\Src\YAEdit\YAEditView.h"\
+	
+NODEP_CPP_YAEDITV=\
+	"..\..\Src\YAEdit\Logger.h"\
+	"..\..\Src\YAEdit\resource.h"\
+	"..\..\Src\YAEdit\TomboLib\Clipboard.h"\
+	"..\..\Src\YAEdit\TomboLib\Uniconv.h"\
+	"..\..\Src\YAEdit\TString.h"\
+	"..\..\Src\YAEdit\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Debug"
+
+DEP_CPP_YAEDITV=\
+	"..\..\Src\YAEdit\FontWidthCache.h"\
+	"..\..\Src\YAEdit\LineManager.h"\
+	"..\..\Src\YAEdit\LineWrapper.h"\
+	"..\..\Src\YAEdit\Region.h"\
+	"..\..\Src\YAEdit\YAEdit.h"\
+	"..\..\Src\YAEdit\YAEditDoc.h"\
+	"..\..\Src\YAEdit\YAEditView.h"\
+	
+NODEP_CPP_YAEDITV=\
+	"..\..\Src\YAEdit\Logger.h"\
+	"..\..\Src\YAEdit\resource.h"\
+	"..\..\Src\YAEdit\TomboLib\Clipboard.h"\
+	"..\..\Src\YAEdit\TomboLib\Uniconv.h"\
+	"..\..\Src\YAEdit\TString.h"\
+	"..\..\Src\YAEdit\VarBuffer.h"\
+	
+
+!ENDIF 
+
+# End Source File
 # End Group
 # Begin Group "Header Files"
 
@@ -5962,11 +7349,27 @@ SOURCE=..\..\Src\FilterDefDlg.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\Src\YAEdit\FontWidthCache.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\Src\GrepDialog.h
 # End Source File
 # Begin Source File
 
 SOURCE=..\..\Src\LagendaPlatform.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\YAEdit\LineManager.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\YAEdit\LineWrapper.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\YAEdit\LineWrapperImpl.h
 # End Source File
 # Begin Source File
 
@@ -5979,6 +7382,10 @@ SOURCE=..\..\Src\TomboLib\Logger.h
 # Begin Source File
 
 SOURCE=..\..\Src\MainFrame.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\YAEdit\MemManager.h
 # End Source File
 # Begin Source File
 
@@ -6018,6 +7425,10 @@ SOURCE=..\..\Src\PasswordManager.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\Src\YAEdit\PhysicalLineManager.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\Src\PlatformLayer.h
 # End Source File
 # Begin Source File
@@ -6031,6 +7442,10 @@ SOURCE=..\..\Src\TomboLib\PropertyPage.h
 # Begin Source File
 
 SOURCE=..\..\Src\regex\regex.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\YAEdit\Region.h
 # End Source File
 # Begin Source File
 
@@ -6063,6 +7478,10 @@ SOURCE=..\..\Src\TomboLib\SipControl.h
 # Begin Source File
 
 SOURCE=..\..\Src\StatusBar.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\YAEdit\StringSplitter.h
 # End Source File
 # Begin Source File
 
@@ -6099,6 +7518,22 @@ SOURCE=..\..\Src\VFManager.h
 # Begin Source File
 
 SOURCE=..\..\Src\VFStream.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\YAEdit\YAEdit.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\YAEdit\YAEditDoc.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\YAEditor.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\YAEdit\YAEditView.h
 # End Source File
 # End Group
 # Begin Group "Resource Files"

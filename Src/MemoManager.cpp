@@ -13,7 +13,6 @@
 #include "File.h"
 #include "Property.h"
 #include "NewFolderDialog.h"
-#include "MemoInfo.h"
 #include "TreeViewItem.h"
 #include "SearchEngine.h"
 #include "Message.h"

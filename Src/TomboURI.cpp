@@ -158,20 +158,6 @@ LPCTSTR TomboURI::GetPath() const
 }
 
 /////////////////////////////////////////////
-// Is the URI encrypted?
-/////////////////////////////////////////////
-
-BOOL TomboURI::IsEncrypted() const
-{
-	DWORD n = _tcslen(uri.Get());
-	if (n > 4) {
-		if (_tcscmp(uri.Get() + n - 4, TEXT(".chi")) == 0) return TRUE;
-		if (_tcscmp(uri.Get() + n - 4, TEXT(".chs")) == 0) return TRUE;
-	}
-	return FALSE;		
-}
-
-/////////////////////////////////////////////
 // Is the URI point to leaf node?
 /////////////////////////////////////////////
 

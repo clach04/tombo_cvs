@@ -45,6 +45,8 @@ BOOL YAEditView::Init()
 	nCursorColPos = nCursorCol = 0;
 	nBaseLineNo = nCursorRow = 0;
 	nColOffset = 0;
+
+	bShowCaret = FALSE;
 	return TRUE;
 }
 
@@ -792,6 +794,7 @@ void YAEditView::OnSetFocus()
 	CreateCaret(hViewWnd, NULL, nCaretWidth, nLineH);
 	bShowCaret = TRUE;
 	ShowCaret(NULL);
+	SetCaretPos();
 }
 
 void YAEditView::OnKillFocus()

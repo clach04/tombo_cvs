@@ -93,7 +93,6 @@ BOOL BookMarkDlg::OnOK()
 	TString sPath;
 	for (int i = 0; i < n; i++) {
 		if (!GetLVItem(hList, i, 1, &sPath)) return TRUE;
-		Sleep(1);
 		pBookMark->Assign(sPath.Get());
 	}
 

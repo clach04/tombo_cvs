@@ -17,6 +17,7 @@ class YAEDocCallbackHandler;
 
 class YAEditCallback {
 public:
+	// called when get screen forcus
 	virtual void OnGetFocus() = 0;
 };
 
@@ -135,6 +136,9 @@ public:
 	void MoveDown();
 	void MoveEOL();
 	void MoveTOL();
+
+	DWORD GetCaretPos();
+	void SetCaretPos(DWORD n);
 
 	/////////////////////////////////
 	// Key hander

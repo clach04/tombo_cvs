@@ -49,10 +49,6 @@ public:
 	//     tombo://default/aa/bb/cc/    -> cc
 	BOOL GetBaseName(TString *pBase) const;
 
-	// Is the URI point to crypted file?
-	// Checking does only to URI string. Not confirm to repository.
-	BOOL IsEncrypted() const;
-
 	// Is the URI point to leaf node?
 	// Checking does only to URI string. Not confirm to repository.
 	BOOL IsLeaf() const;

@@ -931,3 +931,15 @@ Finding and encrypting to the folder may not work.
 * Fix: YAE focusing problem
 * MemoManager::AllocNewMemo refactoring
 
+////////////////////////////////
+// B178
+////////////////////////////////
+
+* Move TomboURI::IsEncrypted() to Repository::GetOption()
+* FIX: leave *.tdt when notes headline changed
+
+////////////////////////////////
+// B179
+////////////////////////////////
+
+* Impliment caret positioning for YAE.
