@@ -579,6 +579,7 @@ HWND CreateToolBar(HWND hParent, HINSTANCE hInst);
 
 void MainFrame::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
+	hMainWnd = hWnd;
 	LPCREATESTRUCT pcs = (LPCREATESTRUCT)lParam;
 
 	DWORD nHOffset;
