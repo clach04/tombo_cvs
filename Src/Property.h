@@ -49,6 +49,9 @@ class Property {
 #if defined(PLATFORM_HPC) || defined(PLATFORM_WIN32)
 	DWORD nHideStatusBar;
 #endif
+#if defined(PLATFORM_WIN32)
+	DWORD nTopMost;
+#endif
 
 public:
 	Property();
@@ -120,12 +123,17 @@ public:
 	DWORD HideStatusBar() { return nHideStatusBar; }
 	void ToggleShowStatusBar() { nHideStatusBar = !nHideStatusBar; }
 #endif
+#if defined(PLATFORM_WIN32)
+	BOOL StayTopMost() { return nTopMost; }
+	void ToggleStayTopMost() { nTopMost = !nTopMost; }
+#endif
 
 	// ウィンドウサイズ関連の保存・復元
 	static BOOL SaveWinSize(LPRECT pWinRect, WORD nSelectViewWidth);
 	static BOOL GetWinSize(LPRECT pWinRect, LPWORD pSelectViewWidth);
 
 	BOOL SaveStatusBarStat();
+	BOOL SaveTopMostStat();
 
 	friend class FolderTab;
 	friend class PasswordTab;

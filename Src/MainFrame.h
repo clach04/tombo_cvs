@@ -109,6 +109,8 @@ public:
 	void ToggleFolding(); // 折り返し表示の切り替え
 	void TogglePane(); // ペインの切り替え
 
+	void SetTopMost(); // keep top of the window
+
 	// メモオープンの要求
 	void RequestOpenMemo(MemoLocator *pLoc, DWORD nSwitchView);
 

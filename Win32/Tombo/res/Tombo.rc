@@ -32,7 +32,7 @@ BEGIN
     BEGIN
         MENUITEM "新規メモ(&M)\tCtrl+N",        IDM_NEWMEMO
         MENUITEM "新規フォルダ",                IDM_NEWFOLDER
-        MENUITEM "ファイル名の変更(&R)",        IDM_RENAME
+        MENUITEM "ファイル名の変更(&R)\tF2",    IDM_RENAME
         MENUITEM "削除(&D)\tDEL",               IDM_DELETEITEM
         MENUITEM SEPARATOR
         MENUITEM "保存(&S)\tCtrl+S",            IDM_SAVE
@@ -62,6 +62,7 @@ BEGIN
         , CHECKED, GRAYED
         MENUITEM "2画面モード(P)",              IDM_TOGGLEPANE, CHECKED
         MENUITEM "ステータスバー",              IDM_SHOWSTATUSBAR, CHECKED
+        MENUITEM "常に手前に表示",              IDM_TOPMOST
         MENUITEM SEPARATOR
         MENUITEM "暗号化(&E)\tCtrl+E",          IDM_ENCRYPT, GRAYED
         MENUITEM "復号化(&P)\tCtrl+P",          IDM_DECRYPT, GRAYED
@@ -486,6 +487,7 @@ BEGIN
     "N",            IDM_NEWMEMO,            VIRTKEY, CONTROL, NOINVERT
     "S",            IDM_SAVE,               VIRTKEY, CONTROL, NOINVERT
     VK_ESCAPE,      IDM_RETURNLIST,         VIRTKEY, NOINVERT
+    VK_F2,          IDM_RENAME,             VIRTKEY, NOINVERT
     VK_F3,          IDM_SEARCH_NEXT,        VIRTKEY, NOINVERT
     VK_F3,          IDM_SEARCH_PREV,        VIRTKEY, SHIFT, NOINVERT
     "Z",            IDM_UNDO,               VIRTKEY, CONTROL, NOINVERT

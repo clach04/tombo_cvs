@@ -215,6 +215,12 @@ PG: Almost remake TSParser.*
 PG: link expat library for parse XML vfolder file at TSParser.
 PG: Change copyright dialog for expat.
 
+////////////////////////////////
+// B089
+////////////////////////////////
+
+* Add option that TOMBO is staying topmost of the window.
+
 
 /////////////////////////////////////////////////////////////////////////
 // TODO

@@ -51,6 +51,7 @@
 
 // saved each exit time.
 #define HIDESTATUSBAR_ATTR_NAME TEXT("HideStatusBar")
+#define STAYTOPMOST_ATTR_NAME TEXT("StayTopMost")
 #define TOMBO_WINSIZE_ATTR_NAME TEXT("WinSize")
 #define TOMBO_REBARHIST_ATTR_NAME TEXT("RebarPos")
 
@@ -101,6 +102,10 @@ static BOOL SetDWORDToReg(HKEY hKey, LPCTSTR pAttr, DWORD nValue);
 // 値の取得 : 失敗したらhKeyはクローズされる
 
 static LPTSTR GetMultiSZFromReg(HKEY hKey, LPCTSTR pAttr);
+
+// Get Value : Don't close hKey when failed.
+//		if function is failed, return nDefault;
+static DWORD GetDWORDFromReg(HKEY hKey, LPCTSTR pAttr, DWORD nDefault);
 
 //////////////////////////////////////////
 // メッセージリソースの取得
@@ -1165,6 +1170,10 @@ BOOL Property::Load(BOOL *pStrict)
 	}
 #endif
 
+#if defined(PLATFORM_WIN32)
+	nTopMost = GetDWORDFromReg(hTomboRoot, STAYTOPMOST_ATTR_NAME, 0);
+#endif
+	
 	RegCloseKey(hTomboRoot);
 	return TRUE;
 }
@@ -1376,6 +1385,20 @@ static BOOL SetDWORDToReg(HKEY hKey, LPCTSTR pAttr, DWORD nValue)
 	}
 	return TRUE;
 }
+
+static DWORD GetDWORDFromReg(HKEY hKey, LPCTSTR pAttr, DWORD nDefault)
+{
+	DWORD siz = sizeof(DWORD);
+	DWORD typ;
+	DWORD nValue;
+	DWORD res = RegQueryValueEx(hKey, pAttr, NULL, &typ, (LPBYTE)&nValue, &siz);
+	if (res != ERROR_SUCCESS) {
+		return nDefault;
+	}
+	return nValue;
+}
+
+
 
 static LPTSTR GetMultiSZFromReg(HKEY hKey, LPCTSTR pAttr, LPDWORD pSize)
 {
@@ -1666,6 +1689,23 @@ BOOL Property::SaveStatusBarStat()
 	if (!hTomboRoot) return FALSE;
 
 	if (!SetDWORDToReg(hTomboRoot, HIDESTATUSBAR_ATTR_NAME, nHideStatusBar)) return FALSE;
+
+	RegCloseKey(hTomboRoot);
+#endif
+	return TRUE;
+}
+
+///////////////////////////////////////////////////
+// Save topmost stat
+///////////////////////////////////////////////////
+
+BOOL Property::SaveTopMostStat()
+{
+#if defined(PLATFORM_WIN32)
+	HKEY hTomboRoot = GetTomboRootKey();
+	if (!hTomboRoot) return FALSE;
+
+	if (!SetDWORDToReg(hTomboRoot, STAYTOPMOST_ATTR_NAME, nTopMost)) return FALSE;
 
 	RegCloseKey(hTomboRoot);
 #endif

@@ -157,8 +157,8 @@ static TBBUTTON aMDCmdBarButtons[NUM_MD_CMDBAR_BUTTONS] = {
 static void ControlMenu(HMENU hMenu, BOOL bSelectViewActive);
 static void ControlToolbar(HWND hToolbar, BOOL bSelectViewActive);
 
-#define NUM_MY_TOOLBAR_BMPS 10
-#define NUM_TOOLBAR_BUTTONS 17
+#define NUM_MY_TOOLBAR_BMPS 11
+#define NUM_TOOLBAR_BUTTONS 19
 
 static TBBUTTON aToolbarButtons[NUM_TOOLBAR_BUTTONS] = {
 	{STD_FILENEW + NUM_MY_TOOLBAR_BMPS,  IDM_NEWMEMO,    TBSTATE_ENABLED, TBSTYLE_BUTTON, 0, 0, 0, -1},
@@ -169,7 +169,6 @@ static TBBUTTON aToolbarButtons[NUM_TOOLBAR_BUTTONS] = {
 	{STD_PASTE + NUM_MY_TOOLBAR_BMPS,    IDM_PASTE,      TBSTATE_ENABLED, TBSTYLE_BUTTON, 0, 0, 0, -1},
 	{0,                                  0,              TBSTATE_ENABLED, TBSTYLE_SEP,    0, 0, 0, -1},
 	{STD_DELETE + NUM_MY_TOOLBAR_BMPS,   IDM_DELETEITEM, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0, 0, 0, -1},
-	{6,                                  IDM_TOGGLEPANE, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0, 0, 0, -1},
 	{0,                                  0,              TBSTATE_ENABLED, TBSTYLE_SEP,    0, 0, 0, -1},
 	{3,                                  IDM_INSDATE1,   TBSTATE_ENABLED, TBSTYLE_BUTTON, 0, 0, 0, -1},
 	{4,                                  IDM_INSDATE2,   TBSTATE_ENABLED, TBSTYLE_BUTTON, 0, 0, 0, -1},
@@ -177,6 +176,9 @@ static TBBUTTON aToolbarButtons[NUM_TOOLBAR_BUTTONS] = {
 	{9,                                  IDM_SEARCH,     TBSTATE_ENABLED, TBSTYLE_BUTTON, 0, 0, 0, -1},
 	{7,                                  IDM_SEARCH_PREV,              0, TBSTYLE_BUTTON, 0, 0, 0, -1},
 	{8,                                  IDM_SEARCH_NEXT,              0, TBSTYLE_BUTTON, 0, 0, 0, -1},
+	{0,                                  0,              TBSTATE_ENABLED, TBSTYLE_SEP,    0, 0, 0, -1},
+	{6,                                  IDM_TOGGLEPANE, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0, 0, 0, -1},
+	{10,                                 IDM_TOPMOST,    TBSTATE_ENABLED, TBSTYLE_BUTTON, 0, 0, 0, -1},
 	{0,                                  0,              TBSTATE_ENABLED, TBSTYLE_SEP,    0, 0, 0, -1},
 };
 #endif
@@ -855,7 +857,12 @@ void MainFrame::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		mmMemoManager.NewMemo();
 	}
 
-//	SetWindowPos(hWnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+#if defined(PLATFORM_WIN32)
+	SetTopMost();
+//	if (g_Property.StayTopMost()) {
+//		SetWindowPos(hWnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+//	}
+#endif
 	ActivateView(TRUE);
 }
 
@@ -966,6 +973,9 @@ BOOL MainFrame::OnExit()
 	SaveWinSize();
 	g_Property.SaveStatusBarStat();
 #endif
+#if defined(PLATFORM_WIN32)
+	g_Property.SaveTopMostStat();
+#endif
 #if defined(PLATFORM_HPC)
 	// save rebar info
 	COMMANDBANDSRESTOREINFO cbri[2];
@@ -1034,6 +1044,12 @@ void MainFrame::OnCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 #if defined(PLATFORM_HPC) || defined(PLATFORM_WIN32)
 	case IDM_TOGGLEPANE:
 		TogglePane();
+		break;
+#endif
+#if defined(PLATFORM_WIN32)
+	case IDM_TOPMOST:
+		g_Property.ToggleStayTopMost();
+		SetTopMost();
 		break;
 #endif
 	case IDM_SEARCH:
@@ -2201,4 +2217,27 @@ void MainFrame::OnGrep()
 			MessageBox(MSG_INSERTVFOLDER_FAIL, TOMBO_APP_NAME, MB_OK | MB_ICONERROR);
 		}
 	}
+}
+
+///////////////////////////////////////////////////
+// stay topmost of the screen
+///////////////////////////////////////////////////
+
+void MainFrame::SetTopMost()
+{
+#if defined(PLATFORM_WIN32)
+	HMENU hMenu = GetMenu(hMainWnd);
+
+	if (g_Property.StayTopMost()) {
+		CheckMenuItem(hMenu, IDM_TOPMOST, MF_BYCOMMAND | MF_CHECKED);
+		SendMessage(hToolBar, TB_SETSTATE, IDM_TOPMOST, MAKELONG(TBSTATE_ENABLED |TBSTATE_PRESSED, 0)); 
+
+		SetWindowPos(hMainWnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+	} else {
+		CheckMenuItem(hMenu, IDM_TOPMOST, MF_BYCOMMAND | MF_UNCHECKED);
+		SendMessage(hToolBar, TB_SETSTATE, IDM_TOPMOST, MAKELONG(TBSTATE_ENABLED, 0)); 
+
+		SetWindowPos(hMainWnd, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+	}
+#endif
 }

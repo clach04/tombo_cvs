@@ -120,13 +120,14 @@
 #define IDM_UNDO                        40029
 #define IDM_SHOWSTATUSBAR               40030
 #define IDM_GREP                        40031
+#define IDM_TOPMOST                     40032
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        137
-#define _APS_NEXT_COMMAND_VALUE         40032
+#define _APS_NEXT_COMMAND_VALUE         40033
 #define _APS_NEXT_CONTROL_VALUE         1037
 #define _APS_NEXT_SYMED_VALUE           108
 #endif
