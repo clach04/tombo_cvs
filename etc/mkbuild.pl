@@ -1,7 +1,7 @@
 #
 # TOMBO Build program for ActivePerl(Win32)
 
-$version = "Tombo1_7b3";
+$version = "Tombo1_7b4";
 
 ##########################################################################
 # Tool definition
@@ -214,34 +214,34 @@ $be300root = "R:\\work2\\BE300SDK_1012\\Installer\\English PC Tools";
 	[\@buildlistCEEN, "CE-EN", "_ce_all_en"],
 	[\@buildlistWin32JP, "Win32-JP", "_win32_jp"],
 	[\@buildlistWin32EN, "Win32-EN", "_win32_en"],
-	[\@buildlist_HPC_JP, "HPC-JP", "_hpcpro_jp"],
-	[\@buildlist_PKTPC_JP, "PKTPC-JP", "_pktpc_jp"],
-	[\@buildlist_PSPC_JP, "PSPC-JP", "_pspc_jp"],
+#	[\@buildlist_HPC_JP, "HPC-JP", "_hpcpro_jp"],
+#	[\@buildlist_PKTPC_JP, "PKTPC-JP", "_pktpc_jp"],
+#	[\@buildlist_PSPC_JP, "PSPC-JP", "_pspc_jp"],
 	[\@buildlist_BE500_JP, "BE500-JP", "_be500_jp"],
-	[\@buildlist_HPC_EN, "HPC-EN", "_hpcpro_en"],
-	[\@buildlist_PKTPC_EN, "PKTPC-EN", "_pktpc_en"],
-	[\@buildlist_PSPC_EN, "PSPC-EN", "_pspc_en"],
+#	[\@buildlist_HPC_EN, "HPC-EN", "_hpcpro_en"],
+#	[\@buildlist_PKTPC_EN, "PKTPC-EN", "_pktpc_en"],
+#	[\@buildlist_PSPC_EN, "PSPC-EN", "_pspc_en"],
 	[\@buildlist_BE300_EN, "BE300-EN", "_be300_en"],
 
 	[\@bl_HPC_ARM_JP, "HPC-ARM-JP", "_hpcpro_arm_jp"],
 	[\@bl_HPC_MIPS_JP,"HPC-MIPS-JP", "_hpcpro_mips_jp"],
-	[\@bl_HPC_SH3_JP,"HPC-SH3-JP", "_hpcpro_sh3_jp"],
-	[\@bl_HPC_SH4_JP,"HPC-SH4-JP", "_hpcpro_sh4_jp"],
+#	[\@bl_HPC_SH3_JP,"HPC-SH3-JP", "_hpcpro_sh3_jp"],
+#	[\@bl_HPC_SH4_JP,"HPC-SH4-JP", "_hpcpro_sh4_jp"],
 	[\@bl_PKTPC_ARM_JP,"PKTPC-ARM-JP", "_pktpc_arm_jp"],
 	[\@bl_PKTPC_MIPS_JP,"PKTPC-MIPS-JP", "_pktpc_mips_jp"],
-	[\@bl_PKTPC_SH3_JP,"PKTPC-SH3-JP", "_pktpc_sh3_jp"],
-	[\@bl_PSPC_MIPS_JP,"PSPC-MIPS-JP", "_pspc_mips_jp"],
-	[\@bl_PSPC_SH3_JP,"PSPC-SH3-JP", "_pspc_sh3_jp"],
+#	[\@bl_PKTPC_SH3_JP,"PKTPC-SH3-JP", "_pktpc_sh3_jp"],
+#	[\@bl_PSPC_MIPS_JP,"PSPC-MIPS-JP", "_pspc_mips_jp"],
+#	[\@bl_PSPC_SH3_JP,"PSPC-SH3-JP", "_pspc_sh3_jp"],
 
 	[\@bl_HPC_ARM_EN, "HPC-ARM-EN", "_hpcpro_arm_en"],
 	[\@bl_HPC_MIPS_EN,"HPC-MIPS-EN", "_hpcpro_mips_en"],
-	[\@bl_HPC_SH3_EN,"HPC-SH3-EN", "_hpcpro_sh3_en"],
-	[\@bl_HPC_SH4_EN,"HPC-SH4-EN", "_hpcpro_sh4_en"],
+#	[\@bl_HPC_SH3_EN,"HPC-SH3-EN", "_hpcpro_sh3_en"],
+#	[\@bl_HPC_SH4_EN,"HPC-SH4-EN", "_hpcpro_sh4_en"],
 	[\@bl_PKTPC_ARM_EN,"PKTPC-ARM-EN", "_pktpc_arm_en"],
 	[\@bl_PKTPC_MIPS_EN,"PKTPC-MIPS-EN", "_pktpc_mips_en"],
-	[\@bl_PKTPC_SH3_EN,"PKTPC-SH3-EN", "_pktpc_sh3_en"],
-	[\@bl_PSPC_MIPS_EN,"PSPC-MIPS-EN", "_pspc_mips_en"],
-	[\@bl_PSPC_SH3_EN,"PSPC-SH3-EN", "_pspc_sh3_en"],
+#	[\@bl_PKTPC_SH3_EN,"PKTPC-SH3-EN", "_pktpc_sh3_en"],
+#	[\@bl_PSPC_MIPS_EN,"PSPC-MIPS-EN", "_pspc_mips_en"],
+#	[\@bl_PSPC_SH3_EN,"PSPC-SH3-EN", "_pspc_sh3_en"],
 );
 
 foreach $arch (@archlist) {
