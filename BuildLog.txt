@@ -291,6 +291,14 @@ PG: Change copyright dialog for expat.
 * FIX: add exec option "-root=" for direct root folder(#1412)
 * NEW: add open notes read-only mode(#1136)
 
+////////////////////////////////
+// B098 (Tombo 1.7 beta 2)
+////////////////////////////////
+
+* Assign Ctrl-;/Ctrl-: key to insert date on edit view(#1702)
+* Add "%n" macro for inserting newline in date strings(#1720)
+* change 1 pane mode from edit view(#1747)
+
 /////////////////////////////////////////////////////////////////////////
 // TODO
 /////////////////////////////////////////////////////////////////////////
