@@ -377,11 +377,23 @@ void MemoSelectView::SetFocus()
 }
 
 ///////////////////////////////////////////
-// OnNotifyハンドラ
+// menu control
 ///////////////////////////////////////////
-//
-// 結果としてTRUE, FALSEの意思表示をしたい場合にはその値を返す。
-// デフォルトの動作に従いたい場合には0xFFFFFFFFを返す。
+
+static void ControlSubMenu(HMENU hMenu, UINT nID, BOOL bEnable)
+{
+	if (bEnable) {
+		EnableMenuItem(hMenu, nID, MF_BYCOMMAND | MF_ENABLED);
+	} else {
+		EnableMenuItem(hMenu, nID, MF_BYCOMMAND | MF_GRAYED);
+	}
+}
+
+///////////////////////////////////////////
+// OnNotify Handler
+///////////////////////////////////////////
+// if you want to return TRUE/FALSE, return TRUE/FALSE.
+// if you want to do default action, return 0xFFFFFFFF.
 
 LRESULT MemoSelectView::OnNotify(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
@@ -455,49 +467,34 @@ LRESULT MemoSelectView::OnNotify(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		break;
 	case TVN_SELCHANGING:
 		{
-			NMTREEVIEW *p = (LPNMTREEVIEW)lParam;
-			TreeViewItem *tvi = (TreeViewItem*)((p->itemOld).lParam);
-
-			MemoNote *pNote;
-			pNote = NULL;
-			if (tvi && !tvi->HasMultiItem()) {
-				pNote = ((TreeViewFileItem*)tvi)->GetNote();
-			}
-			if (pNote == NULL) return FALSE;
-
 #if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
 			// 2-Pane Viewの場合には メモの切り替えが発生し、かつ
 			// 保存確認でキャンセルを押した場合、アイテムの切り替えを
 			// 認めてはならない
-			if (g_Property.IsUseTwoPane()) {			
-				// メモの切り替えが発生
-				DWORD nYNC;
-				if (pMemoMgr &&
-					(pNote->Equal(pMemoMgr->CurrentNote()) || pMemoMgr->CurrentNote() == NULL)) {
-						// 上のif文の第2条件は一挙に複数のSELCHANGINGが来るため
-					if (!pMemoMgr->SaveIfModify(&nYNC, FALSE)) {
-						// セーブに失敗...
-						TCHAR buf[1024];
-						wsprintf(buf, MSG_SAVE_FAILED, GetLastError());
-						pMemoMgr->GetMainFrame()->MessageBox(buf, TEXT("ERROR"), MB_ICONSTOP | MB_OK | MB_APPLMODAL);
-	
-						// 切り替えられると困るので阻止
-						return TRUE;
-					}
-					switch(nYNC) {
-					case IDCANCEL:
-						// 切り替えてほしくないとユーザが言っているので阻止
-						return TRUE;
-					case IDOK:
-						/* fall through */
-					case IDYES:
-						return FALSE;
-					case IDNO:
-						// データの破棄
-						pMemoMgr->ClearMemo();
-						return FALSE;
-					}
-				}
+			if (!g_Property.IsUseTwoPane() || !pMemoMgr) return FALSE;
+
+			DWORD nYNC;
+			if (!pMemoMgr->SaveIfModify(&nYNC, FALSE)) {
+				// セーブに失敗...
+				TCHAR buf[1024];
+				wsprintf(buf, MSG_SAVE_FAILED, GetLastError());
+				pMemoMgr->GetMainFrame()->MessageBox(buf, TEXT("ERROR"), MB_ICONSTOP | MB_OK | MB_APPLMODAL);
+
+				// 切り替えられると困るので阻止
+				return TRUE;
+			}
+			switch(nYNC) {
+			case IDCANCEL:
+				// 切り替えてほしくないとユーザが言っているので阻止
+				return TRUE;
+			case IDOK:
+				/* fall through */
+			case IDYES:
+				return FALSE;
+			case IDNO:
+				// データの破棄
+				pMemoMgr->ClearMemo();
+				return FALSE;
 			}
 #endif
 			return FALSE;
@@ -559,6 +556,15 @@ LRESULT MemoSelectView::OnNotify(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 			HMENU hContextMenu = LoadMenu(g_hInstance, MAKEINTRESOURCE(IDR_CONTEXTMENU));
 			HMENU hMenu = GetSubMenu(hContextMenu, 0);
+			ControlSubMenu(hMenu, IDM_ENCRYPT, pItem->CanEncrypt(this));
+			ControlSubMenu(hMenu, IDM_DECRYPT, pItem->CanDecrypt(this));
+			ControlSubMenu(hMenu, IDM_CUT, pItem->CanCut(this));
+			ControlSubMenu(hMenu, IDM_COPY, pItem->CanCopy(this));
+			ControlSubMenu(hMenu, IDM_RENAME, pItem->CanRename(this));
+			ControlSubMenu(hMenu, IDM_DELETEITEM, pItem->CanDelete(this));
+			ControlSubMenu(hMenu, IDM_NEWFOLDER, pItem->CanNewMemo(this));
+
+#ifdef COMMENT
 			if (!pItem->HasMultiItem()) {
 				if (((TreeViewFileItem*)pItem)->GetNote()->IsEncrypted()) {
 					EnableMenuItem(hMenu, IDM_ENCRYPT, MF_BYCOMMAND | MF_GRAYED);
@@ -568,6 +574,7 @@ LRESULT MemoSelectView::OnNotify(HWND hWnd, WPARAM wParam, LPARAM lParam)
 					EnableMenuItem(hMenu, IDM_DECRYPT, MF_BYCOMMAND | MF_GRAYED);
 				}
 			}
+#endif
 
 			DWORD id = TrackPopupMenuEx(hMenu, TPM_RETURNCMD, pt.x, pt.y, hWnd, NULL);
 			DestroyMenu(hContextMenu);
@@ -1182,6 +1189,7 @@ void MemoSelectView::ControlMenu()
 		pMf->EnableDecrypt(pItem->CanDecrypt(this));
 
 		pMf->EnableNew(pItem->CanNewMemo(this));
+		pMf->EnableNewFolder(pItem->CanNewMemo(this));
 
 		pMf->EnableCut(pItem->CanCut(this));
 		pMf->EnableCopy(pItem->CanCopy(this));
