@@ -98,6 +98,12 @@ public:
 	BOOL IsSingleClickMode() { return bSingleClickMode; }
 
 	/////////////////////////////
+	// Key
+	void SelUpFolderWithoutOpen();
+	void SelNextBrother();
+	void SelPrevBrother();
+
+	/////////////////////////////
 	// ビューアイテム操作関連
 
 	BOOL InitTree(VFManager *pManager);

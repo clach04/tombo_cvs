@@ -54,9 +54,25 @@ LRESULT CALLBACK NewSelectViewProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lP
 		return 0;
 		}
 	case WM_KEYDOWN:
-		if (wParam == VK_DELETE) {
-			SendMessage(hParentWnd, WM_COMMAND, IDM_DELETEITEM, 0);
-			return 0;
+		{
+			BOOL bShiftDown = (GetKeyState(VK_SHIFT) & 0x8000) != 0;
+
+			if (wParam == VK_DELETE) {
+				SendMessage(hParentWnd, WM_COMMAND, IDM_DELETEITEM, 0);
+				return 0;
+			}
+			if (wParam == VK_LEFT && bShiftDown) {
+				pView->SelUpFolderWithoutOpen();
+				return 0;
+			}
+			if (wParam == VK_UP && bShiftDown) {
+				pView->SelPrevBrother();
+				return 0;
+			}
+			if (wParam == VK_DOWN && bShiftDown) {
+				pView->SelNextBrother();
+				return 0;
+			}
 		}
 		break;
 	case WM_SETFOCUS:

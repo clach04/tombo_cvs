@@ -1380,3 +1380,39 @@ void MemoSelectView::CloseVFRoot()
 		TreeCollapse(hSearchRoot);
 	}
 }
+
+/////////////////////////////////////////////
+// select node
+/////////////////////////////////////////////
+
+void MemoSelectView::SelUpFolderWithoutOpen()
+{
+	HTREEITEM hItem;
+	TreeViewItem *pItem = GetCurrentItem(&hItem);
+	HTREEITEM hParent = TreeView_GetParent(hViewWnd, hItem);
+	if (hParent) {
+		TreeView_SelectItem(hViewWnd, hParent);
+	}
+}
+
+void MemoSelectView::SelNextBrother()
+{
+	HTREEITEM hItem;
+	TreeViewItem *pItem = GetCurrentItem(&hItem);
+
+	HTREEITEM h = TreeView_GetNextSibling(hViewWnd, hItem);
+	if (h) {
+		TreeView_SelectItem(hViewWnd, h);
+	}
+}
+
+void MemoSelectView::SelPrevBrother()
+{
+	HTREEITEM hItem;
+	TreeViewItem *pItem = GetCurrentItem(&hItem);
+
+	HTREEITEM h = TreeView_GetPrevSibling(hViewWnd, hItem);
+	if (h) {
+		TreeView_SelectItem(hViewWnd, h);
+	}
+}
