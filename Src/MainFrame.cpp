@@ -553,9 +553,9 @@ BOOL MainFrame::Create(LPCTSTR pWndName, HINSTANCE hInst, int nCmdShow)
 #endif
 
 	// パスワードマネージャ初期化
-	pmPasswordMgr.Init(hMainWnd, hInstance);
-	mmMemoManager.SetPasswordManager(&pmPasswordMgr);
-	g_pPasswordManager = &pmPasswordMgr;
+//	pmPasswordMgr.Init(hMainWnd, hInstance);
+//	mmMemoManager.SetPasswordManager(&pmPasswordMgr);
+//	g_pPasswordManager = &pmPasswordMgr;
 
 	return TRUE;
 }
@@ -892,6 +892,11 @@ void MainFrame::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	SetTopMost();
 #endif
 	ActivateView(TRUE);
+
+	// init password manager
+	pmPasswordMgr.Init(hMainWnd, hInstance);
+	mmMemoManager.SetPasswordManager(&pmPasswordMgr);
+	g_pPasswordManager = &pmPasswordMgr;
 
 
 	// open top page
