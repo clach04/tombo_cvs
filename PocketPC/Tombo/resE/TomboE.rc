@@ -483,6 +483,14 @@ BEGIN
     EDITTEXT        IDC_FILTERDEF_SRC_PATH,5,15,120,14,ES_AUTOHSCROLL
 END
 
+IDD_PROPTAB_SIP DIALOG DISCARDABLE  0, 0, 122, 132
+STYLE WS_CHILD
+FONT 9, "System"
+BEGIN
+    CONTROL         "Keep space over the SIP",IDC_PROP_SIPDELTA,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,5,10,94,10
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -659,6 +667,14 @@ BEGIN
         TOPMARGIN, 7
         BOTTOMMARGIN, 48
     END
+
+    IDD_PROPTAB_SIP, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 115
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 125
+    END
 END
 #endif    // APSTUDIO_INVOKED
 
@@ -750,6 +766,7 @@ BEGIN
     IDS_PROPTAB_APPBUTTON   "AppButton"
     IDS_GREPTAB_MAIN        "Main"
     IDS_GREPTAB_PERSIST     "Save"
+    IDS_PROPTAB_SIP         "SIP"
 END
 
 #endif    // Japanese resources

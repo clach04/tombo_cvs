@@ -49,6 +49,7 @@ class Property {
 #endif
 #if defined(PLATFORM_PKTPC)
 	DWORD nDisableExtraActionButton;
+	DWORD nSIPSizeDelta;
 #endif
 #if defined(PLATFORM_HPC) || defined(PLATFORM_WIN32)
 	DWORD nHideStatusBar;
@@ -103,6 +104,10 @@ public:
 	DWORD AppButton3() { return nAppButton3; }
 	DWORD AppButton4() { return nAppButton4; }
 	DWORD AppButton5() { return nAppButton5; }
+
+#if defined(PLATFORM_PKTPC)
+	DWORD SipSizeDelta() { return nSIPSizeDelta; }
+#endif
 
 	// ウィンドウをメモ名に連動させるか?
 	BOOL SwitchWindowTitle() { return nSwitchWindowTitle; }
@@ -166,6 +171,7 @@ public:
 	friend class SelectMemoTab;
 	friend class AppButtonTab;
 	friend class CodepageTab;
+	friend class SipTab;
 };
 
 ////////////////////////////////////

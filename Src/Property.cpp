@@ -44,6 +44,7 @@
 #define APP_BUTTON3_ATTR_NAME TEXT("AppButton3")
 #define APP_BUTTON4_ATTR_NAME TEXT("AppButton4")
 #define APP_BUTTON5_ATTR_NAME TEXT("AppButton5")
+#define SIPSIZE_DELTA_ATTR_NAME TEXT("SipSizeDelta")
 #define USE_TWO_PANE_ATTR_NAME TEXT("UseTwoPane")
 #define SWITCH_WINDOW_TITLE_ATTR_NAME TEXT("SwitchWindowTitle")
 #define KEEP_TITLE_ATTR_NAME TEXT("KeepTitle")
@@ -60,7 +61,11 @@
 #define TOMBO_REBARHIST_ATTR_NAME TEXT("RebarPos")
 
 #if defined(PLATFORM_PKTPC) || (defined(PLATFORM_BE500) && defined(TOMBO_LANG_ENGLISH))
+#if defined(PLATFORM_PKTPC)
+#define PROPTAB_PAGES 7
+#else
 #define PROPTAB_PAGES 6
+#endif
 #else
 #define PROPTAB_PAGES 5
 #endif
@@ -89,6 +94,8 @@
 
 #define DEFAULTDATEFORMAT1 TEXT("%y/%M/%d")
 #define DEFAULTDATEFORMAT2 TEXT("%h:%m:%s")
+
+#define SIP_DELTA 16
 
 static BOOL CreateDirectories(LPCTSTR pDir);
 static BOOL MakeFont(HFONT *phFont, LPCTSTR pName, DWORD nSize, BYTE bQuality);
@@ -958,6 +965,44 @@ BOOL AppButtonTab::Apply(HWND hDlg)
 #endif
 
 //////////////////////////////////////////
+// SIP tab
+//////////////////////////////////////////
+#if defined(PLATFORM_PKTPC)
+
+class SipTab : public TomboPropertyTab {
+public:
+	SipTab(Property *p) :
+	  TomboPropertyTab(p, IDD_PROPTAB_SIP, (DLGPROC)DefaultPageProc, IDS_PROPTAB_SIP) {}
+  ~SipTab() {}
+
+  void Init(HWND hDlg);
+  BOOL Apply(HWND hDlg);
+};
+
+void SipTab::Init(HWND hDlg)
+{
+	HWND hKeepDelta = GetDlgItem(hDlg, IDC_PROP_SIPDELTA);
+	if (pProperty->SipSizeDelta() != 0) {
+		SendMessage(hKeepDelta, BM_SETCHECK, BST_CHECKED, 0);
+	} else {
+		SendMessage(hKeepDelta, BM_SETCHECK, BST_UNCHECKED, 0);
+	}
+}
+
+BOOL SipTab::Apply(HWND hDlg)
+{
+	HWND hKeepDelta = GetDlgItem(hDlg, IDC_PROP_SIPDELTA);
+	if (SendMessage(hKeepDelta, BM_GETCHECK, 0, 0) == BST_CHECKED) {
+		pProperty->nSIPSizeDelta = SIP_DELTA;
+	} else {
+		pProperty->nSIPSizeDelta = 0;
+	}
+	return TRUE;
+}
+
+#endif
+
+//////////////////////////////////////////
 // Codepage tab
 //////////////////////////////////////////
 #if defined(PLATFORM_BE500) && defined(TOMBO_LANG_ENGLISH)
@@ -1013,6 +1058,7 @@ DWORD Property::Popup(HINSTANCE hInst, HWND hWnd)
 #endif
 #if defined(PLATFORM_PKTPC)
 	AppButtonTab pgAppButton(this);
+	SipTab pgSip(this);
 #endif
 #if defined(PLATFORM_BE500) && defined(TOMBO_LANG_ENGLISH)
 	CodepageTab pgCodepage(this);
@@ -1027,6 +1073,7 @@ DWORD Property::Popup(HINSTANCE hInst, HWND hWnd)
 #endif
 #if defined(PLATFORM_PKTPC)
 	pages[5] = &pgAppButton;
+	pages[6] = &pgSip;
 #endif
 #if defined(PLATFORM_BE500) && defined(TOMBO_LANG_ENGLISH)
 	pages[5] = &pgCodepage;
@@ -1182,6 +1229,9 @@ BOOL Property::Load(BOOL *pStrict)
 	if (res != ERROR_SUCCESS) {
 		nAppButton5 = APPBUTTON_ACTION_DISABLE;
 	}
+
+	// SIP size delta
+	nSIPSizeDelta = GetDWORDFromReg(hTomboRoot, SIPSIZE_DELTA_ATTR_NAME, 0);
 #endif
 
 	// タブストップ
@@ -1326,6 +1376,7 @@ BOOL Property::Save()
 	if (!SetDWORDToReg(hTomboRoot, APP_BUTTON3_ATTR_NAME, nAppButton3)) return FALSE;
 	if (!SetDWORDToReg(hTomboRoot, APP_BUTTON4_ATTR_NAME, nAppButton4)) return FALSE;
 	if (!SetDWORDToReg(hTomboRoot, APP_BUTTON5_ATTR_NAME, nAppButton5)) return FALSE;
+	if (!SetDWORDToReg(hTomboRoot, SIPSIZE_DELTA_ATTR_NAME, nSIPSizeDelta)) return FALSE;
 #endif
 
 	if (!SetDWORDToReg(hTomboRoot, DETAILSVIEW_TABSTOP_ATTR_NAME, nTabstop)) return FALSE;

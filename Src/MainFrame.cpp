@@ -1135,7 +1135,7 @@ void MainFrame::OnSettingChange(WPARAM wParam)
 	if (!sc.GetSipStat(&bStat)) return;
 
 	RECT r = sc.GetRect();
-	OnSIPResize(bStat, r.top);
+	OnSIPResize(bStat, &r);
 #endif
 #if defined(PLATFORM_HPC) || defined(PLATFORM_PSPC)
 	if (wParam == SPI_SETWORKAREA) {
@@ -1151,21 +1151,24 @@ void MainFrame::OnSettingChange(WPARAM wParam)
 // IM‚ÌON/OFF‚É”º‚¤ƒŠƒTƒCƒY
 ///////////////////////////////////////////////////
 
-void MainFrame::OnSIPResize(BOOL bImeOn, DWORD nClientBottom)
+void MainFrame::OnSIPResize(BOOL bImeOn, RECT *pSipRect)
 {
+	DWORD nClientBottom = pSipRect->top;
+
 #ifdef _WIN32_WCE
 #if defined(PLATFORM_PKTPC)
 	RECT r, rWinRect;
 
+	DWORD nDelta = g_Property.SipSizeDelta();
+
 	GetClientRect(hMainWnd, &rWinRect);
 	GetWindowRect(hMSCmdBar, &r);
+	RECT rx;
+	GetWindowRect(hMainWnd, &rx);
 
 	if (bImeOn) {
-		RECT rx;
-		GetWindowRect(hMainWnd, &rx);
-
-		msView.MoveWindow(rWinRect.left, rWinRect.top, rWinRect.right, nClientBottom - rx.top);
-		mdView.MoveWindow(rWinRect.left, rWinRect.top, rWinRect.right, nClientBottom - rx.top);
+		msView.MoveWindow(rWinRect.left, rWinRect.top, rWinRect.right, nClientBottom - rx.top - nDelta);
+		mdView.MoveWindow(rWinRect.left, rWinRect.top, rWinRect.right, nClientBottom - rx.top - nDelta);
 	} else {
 		DWORD nBottom = rWinRect.bottom - (r.bottom - r.top); 
 		msView.MoveWindow(rWinRect.left, rWinRect.top, rWinRect.right, nBottom);

@@ -35,6 +35,7 @@
 #define IDD_DIALOG1                     125
 #define IDD_FILTERCTL                   126
 #define IDD_DIALOG2                     127
+#define IDD_PROPTAB_SIP                 128
 #define IDD_FILTERDEF_SRC               138
 #define IDD_FILTERDEF_FILTER            139
 #define IDD_FILTERDEF_ADD_REGEX         140
@@ -97,6 +98,7 @@
 #define IDC_FILTERDEF_SRC_PATH          1043
 #define IDC_FILTERCTL_DOWN              1044
 #define IDC_FILTERDEF_FILTER_LIST       1044
+#define IDC_PROP_SIPDELTA               1044
 #define IDC_FILTERCTL_NEW               1045
 #define IDC_FILTERDEF_FILTER_UP         1045
 #define IDC_FILTERDEF_FILTER_DOWN       1046
@@ -177,6 +179,7 @@
 #define IDS_GREPTAB_MAIN                40060
 #define IDS_GREPTAB_PERSIST             40061
 #define IDM_SEARCH                      40062
+#define IDS_PROPTAB_SIP                 40062
 #define IDM_SEARCH_NEXT                 40063
 #define IDM_SEARCH_PREV                 40064
 #define IDM_RENAME                      40065
@@ -189,9 +192,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        128
+#define _APS_NEXT_RESOURCE_VALUE        129
 #define _APS_NEXT_COMMAND_VALUE         40071
-#define _APS_NEXT_CONTROL_VALUE         1044
+#define _APS_NEXT_CONTROL_VALUE         1045
 #define _APS_NEXT_SYMED_VALUE           106
 #endif
 #endif
