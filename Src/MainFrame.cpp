@@ -872,7 +872,7 @@ void MainFrame::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	ActivateView(TRUE);
 
 	// Raize window for some PocketPC devices.
-	SetForegroundWindow(hMainWnd);
+//	SetForegroundWindow(hMainWnd);
 }
 
 static HIMAGELIST CreateSelectViewImageList(HINSTANCE hInst)
