@@ -10,6 +10,10 @@
 #include "resource.h"
 #include "AboutDialog.h"
 
+// version info
+
+#define TOMBO_VERSION_INFO TEXT("Tombo DEBUG(20021117)")
+
 // コピーライト表記
 
 LPCTSTR pCopyright = 
