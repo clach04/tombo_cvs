@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+
+<!--
+	DTD for TOMBO virtual folder definitions
+-->
+
+<!ELEMENT folders (vfolder*) >
+<!ELEMENT vfolder (grep|src) >
+<!ELEMENT grep    (grep|src) >
+<!ELEMENT src     EMPTY      >
+
+<!ATTLIST vfolder name          CDATA #REQUIRED>
+<!ATTLIST grep    pattern       CDATA #REQUIRED>
+<!ATTLIST grep    not           CDATA #IMPLIED>
+<!ATTLIST grep    casesensitive CDATA #IMPLIED>
+<!ATTLIST grep    filenameonly  CDATA #IMPLIED>
+<!ATTLIST src     folder        CDATA #REQUIRED>
+<!ATTLIST src     checkencrypt  CDATA #IMPLIED>

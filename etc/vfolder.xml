@@ -1,20 +1,13 @@
 <?xml version='1.0' encoding='UTF-8'?>
 
+<!DOCTYPE folders SYSTEM "TOMBO_vfolder.dtd">
+
+
 <!-- 
 Sample file of virtual folder. 
 Place this file as same folder as Tombo.exe, you may be happy ;-)
 
-DTD is not yet.
-encoding is only UTF-8 or UTF-16.
-
-grep tag attribute
-	not
-	casesensitive
-	filenameonly
-
-src tag attribute
-	checkencrypt
-
+In current version, encoding is allowed only UTF-8 or UTF-16.
 -->
 
 <folders>
