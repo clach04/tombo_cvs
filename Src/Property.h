@@ -190,7 +190,8 @@ public:
 
 	DWORD UseSafeFileName() { return nSafeFileName; }
 
-	BOOL UseYAEdit() { return nUseYAEdit; }
+//	BOOL UseYAEdit() { return nUseYAEdit; }
+	BOOL UseYAEdit() { return FALSE; }
 
 	friend class FolderTab;
 	friend class PasswordTab;

@@ -12,6 +12,10 @@
 #include "MemoManager.h"
 #include "MainFrame.h"
 
+/////////////////////////////////////////////////////////////////////////////
+// TomboDoc callback
+/////////////////////////////////////////////////////////////////////////////
+
 class TomboDocCallback : public YAEDocCallbackHandler {
 	MemoManager *pMgr;
 public:
@@ -19,6 +23,7 @@ public:
 
 	void OnModifyStatusChanged(YAEditDoc *pDoc, BOOL bOld, BOOL bNew);
 };
+
 
 TomboDocCallback::TomboDocCallback(MemoManager *p) : pMgr(p)
 {
@@ -28,6 +33,27 @@ void TomboDocCallback::OnModifyStatusChanged(YAEditDoc *pDoc, BOOL bOld, BOOL bN
 {
 	pMgr->GetMainFrame()->SetModifyStatus(pDoc->IsModify());
 }
+
+/////////////////////////////////////////////////////////////////////////////
+// TomboDoc callback
+/////////////////////////////////////////////////////////////////////////////
+
+class YAEDetailsViewCallback : public YAEditCallback {
+	YAEditor *pEditor;
+public:
+	YAEDetailsViewCallback(YAEditor *pSelf) : pEditor(pSelf) {}
+
+	void OnGetFocus();
+};
+
+void YAEDetailsViewCallback::OnGetFocus()
+{
+	pEditor->OnGetFocus();
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// YAEditor implimentation 
+/////////////////////////////////////////////////////////////////////////////
 
 
 YAEditor::YAEditor(MemoDetailsViewCallback *pCB) : MemoDetailsView(pCB), pEdit(NULL), pMemoMgr(NULL)
@@ -41,7 +67,7 @@ YAEditor::~YAEditor()
 
 BOOL YAEditor::Create(LPCTSTR pName, RECT &r, HWND hParent, HINSTANCE hInst, HFONT hFont)
 {
-	pEdit = new YAEdit();
+	pEdit = new YAEdit(new YAEDetailsViewCallback(this));
 	pEdit->Create(hInst, hParent, nID, r, NULL, new TomboDocCallback(pMemoMgr));
 	pEdit->SetFont(hFont);
 	return TRUE;

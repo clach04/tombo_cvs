@@ -781,8 +781,13 @@ BOOL LocalFileRepository::GetList(const TomboURI *pFolder, DirList *pList, BOOL 
 /////////////////////////////////////////
 // 
 /////////////////////////////////////////
-BOOL LocalFileRepository::RequestAllocateURI(LPCTSTR pMemoPath, LPCTSTR pText, TString *pHeadLine, TomboURI *pURI, const TomboURI *pTemplateURI)
+BOOL LocalFileRepository::RequestAllocateURI(const TomboURI *pBaseURI, LPCTSTR pText, TString *pHeadLine, TomboURI *pURI, const TomboURI *pTemplateURI)
 {	
+	LPCTSTR pMemoPath;
+	TString sMemoPath;
+	if (!pBaseURI->GetFilePath(&sMemoPath)) return FALSE;
+	pMemoPath = sMemoPath.Get();
+
 	MemoNote *pNote;
 	if (pTemplateURI) {
 		MemoNote *pCurrent = MemoNote::MemoNoteFactory(pTemplateURI);

@@ -35,11 +35,12 @@ public:
 	LPCTSTR GetPath() const;
 
 	// get parent path of URI.
-	// ex. tombo://default/aa/bb/cc.txt -> tombo://default/aa/bb/cc/
-	//     tombo://default/aa/bb/cc/    -> tombo://default/aa/bb/
-	// return empty if the URI is repository root.
-	//     tombo://default/ -> "tombo://default/"
+	// ex. tombo://default/aa/bb/cc.txt -> tombo://default/aa/bb/
+	//     tombo://default/aa/bb/       -> tombo://default/aa/
+	//     tombo://default/				-> tombo://default/
 	BOOL GetParent(TomboURI *pParent) const;
+
+	BOOL GetAttachFolder(TomboURI *pAttach) const;
 
 	DWORD GetMaxPathItem() const { return nMaxPathItem; }
 
@@ -68,6 +69,8 @@ public:
 	///////////////////////////////
 	// helper functions
 	static LPCTSTR GetNextSep(LPCTSTR p);
+
+	TomboURI &operator=(const TomboURI &uri);
 };
 
 /////////////////////////////////////////////

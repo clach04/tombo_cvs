@@ -6,7 +6,6 @@
 #endif
 #include "Tombo.h"
 #include "AutoPtr.h"
-#include "MemoManager.h"
 #include "VarBuffer.h"
 #include "MainFrame.h"
 #include "MemoDetailsView.h"
@@ -21,7 +20,7 @@
 
 static BOOL GetDateText(TString *pInsStr, LPCTSTR pFormat, TString *pPath);
 
-void SetWndProc(SUPER_WND_PROC wp, HWND hParent, HINSTANCE h, SimpleEditor *p, MemoManager *pMgr);
+void SetWndProc(SUPER_WND_PROC wp);
 LRESULT CALLBACK NewDetailsViewProc( HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam );
 
 LPCTSTR pMonth[12] = {
@@ -49,20 +48,21 @@ MemoDetailsView::MemoDetailsView(MemoDetailsViewCallback *p) : pCallback(p), pCu
 MemoDetailsView::~MemoDetailsView()
 {
 	delete pCallback;
-	delete [] pCurrentURI;
+	delete pCurrentURI;
 }
 
-LPCTSTR MemoDetailsView::GetCurrentURI()
+const TomboURI* MemoDetailsView::GetCurrentURI()
 {
 	return pCurrentURI;
 }
 
-void MemoDetailsView::SetCurrentNote(LPCTSTR pURI)
+void MemoDetailsView::SetCurrentNote(const TomboURI *pURI)
 {
-	delete [] pCurrentURI;
+	delete pCurrentURI;
 	pCurrentURI = NULL;
+
 	if (pURI) {
-		pCurrentURI = StringDup(pURI);
+		pCurrentURI = new TomboURI(*pURI);
 	}
 }
 
@@ -83,11 +83,7 @@ BOOL MemoDetailsView::StoreCursorPos()
 		if (pCurrentURI && nPos != nInitPos) {
 			NoteAttribute attr;
 			attr.nCursorPos = nPos;
-
-			TomboURI sCurrentURI;
-			if (!sCurrentURI.Init(pCurrentURI)) return FALSE;
-
-			if (!g_Repository.SetAttribute(&sCurrentURI, &attr)) return FALSE;
+			if (!g_Repository.SetAttribute(pCurrentURI, &attr)) return FALSE;
 		}
 	}
 	return TRUE;
@@ -108,7 +104,7 @@ BOOL MemoDetailsView::LoadNote(const TomboURI *pURI)
 
 	// set memo to view
 	SetMemo(p, attr.nCursorPos, attr.bReadOnly);
-	SetCurrentNote(pURI->GetFullURI());
+	SetCurrentNote(pURI);
 
 	return TRUE;
 }
@@ -116,10 +112,10 @@ BOOL MemoDetailsView::LoadNote(const TomboURI *pURI)
 BOOL MemoDetailsView::Save(const TomboURI *pCurrentURI, TomboURI *pNewURI, TString *pNewHeadLine, LPCTSTR pText)
 {
 	if (!g_Repository.Update(pCurrentURI, pText, pNewURI, pNewHeadLine)) return FALSE;
-	ResetModify();
 	StoreCursorPos();
+	ResetModify();
 	pCallback->SetModifyStatus(FALSE);
-	SetCurrentNote(pNewURI->GetFullURI());
+	SetCurrentNote(pNewURI);
 	return TRUE;
 }
 
@@ -132,11 +128,10 @@ SimpleEditor::SimpleEditor(MemoDetailsViewCallback *p) : MemoDetailsView(p), hVi
 }
 
 
-BOOL SimpleEditor::Init(MemoManager *p, DWORD id, DWORD id_nf)
+BOOL SimpleEditor::Init(DWORD id, DWORD id_nf)
 {
 	nID = id;
 	nID_nf = id_nf;
-	pMemoMgr = p;
 	return TRUE;
 }
 
@@ -200,7 +195,7 @@ BOOL SimpleEditor::Create(LPCTSTR pName, RECT &r, HWND hParent, HINSTANCE hInst,
 
 	// sub classing of edit control
 	SUPER_WND_PROC wp = (SUPER_WND_PROC)GetWindowLong(hViewWnd, GWL_WNDPROC);
-	SetWndProc(wp, hParent, g_hInstance, this, pMemoMgr);
+	SetWndProc(wp);
 	SetWindowLong(hViewWnd_nf, GWL_WNDPROC, (LONG)NewDetailsViewProc);
 	SetWindowLong(hViewWnd_fd, GWL_WNDPROC, (LONG)NewDetailsViewProc);
 
@@ -706,7 +701,6 @@ void SimpleEditor::SetTabstop() {
 BOOL SimpleEditor::Search(BOOL bFirstSearch, BOOL bForward, BOOL bNFMsg, BOOL bSearchFromTop)
 {
 	SearchEngineA *pSE;
-//	pSE = pMemoMgr->GetSearchEngine();
 	pSE = pCallback->GetSearchEngine(this);
 	if (pSE == NULL) return FALSE;
 

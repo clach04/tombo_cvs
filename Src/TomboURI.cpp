@@ -29,6 +29,12 @@ TomboURI::~TomboURI()
 {
 }
 
+TomboURI &TomboURI::operator =(const TomboURI &val)
+{
+	uri.Set(val.uri);
+	nMaxPathItem = val.nMaxPathItem;
+	return *this;
+}
 
 /////////////////////////////////////////////
 // initialize
@@ -228,6 +234,20 @@ BOOL TomboURI::GetParent(TomboURI *pParent) const
 }
 
 /////////////////////////////////////////////
+// get folder to attach new note
+/////////////////////////////////////////////
+
+BOOL TomboURI::GetAttachFolder(TomboURI *pAttach) const
+{
+	if (IsLeaf()) {
+		if (!GetParent(pAttach)) return FALSE;
+	} else {
+		*pAttach = *this;
+	}
+	return TRUE;
+}
+
+/////////////////////////////////////////////
 // get parent path
 /////////////////////////////////////////////
 
@@ -278,7 +298,6 @@ BOOL TomboURI::GetBaseName(TString *pBase) const
 	}
 	return TRUE;
 }
-
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////

@@ -923,3 +923,11 @@ Finding and encrypting to the folder may not work.
 ////////////////////////////////
 
 * Fix: Resource leak around YAE.
+
+////////////////////////////////
+// B177
+////////////////////////////////
+
+* Fix: YAE focusing problem
+* MemoManager::AllocNewMemo refactoring
+

@@ -22,7 +22,7 @@ protected:
 	MemoSelectView *pMemoSelectView;
 	MainFrame *pMainFrame;
 
-	BOOL AllocNewMemo(LPCTSTR pText, LPCTSTR pTemplateURI = NULL);
+	BOOL AllocNewMemo(LPCTSTR pText, BOOL bCopy);
 
 	SearchEngineA *pSearchEngineA;
 
@@ -60,8 +60,8 @@ public:
 
 	BOOL MakeNewFolder(HWND hWnd, TreeViewItem *pItem);	// フォルダの新規作成
 
-	// 指定したメモが現在詳細ビューで表示されているか
-	BOOL IsNoteDisplayed(LPCTSTR pURI);
+	// Is the note displayed in details view?
+	BOOL IsNoteDisplayed(const TomboURI *pURI);
 
 	// 詳細ビューに表示されている場合に必要なら保存し、一覧ビューにフォーカスを移す
 	// TODO: 保存依頼に置き換えられる気がする

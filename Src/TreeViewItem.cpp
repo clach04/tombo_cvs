@@ -110,7 +110,7 @@ BOOL TreeViewFileItem::Move(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR *p
 	if (!Copy(pMgr, pView, ppErr)) {
 		return FALSE;
 	}
-	if (g_Property.IsUseTwoPane() && pMgr->IsNoteDisplayed(loc.getURI()->GetFullURI())) {
+	if (g_Property.IsUseTwoPane() && pMgr->IsNoteDisplayed(loc.getURI())) {
 		// close current note
 		pMgr->NewMemo();
 	}
@@ -141,7 +141,7 @@ BOOL TreeViewFileItem::Delete(MemoManager *pMgr, MemoSelectView *pView)
 	// Confirm
 	if (TomboMessageBox(NULL, MSG_CONFIRM_DELETE, MSG_DELETE_TTL, MB_ICONQUESTION | MB_OKCANCEL) != IDOK) return FALSE;
 
-	if (g_Property.IsUseTwoPane() && pMgr->IsNoteDisplayed(loc.getURI()->GetFullURI())) {
+	if (g_Property.IsUseTwoPane() && pMgr->IsNoteDisplayed(loc.getURI())) {
 		// close current note
 		pMgr->NewMemo();
 	}
@@ -160,7 +160,7 @@ BOOL TreeViewFileItem::Encrypt(MemoManager *pMgr, MemoSelectView *pView)
 	if (g_Repository.IsEncrypted(loc.getURI())) return TRUE;
 
 	// if the note is opened, close it.
-	if (g_Property.IsUseTwoPane() && pMgr->IsNoteDisplayed(loc.getURI()->GetFullURI())) {
+	if (g_Property.IsUseTwoPane() && pMgr->IsNoteDisplayed(loc.getURI())) {
 		pMgr->InactiveDetailsView();
 	}
 
@@ -195,7 +195,7 @@ BOOL TreeViewFileItem::Decrypt(MemoManager *pMgr, MemoSelectView *pView)
 	if (!g_Repository.IsEncrypted(loc.getURI())) return TRUE;
 
 	// if the note is opened, close it.
-	if (g_Property.IsUseTwoPane() && pMgr->IsNoteDisplayed(loc.getURI()->GetFullURI())) {
+	if (g_Property.IsUseTwoPane() && pMgr->IsNoteDisplayed(loc.getURI())) {
 		pMgr->InactiveDetailsView();
 	}
 

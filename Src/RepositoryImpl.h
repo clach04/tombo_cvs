@@ -41,7 +41,7 @@ public:
 
 	virtual BOOL GetList(const TomboURI *pFolder, DirList *pList, BOOL bSkipEncrypt) = 0;
 
-	virtual BOOL RequestAllocateURI(LPCTSTR pMemoPath, LPCTSTR pText, TString *pHeadLine, TomboURI *pURI, const TomboURI *pTemplateURI) = 0;
+	virtual BOOL RequestAllocateURI(const TomboURI *pBaseURI, LPCTSTR pText, TString *pHeadLine, TomboURI *pURI, const TomboURI *pTemplateURI) = 0;
 
 	virtual BOOL GetAttribute(const TomboURI *pURI, NoteAttribute *pAttribute) = 0;
 	virtual BOOL SetAttribute(const TomboURI *pURI, const NoteAttribute *pAttribute) = 0;
@@ -115,7 +115,7 @@ public:
 
 	BOOL GetList(const TomboURI *pFolder, DirList *pList, BOOL bSkipEncrypt);
 
-	BOOL RequestAllocateURI(LPCTSTR pMemoPath, LPCTSTR pText, TString *pHeadLine, TomboURI *pURI, const TomboURI *pTemplateURI);
+	BOOL RequestAllocateURI(const TomboURI *pBaseURI, LPCTSTR pText, TString *pHeadLine, TomboURI *pURI, const TomboURI *pTemplateURI);
 
 	BOOL GetAttribute(const TomboURI *pURI, NoteAttribute *pAttribute);
 	BOOL SetAttribute(const TomboURI *pURI, const NoteAttribute *pAttribute);

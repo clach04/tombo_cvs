@@ -101,9 +101,9 @@ BOOL Repository::GetList(const TomboURI *pFolder, DirList *pList, BOOL bSkipEncr
 	return pDefaultImpl->GetList(pFolder, pList, bSkipEncrypt);
 }
 
-BOOL Repository::RequestAllocateURI(LPCTSTR pMemoPath, LPCTSTR pText, TString *pHeadLine, TomboURI *pURI, const TomboURI *pTemplateURI)
+BOOL Repository::RequestAllocateURI(const TomboURI *pBaseURI, LPCTSTR pText, TString *pHeadLine, TomboURI *pURI, const TomboURI *pTemplateURI)
 {
-	return pDefaultImpl->RequestAllocateURI(pMemoPath, pText, pHeadLine, pURI, pTemplateURI);
+	return pDefaultImpl->RequestAllocateURI(pBaseURI, pText, pHeadLine, pURI, pTemplateURI);
 }
 
 BOOL Repository::GetAttribute(const TomboURI *pURI, NoteAttribute *pAttribute)

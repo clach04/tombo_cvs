@@ -6,7 +6,6 @@
 #include "Tombo.h"
 #include "resource.h"
 #include "MemoDetailsView.h"
-#include "MemoManager.h"
 
 #if defined(PLATFORM_PKTPC)
 #include "PlatformLayer.h"
@@ -17,7 +16,6 @@
 
 #include "Property.h"
 
-//static MemoManager *pManager; 
 static SUPER_WND_PROC gSuperProc;
 
 static BOOL bCtrlKeyDown = FALSE;
@@ -30,7 +28,7 @@ static BOOL bCtrlKeyDown = FALSE;
 #define KEY_COLON       0xBB
 #define KEY_SEMICOLON   0xBA
 
-void SetWndProc(SUPER_WND_PROC wp, HWND hParent, HINSTANCE h, SimpleEditor *p, MemoManager *pMgr)
+void SetWndProc(SUPER_WND_PROC wp)
 {
 	gSuperProc = wp;
 }

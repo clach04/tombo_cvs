@@ -1,8 +1,6 @@
 #ifndef MEMODETAILSVIEW_H
 #define MEMODETAILSVIEW_H
 
-class MemoManager;
-
 class MemoDetailsView;
 class SearchEngineA;
 class TString;
@@ -33,8 +31,8 @@ public:
 class MemoDetailsView {
 protected:
 	MemoDetailsViewCallback *pCallback;
+	TomboURI *pCurrentURI;
 public:
-	LPTSTR pCurrentURI;
 
 	MemoDetailsView(MemoDetailsViewCallback *p);
 	virtual ~MemoDetailsView();
@@ -73,8 +71,8 @@ public:
 
 	BOOL Save(const TomboURI *pCurrentURI, TomboURI *pNewURI, TString *pNewHeadLine, LPCTSTR pText);
 
-	LPCTSTR GetCurrentURI();
-	void SetCurrentNote(LPCTSTR pURI);
+	const TomboURI *GetCurrentURI();
+	void SetCurrentNote(const TomboURI *pURI);
 
 	BOOL StoreCursorPos();
 	BOOL ClearMemo();
@@ -92,7 +90,6 @@ class SimpleEditor : public MemoDetailsView {
 
 	DWORD nID, nID_nf;
 
-	MemoManager *pMemoMgr;
 	DWORD nLeftOffset;
 
 	BOOL bShowStatus;	// Is view displayed?
@@ -107,7 +104,7 @@ public:
 	// Initialize
 
 	SimpleEditor(MemoDetailsViewCallback *p);
-	BOOL Init(MemoManager *p, DWORD nID, DWORD nID_nf);
+	BOOL Init(DWORD nID, DWORD nID_nf);
 	BOOL Create(LPCTSTR pName, RECT &r, HWND hParent, HINSTANCE hInst, HFONT hFont);
 
 	static BOOL RegisterClass(HINSTANCE hInst);

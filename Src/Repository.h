@@ -110,7 +110,7 @@ public:
 	BOOL GetList(const TomboURI *pFolder, DirList *pList, BOOL bSkipEncrypt);
 
 	// Decide URI
-	BOOL RequestAllocateURI(LPCTSTR pMemoPath, LPCTSTR pText, TString *pHeadLine, TomboURI *pURI, const TomboURI *pTemplateURI);
+	BOOL RequestAllocateURI(const TomboURI *pBaseURI, LPCTSTR pText, TString *pHeadLine, TomboURI *pURI, const TomboURI *pTemplateURI);
 
 	////////////////////////////
 	// File attribute functions

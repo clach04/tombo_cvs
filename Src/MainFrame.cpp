@@ -427,7 +427,7 @@ BOOL MainFrame::Create(LPCTSTR pWndName, HINSTANCE hInst, int nCmdShow)
 	if (g_Property.UseYAEdit()) {
 		pYAE->Init(&mmMemoManager, IDC_TOMBOEDIT);
 	} else {
-		pSe->Init(&mmMemoManager, IDC_MEMODETAILSVIEW, IDC_MEMODETAILSVIEW_NF);
+		pSe->Init(IDC_MEMODETAILSVIEW, IDC_MEMODETAILSVIEW_NF);
 	}
 
 	pVFManager = new VFManager();
@@ -589,7 +589,7 @@ void MainFrame::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	}
 
 	LoadWinSize(hWnd);
-	pDetailsView->SetMemo(TEXT(""), 0, FALSE);
+	pDetailsView->ClearMemo();
 
 	if (!EnableApplicationButton(hWnd)) {
 		TomboMessageBox(hMainWnd, MSG_INITAPPBTN_FAIL, TEXT("Warning"), MB_ICONEXCLAMATION | MB_OK);
@@ -1198,7 +1198,7 @@ void MainFrame::LeaveDetailsView(BOOL bAskSave)
 		if (nYNC == IDNO) {
 			// discard current note and load old one.
 			if (pDetailsView->GetCurrentURI()) {
-				OpenDetailsView(pDetailsView->GetCurrentURI(), OPEN_REQUEST_MDVIEW_ACTIVE);
+				OpenDetailsView(pDetailsView->GetCurrentURI()->GetFullURI(), OPEN_REQUEST_MDVIEW_ACTIVE);
 			} else {
 				mmMemoManager.NewMemo();
 			}
@@ -1206,7 +1206,7 @@ void MainFrame::LeaveDetailsView(BOOL bAskSave)
 			// nYNC == YES so note has been saved.
 			if (pDetailsView->GetCurrentURI()) {
 				TomboURI uri;
-				if (!uri.Init(pDetailsView->GetCurrentURI())) return;
+				if (!uri.Init(pDetailsView->GetCurrentURI()->GetFullURI())) return;
 				if (uri.IsEncrypted()) {
 					mmMemoManager.NewMemo();
 				}
@@ -1466,7 +1466,7 @@ void MainFrame::OnTimer(WPARAM nTimerID)
 		if (!SelectViewActive()) {
 			if (pDetailsView->GetCurrentURI()) {
 				TomboURI uri;
-				if (!uri.Init(pDetailsView->GetCurrentURI())) return;
+				if (!uri.Init(pDetailsView->GetCurrentURI()->GetFullURI())) return;
 				if (uri.IsEncrypted()) {
 					LeaveDetailsView(FALSE);
 				}

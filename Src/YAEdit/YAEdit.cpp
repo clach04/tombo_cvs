@@ -72,7 +72,7 @@ BOOL YAEdit::RegisterClass(HINSTANCE hInst)
 // ctor & dtor
 /////////////////////////////////////////////////////////////////////////////
 
-YAEdit::YAEdit() : pWrapper(NULL), bScrollTimerOn(FALSE), pView(NULL), bMouseDown(FALSE), pLineMgr(NULL), pHandler(NULL)
+YAEdit::YAEdit(YAEditCallback *pCB) : pWrapper(NULL), bScrollTimerOn(FALSE), pView(NULL), bMouseDown(FALSE), pLineMgr(NULL), pHandler(NULL), pCallback(pCB)
 {
 }
 
@@ -323,7 +323,11 @@ void YAEdit::RequestRedrawRegion(const Region *pRegion) { pView->RequestRedrawRe
 // FOCUS
 /////////////////////////////////////////////////////////////////////////////
 
-void YAEdit::OnSetFocus()  { if (pView) pView->OnSetFocus();  }
+void YAEdit::OnSetFocus()  { 
+	if (pView) pView->OnSetFocus();
+	if (pCallback) pCallback->OnGetFocus();
+}
+
 void YAEdit::OnKillFocus() { if (pView) pView->OnKillFocus(); }
 
 /////////////////////////////////////////////////////////////////////////////

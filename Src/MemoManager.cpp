@@ -47,7 +47,6 @@ BOOL MemoManager::Init(MainFrame *mf, MemoDetailsView *md, MemoSelectView *ms)
 	pMainFrame = mf;
 	pMemoDetailsView = md;
 	pMemoSelectView = ms;
-	pMemoDetailsView->pCurrentURI = NULL;
 	return TRUE; 
 }
 
@@ -60,8 +59,8 @@ BOOL MemoManager::GetCurrentSelectedPath(TString *pPath)
 	LPCTSTR pURI;
 	TString sURIstr;
 
-	if (pMemoDetailsView->pCurrentURI) {
-		pURI = pMemoDetailsView->pCurrentURI;
+	if (pMemoDetailsView->GetCurrentURI()) {
+		pURI = pMemoDetailsView->GetCurrentURI()->GetFullURI();
 	} else {
 		if (!pMemoSelectView->GetURI(&sURIstr)) return FALSE;
 		pURI = sURIstr.Get();
@@ -157,23 +156,21 @@ BOOL MemoManager::SaveIfModify(LPDWORD pYNC, BOOL bDupMode)
 	////////////////////////////////////////////
 
 	if (bDupMode) {
-		if (!AllocNewMemo(pText, pMemoDetailsView->pCurrentURI)) return FALSE;
+		if (!AllocNewMemo(pText, TRUE)) return FALSE;
 		// duplicate mode notes are treated as update because pCurrentURI has set.
-	}
-
-	// Create node if the note is new
-	if (pMemoDetailsView->pCurrentURI == NULL) {
-		if (!AllocNewMemo(pText)) return FALSE;
-		// change status because the note is not new note at this point.
-		pMainFrame->SetNewMemoStatus(FALSE);
+	} else {
+		// Create node if the note is new
+		if (pMemoDetailsView->GetCurrentURI() == NULL) {
+			if (!AllocNewMemo(pText, FALSE)) return FALSE;
+			// change status because the note is not new note at this point.
+			pMainFrame->SetNewMemoStatus(FALSE);
+		}
 	}
 
 	///////////////////////////////////////
 	// save notes and update treeview
 
-	TomboURI sCurrentURI;
-	if (!sCurrentURI.Init(pMemoDetailsView->pCurrentURI)) return FALSE;
-
+	TomboURI sCurrentURI(*(pMemoDetailsView->GetCurrentURI()));	// to preserve it because it changed by method Save.
 
 	TomboURI sNewURI;
 	TString sNewHeadLine;
@@ -196,48 +193,34 @@ BOOL MemoManager::SaveIfModify(LPDWORD pYNC, BOOL bDupMode)
 // allocate new memo
 ////////////////////////////////////////////////////////
 
-BOOL MemoManager::AllocNewMemo(LPCTSTR pText, LPCTSTR pTemplateURI)
+BOOL MemoManager::AllocNewMemo(LPCTSTR pText, BOOL bCopy)
 {
-	TString sMemoPath;
-	TomboURI sParentURI;
-
-	// get note path
-	{
-		TString sURIstr;
-		if (!pMemoSelectView->GetURI(&sURIstr)) return FALSE;
-		if (!sParentURI.Init(sURIstr.Get())) return FALSE;
-
-		if (sParentURI.IsLeaf()) {
-			TomboURI sParent;
-			if (!sParentURI.GetParent(&sParent)) return FALSE;
-			if (!sParent.GetFilePath(&sMemoPath)) return FALSE;
-		} else {
-			if (!sParentURI.GetFilePath(&sMemoPath)) return FALSE;
-		}
+	const TomboURI *pTemplateURI = NULL;
+	if (bCopy) {
+		pTemplateURI = pMemoDetailsView->GetCurrentURI();
 	}
 
-	// get parent node
-	HTREEITEM hParent;
-	hParent = pMemoSelectView->ShowItem(sMemoPath.Get(), FALSE);
-	if (hParent == NULL) return FALSE;
+	// get note path
+	TomboURI sAttachFolder;
+
+	TomboURI sSelected;
+	if (!pMemoSelectView->GetURI(&sSelected)) return FALSE;
+	if (!sSelected.GetAttachFolder(&sAttachFolder)) return FALSE;
 
 	// allocate new MemoNote instance and associate to tree view
 	TString sHeadLine;
 	TomboURI sNewURI;
 
-	TomboURI *pTmpl;
-	TomboURI sTemplateURI;
-	if (pTemplateURI) {
-		if (!sTemplateURI.Init(pTemplateURI)) return FALSE;
-		pTmpl = &sTemplateURI;
-	} else {
-		pTmpl = NULL;
-	}
+	// get URI
+	if (!g_Repository.RequestAllocateURI(&sAttachFolder, pText, &sHeadLine, &sNewURI, pTemplateURI)) return FALSE;
 
-	if (!g_Repository.RequestAllocateURI(sMemoPath.Get(), pText, &sHeadLine, &sNewURI, pTmpl)) return FALSE;
-
+	// Insert new node to select view
+	HTREEITEM hParent;
+	hParent = pMemoSelectView->ShowItemByURI(&sAttachFolder, FALSE);
+	if (hParent == NULL) return FALSE;
 	HTREEITEM hNewItem = pMemoSelectView->InsertFile(hParent, &sNewURI, sHeadLine.Get(), FALSE, FALSE);
-	pMemoDetailsView->SetCurrentNote(sNewURI.GetFullURI());
+
+	pMemoDetailsView->SetCurrentNote(&sNewURI);
 
 	return TRUE;
 }
@@ -288,8 +271,8 @@ void MemoManager::SetSearchEngine(SearchEngineA *p)
 // Is this note are displayed in detailsview?
 ////////////////////////////////////////////////////////
 
-BOOL MemoManager::IsNoteDisplayed(LPCTSTR pURI)
+BOOL MemoManager::IsNoteDisplayed(const TomboURI *pURI)
 {
-	if (pMemoDetailsView->pCurrentURI == NULL) return FALSE;
-	return _tcsicmp(pURI, pMemoDetailsView->pCurrentURI) == 0;
+	if (pMemoDetailsView->GetCurrentURI() == NULL) return FALSE;
+	return _tcsicmp(pURI->GetFullURI(), pMemoDetailsView->GetCurrentURI()->GetFullURI()) == 0;
 }

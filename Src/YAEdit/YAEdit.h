@@ -12,11 +12,23 @@ class YAECallbackHandler;
 class YAEDocCallbackHandler;
 
 //////////////////////////////////////////////////
+// callback class
+//////////////////////////////////////////////////
+
+class YAEditCallback {
+public:
+	virtual void OnGetFocus() = 0;
+};
+
+//////////////////////////////////////////////////
 // Controller class for YAE
 //////////////////////////////////////////////////
 
 class YAEdit {
 protected:
+	///////////////////////////////////////
+	// callback handler
+	YAEditCallback *pCallback;
 
 	///////////////////////////////////////
 	// window related members
@@ -77,7 +89,7 @@ public:
 
 	///////////////////////////////////////
 	// ctor & initialize
-	YAEdit();
+	YAEdit(YAEditCallback *pCb);
 	~YAEdit();
 	BOOL Create(HINSTANCE hInst, HWND hWnd, DWORD nId, RECT &r, YAECallbackHandler *pViewCB, YAEDocCallbackHandler* pDocCB);
 	void SetFocus();
