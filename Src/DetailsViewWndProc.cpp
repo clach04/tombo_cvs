@@ -25,6 +25,7 @@ static BOOL bCtrlKeyDown = FALSE;
 #define KEY_ESC 0x1B
 #define KEY_CTRL_A 1
 #define KEY_CTRL_B 2
+#define KEY_CTRL_C 3
 
 #define KEY_COLON       0xBB
 #define KEY_SEMICOLON   0xBA
@@ -146,7 +147,10 @@ LRESULT CALLBACK NewDetailsViewProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM l
 		pView->SetMDSearchFlg(TRUE); // clear search status flag
 
 		// if read only mode, ignore key events
-		if (pView->IsReadOnly()) return 0;
+		if (pView->IsReadOnly()) {
+			if (wParam == KEY_CTRL_C) break;	// Ctrl-C should not disable
+			return 0;
+		}
 		// disable Ctrl-B(BELL)
 		if (wParam == KEY_CTRL_B) return 0;
 		break;

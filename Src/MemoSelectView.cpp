@@ -377,16 +377,6 @@ LRESULT MemoSelectView::OnNotify(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	if (pnmrginfo->hdr.code == GN_CONTEXTMENU) {
 		// tap & hold
 		OnNotify_RClick(pnmrginfo->ptAction);
-#ifdef COMMENT
-		TV_HITTESTINFO hti;
-		hti.pt = pnmrginfo->ptAction;
-		TreeView_HitTest(hWnd, &hti);
-		TreeView_SelectItem(hWnd, hti.hItem);
-
-		HMENU hPopup = PocketPCPlatform::LoadSelectViewPopupMenu();
-		TrackPopupMenuEx(hPopup, 0, pnmrginfo->ptAction.x, pnmrginfo->ptAction.x, hWnd, NULL);
-		DestroyMenu(hPopup);
-#endif
 		return TRUE;
 	}
 #endif
@@ -521,8 +511,9 @@ void MemoSelectView::OnNotify_RClick(POINT pt)
 {
 	TV_HITTESTINFO hti;
 	POINT cpt = pt;
+#if !defined(PLATFORM_HPC)
 	ScreenToClient(hViewWnd, &cpt);
-
+#endif
 	hti.pt = cpt;
 	HTREEITEM hX = TreeView_HitTest(hViewWnd, &hti);
 

@@ -142,6 +142,7 @@
 #define IDC_PROPTAB_DEFNOTE_LABEL       1074
 #define IDC_SEARCH_FIND_LABEL           1075
 #define IDC_SEARCH_DIRECT_LABEL         1076
+#define IDC_PROPTAB_DISABLESAVEDLG      1077
 #define IDM_ACTIONBUTTON                30001
 #define IDM_FILE_EXIT                   40002
 #define IDM_HELP_ABOUT                  40003
@@ -209,7 +210,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        128
 #define _APS_NEXT_COMMAND_VALUE         40061
-#define _APS_NEXT_CONTROL_VALUE         1077
+#define _APS_NEXT_CONTROL_VALUE         1078
 #define _APS_NEXT_SYMED_VALUE           108
 #endif
 #endif

@@ -233,7 +233,7 @@ BOOL FilterDlgFilterTab::Command_UpDown(HWND hDlg, int iDelta)
 	HWND hList = GetDlgItem(hDlg, IDC_FILTERDEF_FILTER_LIST);
 	int iSel = ListView_GetNextItem(hList, -1, LVNI_SELECTED);
 
-	if (iSel <= 0) return TRUE;
+	if (iSel < 0) return TRUE;
 
 	LVITEM li;
 	li.mask = LVIF_PARAM;

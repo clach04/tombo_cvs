@@ -1140,8 +1140,13 @@ void MainFrame::LeaveDetailsView(BOOL bAskSave)
 	if (bAskSave) {
 		bResult = mmMemoManager.SaveIfModify(&nYNC, FALSE);
 	} else {
-		nYNC = IDYES;
-		bResult = mmMemoManager.SaveIfModify(NULL, TRUE);
+		if (GetKeyState(VK_SHIFT) < 0) {
+			nYNC = IDNO;
+			bResult = TRUE;
+		} else {
+			nYNC = IDYES;
+			bResult = mmMemoManager.SaveIfModify(NULL, TRUE);
+		}
 	}
 	if (!bResult) {
 		TCHAR buf[1024];

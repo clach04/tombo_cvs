@@ -751,4 +751,15 @@ Not fully tested on both platform, probably it will work.
 ////////////////////////////////
 
 * For unstable problem inspection
+	-> Fixed at heap memory destruction.(#5029, #5030)
+
+////////////////////////////////
+// B154(TOMBO 1.11)
+////////////////////////////////
+
+* Add save without dialog option(#4988)
+* Down button ignored at filterdef dialog(#2771,#2772)
+* Ctrl-C is disabled on read only mode(#5006,#5007)
+* A heap memory is destroyed.(#5029,#5030)
+* Different memo is chosen (#5031,#5032)
 
