@@ -62,6 +62,7 @@ BEGIN
         , CHECKED, GRAYED
         MENUITEM "Two panes",                   IDM_TOGGLEPANE, CHECKED
         MENUITEM "Status bar",                  IDM_SHOWSTATUSBAR, CHECKED
+        MENUITEM "Stay topmost",                IDM_TOPMOST
         MENUITEM SEPARATOR
         MENUITEM "&Encrypt\tCtrl+E",            IDM_ENCRYPT, GRAYED
         MENUITEM "Decry&pt\tCtrl+P",            IDM_DECRYPT, GRAYED
