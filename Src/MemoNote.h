@@ -7,6 +7,14 @@ class TString;
 #include "TreeViewItem.h"
 
 ////////////////////////////////////////
+// Note type definition
+////////////////////////////////////////
+
+#define NOTE_TYPE_NO      0
+#define NOTE_TYPE_PLAIN   1
+#define NOTE_TYPE_CRYPTED 2
+
+////////////////////////////////////////
 // ÉÅÉÇÇíäè€Ç∑ÇÈÉNÉâÉX
 ////////////////////////////////////////
 
@@ -96,6 +104,7 @@ public:
 	static void WipeOutAndDelete(char *pMemo);
 #endif
 
+	static DWORD IsNote(LPCTSTR pFile);
 	static BOOL MemoNoteFactory(LPCTSTR pPrefix, LPCTSTR pFile, MemoNote **ppNote);
 };
 

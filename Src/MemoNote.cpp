@@ -868,6 +868,29 @@ BOOL MemoNote::Rename(LPCTSTR pNewName)
 }
 
 /////////////////////////////////////////////
+// Check is this file memo?
+/////////////////////////////////////////////
+
+DWORD MemoNote::IsNote(LPCTSTR pFile)
+{
+	DWORD len = _tcslen(pFile);
+	if (len <= 4) return NOTE_TYPE_NO;
+
+	LPCTSTR p = pFile + len - 4;
+
+	DWORD nType;
+	if (_tcsicmp(p, TEXT(".txt")) == 0) {
+		nType = NOTE_TYPE_PLAIN;
+	} else if (_tcsicmp(p, TEXT(".chi")) == 0) {
+		nType = NOTE_TYPE_CRYPTED;
+	} else {
+		nType = NOTE_TYPE_NO;
+	}
+	return nType;
+}
+
+
+/////////////////////////////////////////////
 // MemoNote object factory
 /////////////////////////////////////////////
 
@@ -875,16 +898,12 @@ BOOL MemoNote::MemoNoteFactory(LPCTSTR pPrefix, LPCTSTR pFile, MemoNote **ppNote
 {
 	*ppNote = NULL;
 
-	DWORD len = _tcslen(pFile);
-	if (len <= 4) return TRUE;
-
-	if (_tcsicmp(pFile + len - 4, TEXT(".txt")) == 0) {
+	DWORD nType = IsNote(pFile);
+	if (nType == NOTE_TYPE_NO) return TRUE;
+	if (nType == NOTE_TYPE_PLAIN) {
 		*ppNote = new PlainMemoNote();
-	} else if (_tcsicmp(pFile + len - 4, TEXT(".chi")) == 0) {
-		*ppNote = new CryptedMemoNote();
 	} else {
-		// There are no action except *.txt, *.chi
-		return TRUE;
+		*ppNote = new CryptedMemoNote();
 	}
 
 	if (*ppNote == NULL) {
@@ -901,3 +920,4 @@ BOOL MemoNote::MemoNoteFactory(LPCTSTR pPrefix, LPCTSTR pFile, MemoNote **ppNote
 	}
 	return TRUE;
 }
+
