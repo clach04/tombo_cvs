@@ -110,9 +110,10 @@ DWORD FileSelector::Popup(HINSTANCE hInst, HWND hWnd, LPCTSTR pt, LPCTSTR pExt)
 {
 	// イメージリスト生成
 	if (hImg == NULL) {
-	    if ((hImg = ImageList_Create(IMAGE_CX, IMAGE_CY, FALSE, NUM_BITMAPS, 0)) == NULL) return IDCANCEL;
+	    if ((hImg = ImageList_Create(IMAGE_CX, IMAGE_CY, ILC_MASK, NUM_BITMAPS, 0)) == NULL) return IDCANCEL;
 	     HBITMAP hBmp = LoadBitmap(hInst, MAKEINTRESOURCE(IDB_ARTICLEBOX)); 
-	    ImageList_Add(hImg, hBmp, (HBITMAP) NULL); 
+		COLORREF rgbTransparent = RGB(0, 255, 0);
+		ImageList_AddMasked(hImg, hBmp, rgbTransparent); 
 	    DeleteObject(hBmp); 
 	}
 
