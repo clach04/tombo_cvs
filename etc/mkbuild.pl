@@ -1,7 +1,7 @@
 #
 # TOMBO Build program for ActivePerl(Win32)
 
-$version = "Tombo1_8";
+$version = "Tombo1_8_1";
 
 ##########################################################################
 # Tool definition
@@ -63,6 +63,10 @@ $be300root = "R:\\work2\\BE300SDK_1012\\Installer\\English PC Tools";
 
 @bin_hpc_sh4_jp =(
 	["Bin\\HPCPro\\SH4", "$buildroot\\HpcPro\\Tombo\\SH4Rel\\Tombo.exe"],
+);
+
+@bin_sig3 =(
+	["Bin\\Sig3", "$buildroot\\HpcPro\\Tombo\\Sig3\\Tombo.exe"],
 );
 
 @bin_pktpc_arm_jp = (
@@ -160,7 +164,7 @@ $be300root = "R:\\work2\\BE300SDK_1012\\Installer\\English PC Tools";
 	@bin_hpc_arm_jp, @bin_hpc_mips_jp, @bin_hpc_sh3_jp, @bin_hpc_sh4_jp,
 	@bin_pktpc_arm_jp, @bin_pktpc_mips_jp, @bin_pktpc_sh3_jp,
 	@bin_pspc_mips_jp, @bin_pspc_sh3_jp,
-	@bin_be500,
+	@bin_be500, @bin_sig3,
 
 	@docsJP
 );
@@ -170,6 +174,7 @@ $be300root = "R:\\work2\\BE300SDK_1012\\Installer\\English PC Tools";
 @buildlist_PKTPC_JP = ( @bin_pktpc_arm_jp, @bin_pktpc_mips_jp, @bin_pktpc_sh3_jp,  @docsJP);
 @buildlist_PSPC_JP = ( @bin_pspc_mips_jp, @bin_pspc_sh3_jp,  @docsJP);
 @buildlist_BE500_JP = ( @bin_be500, @docsJP);
+@buildlist_SIG3_JP = ( @bin_sig3, @docsJP);
 
 @buildlistCEEN = (
 	@bin_hpc_arm_en, @bin_hpc_mips_en, @bin_hpc_sh3_en, @bin_hpc_sh4_en,
@@ -244,6 +249,8 @@ $be300root = "R:\\work2\\BE300SDK_1012\\Installer\\English PC Tools";
 #	[\@bl_PKTPC_SH3_JP,"PKTPC-SH3-JP", "_pktpc_sh3_jp"],
 #	[\@bl_PSPC_MIPS_JP,"PSPC-MIPS-JP", "_pspc_mips_jp"],
 #	[\@bl_PSPC_SH3_JP,"PSPC-SH3-JP", "_pspc_sh3_jp"],
+
+	[\@buildlist_SIG3_JP,"SIG3", "_sig3"],
 
 #	[\@bl_HPC_ARM_EN, "HPC-ARM-EN", "_hpcpro_arm_en"],
 #	[\@bl_HPC_MIPS_EN,"HPC-MIPS-EN", "_hpcpro_mips_en"],
