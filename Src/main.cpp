@@ -14,6 +14,9 @@
 #include "Logger.h"
 #include "PasswordManager.h"
 
+#include "Region.h"
+#include "YAEdit.h"
+
 //////////////////////////////////////
 // Global variables
 //////////////////////////////////////
@@ -87,6 +90,9 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPTSTR pCmdLine, int nCmdSh
 #if defined(PLATFORM_PKTPC)
 	SHInitExtraControls();
 #endif
+
+	// register YAEdit class 
+	TomboEdit::RegisterClass(hInst);
 
 	// create MainFrame instance
 	MainFrame frmMain;

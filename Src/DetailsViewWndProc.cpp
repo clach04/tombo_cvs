@@ -7,12 +7,13 @@
 #include "MemoDetailsView.h"
 #include "MemoManager.h"
 
-#define PLATFORM_SIG3
+//#define PLATFORM_SIG3
 
 #include "Property.h"
 
 static MemoManager *pManager; 
-static MemoDetailsView *pView;
+//static MemoDetailsView *pView;
+static SimpleEditor *pView;
 static HINSTANCE hInst;
 static HWND hParentWnd;
 static SUPER_WND_PROC gSuperProc;
@@ -26,7 +27,7 @@ static BOOL bCtrlKeyDown = FALSE;
 #define KEY_COLON       0xBB
 #define KEY_SEMICOLON   0xBA
 
-void SetWndProc(SUPER_WND_PROC wp, HWND hParent, HINSTANCE h, MemoDetailsView *p, MemoManager *pMgr)
+void SetWndProc(SUPER_WND_PROC wp, HWND hParent, HINSTANCE h, SimpleEditor *p, MemoManager *pMgr)
 {
 	gSuperProc = wp;
 	hParentWnd = hParent;

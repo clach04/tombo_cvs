@@ -496,10 +496,18 @@ Changes
 * Add edit bookmark dialog
 
 ////////////////////////////////
-// B121
+// B121 (Tombo_1_8)
 ////////////////////////////////
 
 * Change bookmark format path to URI.
 * Support virtual folder's bookmark/startpage.
 * Add '%I' to date format. (#4190, #4191)
 
+////////////////////////////////
+// B122
+////////////////////////////////
+// 2.0 branch
+
+* Initial version of TOMBO 2.0 alpha
+* You can build only win32 version. CE version is not yet.
+* Very very unstable. there are crush, hung up, and so on.
