@@ -540,3 +540,10 @@ Changes
 * FIX: Selected region shifts when resizing.
 * Support CE version.
 
+////////////////////////////////
+// B126
+////////////////////////////////
+// 2.0 branch
+
+* FIX: Crush when encrypting folder(#4286,#4287).
+* FIX: Ctrl-C,V,X is not worked on HPC.
