@@ -2,17 +2,17 @@
 #define TOMBO_STRING_H
 
 ////////////////////////////////////
-// String
+// TCHAR string
 ////////////////////////////////////
 
-class MyString {
-protected:
+class TString {
 	LPTSTR pString;
 public:
-	MyString() : pString(NULL) {}
-	~MyString() { if (pString) delete [] pString; }
+	TString() : pString(NULL) {}
+	~TString() { if (pString) delete [] pString; }
 
 	LPTSTR Get() { return pString; }
+
 	BOOL Alloc(DWORD nSize);
 	BOOL Set(LPCTSTR p);
 	BOOL StrCat(LPCTSTR p);
@@ -20,15 +20,8 @@ public:
 	BOOL Join(LPCTSTR p1, LPCTSTR p2);
 	BOOL Join(LPCTSTR p1, LPCTSTR p2, LPCTSTR p3);
 	BOOL Join(LPCTSTR p1, LPCTSTR p2, LPCTSTR p3, LPCTSTR p4);
-};
 
-////////////////////////////////////
-// TomboÇÃString (^_^;
-////////////////////////////////////
-// Ç¢Ç‚TCHARÇÃTÇ…ÇµÇ∆Ç±Ç§(^_^;
 
-class TString : public MyString {
-public:
 	// TOMBOROOT\\pPath Ç»ÇÈï∂éöóÒÇê∂ê¨
 	BOOL AllocFullPath(LPCTSTR pPath);
 
@@ -43,6 +36,22 @@ public:
 	void ChopExtension();
 	void ChopFileNumber();
 	void ChopFileSeparator();
+};
+
+////////////////////////////////////
+// WCHAR string
+////////////////////////////////////
+
+class WString {
+	LPWSTR pString;
+public:
+	WString() : pString(NULL) {}
+	~WString() { if (pString) delete [] pString; }
+
+	LPWSTR Get() { return pString; }
+	BOOL Alloc(DWORD nLetters);
+
+	BOOL Set(TString *pSrc);
 };
 
 ////////////////////////////////////

@@ -8,11 +8,11 @@
 // ヘッドライン除外文字列
 #define SKIPCHAR TEXT("\\/:,;*?<>\"\t")
 
-/////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////
+////////////////////////////////////////////////////
+// TString implimentation
+////////////////////////////////////////////////////
 
-BOOL MyString::Alloc(DWORD nSize)
+BOOL TString::Alloc(DWORD nSize)
 {
 	if (pString) delete [] pString;
 	pString = new TCHAR[nSize];
@@ -23,14 +23,14 @@ BOOL MyString::Alloc(DWORD nSize)
 	return TRUE;
 }
 
-BOOL MyString::Set(LPCTSTR p)
+BOOL TString::Set(LPCTSTR p)
 {
 	if (!Alloc(_tcslen(p) + 1)) return FALSE;
 	_tcscpy(pString, p);
 	return TRUE;
 }
 
-BOOL MyString::StrCat(LPCTSTR pCat)
+BOOL TString::StrCat(LPCTSTR pCat)
 {
 	if (pString == NULL) return Set(pCat);
 
@@ -45,7 +45,7 @@ BOOL MyString::StrCat(LPCTSTR pCat)
 	return TRUE;
 }
 
-BOOL MyString::Join(LPCTSTR p1, LPCTSTR p2)
+BOOL TString::Join(LPCTSTR p1, LPCTSTR p2)
 {
 	DWORD n = _tcslen(p1) + _tcslen(p2) + 1;
 	if (!Alloc(n)) return FALSE;
@@ -53,7 +53,7 @@ BOOL MyString::Join(LPCTSTR p1, LPCTSTR p2)
 	return TRUE;
 }
 
-BOOL MyString::Join(LPCTSTR p1, LPCTSTR p2, LPCTSTR p3)
+BOOL TString::Join(LPCTSTR p1, LPCTSTR p2, LPCTSTR p3)
 {
 	DWORD n = _tcslen(p1) + _tcslen(p2) + _tcslen(p3) + 1;
 	if (!Alloc(n)) return FALSE;
@@ -61,7 +61,7 @@ BOOL MyString::Join(LPCTSTR p1, LPCTSTR p2, LPCTSTR p3)
 	return TRUE;
 }
 
-BOOL MyString::Join(LPCTSTR p1, LPCTSTR p2, LPCTSTR p3, LPCTSTR p4)
+BOOL TString::Join(LPCTSTR p1, LPCTSTR p2, LPCTSTR p3, LPCTSTR p4)
 {
 	DWORD n = _tcslen(p1) + _tcslen(p2) + _tcslen(p3) + _tcslen(p4) + 1;
 	if (!Alloc(n)) return FALSE;
@@ -199,6 +199,40 @@ BOOL TString::GetPathTail(LPCTSTR pFullPath)
 	} else {
 		return Set(q + 1);
 	}
+}
+
+////////////////////////////////////////////////////
+// WString implimentation
+////////////////////////////////////////////////////
+
+BOOL WString::Alloc(DWORD nLetters)
+{
+	if (pString) delete [] pString;
+	pString = new WCHAR[nLetters];
+	if (pString == NULL) {
+		SetLastError(ERROR_NOT_ENOUGH_MEMORY);
+		return FALSE;
+	}
+	return TRUE;
+}
+
+BOOL WString::Set(TString *pSrc)
+{
+	if (pSrc->Get() == NULL) return FALSE;
+#ifdef _WIN32_WCE
+	// TString has WCHAR strings. So copy it.
+	if (!Alloc(wcslen(pSrc->Get()) + 1) return FALSE;
+	wcscpy(pString, pSrc->Get());
+#else
+	// TString has char strings. Convert WBCS to Unicode.
+	DWORD len = strlen(pSrc->Get());
+	if (!Alloc(len + 1)) return FALSE;
+		// Strictly say, this allocation is overallocation. 
+		// But for performance, allocation does without counting.
+	MultiByteToWideChar(CP_ACP, 0, pSrc->Get(), -1, pString, len + 1);
+#endif
+
+	return TRUE;
 }
 
 ////////////////////////////////////////////////////////////////////
