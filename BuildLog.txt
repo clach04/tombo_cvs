@@ -122,6 +122,20 @@ RESTRICTION:
 * Filename search is not implimented yet.
 * New search works only "Search". "Search Next/Prev" are yet traditional logic.
 
+////////////////////////////////
+// B079
+////////////////////////////////
+
+PG: impliment filename search.
+PG: impliment Search Next/Prev.
+
+* FIX: after search all tree's levels opened.(#649)
+* NEW: Cancellation of finding(#755) 
+* FIX: Change menu label "Tool" to "Tools" (#861,#862)
+
+FIX: At the time of searching, when a file name and a directory name are the same, 
+a note does not open correctly.
+
 /////////////////////////////////////////////////////////////////////////
 // TODO
 /////////////////////////////////////////////////////////////////////////
@@ -142,7 +156,6 @@ InactivateDetailsView‚ð‚È‚ñ‚Æ‚©‚·‚é
 
 * Treat encrypted memo.
 * Change object create method to MemoMonte's factory method.
-# * Eliminate virtual items from search target.
 * Change icon at virtual node.
 * Disable Cut/Copy/Paste/Disable/Encrypt/Decrypt etc. when virtual node selected.
 * Impliment matching filter notes.match().
