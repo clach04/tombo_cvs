@@ -860,9 +860,6 @@ void MainFrame::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 #if defined(PLATFORM_WIN32)
 	SetTopMost();
-//	if (g_Property.StayTopMost()) {
-//		SetWindowPos(hWnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
-//	}
 #endif
 	ActivateView(TRUE);
 }
@@ -919,15 +916,6 @@ void MainFrame::ResizeStatusBar()
 	nSep[2] = nSep[1] + nWndSize;
 	nSep[3] = nSep[2] + nWndSize;
 	SendMessage(hStatusBar, SB_SETPARTS, (WPARAM)4, (LPARAM)nSep);
-#ifdef COMMENT
-	int nSep[3];
-
-	DWORD nWndSize = nHeight * 2;
-	nSep[0] = nWidth - nWndSize*2 - nHeight;
-	nSep[1] = nSep[0] + nWndSize;
-	nSep[2] = nSep[1] + nWndSize;
-	SendMessage(hStatusBar, SB_SETPARTS, (WPARAM)3, (LPARAM)nSep);
-#endif
 }
 #endif
 
@@ -1540,11 +1528,7 @@ void MainFrame::ActivateView(BOOL bList)
 		msView.Show(SW_SHOW);
 
 		TreeViewItem *pItem = msView.GetCurrentItem();
-		if (pItem == NULL) {
-			mmMemoManager.SelectNote(NULL);
-		} else if (!pItem->HasMultiItem()) {
-			mmMemoManager.SelectNote(((TreeViewFileItem*)pItem)->GetNote());
-		}
+		mmMemoManager.UpdateMenu(pItem);
 	} else {
 		// CE版(& CEデバグ版 on Win32) ではビューの切り替えを行う
 		// ビューの表示・非表示の切り替え
@@ -1610,7 +1594,6 @@ static void ControlMenu(HMENU hMenu, BOOL bSelectViewActive)
 	}
 
 	EnableMenuItem(hMenu, IDM_NEWFOLDER, uFlg1);
-	EnableMenuItem(hMenu, IDM_DELETEITEM, uFlg1);
 	EnableMenuItem(hMenu, IDM_FORGETPASS, uFlg1);
 	EnableMenuItem(hMenu, IDM_PROPERTY, uFlg1);
 	EnableMenuItem(hMenu, IDM_TOGGLEPANE, uFlg1);
@@ -1624,10 +1607,33 @@ static void ControlMenu(HMENU hMenu, BOOL bSelectViewActive)
 ///////////////////////////////////////////////////
 // ツールバーのボタン状態の更新
 ///////////////////////////////////////////////////
+void MainFrame::EnableMenu(UINT uId, BOOL bEnable)
+{
+#if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
+	HMENU hMenu = GetMainMenu();
+	UINT uDisableFlg = MF_BYCOMMAND | MF_GRAYED;
+#if defined(PLATFORM_WIN32)
+	uDisableFlg |= MF_DISABLED;
+#endif
+
+	UINT uFlg1;
+	if (bEnable) {
+		uFlg1 = MF_BYCOMMAND | MF_ENABLED;
+	} else {
+		uFlg1 = uDisableFlg;
+	}
+	EnableMenuItem(hMenu, uId, uFlg1);
+#endif
+}
+
+
+///////////////////////////////////////////////////
+// ツールバーのボタン状態の更新
+///////////////////////////////////////////////////
+
 #if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
 static void ControlToolbar(HWND hToolbar, BOOL bSelectViewActive)
 {
-	SendMessage(hToolbar, TB_ENABLEBUTTON, IDM_DELETEITEM, MAKELONG(bSelectViewActive, 0));
 	SendMessage(hToolbar, TB_ENABLEBUTTON, IDM_INSDATE1, MAKELONG(!bSelectViewActive, 0));
 	SendMessage(hToolbar, TB_ENABLEBUTTON, IDM_INSDATE2, MAKELONG(!bSelectViewActive, 0));
 
@@ -1636,7 +1642,7 @@ static void ControlToolbar(HWND hToolbar, BOOL bSelectViewActive)
 #endif
 
 ///////////////////////////////////////////////////
-// 暗号化を有効/無効にする
+// Menu control
 ///////////////////////////////////////////////////
 
 void MainFrame::EnableEncrypt(BOOL bEnable)
@@ -1660,9 +1666,6 @@ void MainFrame::EnableEncrypt(BOOL bEnable)
 #endif
 }
 
-///////////////////////////////////////////////////
-// 復号化を有効/無効にする
-///////////////////////////////////////////////////
 
 void MainFrame::EnableDecrypt(BOOL bEnable)
 {
@@ -1683,6 +1686,20 @@ void MainFrame::EnableDecrypt(BOOL bEnable)
 #endif
 }
 
+void MainFrame::EnableDelete(BOOL bEnable)
+{
+#if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
+	EnableMenu(IDM_DELETEITEM, bEnable);
+	SendMessage(GetMainToolBar(), TB_ENABLEBUTTON, IDM_DELETEITEM, MAKELONG(bEnable, 0));
+#endif
+}
+
+void MainFrame::EnableRename(BOOL bEnable)
+{
+#if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
+	EnableMenu(IDM_RENAME, bEnable);
+#endif
+}
 
 ///////////////////////////////////////////////////
 // パスワード消去

@@ -30,7 +30,7 @@ public:
 	void SetViewItem(HTREEITEM h);
 
 	///////////////////////////////////////////////////////
-	// アイテムに対する操作
+	// Item operator
 
 	// このアイテムと同じデータを現在選択している位置と同列に保存する
 	virtual BOOL Move(MemoManager *pMgr, MemoSelectView *pView) = 0;
@@ -38,13 +38,17 @@ public:
 	// このアイテムと同じデータを現在選択している位置と同列にコピーする
 	virtual BOOL Copy(MemoManager *pMgr, MemoSelectView *pView) = 0;
 
-	// データ実体を削除する。保持しているMemoNoteについてもdeleteされる
-	// thisについてはdeleteされないため、戻り値がTRUEの場合のみ、deleteを行う必要がある
+	// delete node. 
+	// MemoNote object that has TreeViewItem is also deleted.
+	// "this" object is not deleted, so delete manually if return value is TRUE.
+
 	virtual BOOL Delete(MemoManager *pMgr, MemoSelectView *pView) = 0;
+	virtual BOOL CanDelete(MemoSelectView *pView);
 
-
-	// メモ実体の名称(ファイル名/ディレクトリ名)を変更する
+	// rename node
 	virtual BOOL Rename(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR pNewName) = 0;
+	virtual BOOL CanRename(MemoSelectView *pView);
+
 
 	virtual BOOL Encrypt(MemoManager *pMgr, MemoSelectView *pView) = 0;
 	virtual BOOL Decrypt(MemoManager *pMgr, MemoSelectView *pView) = 0;
@@ -80,8 +84,10 @@ public:
 	BOOL Encrypt(MemoManager *pMgr, MemoSelectView *pView);
 	BOOL Decrypt(MemoManager *pMgr, MemoSelectView *pView);
 	BOOL Rename(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR pNewName);
+	virtual BOOL CanRename(MemoSelectView *pView);
 
 	DWORD GetIcon(MemoSelectView *pView, DWORD nStatus);
+	virtual BOOL CanDelete(MemoSelectView *pView);
 
 	DWORD ItemOrder();
 
@@ -104,11 +110,14 @@ public:
 	BOOL Delete(MemoManager *pMgr, MemoSelectView *pView);
 	BOOL Encrypt(MemoManager *pMgr, MemoSelectView *pView);
 	BOOL Decrypt(MemoManager *pMgr, MemoSelectView *pView);
+
 	BOOL Rename(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR pNewName);
+	virtual BOOL CanRename(MemoSelectView *pView);
 
 	DWORD GetIcon(MemoSelectView *pView, DWORD nStatus);
 	DWORD ItemOrder();
 
+	virtual BOOL CanDelete(MemoSelectView *pView);
 	virtual BOOL Expand(MemoSelectView *pView);
 };
 
@@ -134,6 +143,15 @@ public:
 };
 
 /////////////////////////////////////////////
+//  File link
+/////////////////////////////////////////////
+class TreeViewFileLink : public TreeViewFileItem {
+public:
+	virtual BOOL CanDelete(MemoSelectView *pView);
+	virtual BOOL CanRename(MemoSelectView *pView);
+};
+
+/////////////////////////////////////////////
 //  Virtual Folder (Root)
 /////////////////////////////////////////////
 
@@ -153,6 +171,8 @@ public:
 	BOOL AddSearchResult(MemoSelectView *pView, VFInfo *p);
 
 	BOOL StreamObjectsFactory(VFInfo *pInfo, TreeViewVirtualFolder **ppVf, VFDirectoryGenerator **ppGen, VFStore **ppStore);
+	BOOL CanDelete(MemoSelectView *pView); 
+	BOOL CanRename(MemoSelectView *pView);
 };
 
 /////////////////////////////////////////////
@@ -170,6 +190,8 @@ public:
 	DWORD GetIcon(MemoSelectView *pView, DWORD nStatus);
 
 	BOOL Expand(MemoSelectView *pView);
+	BOOL CanDelete(MemoSelectView *pView);
+	BOOL CanRename(MemoSelectView *pView);
 
 	// pGen's life scope is control under TreeViewVirtualFolder.
 	// don't delete pGen after calling SetGenerator.

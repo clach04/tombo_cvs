@@ -60,6 +60,16 @@ protected:
 
 	void SetStatusIndicator(DWORD nPos, LPCTSTR pText, BOOL bDisp);
 
+#if defined(PLATFORM_WIN32)
+	HMENU GetMainMenu() { return GetMenu(hMainWnd); }
+	HWND GetMainToolBar() { return hToolBar; }
+#endif
+#if defined(PLATFORM_HPC)
+	HMENU GetMainMenu() { return CommandBar_GetMenu(GetCommandBar(hMSCmdBar, ID_CMDBAR_MAIN), 0); }
+	HWND GetMainToolBar() { return GetCommandBar(hMSCmdBar, ID_BUTTONBAND); }
+#endif
+	void EnableMenu(UINT uId, BOOL bEnable);
+
 public:
 	MainFrame(); // ctor
 
@@ -87,21 +97,24 @@ public:
 	void OnTooltip(WPARAM wParam, LPARAM lParam);
 
 	///////////////////
-	// 検索
+	// Search/grep
+
 	void OnSearch();
 	void OnSearchNext(BOOL bForward);
 	void DoSearchTree(BOOL bFirst, BOOL bForward);
 
 	void OnGrep();
+
 	///////////////////
-	// ペイン配分変更
+	// for move panes
+
 	void OnLButtonDown(WPARAM wParam, LPARAM lParam);
 	void OnMouseMove(WPARAM wParam, LPARAM lParam);
 	void OnLButtonUp(WPARAM wParam, LPARAM lParam);
 
 
 	////////////////////
-	// メニュー
+	// menu handler
 
 	void About();	// Aboutダイアログ
 	void NewMemo();	// 新規メモの作成
@@ -111,8 +124,13 @@ public:
 
 	void SetTopMost(); // keep top of the window
 
-	// メモオープンの要求
+	//////////////////////////
+	// open notes
+
 	void RequestOpenMemo(MemoLocator *pLoc, DWORD nSwitchView);
+	void SendRequestOpen(MemoLocator *pLoc, DWORD nSwitchFlg) { SendMessage(hMainWnd, MWM_OPEN_REQUEST, (WPARAM)nSwitchFlg, (LPARAM)pLoc); }
+	void PostRequestOpen(MemoLocator *pLoc, DWORD nSwitchFlg) { PostMessage(hMainWnd, MWM_OPEN_REQUEST, (WPARAM)nSwitchFlg, (LPARAM)pLoc); }
+
 
 	void OnList(BOOL bAskSave);
 
@@ -123,14 +141,23 @@ public:
 
 	void SetFocus();
 
+	////////////////////////////////
+	// Control menus & toolbars
+
 	void EnableEncrypt(BOOL bEnable);
 	void EnableDecrypt(BOOL bEnable);
+	void EnableDelete(BOOL bEnable);
+	void EnableSaveButton(BOOL bEnable);
+	void EnableRename(BOOL bEnable);
 
 	// ウィンドウサイズの保存・復元
 	void LoadWinSize(HWND hWnd);
 	void SaveWinSize();
 
-	// ステータス表示制御
+	
+	////////////////////////////////
+	// Control status indicator
+
 	void SetReadOnlyStatus(BOOL bReadOnly) { SetStatusIndicator(1, MSG_RONLY, bReadOnly); }
 	void SetNewMemoStatus(BOOL bNew) { SetStatusIndicator(2, MSG_NEW, bNew); }
 	void SetModifyStatus(BOOL bModify);
@@ -142,11 +169,8 @@ public:
 	// タイトルの変更
 	void SetTitle(LPCTSTR pTitle);
 
-	// Enable Save button
-	void EnableSaveButton(BOOL bEnable);
-
-	void SendRequestOpen(MemoLocator *pLoc, DWORD nSwitchFlg) { SendMessage(hMainWnd, MWM_OPEN_REQUEST, (WPARAM)nSwitchFlg, (LPARAM)pLoc); }
-	void PostRequestOpen(MemoLocator *pLoc, DWORD nSwitchFlg) { PostMessage(hMainWnd, MWM_OPEN_REQUEST, (WPARAM)nSwitchFlg, (LPARAM)pLoc); }
+	////////////////////////////////
+	// misc funcs
 
 	int MessageBox(LPCTSTR pText, LPCTSTR pCaption, UINT uType); 
 };

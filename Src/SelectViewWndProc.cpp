@@ -33,12 +33,12 @@ LRESULT CALLBACK NewSelectViewProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lP
 	// Focus状態で一般のキーをたたいた際に音が出ないようにイベントを無視する
 	case WM_CHAR:
 		return 0;
-	case WM_KEYDOWN:
-		if (wParam == VK_DELETE) {
-			SendMessage(hParentWnd, WM_COMMAND, IDM_DELETEITEM, 0);
-			return 0;
-		}
-		break;
+//	case WM_KEYDOWN:
+//		if (wParam == VK_DELETE) {
+//			SendMessage(hParentWnd, WM_COMMAND, IDM_DELETEITEM, 0);
+//			return 0;
+//		}
+//		break;
 	case WM_SETFOCUS:
 		{
 			if (g_Property.IsUseTwoPane() && pView) {

@@ -152,10 +152,10 @@ BOOL MemoSelectView::InsertFile(HTREEITEM hParent, LPCTSTR pPrefix, LPCTSTR pFil
 	_tcscpy(disp, pFile);
 	*(disp + len - 4) = TEXT('\0');
 
-	return InsertFile(hParent, pNote, disp, FALSE);
+	return InsertFile(hParent, pNote, disp, FALSE, FALSE);
 }
 
-BOOL MemoSelectView::InsertFile(HTREEITEM hParent, MemoNote *pNote, LPCTSTR pTitle, BOOL bInsertToLast)
+BOOL MemoSelectView::InsertFile(HTREEITEM hParent, MemoNote *pNote, LPCTSTR pTitle, BOOL bInsertToLast, BOOL bLink)
 {
 	TV_INSERTSTRUCT ti;
 	ti.hParent = hParent;
@@ -163,7 +163,13 @@ BOOL MemoSelectView::InsertFile(HTREEITEM hParent, MemoNote *pNote, LPCTSTR pTit
 	ti.item.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE | TVIF_PARAM;
 	ti.item.iImage = ti.item.iSelectedImage = pNote->GetMemoIcon();
 
-	TreeViewFileItem *ptvi = new TreeViewFileItem();
+	TreeViewFileItem *ptvi;
+	if (bLink) {
+		ptvi = new TreeViewFileLink();
+	} else {
+		ptvi = new TreeViewFileItem();
+	}
+
 	if (!ptvi) {
 		delete pNote;
 		return FALSE;
@@ -504,16 +510,12 @@ LRESULT MemoSelectView::OnNotify(HWND hWnd, WPARAM wParam, LPARAM lParam)
 			if (tvi == NULL) {
 				break;
 			}
-
-			MemoNote *pNote;
-			if (tvi->HasMultiItem()) {
-				pNote = NULL;
-			} else {
-				pNote = ((TreeViewFileItem*)tvi)->GetNote();
+			// Control menu item
+			pMemoMgr->UpdateMenu(tvi);
+			if (pMemoMgr && pMemoMgr->GetMainFrame() && tvi) {
+				pMemoMgr->GetMainFrame()->EnableDelete(tvi->CanDelete(this));
+				pMemoMgr->GetMainFrame()->EnableRename(tvi->CanRename(this));
 			}
-
-			// メニューの制御
-			pMemoMgr->SelectNote(pNote);
 
 			if (g_Property.IsUseTwoPane() && (p->action == TVC_BYMOUSE || p->action == TVC_BYKEYBOARD)) {
 				// ユーザ操作の場合、メモの切り替えを発生させる
@@ -1169,6 +1171,14 @@ void MemoSelectView::OnGetFocus()
 	MainFrame *pMf = pMemoMgr->GetMainFrame();
 	if (pMf) {
 		pMf->ActivateView(TRUE);
+		TreeViewItem *pItem = GetCurrentItem();
+		if (pItem) {
+			pMf->EnableDelete(pItem->CanDelete(this));
+			pMf->EnableRename(pItem->CanRename(this));
+		} else {
+			pMf->EnableDelete(FALSE);
+			pMf->EnableRename(FALSE);
+		}
 	}
 }
 

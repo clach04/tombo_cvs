@@ -111,7 +111,7 @@ public:
 	HTREEITEM NewMemoCreated(MemoNote *pNote, LPCTSTR pHeadLine, HTREEITEM hItem);
 
 	BOOL InsertFile(HTREEITEM hParent, LPCTSTR pPrefix, LPCTSTR pFile);
-	BOOL InsertFile(HTREEITEM hParent, MemoNote *pNote, LPCTSTR pTitle, BOOL bInsertLast);
+	BOOL InsertFile(HTREEITEM hParent, MemoNote *pNote, LPCTSTR pTitle, BOOL bInsertLast, BOOL bLink);
 
 	// if bInsertLast is TRUE, Insert folder without sorting.
 	HTREEITEM InsertFolder(HTREEITEM hParent, LPCTSTR pName, TreeViewItem *tvi, BOOL bInsertLast);
@@ -124,6 +124,8 @@ public:
 	HTREEITEM GetPathForNewItem(TString *pPath, TreeViewItem *pItem = NULL);
 
 	HTREEITEM GetTreeItemFromPath(LPCTSTR pPath);
+
+	HTREEITEM GetParentItem(HTREEITEM hItem) { return TreeView_GetParent(hViewWnd, hItem); }
 
 	// ÉmÅ[ÉhÇÃëIë
 	void SelectNote(MemoNote *pNote);

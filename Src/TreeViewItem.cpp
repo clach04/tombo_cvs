@@ -48,6 +48,16 @@ MemoLocator TreeViewItem::ToLocator()
 	return MemoLocator(NULL, NULL);
 }
 
+BOOL TreeViewItem::CanDelete(MemoSelectView *pView)
+{
+	return FALSE;
+}
+
+BOOL TreeViewItem::CanRename(MemoSelectView *pView)
+{
+	return FALSE;
+}
+
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 //  File
@@ -176,7 +186,7 @@ BOOL TreeViewFileItem::Decrypt(MemoManager *pMgr, MemoSelectView *pView)
 }
 
 /////////////////////////////////////////////
-//  –¼Ì•ÏX
+//  Rename
 /////////////////////////////////////////////
 
 BOOL TreeViewFileItem::Rename(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR pNewName)
@@ -195,6 +205,11 @@ BOOL TreeViewFileItem::Rename(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR 
 		}
 	}
 	return bResult;
+}
+
+BOOL TreeViewFileItem::CanRename(MemoSelectView *pView)
+{
+	return TRUE;
 }
 
 /////////////////////////////////////////////
@@ -230,6 +245,11 @@ DWORD TreeViewFileItem::GetIcon(MemoSelectView *, DWORD nStatus)
 DWORD TreeViewFileItem::ItemOrder()
 {
 	return ITEM_ORDER_FILE;
+}
+
+BOOL TreeViewFileItem::CanDelete(MemoSelectView *pView)
+{
+	return TRUE;
 }
 
 /////////////////////////////////////////////
@@ -515,10 +535,39 @@ BOOL TreeViewFolderItem::Expand(MemoSelectView *pView)
 			pView->InsertFolder(hParent, q, pItem, TRUE);
 		} else {
 			// note
-			if (!pView->InsertFile(hParent, p->pNote, q, TRUE)) return FALSE;
+			if (!pView->InsertFile(hParent, p->pNote, q, TRUE, FALSE)) return FALSE;
 		}
 	}
 	return TRUE;
+}
+
+BOOL TreeViewFolderItem::CanDelete(MemoSelectView *pView)
+{
+	HTREEITEM hParent = pView->GetParentItem(GetViewItem());
+	if (hParent == NULL) return FALSE;
+	return TRUE;
+}
+
+BOOL TreeViewFolderItem::CanRename(MemoSelectView *pView)
+{
+	// In current version, act is same as CanDelete, so calls it.
+	return CanDelete(pView);
+}
+
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+//  File link
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+
+BOOL TreeViewFileLink::CanDelete(MemoSelectView *pView)
+{
+	return FALSE;
+}
+
+BOOL TreeViewFileLink::CanRename(MemoSelectView *pView)
+{
+	return FALSE;
 }
 
 /////////////////////////////////////////////
@@ -673,6 +722,16 @@ BOOL TreeViewVirtualFolderRoot::AddSearchResult(MemoSelectView *pView, VFInfo *p
 	return TRUE;
 }
 
+BOOL TreeViewVirtualFolderRoot::CanDelete(MemoSelectView *pView)
+{
+	return FALSE;
+}
+
+BOOL TreeViewVirtualFolderRoot::CanRename(MemoSelectView *pView)
+{
+	return FALSE;
+}
+
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 //  Virtual folder (non-root)
@@ -752,8 +811,18 @@ BOOL TreeViewVirtualFolder::Expand(MemoSelectView *pView)
 		MemoNote *p = pNote->GetNote();
 		pNote->ClearNote(); // to prevent deleting p
 		LPCTSTR pTitle = pNote->GetFileName();
-		pView->InsertFile(hItem, p, pTitle, TRUE);
+		pView->InsertFile(hItem, p, pTitle, TRUE, TRUE);
 	}
 	pStore->FreeArray();
 	return TRUE;
+}
+
+BOOL TreeViewVirtualFolder::CanDelete(MemoSelectView *pView)
+{
+	return FALSE;
+}
+
+BOOL TreeViewVirtualFolder::CanRename(MemoSelectView *pView)
+{
+	return FALSE;
 }

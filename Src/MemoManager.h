@@ -93,7 +93,7 @@ public:
 	// メモのクリア
 	BOOL ClearMemo();
 
-	void SelectNote(MemoNote *pNote);
+	void UpdateMenu(TreeViewItem *pItem);
 
 	BOOL MakeNewFolder(HWND hWnd, TreeViewItem *pItem);	// フォルダの新規作成
 

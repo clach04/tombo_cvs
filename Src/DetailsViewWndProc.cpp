@@ -106,9 +106,7 @@ LRESULT CALLBACK NewDetailsViewProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM l
 #endif
 	case WM_SETFOCUS:
 		{
-			if (g_Property.IsUseTwoPane() && pView) {
-				pView->OnGetFocus();
-			}
+			if (pView) pView->OnGetFocus();
 			break;
 		}
 	}

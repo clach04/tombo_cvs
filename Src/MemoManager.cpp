@@ -129,21 +129,37 @@ BOOL MemoManager::WipeOutAndDeleteFile(LPCTSTR pFile)
 }
 
 ////////////////////////////////////////////////////////
-// ƒƒ‚‚ª‘I‘ð‚³‚ê‚½ê‡‚Ìˆ—
+// Control menu item
 ////////////////////////////////////////////////////////
 
-void MemoManager::SelectNote(MemoNote *pNote)
+void MemoManager::UpdateMenu(TreeViewItem *pItem)
 {
-	if (pNote == NULL) {
-		pMainFrame->EnableEncrypt(TRUE);
-		pMainFrame->EnableDecrypt(TRUE);
-	} else if (pNote->IsEncrypted()) {
+	if (pItem == NULL) {
 		pMainFrame->EnableEncrypt(FALSE);
+		pMainFrame->EnableDecrypt(FALSE);
+		return;
+	}
+
+	MemoNote *pNote;
+	if (pItem->HasMultiItem()) {
+		// Encrypt/decrypt menu
+		pMainFrame->EnableEncrypt(TRUE);
 		pMainFrame->EnableDecrypt(TRUE);
 	} else {
-		pMainFrame->EnableEncrypt(TRUE);
-		pMainFrame->EnableDecrypt(FALSE);
+		pNote = ((TreeViewFileItem*)pItem)->GetNote();
+
+		// Encrypt/decrypt menu
+		if (pNote->IsEncrypted()) {
+			pMainFrame->EnableEncrypt(FALSE);
+			pMainFrame->EnableDecrypt(TRUE);
+		} else {
+			pMainFrame->EnableEncrypt(TRUE);
+			pMainFrame->EnableDecrypt(FALSE);
+		}
+
+		pMainFrame->EnableDelete(pItem->CanDelete(pMemoSelectView));
 	}
+	
 }
 
 ////////////////////////////////////////////////////////

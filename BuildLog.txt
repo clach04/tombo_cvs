@@ -221,6 +221,19 @@ PG: Change copyright dialog for expat.
 
 * Add option that TOMBO is staying topmost of the window.
 
+////////////////////////////////
+// B090
+////////////////////////////////
+
+* FIX: Stay topmost is not effected when exit TOMBO and next started.
+* Add TOMBO_vfolder.dtd. You can validate your vfolder.xml by using IE.
+* Add keyboard shotcut as F2.
+
+////////////////////////////////
+// B091
+////////////////////////////////
+
+* Disable delete/rename button/menu when selecting virtual folder or root node.
 
 /////////////////////////////////////////////////////////////////////////
 // TODO
@@ -228,12 +241,8 @@ PG: Change copyright dialog for expat.
 
 == entire
 
-Disable menu to rename/delete root node.
-Check and refine menu item's enable/disable
 Refactoring: MemoInfo control under MemoManager to MemoNote.
 Move method OpenRequest() from MemoSelectView to TreeViewItem.
-Refactoring : MemoManager::MakeNewFolder
-Refactoring : InactivateDetailsView
 
 == around virtual folder
 

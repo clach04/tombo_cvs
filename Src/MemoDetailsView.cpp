@@ -198,14 +198,18 @@ BOOL MemoDetailsView::OnHotKey(HWND hWnd, WPARAM wParam)
 
 void MemoDetailsView::OnGetFocus()
 {
+	if (!g_Property.IsUseTwoPane()) return;
+
 	MainFrame *pMf = pMemoMgr->GetMainFrame();
 	if (pMf) {
 		pMf->ActivateView(FALSE);
+		pMf->EnableDelete(FALSE);
+		pMf->EnableRename(FALSE);
 	}
 
 #if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
 	// 詳細ビューにフォーカスが移った場合にはメニューのEncrypt/DecryptはDisableする
-	pMemoMgr->SelectNote(NULL);
+	pMemoMgr->UpdateMenu(NULL);
 #endif
 	SetModifyStatus();
 }
