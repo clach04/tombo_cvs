@@ -305,7 +305,7 @@ static LRESULT CALLBACK MainFrameWndProc(HWND hWnd, UINT nMessage, WPARAM wParam
 		frm->SetFocus();
 		return 0;
 	case WM_SETTINGCHANGE:
-		frm->OnSettingChange();
+		frm->OnSettingChange(wParam);
 		return 0;
 	case WM_TIMER:
 		frm->OnTimer(wParam);
@@ -801,11 +801,7 @@ void MainFrame::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	SetModifyStatus(FALSE);
 
 	// control show/hide status bar
-#if defined(PLATFORM_WIN32)
-	HMENU hMenu = GetMenu(hWnd);
-#else
-	HMENU hMenu = CommandBar_GetMenu(GetCommandBar(hMSCmdBar, ID_CMDBAR_MAIN), 0);
-#endif
+	HMENU hMenu = GetMainMenu();
 	if (g_Property.HideStatusBar()) {
 		CheckMenuItem(hMenu, IDM_SHOWSTATUSBAR, MF_BYCOMMAND | MF_UNCHECKED);
 	} else {
@@ -834,6 +830,10 @@ void MainFrame::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 	// メモ詳細ビュー生成
 	mdView.Create(TEXT("MemoDetails"), r, hWnd, IDC_MEMODETAILSVIEW, IDC_MEMODETAILSVIEW_NF, hInstance, g_Property.DetailsViewFont());
+
+	if (!g_Property.WrapText()) {
+		SetWrapText(g_Property.WrapText());
+	}
 
 	// メモ選択ビュー生成
 	msView.Create(TEXT("MemoSelect"), r, hWnd, IDC_MEMOSELECTVIEW, hInstance, g_Property.SelectViewFont());
@@ -962,6 +962,9 @@ BOOL MainFrame::OnExit()
 	SaveWinSize();
 	g_Property.SaveStatusBarStat();
 #endif
+
+	g_Property.SaveWrapTextStat();
+
 #if defined(PLATFORM_WIN32)
 	g_Property.SaveTopMostStat();
 #endif
@@ -1028,7 +1031,8 @@ void MainFrame::OnCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		}
 		break;
 	case IDM_DETAILS_HSCROLL:
-		ToggleFolding();
+		g_Property.SetWrapText(!g_Property.WrapText());
+		SetWrapText(g_Property.WrapText());
 		break;
 #if defined(PLATFORM_HPC) || defined(PLATFORM_WIN32)
 	case IDM_TOGGLEPANE:
@@ -1092,7 +1096,7 @@ BOOL MainFrame::OnNotify(HWND hWnd, WPARAM wParam, LPARAM lParam)
 ///////////////////////////////////////////////////
 // 現在はIMEのON/OFFのチェックのみ
 
-void MainFrame::OnSettingChange()
+void MainFrame::OnSettingChange(WPARAM wParam)
 {
 #if defined(PLATFORM_PKTPC) || defined(PLATFORM_PSPC) || defined(PLATFORM_BE500)
 	BOOL bStat;
@@ -1102,6 +1106,14 @@ void MainFrame::OnSettingChange()
 
 	RECT r = sc.GetRect();
 	OnSIPResize(bStat, r.bottom - r.top);
+#endif
+#if defined(PLATFORM_HPC) || defined(PLATFORM_PSPC)
+	if (wParam == SPI_SETWORKAREA) {
+		// Change taskbar size
+		RECT r;
+		SystemParametersInfo(SPI_GETWORKAREA, 0, &r, 0);
+		MoveWindow(hMainWnd, r.left, r.top, r.right - r.left, r.bottom - r.top, TRUE);
+	}
 #endif
 }
 
@@ -1590,7 +1602,6 @@ static void ControlMenu(HMENU hMenu, BOOL bSelectViewActive)
 		uFlg2 = MF_BYCOMMAND | MF_ENABLED;
 	}
 
-	EnableMenuItem(hMenu, IDM_NEWFOLDER, uFlg1);
 	EnableMenuItem(hMenu, IDM_FORGETPASS, uFlg1);
 	EnableMenuItem(hMenu, IDM_PROPERTY, uFlg1);
 	EnableMenuItem(hMenu, IDM_TOGGLEPANE, uFlg1);
@@ -1731,6 +1742,13 @@ void MainFrame::EnablePaste(BOOL bEnable)
 #endif
 }
 
+void MainFrame::EnableNewFolder(BOOL bEnable)
+{
+#if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
+	EnableMenu(IDM_NEWFOLDER, bEnable);
+//	SendMessage(GetMainToolBar(), TB_ENABLEBUTTON, IDM_PASTE, MAKELONG(bEnable, 0));
+#endif
+}
 
 ///////////////////////////////////////////////////
 // パスワード消去
@@ -1813,7 +1831,7 @@ void MainFrame::OnMutualExecute()
 #if defined(PLATFORM_WIN32)
 	BringWindowToTop(hMainWnd);
 #endif
-	OnSettingChange();
+	OnSettingChange(NULL);
 }
 
 ///////////////////////////////////////////////////
@@ -1915,6 +1933,44 @@ void MainFrame::LoadWinSize(HWND hWnd)
 // 詳細ビューの折り返し表示の制御
 ///////////////////////////////////////////////////
 
+void MainFrame::SetWrapText(BOOL bWrap)
+{
+	UINT uCheckFlg;
+
+	HMENU hMenu;
+#if defined(PLATFORM_WIN32)
+	hMenu = GetMenu(hMainWnd);
+#endif
+#if defined(PLATFORM_PKTPC)
+	hMenu = SHGetSubMenu(hMDCmdBar, IDM_DETAILS_TOOL);
+#endif
+#if defined(PLATFORM_PSPC)
+	hMenu = CommandBar_GetMenu(hMDCmdBar, 0);
+#endif
+#if defined(PLATFORM_BE500)
+	hMenu = hFoldMenu;
+#endif
+#if defined(PLATFORM_HPC)
+	hMenu = CommandBar_GetMenu(GetCommandBar(hMSCmdBar, ID_CMDBAR_MAIN), 0);
+#endif
+
+	if (bWrap) {
+		uCheckFlg = MF_CHECKED;
+	} else {
+		uCheckFlg = MF_UNCHECKED;
+	}
+
+	// Change edit view status
+	if (!mdView.SetFolding(bWrap)) {
+		TomboMessageBox(NULL, MSG_FOLDING_FAILED, TOMBO_APP_NAME, MB_ICONERROR | MB_OK);
+		return;
+	}
+
+	// CheckMenuItem is superseded, but CE don't have SetMenuItemInfo.
+	CheckMenuItem(hMenu, IDM_DETAILS_HSCROLL, MF_BYCOMMAND | uCheckFlg);
+}
+
+#ifdef COMMENT
 void MainFrame::ToggleFolding()
 {
 	MENUITEMINFO mii;
@@ -1953,7 +2009,6 @@ void MainFrame::ToggleFolding()
 		bFolding = FALSE;
 		uCheckFlg = MF_CHECKED;
 	}
-
 	// 詳細ビューの制御
 	if (!mdView.SetFolding(bFolding)) {
 		TomboMessageBox(NULL, MSG_FOLDING_FAILED, TOMBO_APP_NAME, MB_ICONERROR | MB_OK);
@@ -1963,6 +2018,7 @@ void MainFrame::ToggleFolding()
 	// superseded な関数だが、CEだとSetMenuItemInfoは値の設定ができないのでCheckMenuItemを使用
 	CheckMenuItem(hMenu, IDM_DETAILS_HSCROLL, MF_BYCOMMAND | uCheckFlg);
 }
+#endif
 
 ///////////////////////////////////////////////////
 // ペインの切り替え

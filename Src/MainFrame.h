@@ -85,7 +85,7 @@ public:
 	void OnPaint(HWND hWnd, WPARAM wParam, LPARAM lParam);
 	BOOL OnExit();
 	BOOL OnNotify(HWND hWnd, WPARAM wParam, LPARAM lParam);
-	void OnSettingChange();
+	void OnSettingChange(WPARAM wParam);
 	void OnSIPResize(BOOL bImeOn, DWORD nSipHeight);
 	void OnCommand(HWND hWnd, WPARAM wParam, LPARAM lParam);
 	void OnProperty();
@@ -119,7 +119,7 @@ public:
 	void About();	// Aboutダイアログ
 	void NewMemo();	// 新規メモの作成
 	void NewFolder(TreeViewItem *pItem); // 新規フォルダの作成
-	void ToggleFolding(); // 折り返し表示の切り替え
+	void SetWrapText(BOOL bWrap); // 折り返し表示の切り替え
 	void TogglePane(); // ペインの切り替え
 
 	void SetTopMost(); // keep top of the window
@@ -153,6 +153,7 @@ public:
 	void EnableCut(BOOL bEnable);
 	void EnableCopy(BOOL bEnable);
 	void EnablePaste(BOOL bEnable);
+	void EnableNewFolder(BOOL bEnable);
 
 	// ウィンドウサイズの保存・復元
 	void LoadWinSize(HWND hWnd);
