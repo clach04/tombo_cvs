@@ -231,6 +231,14 @@ BOOL MemoSelectView::LoadItems()
 	HTREEITEM hRoot = InsertFolder(TVI_ROOT, MSG_MEMO, pItem);
 	TreeView_Expand(hViewWnd, hRoot, TVE_EXPAND);
 
+	// check vfolder def file
+	if (_tcslen(g_Property.PropertyDir()) == 0) return TRUE;
+	TString sVFpath;
+	if (!sVFpath.Join(g_Property.PropertyDir(), TEXT("\\"), TOMBO_VFOLDER_DEF_FILE)) return TRUE;
+	File f;
+	if (!f.Open(sVFpath.Get(), GENERIC_READ, FILE_SHARE_READ, OPEN_EXISTING)) return FALSE;
+	f.Close();
+
 	// Insert virtual tree
 	TreeViewVirtualFolderRoot *pVFRoot = new TreeViewVirtualFolderRoot();
 	InsertFolder(TVI_ROOT, MSG_VIRTUAL_FOLDER, pVFRoot);
