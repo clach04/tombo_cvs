@@ -309,6 +309,10 @@ SOURCE=.\resE\TomboE.rc
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\Src\TomboURI.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\Src\TreeViewItem.cpp
 # End Source File
 # Begin Source File
@@ -528,6 +532,10 @@ SOURCE=..\..\Src\TomboLib\SipControl.h
 # Begin Source File
 
 SOURCE=..\..\Src\Tombo.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\TomboURI.h
 # End Source File
 # Begin Source File
 

@@ -28,7 +28,7 @@ class MemoSelectView {
 	TreeViewItem *pClipItem;
 	BOOL bCut;
 
-	// 自動切換えモードフラグ
+	// mode flags
 	BOOL bAutoLoadMode;
 	BOOL bSingleClickMode;
 
@@ -44,7 +44,6 @@ class MemoSelectView {
 	///////////////////////////////////
 	LRESULT EditLabel(TVITEM *pItem);
 
-
 public:
 	/////////////////////////////
 	// Initialize functions
@@ -54,7 +53,7 @@ public:
 	BOOL Create(LPCTSTR pName, RECT &r, HWND hParent, DWORD nID, HINSTANCE hInst, HFONT hFont, HIMAGELIST hList);
 
 	/////////////////////////////
-	// 表示・画面関連
+	// display related funcs
 
 	HWND GetHWnd() { return hViewWnd; }
 
@@ -77,18 +76,17 @@ public:
 	void OnDecrypt(TreeViewItem *pItem);
 	void OnEditLabel(HTREEITEM hItem);
 
-	// クリップボード(もどき)操作用
+	// psudo clipboard
 	void OnCut(TreeViewItem *pItem);
 	void OnCopy(TreeViewItem *pItem);
 	void OnPaste();
 
-	// ウィンドウサイズ取得
 	void GetSize(LPWORD pWidth, LPWORD pHeight);
 
 	void MoveWindow(DWORD x, DWORD y, DWORD nWidth, DWORD nHeight);
 
 	/////////////////////////////
-	// プロパティ操作関連
+	// accessor/mutator for flags
 
 	// 自動切換えモード
 	void SetAutoLoadMode(BOOL bMode) { bAutoLoadMode = bMode; }
@@ -134,13 +132,13 @@ public:
 
 	HTREEITEM GetParentItem(HTREEITEM hItem) { return TreeView_GetParent(hViewWnd, hItem); }
 
-	// ノードの選択
+	// node selection
 	void SelectNote(MemoNote *pNote);
 
 	BOOL CreateNewFolder(HTREEITEM hItem, LPCTSTR pFolder);
 	BOOL GetHeadLine(MemoNote *pNote, LPTSTR pHeadLine, DWORD nLen);
 
-	// ヘッドライン文字列の書き換え
+	// rewrite headline string
 	BOOL UpdateHeadLine(MemoLocator *pLoc, LPCTSTR pHeadLine);
 
 	// 現在選択されているアイテムと関連付けられているTreeViewItemを返す。
@@ -157,8 +155,13 @@ public:
 	LPTSTR GeneratePath(HTREEITEM hItem, LPTSTR pBuf, DWORD nSiz);
 	BOOL GetCurrentItemPath(TString *pPath);
 
+	BOOL GetCurrentURI(TString *pURI);
+
+	BOOL GetURINodeName(HTREEITEM h, LPTSTR pBuf, DWORD nBufLen);
+
 	// Choose specified notes. if tree is collapsed, expand one.
 	HTREEITEM ShowItem(LPCTSTR pPath, BOOL bSelChange = TRUE, BOOL bOpenNotes = TRUE);
+	HTREEITEM ShowItemByURI(LPCTSTR pPath, BOOL bSelChange = TRUE, BOOL bOpenNotes = TRUE);
 
 	/////////////////////////////
 	// Virtual folder

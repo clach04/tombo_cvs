@@ -462,6 +462,14 @@ static BOOL GetDateText(TString *pInsStr, LPCTSTR pFormat, TString *pPath)
 				wsprintf(q, TEXT("%02d"), st.wHour % 12);
 				q += 2;
 				break;
+			case TEXT('I'):
+				{
+					int n = st.wHour % 12;
+					if (n == 0) n = 12;
+					wsprintf(q, TEXT("%02d"), n);
+					q+= 2;
+				}
+				break;
 			case TEXT('a'):
 				if (st.wHour >= 12) {
 					_tcscpy(q, TEXT("PM"));

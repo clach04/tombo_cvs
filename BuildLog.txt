@@ -501,4 +501,5 @@ Changes
 
 * Change bookmark format path to URI.
 * Support virtual folder's bookmark/startpage.
+* Add '%I' to date format. (#4190, #4191)
 

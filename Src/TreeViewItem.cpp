@@ -364,6 +364,37 @@ BOOL TreeViewFileItem::GetLocationPath(MemoSelectView *pView, TString *pPath)
 	return TRUE;
 }
 
+BOOL TreeViewFileItem::GetURIItem(MemoSelectView *pView, TString *pItem)
+{
+	LPCTSTR p = pNote->MemoPath();
+	LPCTSTR q = NULL;
+	if (*p != TEXT('\\')) {
+		q = p;
+	}
+
+	while (*p) {
+#if defined(PLATFORM_WIN32)
+		if (IsDBCSLeadByte(*p)) {
+			p+=2;
+			continue;
+		}
+#endif
+		if (*p == TEXT('\\')) {
+			q = p;
+		}
+		p++;
+	}
+	if (q) {
+		if (*q == TEXT('\\')) {
+			return pItem->Set(q + 1);
+		} else {
+			return pItem->Set(q);
+		}
+	} else {
+		return FALSE;
+	}
+}
+
 /////////////////////////////////////////////
 //  Folder
 /////////////////////////////////////////////
@@ -386,13 +417,11 @@ BOOL TreeViewFolderItem::Move(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR 
 	TString sCurrentPath;
 	HTREEITEM hItem = GetViewItem();
 	LPTSTR pCurrentPath = pView->GeneratePath(hItem, buf, MAX_PATH);
-//	if (!sCurrentPath.AllocFullPath(pCurrentPath)) return FALSE;
 	if (!sCurrentPath.Join(g_Property.TopDir(), TEXT("\\"), pCurrentPath)) return FALSE;
 
 	// Dstパスの取得
 	TString sDstPath, sDstFullPath;
 	HTREEITEM hParent = pView->GetPathForNewItem(&sDstPath);
-//	if (!sDstFullPath.AllocFullPath(sDstPath.Get())) return FALSE;
 	if (!sDstFullPath.Join(g_Property.TopDir(), TEXT("\\"), sDstPath.Get())) return FALSE;
 
 	if (IsSubFolder(pCurrentPath, sDstPath.Get())) {
@@ -427,13 +456,11 @@ BOOL TreeViewFolderItem::Copy(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR 
 	TString sCurrentPath;
 	HTREEITEM hItem = GetViewItem();
 	LPTSTR pCurrentPath = pView->GeneratePath(hItem, buf, MAX_PATH);
-//	if (!sCurrentPath.AllocFullPath(pCurrentPath)) return FALSE;
 	if (!sCurrentPath.Join(g_Property.TopDir(), TEXT("\\"), pCurrentPath)) return FALSE;
 
 	// Dstパスの取得
 	TString sDstPath, sDstFullPath;
 	HTREEITEM hParent = pView->GetPathForNewItem(&sDstPath);
-//	if (!sDstFullPath.AllocFullPath(sDstPath.Get())) return FALSE;
 	if (!sDstFullPath.Join(g_Property.TopDir(), TEXT("\\"), sDstPath.Get())) return FALSE;
 
 	if (IsSubFolder(pCurrentPath, sDstPath.Get())) {
@@ -474,7 +501,6 @@ BOOL TreeViewFolderItem::Delete(MemoManager *pMgr, MemoSelectView *pView)
 	TString sCurrentPath;
 	HTREEITEM hItem = GetViewItem();
 	LPTSTR pCurrentPath = pView->GeneratePath(hItem, buf, MAX_PATH);
-//	if (!sCurrentPath.AllocFullPath(pCurrentPath)) return FALSE;
 	if (!sCurrentPath.Join(g_Property.TopDir(), TEXT("\\"), pCurrentPath)) return FALSE;
 
 	if (_tcslen(pCurrentPath) == 0 ||
@@ -504,7 +530,6 @@ BOOL TreeViewFolderItem::Encrypt(MemoManager *pMgr, MemoSelectView *pView)
 	TString sCurrentPath;
 	HTREEITEM hItem = GetViewItem();
 	LPTSTR pCurrentPath = pView->GeneratePath(hItem, buf, MAX_PATH);
-//	if (!sCurrentPath.AllocFullPath(pCurrentPath)) return FALSE;
 	if (!sCurrentPath.Join(g_Property.TopDir(), TEXT("\\"), pCurrentPath)) return FALSE;
 
 	if (_tcslen(pCurrentPath) == 0 ||
@@ -529,7 +554,6 @@ BOOL TreeViewFolderItem::Decrypt(MemoManager *pMgr, MemoSelectView *pView)
 	TString sCurrentPath;
 	HTREEITEM hItem = GetViewItem();
 	LPTSTR pCurrentPath = pView->GeneratePath(hItem, buf, MAX_PATH);
-//	if (!sCurrentPath.AllocFullPath(pCurrentPath)) return FALSE;
 	if (!sCurrentPath.Join(g_Property.TopDir(), TEXT("\\"), pCurrentPath)) return FALSE;
 
 	if (_tcslen(pCurrentPath) == 0 ||
@@ -626,6 +650,14 @@ BOOL TreeViewFolderItem::GetLocationPath(MemoSelectView *pView, TString *pPath)
 {
 	return GetFolderPath(pView, pPath);
 }
+
+BOOL TreeViewFolderItem::GetURIItem(MemoSelectView *pView, TString *pItem)
+{
+	TCHAR buf[MAX_PATH];
+	if (!pView->GetURINodeName(GetViewItem(), buf, MAX_PATH)) return FALSE;
+	return pItem->Set(buf);
+}
+
 /////////////////////////////////////////////
 //  名称変更
 /////////////////////////////////////////////
@@ -966,6 +998,11 @@ BOOL TreeViewVirtualFolderRoot::GetFolderPath(MemoSelectView *pView, TString *pP
 BOOL TreeViewVirtualFolderRoot::GetLocationPath(MemoSelectView *pView, TString *pPath)
 {
 	return FALSE;
+}
+
+BOOL TreeViewVirtualFolderRoot::GetURIItem(MemoSelectView *pView, TString *pItem)
+{
+	return pItem->Set(TEXT("@vfolder"));
 }
 
 /////////////////////////////////////////////

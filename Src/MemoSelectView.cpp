@@ -16,6 +16,7 @@
 #include "MemoNote.h"
 #include "Property.h"
 #include "TString.h"
+#include "TomboURI.h"
 #include "TreeViewItem.h"
 #include "Message.h"
 
@@ -217,16 +218,6 @@ BOOL MemoSelectView::InitTree(VFManager *pManager)
 	TreeViewFolderItem *pItem = new TreeViewFolderItem();
 	hMemoRoot = InsertFolder(TVI_ROOT, MSG_MEMO, pItem, TRUE);
 	TreeView_Expand(hViewWnd, hMemoRoot, TVE_EXPAND);
-
-#ifdef COMMENT
-	// check vfolder def file
-	if (_tcslen(g_Property.PropertyDir()) == 0) return TRUE;
-	TString sVFpath;
-	if (!sVFpath.Join(g_Property.PropertyDir(), TEXT("\\"), TOMBO_VFOLDER_DEF_FILE)) return TRUE;
-	File f;
-	if (!f.Open(sVFpath.Get(), GENERIC_READ, FILE_SHARE_READ, OPEN_EXISTING)) return FALSE;
-	f.Close();
-#endif
 
 	// Insert virtual tree
 	TreeViewVirtualFolderRoot *pVFRoot = new TreeViewVirtualFolderRoot();
@@ -780,9 +771,68 @@ BOOL MemoSelectView::GetCurrentItemPath(TString *pPath)
 	TreeViewItem *pItem = GetCurrentItem(&h);
 	if (pItem == NULL) return FALSE;
 
-	TString sPath;
 	if (!pItem->GetLocationPath(this, pPath)) return FALSE;
 	return TRUE;
+}
+
+BOOL MemoSelectView::GetCurrentURI(TString *pURI)
+{
+	HTREEITEM h;
+	TreeViewItem *pItem = GetCurrentItem(&h);
+	if (pItem == NULL) return FALSE;
+
+	TString s;
+	DWORD n = 0;
+	while(h) {
+		TreeViewItem *pItem = GetTVItem(h);
+
+		if (!pItem->GetURIItem(this, &s)) return FALSE;
+		n += _tcslen(s.Get());
+		if (pItem->HasMultiItem()) n++;
+
+		h = TreeView_GetParent(hViewWnd, h);
+	}
+	if (!pURI->Alloc(n + 8 + 1)) return FALSE;
+	GetCurrentItem(&h);
+
+	LPTSTR pTail = pURI->Get() + n + 8;
+	*pTail = TEXT('\0');
+	while(h) {
+		TreeViewItem *pItem = GetTVItem(h);
+
+		if (pItem->HasMultiItem()) {
+			*--pTail = TEXT('/');
+		}
+		if (!pItem->GetURIItem(this, &s)) return FALSE;
+		pTail -= _tcslen(s.Get());
+		_tcsncpy(pTail, s.Get(), _tcslen(s.Get()));
+
+		h = TreeView_GetParent(hViewWnd, h);
+	}
+	pTail -= 8;
+	_tcsncpy(pTail, TEXT("tombo://"), 8);
+
+	DWORD x = _tcslen(pURI->Get());
+	return TRUE;
+}
+
+BOOL MemoSelectView::GetURINodeName(HTREEITEM h, LPTSTR pBuf, DWORD nBufLen)
+{
+	if (h == hMemoRoot) {
+		_tcsncpy(pBuf, TEXT("default"), nBufLen);
+		return TRUE;
+	}
+	if (h == hSearchRoot) {
+		_tcsncpy(pBuf, TEXT("@vfolder"), nBufLen);
+		return TRUE;
+	}
+	TV_ITEM ti;
+	ti.mask = TVIF_TEXT;
+	ti.hItem = h;
+	ti.pszText = pBuf;
+	ti.cchTextMax = nBufLen;
+
+	return TreeView_GetItem(hViewWnd, &ti);
 }
 
 void MemoSelectView::TreeExpand(HTREEITEM hItem)
@@ -1376,6 +1426,98 @@ HTREEITEM MemoSelectView::ShowItem(LPCTSTR pPath, BOOL bSelChange, BOOL bOpenNot
 		}
 	}
 	return hTargetItem;
+}
+
+static HTREEITEM FindItem2(HWND hWnd, HTREEITEM hParent, LPCTSTR pStr, DWORD nLen)
+{
+	HTREEITEM hItem = TreeView_GetChild(hWnd, hParent);
+	TV_ITEM ti;
+
+	TCHAR buf[MAX_PATH + 1];
+	ti.mask = TVIF_TEXT | TVIF_PARAM;
+	ti.cchTextMax = MAX_PATH;
+	ti.pszText = buf;
+
+	while(hItem) {
+		ti.hItem = hItem;
+		TreeView_GetItem(hWnd, &ti);
+
+		if (_tcsnicmp(buf, pStr, nLen) == 0) {
+			return hItem;
+		}
+
+		hItem = TreeView_GetNextSibling(hWnd, hItem);
+	}
+	return NULL;
+}
+
+HTREEITEM MemoSelectView::ShowItemByURI(LPCTSTR pPath, BOOL bSelChange, BOOL bOpenNotes)
+{
+	TomboURI tURI;
+	if (!tURI.Init(pPath)) return NULL;
+
+	HTREEITEM hCurrent;
+
+	// get root node
+	TString sRepo;
+	if (!tURI.GetRepository(&sRepo)) return FALSE;
+	if (_tcscmp(sRepo.Get(), TEXT("default")) == 0) {
+		hCurrent = hMemoRoot;
+	} else if (_tcscmp(sRepo.Get(), TEXT("@vfolder")) == 0) {
+		hCurrent = hSearchRoot;
+	} else {
+		return NULL;
+	}
+
+	// expand root node
+	if (!IsExpand(hCurrent)) {
+		TreeView_Expand(hViewWnd, hCurrent, TVE_EXPAND);
+	}
+
+	TreeView_SelectItem(hViewWnd, hCurrent);
+
+	TomboURIItemIterator itr(&tURI);
+	if (!itr.Init()) return NULL;
+
+	TreeViewItem *pItem = NULL;
+	LPCTSTR p;
+	for (itr.First(); p = itr.Current(); itr.Next()) {
+		HTREEITEM h;
+		if (itr.IsLeaf()) {
+			// item is file, ignore extensions
+			DWORD n = _tcslen(p);
+			if (n >= 4) {
+				h = FindItem2(hViewWnd, hCurrent, p, n - 4);
+			} else {
+				h = FindItem2(hViewWnd, hCurrent, p, n);
+			}
+		} else {
+			h = FindItem2(hViewWnd, hCurrent, p, _tcslen(p));
+		}
+
+		if (h) {
+			hCurrent = h;
+
+			pItem = GetTVItem(hCurrent);
+
+			if (pItem->HasMultiItem() && !IsExpand(hCurrent)) {
+				TreeView_Expand(hViewWnd, hCurrent, TVE_EXPAND);
+			}
+			TreeView_SelectItem(hViewWnd, hCurrent);
+		}
+	}
+
+	if (pItem && !pItem->HasMultiItem()) {
+		TreeViewFileItem *p = (TreeViewFileItem*)pItem;
+		MemoLocator loc(p->GetNote(), p->GetViewItem());
+		if (bOpenNotes) {
+			pMemoMgr->GetMainFrame()->SendRequestOpen(&loc, OPEN_REQUEST_MSVIEW_ACTIVE);
+		} else {
+			pMemoMgr->GetMainFrame()->SendRequestOpen(&loc, OPEN_REQUEST_MDVIEW_ACTIVE);
+		}
+	}
+
+	return hCurrent;
 }
 
 /////////////////////////////////////////////

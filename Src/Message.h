@@ -76,8 +76,8 @@
 #define MSG_REN_FOLDER_FAILED	MSG("フォルダ名の変更に失敗しました: %d", "Rename folder failed(%d).")
 #define MSG_GET_DATE_FAILED		MSG("日付の取得に失敗しました", "Get dateformat failed.")
 #define MSG_ROOT_NOT_ALLOWED	MSG("\\はメモフォルダとして指定できません", "Can't set memo folder as '\\'")
-#define MSG_DATEFORMAT_DESC		MSG("%y\t：年4桁(2001)\r\n%Y\t：年下2桁(01)\r\n%M\t：月(01,02,...)\r\n%b\t：月(Jan,Feb..)\r\n%d\t：日(01,02..)\r\n%D\t：日(1,2,..)\r\n%w\t：曜日(日,月..)\r\n%W\t：曜日(Sun,Mon)\r\n%H\t：時(12H)\r\n%h\t：時(24H)\r\n%a\t：AM,PM\r\n%m\t：分(01,02..)\r\n%s\t：秒(01,02..)\r\n%%\t：\"%\"\r\n%n\t：改行\r\n%fn\t：ファイルパス(上位n階層,0はすべて)\r\n%Fn\t：ファイルパス(下位n階層)", \
-									"%y\t:Year(2001)\r\n%Y\t:Year(01)\r\n%M\t:Month(01,02,..)\r\n%b\t:Month(Jan,Feb,..)\r\n%d\t:Day(01,02..)\r\n%D\t:Day(1,2,..)\r\n%W\t:WDay(Sun,Mon,..)\r\n%H\t:Hour(12H)\r\n%h\t:Hour(24H)\r\n%a\t:AM,PM\r\n%m\t:Min(01,02,..)\r\n%s\t:Sec(01,02,..)\r\n%%\t:\"%\"\r\n%n\t:newline\r\n%fn\t:file path(n is 0-9)\r\n%Fn\t:file path")
+#define MSG_DATEFORMAT_DESC		MSG("%y\t：年4桁(2001)\r\n%Y\t：年下2桁(01)\r\n%M\t：月(01,02,...)\r\n%b\t：月(Jan,Feb..)\r\n%d\t：日(01,02..)\r\n%D\t：日(1,2,..)\r\n%w\t：曜日(日,月..)\r\n%W\t：曜日(Sun,Mon)\r\n%H\t：時(12H:00..11)\r\n%I\t：時(12H:01..12)\r\n%h\t：時(24H)\r\n%a\t：AM,PM\r\n%m\t：分(01,02..)\r\n%s\t：秒(01,02..)\r\n%%\t：\"%\"\r\n%n\t：改行\r\n%fn\t：ファイルパス(上位n階層,0はすべて)\r\n%Fn\t：ファイルパス(下位n階層)", \
+									"%y\t:Year(2001)\r\n%Y\t:Year(01)\r\n%M\t:Month(01,02,..)\r\n%b\t:Month(Jan,Feb,..)\r\n%d\t:Day(01,02..)\r\n%D\t:Day(1,2,..)\r\n%W\t:WDay(Sun,Mon,..)\r\n%H\t:Hour(12H:00..11)\r\n%I\t:Hour(12H:01..12)\r\n%h\t:Hour(24H)\r\n%a\t:AM,PM\r\n%m\t:Min(01,02,..)\r\n%s\t:Sec(01,02,..)\r\n%%\t:\"%\"\r\n%n\t:newline\r\n%fn\t:file path(n is 0-9)\r\n%Fn\t:file path")
 #define MSG_VIRTUAL_FOLDER		MSG("検索結果", "Search result")
 #define MSG_CONFIRM_ENCRYPT_FOLDER \
 								MSG("フォルダのファイルに対して暗号化を行います。よろしいですか？", "Encrypt files under the folder?")
@@ -156,8 +156,9 @@
 								MSG("メモ名の前に表示", "View before file name")
 #define MSG_FILTEDEF_VIEW_TYPE_POST \
 								MSG("メモ名の後に表示", "View after file name")
-
 #define MSG_BMDLG_TITLE_NAME	MSG("アイテム名", "Name")
 #define MSG_BMDLG_TITLE_PATH	MSG("パス", "Path")
+#define MSG_DEL_BOOKMARK		MSG("お気に入りの削除", "Delete bookmarks")
+#define MSG_CONFIRM				MSG("選択したお気に入りを削除します。よろしいですか？", "Deleting selected bookmarks. Are you sure?")
 #endif
 

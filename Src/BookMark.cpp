@@ -2,6 +2,7 @@
 #include <tchar.h>
 #include "VarBuffer.h"
 #include "TString.h"
+#include "TomboURI.h"
 #include "UniConv.h"
 #include "BookMark.h"
 #include "MemoNote.h"
@@ -60,10 +61,10 @@ const BookMarkItem *BookMark::Assign(LPCTSTR pPath)
 {
 	// get headline 
 	TString sTitle;
-	if (!MemoNote::GetHeadLineFromPath(pPath, &sTitle)) return NULL;
-	if (_tcslen(sTitle.Get()) == 0) {
-		if (!sTitle.Set(TEXT("[root]"))) return NULL;
-	}
+
+	TomboURI tURI;
+	if (!tURI.Init(pPath)) return NULL;
+	if (!tURI.GetHeadLine(&sTitle)) return NULL;
 
 	BookMarkItem bi;
 

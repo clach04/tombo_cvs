@@ -510,6 +510,7 @@ DEP_CPP_BOOKM=\
 	"..\..\Src\TomboLib\TString.h"\
 	"..\..\Src\TomboLib\Uniconv.h"\
 	"..\..\Src\TomboLib\VarBuffer.h"\
+	"..\..\Src\TomboURI.h"\
 	"..\..\Src\TreeViewItem.h"\
 	
 
@@ -2958,6 +2959,7 @@ DEP_CPP_MEMOS=\
 	"..\..\Src\TomboLib\TString.h"\
 	"..\..\Src\TomboLib\Uniconv.h"\
 	"..\..\Src\TomboLib\VarBuffer.h"\
+	"..\..\Src\TomboURI.h"\
 	"..\..\Src\TreeViewItem.h"\
 	
 
@@ -4022,6 +4024,69 @@ SOURCE=.\res\Tombo.rc
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\Src\TomboURI.cpp
+
+!IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
+
+DEP_CPP_TOMBO=\
+	"..\..\Src\TomboLib\TString.h"\
+	"..\..\Src\TomboURI.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
+
+DEP_CPP_TOMBO=\
+	"..\..\Src\TomboLib\TString.h"\
+	"..\..\Src\TomboURI.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Release"
+
+DEP_CPP_TOMBO=\
+	"..\..\Src\TomboLib\TString.h"\
+	"..\..\Src\TomboURI.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Debug"
+
+DEP_CPP_TOMBO=\
+	"..\..\Src\TomboLib\TString.h"\
+	"..\..\Src\TomboURI.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Release"
+
+DEP_CPP_TOMBO=\
+	"..\..\Src\TomboLib\TString.h"\
+	"..\..\Src\TomboURI.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Debug"
+
+DEP_CPP_TOMBO=\
+	"..\..\Src\TomboLib\TString.h"\
+	"..\..\Src\TomboURI.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Release"
+
+DEP_CPP_TOMBO=\
+	"..\..\Src\TomboLib\TString.h"\
+	"..\..\Src\TomboURI.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Debug"
+
+DEP_CPP_TOMBO=\
+	"..\..\Src\TomboLib\TString.h"\
+	"..\..\Src\TomboURI.h"\
+	
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\Src\TreeViewItem.cpp
 
 !IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
@@ -5058,6 +5123,10 @@ SOURCE=..\..\Src\TomboLib\SipControl.h
 # Begin Source File
 
 SOURCE=..\..\Src\Tombo.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\TomboURI.h
 # End Source File
 # Begin Source File
 

@@ -937,7 +937,7 @@ void MainFrame::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 	// open top page
 	if (_tcslen(g_Property.GetDefaultNote()) != 0) {
-		msView.ShowItem(g_Property.GetDefaultNote());
+		msView.ShowItemByURI(g_Property.GetDefaultNote());
 	}
 
 	// Raize window for some PocketPC devices.
@@ -1992,7 +1992,8 @@ void MainFrame::OnProperty()
 	mmMemoManager.NewMemo();
 
 	TString sPath;
-	if (!msView.GetCurrentItemPath(&sPath)) {
+//	if (!msView.GetCurrentItemPath(&sPath)) {
+	if (!msView.GetCurrentURI(&sPath)) {
 		sPath.Set(TEXT(""));
 	}
 
@@ -2636,13 +2637,11 @@ void MainFrame::OnVFolderDef()
 void MainFrame::OnBookMarkAdd(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
 	// get note's path
-	TString sPath;
-	if (!msView.GetCurrentItemPath(&sPath)) {
-		sPath.Set(TEXT(""));
-	}
+	TString sURI;
+	if (!msView.GetCurrentURI(&sURI)) return;
 
 	// add to bookmark manager
-	const BookMarkItem *pItem = pBookMark->Assign(sPath.Get());
+	const BookMarkItem *pItem = pBookMark->Assign(sURI.Get());
 	if (pItem == NULL) return;
 
 	AppendBookMark(GetMSBookMarkMenu(), pItem);
@@ -2675,7 +2674,7 @@ void MainFrame::OnBookMark(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
 	const BookMarkItem *pItem = pBookMark->Find(LOWORD(wParam));
 	if (pItem) {
-		msView.ShowItem(pItem->pPath);
+		msView.ShowItemByURI(pItem->pPath);
 	}
 }
 

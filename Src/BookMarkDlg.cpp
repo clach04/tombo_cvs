@@ -148,11 +148,17 @@ BOOL BookMarkDlg::Command_UpDown(HWND hDlg, int iDelta)
 
 BOOL BookMarkDlg::Command_Delete(HWND hDlg)
 {
+	// confirm delete
+	if (MessageBox(hDlg, MSG_CONFIRM, MSG_DEL_BOOKMARK, MB_YESNO | MB_ICONQUESTION) != IDYES) return TRUE;
+
 	HWND hList = GetDlgItem(hDlg, IDC_BMEDIT_LIST);
-	int iSel = ListView_GetNextItem(hList, -1, LVNI_SELECTED);
+	int iSel;
 
-	ListView_DeleteItem(hList, iSel);
-
+	while(1) {
+		iSel = ListView_GetNextItem(hList, -1, LVNI_SELECTED);
+		if (iSel == -1) break;
+		ListView_DeleteItem(hList, iSel);
+	}
 	return TRUE;
 }
 
