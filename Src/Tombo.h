@@ -23,7 +23,7 @@
 // ‹¤’Ê’è‹`
 ///////////////////////////////////////
 
-#define TOMBO_VERSION_INFO TEXT("Tombo 1.5 alpha 0")
+#define TOMBO_VERSION_INFO TEXT("Tombo DEBUG(20021115)")
 
 #define TOMBO_MAIN_FRAME_WINDOW_CLSS TEXT("TomboMainFrmWnd")
 

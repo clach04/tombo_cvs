@@ -433,17 +433,24 @@ BOOL CryptedMemoNote::SaveData(PasswordManager *pMgr, const char *pText, LPCTSTR
 
 MemoNote *MemoNote::Encrypt(PasswordManager *pMgr, TString *pHeadLine, BOOL *pIsModified)
 {
+	MessageBox(NULL, TEXT("MemoNote::Encrypt called"), TEXT("DEBUG"), MB_OK); // XXXX_DEBUG
 	return NULL;
 }
 
 MemoNote *PlainMemoNote::Encrypt(PasswordManager *pMgr, TString *pHeadLine, BOOL *pIsModified)
 {
 	TString sMemoDir;
-	if (!sMemoDir.GetDirectoryPath(pPath)) return FALSE;
+	if (!sMemoDir.GetDirectoryPath(pPath)) {
+		MessageBox(NULL, TEXT("GetDirectoryPath failed"), TEXT("DEBUG"), MB_OK); // XXXX_DEBUG
+		return FALSE;
+	}
 
 	// メモ本文取得
 	LPTSTR pText = GetMemoBody(pMgr);
-	if (pText == NULL) return FALSE;
+	if (pText == NULL) {
+		MessageBox(NULL, TEXT("GetMemoBody failed"), TEXT("DEBUG"), MB_OK); // XXXX_DEBUG
+		return FALSE;
+	}
 
 	// メモファイル名の確定
 	TString sFullPath;
@@ -455,17 +462,20 @@ MemoNote *PlainMemoNote::Encrypt(PasswordManager *pMgr, TString *pHeadLine, BOOL
 		// チェックOFF時
 		if (!GetHeadLineFromFilePath(pPath, &sHeadLine)) {
 			MemoNote::WipeOutAndDelete(pText);
+			MessageBox(NULL, TEXT("GetHeadLineFromFilePath failed"), TEXT("DEBUG"), MB_OK); // XXXX_DEBUG
 			return FALSE;
 		}
 	} else {
 		if (!GetHeadLineFromMemoText(pText, &sHeadLine)) {
 			MemoNote::WipeOutAndDelete(pText);
+			MessageBox(NULL, TEXT("GetHeadLineFromMemoText failed"), TEXT("DEBUG"), MB_OK); // XXXX_DEBUG
 			return FALSE;
 		}
 	}
 
 	// 新ファイル名を決定
 	if (!GetHeadLinePath(sMemoDir.Get(), sHeadLine.Get(), TEXT(".chi"), &sFullPath, &pNotePath, pHeadLine)) {
+		MessageBox(NULL, TEXT("GetHeadLinePath failed"), TEXT("DEBUG"), MB_OK); // XXXX_DEBUG
 		MemoNote::WipeOutAndDelete(pText);
 		return FALSE;
 	}
@@ -475,16 +485,21 @@ MemoNote *PlainMemoNote::Encrypt(PasswordManager *pMgr, TString *pHeadLine, BOOL
 	if (!p->Init(pNotePath)) {
 		MemoManager::WipeOutAndDeleteFile(sFullPath.Get());
 		MemoNote::WipeOutAndDelete(pText);
+		MessageBox(NULL, TEXT("new CryptedMemoNote failed"), TEXT("DEBUG"), MB_OK); // XXXX_DEBUG
 		return FALSE;
 	}
 
 	char *pTextA = ConvUnicode2SJIS(pText);
 	MemoNote::WipeOutAndDelete(pText);
-	if (pTextA == NULL) return FALSE;
+	if (pTextA == NULL) {
+		MessageBox(NULL, TEXT("ConvUnicode2SJIS failed"), TEXT("DEBUG"), MB_OK); // XXXX_DEBUG
+		return FALSE;
+	}
 	// メモ保存
 	if (!p->SaveData(pMgr, pTextA, sFullPath.Get())) {
 		MemoNote::WipeOutAndDelete(pTextA);
 		delete p;
+		MessageBox(NULL, TEXT("SaveData failed"), TEXT("DEBUG"), MB_OK); // XXXX_DEBUG
 		return FALSE;
 	}
 	MemoNote::WipeOutAndDelete(pTextA);

@@ -669,6 +669,11 @@ void BF_Free(void *handle)
 	LocalFree(ctx);
 }
 
+const char *CheckBlowFish()
+{
+	return selftest();
+}
+
 #ifdef COMMENT
 
 void BlowFishTest()
