@@ -82,14 +82,14 @@ IDD_PROPTAB_FOLDER DIALOG DISCARDABLE  0, 0, 126, 111
 STYLE WS_CHILD | WS_BORDER
 FONT 9, "System"
 BEGIN
-    LTEXT           "Memo folderÅF",IDC_STATIC,5,5,40,10
-    PUSHBUTTON      "...",IDC_FOLDERSEL,105,20,15,10
+    LTEXT           "Memo folder:",IDC_STATIC,5,5,65,10
+    PUSHBUTTON      "...",IDC_FOLDERSEL,100,20,20,10
     LTEXT           "Folder to store Tombo Notes",IDC_STATIC,10,40,105,10
     CONTROL         "Sync file name and title",IDC_KEEPTITLE,"Button",
                     BS_AUTOCHECKBOX | WS_TABSTOP,5,55,115,8
     LTEXT           "Rename file name if headline changed.",IDC_STATIC,10,70,
                     105,20
-    COMBOBOX        IDC_TOPFOLDER,5,20,95,75,CBS_DROPDOWN | CBS_AUTOHSCROLL | 
+    COMBOBOX        IDC_TOPFOLDER,5,20,90,75,CBS_DROPDOWN | CBS_AUTOHSCROLL | 
                     WS_VSCROLL | WS_TABSTOP
     CONTROL         "Open notes read-only mode",IDC_PROP_READONLY,"Button",
                     BS_AUTOCHECKBOX | WS_TABSTOP,5,95,104,10
