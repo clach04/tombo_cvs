@@ -4,6 +4,7 @@
 class MemoNote;
 class SearchEngineA;
 class PasswordManager;
+class VFStore;
 #include "VarBuffer.h"
 
 ////////////////////////////////////
@@ -44,6 +45,7 @@ class VFStream {
 protected:
 	VFStream *pNext;
 public:
+
 	VFStream();
 	virtual ~VFStream();
 
@@ -52,6 +54,7 @@ public:
 
 	BOOL SetNext(VFStream *p);
 	virtual void FreeObject();
+	VFStream *GetNext() { return pNext; }
 
 	///////////////////////////
 	// Notes filtering.
@@ -67,6 +70,11 @@ public:
 	// Finalize classes after calling sequence of Store().
 	// by default PostActive() calls pNext->PostActive().
 	virtual BOOL PostActivate();
+
+	///////////////////////////
+	// copy method
+
+	virtual VFStream *Clone(VFStore **ppTail) = 0;
 };
 
 ////////////////////////////////////
@@ -95,6 +103,7 @@ public:
 	// do not delete pDir after calling Init.
 	BOOL Init(LPTSTR pDir, BOOL bCheckEncrypt);
 
+	VFStream *Clone(VFStore **ppTail);
 };
 
 ////////////////////////////////////
@@ -122,6 +131,7 @@ public:
 	BOOL Prepare();
 	BOOL Store(VFNote *p);
 	BOOL PostActivate();
+	VFStream *Clone(VFStore **ppTail);
 
 	DWORD NumItem() { return vNotes.NumItems(); }
 	VFNote *GetNote(DWORD n) { return *vNotes.GetUnit(n); }
@@ -136,6 +146,9 @@ public:
 ////////////////////////////////////
 
 class VFRegexFilter : public VFStream {
+#ifdef UNIT_TEST
+public:
+#endif
 	SearchEngineA *pRegex;
 	BOOL bNegate;
 public:
@@ -150,6 +163,8 @@ public:
 	virtual BOOL Store(VFNote *p);
 	// BOOL PostActivate();	inherit to VFStream
 	// void FreeObject();	inherit to VFStream
+
+	VFStream *Clone(VFStore **ppTail);
 };
 
 ////////////////////////////////////
@@ -157,9 +172,11 @@ public:
 ////////////////////////////////////
 
 class VFLimitFilter : public VFStream {
+#ifdef UNIT_TEST
+public:
+#endif
 	DWORD nLimit;
 	DWORD nCount;
-
 public:
 	VFLimitFilter();
 	~VFLimitFilter();
@@ -167,6 +184,8 @@ public:
 
 	BOOL Prepare();
 	BOOL Store(VFNote *p);
+
+	VFStream *Clone(VFStore **ppTail);
 };
 
 ////////////////////////////////////
@@ -174,6 +193,9 @@ public:
 ////////////////////////////////////
 
 class VFTimestampFilter : public VFStream {
+#ifdef UNIT_TEST
+public:
+#endif
 	BOOL bNewer;
 	UINT64 uBase;
 public:
@@ -183,6 +205,8 @@ public:
 
 	// BOOL Prepare();
 	BOOL Store(VFNote *p);
+
+	VFStream *Clone(VFStore **ppTail);
 };
 
 ////////////////////////////////////
@@ -198,7 +222,9 @@ public:
 		SortFunc_LastUpdateAsc,
 		SortFunc_LastUpdateDsc
 	};
+#ifndef UNIT_TEST
 protected:
+#endif
 	SortFuncType sfType;
 	TVector<VFNote*> vNotes;
 public:
@@ -209,6 +235,8 @@ public:
 	BOOL Prepare();
 	BOOL Store(VFNote *p);
 	BOOL PostActivate();
+
+	VFStream *Clone(VFStore **ppTail);
 };
 
 #endif

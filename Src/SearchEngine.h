@@ -6,7 +6,7 @@ class MemoNote;
 enum SearchResult;
 
 ///////////////////////////////////////////////////////////
-// テキスト検索ロジック(SJIS版)
+// Regular expression pattern matching (MBCS)
 ///////////////////////////////////////////////////////////
 
 class SearchEngineA {
@@ -26,18 +26,18 @@ protected:
 public:
 
 	//////////////////////////////
-	// ctor & dtor, 初期化
+	// ctor & dtor
 	SearchEngineA();
 	~SearchEngineA();
 	BOOL Init(BOOL bSearchEncrypt, BOOL bFileNameOnly, PasswordManager *pPassMgr);
 
 	//////////////////////////////
-	// パターン準備
+	// prepare pattern
 
 	BOOL Prepare(LPCTSTR pPattern, BOOL bCs, const char **ppReason);
 
 	//////////////////////////////
-	// 検索の実行
+	// exec pattern
 
 	BOOL SearchForward(const char *pText, DWORD nStartPos, BOOL bShift);
 	BOOL SearchBackward(const char *pText, DWORD nStartPos, BOOL bShift);
@@ -45,15 +45,19 @@ public:
 	SearchResult Search(MemoNote *pNote);
 
 	//////////////////////////////
-	// 結果取得
+	// get result
 
 	DWORD MatchStart() { return nMatchStart; }
 	DWORD MatchEnd() { return nMatchEnd; }
 
+	//////////////////////////////
+	// misc funcs
+
 	BOOL IsSearchEncryptMemo() { return bSearchEncrypt; }
 	BOOL IsFileNameOnly() { return bFileNameOnly; }
-
 	PasswordManager *GetPasswordManager() { return pPassMgr; }
+
+	SearchEngineA *Clone();
 };
 
 #endif

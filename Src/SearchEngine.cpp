@@ -185,3 +185,25 @@ SearchResult SearchEngineA::Search(MemoNote *pNote)
 		return bMatch ? SR_FOUND : SR_NOTFOUND;
 	}
 }
+
+////////////////////////////////////////////////////////
+// Duplicate object
+////////////////////////////////////////////////////////
+
+SearchEngineA *SearchEngineA::Clone()
+{
+	const char *pReason;
+	SearchEngineA *p = new SearchEngineA();
+	LPTSTR pPat = ConvSJIS2Unicode(pPattern);
+	if (!p) return NULL;
+	if (!p->Init(bSearchEncrypt, bFileNameOnly, pPassMgr) ||
+		!p->Prepare(pPat, bCaseSensitive, &pReason)) {
+		delete p;
+		delete [] pPat;
+		return NULL;
+	}
+	delete [] pPat;
+	return p;
+}
+
+

@@ -194,6 +194,21 @@ BOOL VFDirectoryGenerator::Store(VFNote *p)
 	return FALSE;
 }
 
+VFStream *VFDirectoryGenerator::Clone(VFStore **ppTail)
+{
+	VFDirectoryGenerator *p = new VFDirectoryGenerator();
+	if (p == NULL) return NULL;
+	
+	p->bCheckEncrypt = bCheckEncrypt;
+	p->pDirPath = StringDup(pDirPath);
+	p->pNext = pNext->Clone(ppTail);
+	if (!p || p->pDirPath == NULL ||
+		p->pNext == NULL) {
+		delete p;
+		return NULL;
+	}
+	return p;
+}
 ////////////////////////////////////
 // VFStore implimentation
 ////////////////////////////////////
@@ -240,6 +255,14 @@ void VFStore::FreeArray()
 		delete (*vNotes.GetUnit(i));
 	}
 	vNotes.Clear(FALSE);
+}
+
+VFStream *VFStore::Clone(VFStore **ppTail)
+{
+	VFStore *p = new VFStore(oiOrder);
+	if (!p || !p->Init()) return NULL;
+	*ppTail = p;
+	return p;
 }
 
 ////////////////////////////////////
@@ -291,6 +314,21 @@ BOOL VFRegexFilter::Store(VFNote *p)
 	}
 }
 
+VFStream *VFRegexFilter::Clone(VFStore **ppTail)
+{
+	VFRegexFilter *p = new VFRegexFilter();
+	if (p == NULL) return NULL;
+
+	p->pRegex = pRegex->Clone();
+	p->pNext = pNext->Clone(ppTail);
+	p->bNegate = bNegate;
+	if (!p || p->pRegex == NULL || 
+		p->pNext == NULL) {
+		delete p;
+		return NULL;
+	}
+	return p;
+}
 ////////////////////////////////////
 //  VFLimitFilter
 ////////////////////////////////////
@@ -323,6 +361,21 @@ BOOL VFLimitFilter::Store(VFNote *p)
 	}
 	nCount++;
 	return pNext->Store(p);
+}
+
+VFStream *VFLimitFilter::Clone(VFStore **ppTail)
+{
+	VFLimitFilter *p = new VFLimitFilter();
+	if (!p || !p->Init(nLimit)) {
+		delete p;
+		return NULL;
+	}
+	p->pNext = pNext->Clone(ppTail);
+	if (!p || p->pNext == NULL) {
+		delete p;
+		return NULL;
+	}
+	return p;
 }
 
 ////////////////////////////////////
@@ -361,27 +414,21 @@ BOOL VFTimestampFilter::Store(VFNote *pNote)
 		delete pNote;
 		return TRUE;
 	}
-#ifdef COMMENT
-	TString sPath;
-	if (!sPath.AllocFullPath(pMemo->MemoPath())) return FALSE;
+}
 
-	WIN32_FIND_DATA wfd;
-	HANDLE h = FindFirstFile(sPath.Get(), &wfd);
-	if (h != INVALID_HANDLE_VALUE) {
-		UINT64 uUpdate = ((UINT64)wfd.ftLastWriteTime.dwHighDateTime << 32) | (UINT64)wfd.ftLastWriteTime.dwLowDateTime ;
-		BOOL bResult = TRUE;
-		if ((bNewer && uUpdate > uBase) || (!bNewer && uUpdate < uBase)) {
-			bResult = pNext->Store(pNote);
-		} else {
-			delete pNote;
-		}
-		FindClose(h);
-		return bResult;
-	} else {
-		delete pNote;
-		return TRUE;
+VFStream *VFTimestampFilter::Clone(VFStore **ppTail)
+{
+	VFTimestampFilter *p = new VFTimestampFilter();
+	if (!p) return NULL;
+
+	p->bNewer = bNewer;
+	p->uBase = uBase;
+	p->pNext = pNext->Clone(ppTail);
+	if (!p || p->pNext == NULL) {
+		delete p;
+		return NULL;
 	}
-#endif
+	return p;
 }
 
 ////////////////////////////////////
@@ -478,4 +525,17 @@ BOOL VFSortFilter::PostActivate()
 		if (!pNext->Store(p)) return FALSE;
 	}
 	return VFStream::PostActivate();
+}
+
+VFStream *VFSortFilter::Clone(VFStore **ppTail)
+{
+	VFSortFilter *p = new VFSortFilter();
+	if (!p || !p->Init(sfType)) return NULL;
+
+	p->pNext = pNext->Clone(ppTail);
+	if (!p || p->pNext == NULL) {
+		delete p;
+		return NULL;
+	}
+	return p;
 }
