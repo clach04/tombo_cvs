@@ -28,8 +28,8 @@
 #include "PsPCPlatform.h"
 #include "HPCPlatform.h"
 #include "LagendaPlatform.h"
+#include "TomboURI.h"
 #include "Repository.h"
-#include "RepositoryFactory.h"
 
 #if defined(PLATFORM_PKTPC)
 #include "DialogTemplate.h"
@@ -55,7 +55,6 @@ UINT WINAPI ImmGetVirtualKey(HWND);
 #include "SearchDlg.h"
 #include "SearchEngine.h"
 #include "SearchTree.h"
-#include "TomboURI.h"
 
 //#include "YAEditor.h"
 
@@ -512,7 +511,10 @@ void MainFrame::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	}
 
 	// Initialize RepositoryFactory
-	g_RepositoryFactory.Init(&g_Property);
+	RepositoryOption roOpt;
+	roOpt.bKeepCaret = g_Property.KeepCaret();
+	roOpt.bKeepTitle = g_Property.KeepTitle();
+	g_Repository.Init(g_Property.TopDir(), &roOpt);
 
 	// create toolbar
 	pPlatform->Create(hWnd, pcs->hInstance);
@@ -1039,8 +1041,9 @@ void MainFrame::SetWindowTitle(TomboURI *pURI)
 		LPCTSTR pPrefix = TEXT("Tombo - ");
 		LPCTSTR pBase;
 		TString sHeadLine;
-		Repository *pRepo = g_RepositoryFactory.GetRepository(pURI);
-		if (pRepo != NULL && pRepo->GetHeadLine(pURI, &sHeadLine)) {
+//		Repository *pRepo = g_RepositoryFactory.GetRepository(pURI);
+//		if (pRepo != NULL && pRepo->GetHeadLine(pURI, &sHeadLine)) {
+		if (g_Repository.GetHeadLine(pURI, &sHeadLine)) {
 			pBase = sHeadLine.Get();
 		} else {
 			pBase = TEXT("");
@@ -1642,11 +1645,10 @@ void MainFrame::DoSearchTree(BOOL bFirst, BOOL bForward)
 
 	SearchEngineA *pSE = mmMemoManager.GetSearchEngine();
 
-	TString sPath, sFullPath;
-	// Get path of selecting on treeview.
-	TreeViewItem *pItem = msView.GetCurrentItem();
-	if (pItem == NULL || !pItem->GetLocationPath(&msView, &sPath)) return;
-	if (!sFullPath.Join(g_Property.TopDir(), TEXT("\\"), sPath.Get())) return;
+	TomboURI sURI;
+	if (!msView.GetURI(&sURI)) return;
+	TString sFullPath;
+	if (!g_Repository.GetPhysicalPath(&sURI, &sFullPath)) return;
 
 	// Create dialog and do search.
 	SearchTree st;

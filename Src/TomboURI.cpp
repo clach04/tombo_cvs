@@ -130,7 +130,7 @@ LPCTSTR TomboURI::GetPath() const
 // Is the URI encrypted?
 /////////////////////////////////////////////
 
-BOOL TomboURI::IsEncrypted()
+BOOL TomboURI::IsEncrypted() const
 {
 	DWORD n = _tcslen(Get());
 	if (n > 4 && _tcscmp(Get() + n - 4, TEXT(".chi")) == 0) return TRUE;
@@ -141,7 +141,7 @@ BOOL TomboURI::IsEncrypted()
 // Is the URI point to leaf node?
 /////////////////////////////////////////////
 
-BOOL TomboURI::IsLeaf()
+BOOL TomboURI::IsLeaf() const
 {
 	if (_tcslen(GetPath() + 1) == 0) return FALSE; // root
 	LPCTSTR p = Get();
@@ -152,7 +152,7 @@ BOOL TomboURI::IsLeaf()
 // get parent path
 /////////////////////////////////////////////
 
-BOOL TomboURI::GetParent(TomboURI *pParent)
+BOOL TomboURI::GetParent(TomboURI *pParent) const
 {
 	LPCTSTR p = GetPath();
 	LPCTSTR pBase = p;

@@ -2455,6 +2455,7 @@ DEP_CPP_MEMOM=\
 	"..\..\Src\RepositoryFactory.h"\
 	"..\..\Src\SearchEngine.h"\
 	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboLib\AutoPtr.h"\
 	"..\..\Src\TomboLib\File.h"\
 	"..\..\Src\TomboLib\Logger.h"\
 	"..\..\Src\TomboLib\TString.h"\
@@ -3470,14 +3471,30 @@ DEP_CPP_REPOS=\
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) ReleaseVGA"
 
 DEP_CPP_REPOS=\
+	"..\..\Src\Repository.h"\
+	"..\..\Src\RepositoryImpl.h"\
+	"..\..\Src\TomboLib\TString.h"\
+	"..\..\Src\TomboURI.h"\
+	
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\RepositoryImpl.cpp
+
+!IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
+
+DEP_CPP_REPOSI=\
 	"..\..\Src\MemoInfo.h"\
 	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoNote.h"\
 	"..\..\Src\Message.h"\
 	"..\..\Src\MsgRes\MsgDef.h"\
 	"..\..\Src\PasswordManager.h"\
-	"..\..\Src\Property.h"\
 	"..\..\Src\Repository.h"\
+	"..\..\Src\RepositoryImpl.h"\
 	"..\..\Src\TomboLib\AutoPtr.h"\
 	"..\..\Src\TomboLib\TString.h"\
 	"..\..\Src\TomboLib\Uniconv.h"\
@@ -3486,61 +3503,99 @@ DEP_CPP_REPOS=\
 	"..\..\Src\TreeViewItem.h"\
 	
 
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\RepositoryFactory.cpp
-
-!IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
-
-DEP_CPP_REPOSI=\
-	"..\..\Src\Property.h"\
-	"..\..\Src\Repository.h"\
-	"..\..\Src\RepositoryFactory.h"\
-	
-
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Release"
 
 DEP_CPP_REPOSI=\
-	"..\..\Src\Property.h"\
+	"..\..\Src\MemoInfo.h"\
+	"..\..\Src\MemoManager.h"\
+	"..\..\Src\MemoNote.h"\
+	"..\..\Src\Message.h"\
+	"..\..\Src\MsgRes\MsgDef.h"\
+	"..\..\Src\PasswordManager.h"\
 	"..\..\Src\Repository.h"\
-	"..\..\Src\RepositoryFactory.h"\
+	"..\..\Src\RepositoryImpl.h"\
+	"..\..\Src\TomboLib\AutoPtr.h"\
+	"..\..\Src\TomboLib\TString.h"\
+	"..\..\Src\TomboLib\Uniconv.h"\
+	"..\..\Src\TomboLib\VarBuffer.h"\
+	"..\..\Src\TomboURI.h"\
+	"..\..\Src\TreeViewItem.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Debug"
 
 DEP_CPP_REPOSI=\
-	"..\..\Src\Property.h"\
+	"..\..\Src\MemoInfo.h"\
+	"..\..\Src\MemoManager.h"\
+	"..\..\Src\MemoNote.h"\
+	"..\..\Src\Message.h"\
+	"..\..\Src\MsgRes\MsgDef.h"\
+	"..\..\Src\PasswordManager.h"\
 	"..\..\Src\Repository.h"\
-	"..\..\Src\RepositoryFactory.h"\
+	"..\..\Src\RepositoryImpl.h"\
+	"..\..\Src\TomboLib\AutoPtr.h"\
+	"..\..\Src\TomboLib\TString.h"\
+	"..\..\Src\TomboLib\Uniconv.h"\
+	"..\..\Src\TomboLib\VarBuffer.h"\
+	"..\..\Src\TomboURI.h"\
+	"..\..\Src\TreeViewItem.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Release"
 
 DEP_CPP_REPOSI=\
-	"..\..\Src\Property.h"\
+	"..\..\Src\MemoInfo.h"\
+	"..\..\Src\MemoManager.h"\
+	"..\..\Src\MemoNote.h"\
+	"..\..\Src\Message.h"\
+	"..\..\Src\MsgRes\MsgDef.h"\
+	"..\..\Src\PasswordManager.h"\
 	"..\..\Src\Repository.h"\
-	"..\..\Src\RepositoryFactory.h"\
+	"..\..\Src\RepositoryImpl.h"\
+	"..\..\Src\TomboLib\AutoPtr.h"\
+	"..\..\Src\TomboLib\TString.h"\
+	"..\..\Src\TomboLib\Uniconv.h"\
+	"..\..\Src\TomboLib\VarBuffer.h"\
+	"..\..\Src\TomboURI.h"\
+	"..\..\Src\TreeViewItem.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Release"
 
 DEP_CPP_REPOSI=\
-	"..\..\Src\Property.h"\
+	"..\..\Src\MemoInfo.h"\
+	"..\..\Src\MemoManager.h"\
+	"..\..\Src\MemoNote.h"\
+	"..\..\Src\Message.h"\
+	"..\..\Src\MsgRes\MsgDef.h"\
+	"..\..\Src\PasswordManager.h"\
 	"..\..\Src\Repository.h"\
-	"..\..\Src\RepositoryFactory.h"\
+	"..\..\Src\RepositoryImpl.h"\
+	"..\..\Src\TomboLib\AutoPtr.h"\
+	"..\..\Src\TomboLib\TString.h"\
+	"..\..\Src\TomboLib\Uniconv.h"\
+	"..\..\Src\TomboLib\VarBuffer.h"\
+	"..\..\Src\TomboURI.h"\
+	"..\..\Src\TreeViewItem.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) ReleaseVGA"
 
 DEP_CPP_REPOSI=\
-	"..\..\Src\Property.h"\
+	"..\..\Src\MemoInfo.h"\
+	"..\..\Src\MemoManager.h"\
+	"..\..\Src\MemoNote.h"\
+	"..\..\Src\Message.h"\
+	"..\..\Src\MsgRes\MsgDef.h"\
+	"..\..\Src\PasswordManager.h"\
 	"..\..\Src\Repository.h"\
-	"..\..\Src\RepositoryFactory.h"\
+	"..\..\Src\RepositoryImpl.h"\
+	"..\..\Src\TomboLib\AutoPtr.h"\
 	"..\..\Src\TomboLib\TString.h"\
+	"..\..\Src\TomboLib\Uniconv.h"\
+	"..\..\Src\TomboLib\VarBuffer.h"\
 	"..\..\Src\TomboURI.h"\
+	"..\..\Src\TreeViewItem.h"\
 	
 
 !ENDIF 
@@ -4230,6 +4285,8 @@ DEP_CPP_TREEV=\
 	"..\..\Src\PocketPCPlatform.h"\
 	"..\..\Src\Property.h"\
 	"..\..\Src\PsPCPlatform.h"\
+	"..\..\Src\Repository.h"\
+	"..\..\Src\RepositoryFactory.h"\
 	"..\..\Src\Tombo.h"\
 	"..\..\Src\TomboLib\DirectoryScanner.h"\
 	"..\..\Src\TomboLib\File.h"\
@@ -4930,7 +4987,7 @@ SOURCE=..\..\Src\Repository.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\Src\RepositoryFactory.h
+SOURCE=..\..\Src\RepositoryImpl.h
 # End Source File
 # Begin Source File
 

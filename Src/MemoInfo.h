@@ -1,15 +1,14 @@
 #ifndef MEMOINFO_H
 #define MEMOINFO_H
 
-#include "TString.h"
-
 ////////////////////////////////////////
-// ÉÅÉÇèÓïÒDB
+// Notes properties
 ////////////////////////////////////////
 
 class MemoInfo {
+	LPCTSTR pTopDir;
 public:
-	MemoInfo() {}
+	MemoInfo(LPCTSTR pTop) : pTopDir(pTop) {}
 	~MemoInfo() {}
 
 	BOOL WriteInfo(LPCTSTR pMemoPath, DWORD nPos);

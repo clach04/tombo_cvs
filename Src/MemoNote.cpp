@@ -65,7 +65,7 @@ BOOL MemoNote::Init(LPCTSTR p)
 // if subclass of MemoNote has class-oriented member variables,
 // create this method for each classes.
 
-MemoNote *MemoNote::Clone()
+MemoNote *MemoNote::Clone() const
 {
 	MemoNote *p = GetNewInstance();
 	if (p == NULL || !p->Init(pPath)) return NULL;
@@ -82,13 +82,13 @@ BOOL MemoNote::Equal(MemoNote *pTarget)
 // メモ内容の取得(MemoNote)
 /////////////////////////////////////////////
 
-LPTSTR MemoNote::GetMemoBody(PasswordManager *pMgr) 
+LPTSTR MemoNote::GetMemoBody(PasswordManager *pMgr) const
 {
 	SetLastError(ERROR_INVALID_FUNCTION);
 	return NULL;
 }
 
-char *MemoNote::GetMemoBodyA(PasswordManager *pMgr)
+char *MemoNote::GetMemoBodyA(PasswordManager *pMgr) const
 {
 	SetLastError(ERROR_INVALID_FUNCTION);
 	return NULL;
@@ -141,7 +141,7 @@ BOOL MemoNote::InitNewMemo(LPCTSTR pMemoPath, LPCTSTR pText, TString *pHeadLine)
 // get note's URI
 /////////////////////////////////////////////
 
-BOOL MemoNote::GetURI(TomboURI *pURI)
+BOOL MemoNote::GetURI(TomboURI *pURI) const
 {
 	return pURI->InitByNotePath(pPath);
 }
@@ -150,7 +150,7 @@ BOOL MemoNote::GetURI(TomboURI *pURI)
 // メモ内容の取得(PlainMemoNote)
 /////////////////////////////////////////////
 
-char *PlainMemoNote::GetMemoBodyA(PasswordManager*)
+char *PlainMemoNote::GetMemoBodyA(PasswordManager*) const
 {
 	TString sFileName;
 	if (!sFileName.Join(g_Property.TopDir(), TEXT("\\"), pPath)) return NULL;
@@ -168,7 +168,7 @@ char *PlainMemoNote::GetMemoBodyA(PasswordManager*)
 	return pText;
 }
 
-LPTSTR PlainMemoNote::GetMemoBody(PasswordManager *p)
+LPTSTR PlainMemoNote::GetMemoBody(PasswordManager *p) const
 {
 	char *pText = GetMemoBodyA(p);
 	if (!pText) return NULL;
@@ -183,7 +183,7 @@ LPTSTR PlainMemoNote::GetMemoBody(PasswordManager *p)
 /////////////////////////////////////////////
 // メモ内容の取得(CryptedMemoNote)
 /////////////////////////////////////////////
-LPBYTE CryptedMemoNote::GetMemoBodySub(PasswordManager *pMgr, LPDWORD pSize)
+LPBYTE CryptedMemoNote::GetMemoBodySub(PasswordManager *pMgr, LPDWORD pSize) const
 {
 	CryptManager cMgr;
 	BOOL bRegistedPassword = TRUE;
@@ -217,13 +217,13 @@ LPBYTE CryptedMemoNote::GetMemoBodySub(PasswordManager *pMgr, LPDWORD pSize)
 	return pPlain;
 }
 
-char *CryptedMemoNote::GetMemoBodyA(PasswordManager *pMgr)
+char *CryptedMemoNote::GetMemoBodyA(PasswordManager *pMgr) const
 {
 	DWORD nSize;
 	return (char*)GetMemoBodySub(pMgr, &nSize);
 }
 
-LPTSTR CryptedMemoNote::GetMemoBody(PasswordManager *pMgr)
+LPTSTR CryptedMemoNote::GetMemoBody(PasswordManager *pMgr) const
 {
 	DWORD nSize;
 	LPBYTE pPlain = GetMemoBodySub(pMgr, &nSize);
@@ -282,13 +282,13 @@ BOOL CryptedMemoNote::SaveData(PasswordManager *pMgr, const char *pText, LPCTSTR
 // 暗号化
 /////////////////////////////////////////////
 
-MemoNote *MemoNote::Encrypt(PasswordManager *pMgr, TString *pHeadLine, BOOL *pIsModified)
+MemoNote *MemoNote::Encrypt(PasswordManager *pMgr, TString *pHeadLine, BOOL *pIsModified) const
 {
 	MessageBox(NULL, TEXT("MemoNote::Encrypt called"), TEXT("DEBUG"), MB_OK);
 	return NULL;
 }
 
-MemoNote *PlainMemoNote::Encrypt(PasswordManager *pMgr, TString *pHeadLine, BOOL *pIsModified)
+MemoNote *PlainMemoNote::Encrypt(PasswordManager *pMgr, TString *pHeadLine, BOOL *pIsModified) const
 {
 	TString sMemoDir;
 	if (!sMemoDir.GetDirectoryPath(pPath)) {
@@ -361,12 +361,12 @@ MemoNote *PlainMemoNote::Encrypt(PasswordManager *pMgr, TString *pHeadLine, BOOL
 // 復号化
 /////////////////////////////////////////////
 
-MemoNote *MemoNote::Decrypt(PasswordManager *pMgr, TString *pHeadLine, BOOL *pIsModified)
+MemoNote *MemoNote::Decrypt(PasswordManager *pMgr, TString *pHeadLine, BOOL *pIsModified) const
 {
 	return NULL;
 }
 
-MemoNote *CryptedMemoNote::Decrypt(PasswordManager *pMgr, TString *pHeadLine, BOOL *pIsModified)
+MemoNote *CryptedMemoNote::Decrypt(PasswordManager *pMgr, TString *pHeadLine, BOOL *pIsModified) const
 {
 	// メモ本文取得
 	LPTSTR pText = GetMemoBody(pMgr);
@@ -413,14 +413,14 @@ MemoNote *CryptedMemoNote::Decrypt(PasswordManager *pMgr, TString *pHeadLine, BO
 // データの削除
 /////////////////////////////////////////////
 
-BOOL MemoNote::DeleteMemoData()
+BOOL MemoNote::DeleteMemoData() const 
 {
 	TString sFileName;
 	if (!sFileName.Join(g_Property.TopDir(), TEXT("\\"), pPath)) return FALSE;
 
 	// 付加情報を保持していた場合にはその情報も削除
 	if (MemoPath()) {
-		MemoInfo mi;
+		MemoInfo mi(g_Property.TopDir());
 		mi.DeleteInfo(MemoPath());
 	}
 
@@ -431,12 +431,12 @@ BOOL MemoNote::DeleteMemoData()
 // インスタンスの生成
 /////////////////////////////////////////////
 
-MemoNote *PlainMemoNote::GetNewInstance()
+MemoNote *PlainMemoNote::GetNewInstance() const 
 {
 	return new PlainMemoNote();
 }
 
-MemoNote *CryptedMemoNote::GetNewInstance()
+MemoNote *CryptedMemoNote::GetNewInstance() const
 {
 	return new CryptedMemoNote();
 }
@@ -612,7 +612,7 @@ static BOOL GetHeadLineFromFilePath(LPCTSTR pFilePath, TString *pHeadLine)
 // メモファイルをコピーしてインスタンスを生成
 ////////////////////////////////////////////////////////
 
-MemoNote *MemoNote::CopyMemo(MemoNote *pOrig, LPCTSTR pMemoPath, TString *pHeadLine)
+MemoNote *MemoNote::CopyMemo(const MemoNote *pOrig, LPCTSTR pMemoPath, TString *pHeadLine)
 {
 	MemoNote *pNote;
 	pNote = pOrig->GetNewInstance();
@@ -687,7 +687,7 @@ BOOL MemoNote::Rename(LPCTSTR pNewName)
 	}
 
 	// *.tdtのリネームの実行
-	MemoInfo mi;
+	MemoInfo mi(g_Property.TopDir());
 	mi.RenameInfo(sOldFullPath.Get(), sNewFullPath.Get());
 
 	delete [] pPath;

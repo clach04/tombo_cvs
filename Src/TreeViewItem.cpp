@@ -21,6 +21,8 @@
 #include "DirList.h"
 #include "VFManager.h"
 
+#include "Repository.h"
+
 #if defined(PLATFORM_BE500)
 #include "COShellAPI.h"
 #endif
@@ -78,6 +80,24 @@ BOOL TreeViewItem::LoadMemo(MemoSelectView *pView, BOOL bAskPass)
 //  File
 /////////////////////////////////////////////
 /////////////////////////////////////////////
+TreeViewFileItem::Locator::~Locator()
+{
+	delete pURI;
+}
+
+void TreeViewFileItem::Locator::set(MemoNote *p)
+{
+	delete pURI;
+	pURI = new TomboURI();
+	p->GetURI(pURI);
+}
+
+void TreeViewFileItem::Locator::set(TomboURI *p)
+{
+	delete pURI;
+	pURI = new TomboURI();
+	pURI->Init(p->GetFullURI());
+}
 
 TreeViewFileItem::TreeViewFileItem() : TreeViewItem(FALSE)
 {
@@ -85,13 +105,12 @@ TreeViewFileItem::TreeViewFileItem() : TreeViewItem(FALSE)
 
 TreeViewFileItem::~TreeViewFileItem()
 {
-	delete pNote;
 }
 
 void TreeViewFileItem::SetNote(MemoNote *p)
 { 
-	pNote = p;
-	bIsEncrypted = pNote->IsEncrypted();
+	loc.set(p);
+	bIsEncrypted = g_Repository.IsEncrypted(loc.getURI());
 }
 
 BOOL TreeViewFileItem::Move(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR *ppErr)
@@ -99,50 +118,44 @@ BOOL TreeViewFileItem::Move(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR *p
 	if (!Copy(pMgr, pView, ppErr)) {
 		return FALSE;
 	}
-	TString uri;
-	if (!pView->GetURI(&uri, GetViewItem())) return FALSE;
-
-	if (g_Property.IsUseTwoPane() && pMgr->IsNoteDisplayed(uri.Get())) {
-		// 現在表示されているメモの表示をキャンセルする
+	if (g_Property.IsUseTwoPane() && pMgr->IsNoteDisplayed(loc.getURI()->GetFullURI())) {
+		// close current note
 		pMgr->NewMemo();
 	}
-	// ファイルの削除
-	if (!pNote->DeleteMemoData()) return FALSE;
+
+	URIOption opt;
+	if (!g_Repository.Delete(loc.getURI(), &opt)) return FALSE;
 	return TRUE;
 }
 
 BOOL TreeViewFileItem::Copy(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR *ppErr)
 {
-	TString sPath;
-	TString sHeadLine;
+	TomboURI sCopyToURI;
+	TomboURI sCurURI;
 
-	HTREEITEM hParent = pView->GetPathForNewItem(&sPath);
-	if (hParent == NULL) return FALSE;
+	if (!pView->GetURI(&sCurURI)) return FALSE;
+	if (!g_Repository.GetAttachURI(&sCurURI, &sCopyToURI)) return FALSE;
 
-	MemoNote *pNewNote = MemoNote::CopyMemo(pNote, sPath.Get(), &sHeadLine);
-	if (pNewNote == NULL) return FALSE;
+	HTREEITEM hParent = pView->ShowItemByURI(sCopyToURI.GetFullURI(), FALSE, FALSE);
+	URIOption opt;
+	if (!g_Repository.Copy(loc.getURI(), &sCopyToURI, &opt)) return FALSE;
 
-	TomboURI sURI;
-	pNewNote->GetURI(&sURI);
-
-	pView->InsertFile(hParent, &sURI, sHeadLine.Get(), FALSE, FALSE);
+	pView->InsertFile(hParent, opt.pNewURI, opt.pNewHeadLine->Get(), FALSE, FALSE);
 	return TRUE;
 }
 
 BOOL TreeViewFileItem::Delete(MemoManager *pMgr, MemoSelectView *pView)
 {
-	// ユーザへの意思確認
+	// Confirm
 	if (TomboMessageBox(NULL, MSG_CONFIRM_DELETE, MSG_DELETE_TTL, MB_ICONQUESTION | MB_OKCANCEL) != IDOK) return FALSE;
 
-	TString uri;
-	if (!pView->GetURI(&uri, GetViewItem())) return FALSE;
-
-	if (g_Property.IsUseTwoPane() && pMgr->IsNoteDisplayed(uri.Get())) {
-		// 現在表示されているメモの表示をキャンセルする
+	if (g_Property.IsUseTwoPane() && pMgr->IsNoteDisplayed(loc.getURI()->GetFullURI())) {
+		// close current note
 		pMgr->NewMemo();
 	}
-	// ファイルの削除
-	if (!pNote->DeleteMemoData()) {
+
+	URIOption opt;
+	if (!g_Repository.Delete(loc.getURI(), &opt)) {
 		TomboMessageBox(NULL, MSG_DELETE_FAILED, TEXT("ERROR"), MB_ICONSTOP | MB_OK);
 		return FALSE;
 	}
@@ -151,36 +164,27 @@ BOOL TreeViewFileItem::Delete(MemoManager *pMgr, MemoSelectView *pView)
 
 BOOL TreeViewFileItem::Encrypt(MemoManager *pMgr, MemoSelectView *pView)
 {
-	// 既に暗号化されていたら無視する
-	if (pNote->IsEncrypted()) return TRUE;
+	// if this note is encrypted, ignore. 
+	if (g_Repository.IsEncrypted(loc.getURI())) return TRUE;
 
-	// 詳細ビューに表示されているメモを暗号化しようとしているのであれば、
-	// 保存しておく
-	TString uri;
-	if (!pView->GetURI(&uri, GetViewItem())) return FALSE;
-
-	if (g_Property.IsUseTwoPane() && pMgr->IsNoteDisplayed(uri.Get())) {
+	// if the note is opened, close it.
+	if (g_Property.IsUseTwoPane() && pMgr->IsNoteDisplayed(loc.getURI()->GetFullURI())) {
 		pMgr->InactiveDetailsView();
 	}
 
-	// 暗号化
-	BOOL b;
-	TString sHeadLine;
-	MemoNote *p = pNote->Encrypt(pMgr->GetPasswordManager(), &sHeadLine, &b);
-	if (p == NULL) return FALSE;
-
-	// 暗号化前のメモを削除
-	if (!pNote->DeleteMemoData()) {
-		MessageBox(NULL, MSG_DELETE_PREV_CRYPT_MEMO_FAILED, TEXT("TOMBO"), MB_ICONWARNING | MB_OK);
+	URIOption opt(NOTE_OPTIONMASK_ENCRYPTED);
+	opt.bEncrypt = TRUE;
+	if (!g_Repository.SetOption(loc.getURI(), &opt)) {
+		MessageBox(NULL, g_mMsgRes.GetMsg(opt.nErrorCode), TEXT("TOMBO"), opt.iLevel | MB_OK);
+		return FALSE;
 	}
 
-	// TreeViewItemの保持するMemoNoteを暗号化されたものに置き換える
-	delete pNote;
-	pNote = p;
+	// replace MemoNote that TreeViewItem have
+	loc.set(opt.pNewNote);
 	bIsEncrypted = TRUE;
 
-	// 暗号化に伴いアイコン・ヘッドラインが変更になる可能性があるので更新依頼
-	if (!pView->UpdateItemStatusNotify(this, sHeadLine.Get())) {
+	// update icon and headline string
+	if (!pView->UpdateItemStatusNotify(this, opt.pNewHeadLine->Get())) {
 		MessageBox(NULL, TEXT("UpdateItemStatusNotify failed"), TEXT("DEBUG"), MB_OK);
 		return FALSE;
 	}
@@ -189,36 +193,28 @@ BOOL TreeViewFileItem::Encrypt(MemoManager *pMgr, MemoSelectView *pView)
 
 BOOL TreeViewFileItem::Decrypt(MemoManager *pMgr, MemoSelectView *pView)
 {
-	// 平文だったら無視する
-	if (!pNote->IsEncrypted()) return TRUE;
+	// if the note is plain text, ignore it
+	if (!g_Repository.IsEncrypted(loc.getURI())) return TRUE;
 
-	// 詳細ビューに表示されているメモを復号化しようとしているのであれば、
-	// 保存しておく
-	TString uri;
-	if (!pView->GetURI(&uri, GetViewItem())) return FALSE;
-
-	if (g_Property.IsUseTwoPane() && pMgr->IsNoteDisplayed(uri.Get())) {
+	// if the note is opened, close it.
+	if (g_Property.IsUseTwoPane() && pMgr->IsNoteDisplayed(loc.getURI()->GetFullURI())) {
 		pMgr->InactiveDetailsView();
 	}
 
-	// 復号化
-	BOOL b;
-	TString sHeadLine;
-	MemoNote *p = pNote->Decrypt(pMgr->GetPasswordManager(), &sHeadLine, &b);
-	if (p == NULL) return FALSE;
-
-	// 復号化前のメモを削除
-	if (!pNote->DeleteMemoData()) {
-		MessageBox(NULL, MSG_DEL_PREV_DECRYPT_MEMO_FAILED, TEXT("TOMBO"), MB_ICONWARNING | MB_OK);
+	// decrypt
+	URIOption opt(NOTE_OPTIONMASK_ENCRYPTED);
+	opt.bEncrypt = FALSE;
+	if (!g_Repository.SetOption(loc.getURI(), &opt)) {
+		MessageBox(NULL, g_mMsgRes.GetMsg(opt.nErrorCode), TEXT("TOMBO"), opt.iLevel | MB_OK);
+		return FALSE;
 	}
 
-	// TreeViewItemの保持するMemoNoteを復号化されたものに置き換える
-	delete pNote;
-	pNote = p;
+	// replace MemoNote that TreeViewItem have
+	loc.set(opt.pNewNote);
 	bIsEncrypted = FALSE;
 
-	// 暗号化に伴いアイコン・ヘッドラインが変更になる可能性があるので更新依頼
-	if (!pView->UpdateItemStatusNotify(this, sHeadLine.Get())) {
+	// update icon and headline string
+	if (!pView->UpdateItemStatusNotify(this, opt.pNewHeadLine->Get())) {
 		return FALSE;
 	}
 	return TRUE;
@@ -236,22 +232,22 @@ BOOL TreeViewFileItem::IsOperationEnabled(MemoSelectView *pView, OpType op)
 	}
 }
 
-BOOL TreeViewFileItem::Rename(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR pNewName)
+BOOL TreeViewFileItem::Rename(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR pNewHeadLine)
 {
-	BOOL bResult = pNote->Rename(pNewName);
-	if (!bResult) {
-		DWORD nErr = GetLastError();
-		if (nErr == ERROR_NO_DATA) {
-			TomboMessageBox(NULL, MSG_NO_FILENAME, TOMBO_APP_NAME, MB_ICONWARNING | MB_OK);
-		} else if (nErr == ERROR_ALREADY_EXISTS) {
-			TomboMessageBox(NULL, MSG_SAME_FILE, TOMBO_APP_NAME, MB_ICONWARNING | MB_OK);
+	URIOption opt;
+	if (!g_Repository.ChangeHeadLine(loc.getURI(), pNewHeadLine, &opt)) {
+		if (opt.nErrorCode != -1) {
+			TomboMessageBox(NULL, g_mMsgRes.GetMsg(opt.nErrorCode), TOMBO_APP_NAME, opt.iLevel | MB_OK);
 		} else {
 			TCHAR buf[MAX_PATH];
-			wsprintf(buf, MSG_RENAME_FAILED, nErr);
+			wsprintf(buf, MSG_RENAME_FAILED, GetLastError());
 			TomboMessageBox(NULL, buf, TOMBO_APP_NAME, MB_ICONERROR | MB_OK);
 		}
+		return FALSE;
 	}
-	return bResult;
+
+	loc.set(opt.pNewNote);
+	return TRUE;
 }
 
 DWORD TreeViewFileItem::GetIcon(MemoSelectView *, DWORD nStatus)
@@ -284,41 +280,15 @@ DWORD TreeViewFileItem::ItemOrder()
 	return ITEM_ORDER_FILE;
 }
 
-BOOL TreeViewFileItem::GetLocationPath(MemoSelectView *pView, TString *pPath)
-{
-	if (!pPath->Set(pNote->MemoPath())) return FALSE;
-	return TRUE;
-}
-
 BOOL TreeViewFileItem::GetURIItem(MemoSelectView *pView, TString *pItem)
 {
-	LPCTSTR p = pNote->MemoPath();
-	LPCTSTR q = NULL;
-	if (*p != TEXT('\\')) {
-		q = p;
-	}
+	return FALSE;
+}
 
-	while (*p) {
-#if defined(PLATFORM_WIN32)
-		if (IsDBCSLeadByte(*p)) {
-			p+=2;
-			continue;
-		}
-#endif
-		if (*p == TEXT('\\')) {
-			q = p;
-		}
-		p++;
-	}
-	if (q) {
-		if (*q == TEXT('\\')) {
-			return pItem->Set(q + 1);
-		} else {
-			return pItem->Set(q);
-		}
-	} else {
-		return FALSE;
-	}
+BOOL TreeViewFileItem::GetURI(TString *pURI)
+{
+	if (!pURI->Set(loc.getURI()->GetFullURI())) return FALSE;
+	return TRUE;
 }
 
 TreeViewFileItem::IsUseDetailsView()
@@ -344,9 +314,8 @@ BOOL TreeViewFileItem::LoadMemo(MemoSelectView *pView, BOOL bAskPass)
 
 BOOL TreeViewFileItem::ExecApp(MemoManager *pMgr, MemoSelectView *pView, ExeAppType nType)
 {
-	LPCTSTR p = pNote->MemoPath();
 	TString sFullPath;
-	if (!sFullPath.Join(g_Property.TopDir(), TEXT("\\"), p)) return FALSE;
+	if (!g_Repository.GetPhysicalPath(loc.getURI(), &sFullPath)) return FALSE;
 
 	if (nType == ExecType_Assoc) {
 		SHELLEXECUTEINFO se;
@@ -639,10 +608,6 @@ BOOL TreeViewFolderItem::IsOperationEnabled(MemoSelectView *pView, OpType op)
 	}
 }
 
-BOOL TreeViewFolderItem::GetLocationPath(MemoSelectView *pView, TString *pPath)
-{
-	return pView->GetPathForNewItem(pPath, this) != NULL;
-}
 
 BOOL TreeViewFolderItem::GetURIItem(MemoSelectView *pView, TString *pItem)
 {
@@ -774,24 +739,18 @@ BOOL TreeViewFileLink::IsOperationEnabled(MemoSelectView *pView, OpType op)
 	return (nOpMatrix & op) != 0;
 }
 
-BOOL TreeViewFileLink::GetLocationPath(MemoSelectView *pView, TString *pPath)
-{
-	return FALSE;
-}
-
 BOOL TreeViewFileLink::OpenMemo(MemoSelectView *pView, DWORD nOption)
 {
-	TomboURI sURI;
-	pNote->GetURI(&sURI);
-	pView->GetManager()->GetMainFrame()->OpenDetailsView(sURI.GetFullURI(), nOption);
+//	TomboURI sURI;
+//	loc.get()->GetURI(&sURI);
+//	pView->GetManager()->GetMainFrame()->OpenDetailsView(sURI.GetFullURI(), nOption);
+	pView->GetManager()->GetMainFrame()->OpenDetailsView(GetRealURI()->GetFullURI(), nOption);
 	return TRUE;
 }
 
 BOOL TreeViewFileLink::LoadMemo(MemoSelectView *pView, BOOL bAskPass)
 {
-	TomboURI sURI;
-	pNote->GetURI(&sURI);
-	pView->GetManager()->GetMainFrame()->LoadMemo(sURI.GetFullURI(), bAskPass);
+	pView->GetManager()->GetMainFrame()->LoadMemo(GetRealURI()->GetFullURI(), bAskPass);
 	return TRUE;
 }
 
@@ -901,11 +860,6 @@ BOOL TreeViewVirtualFolderRoot::IsOperationEnabled(MemoSelectView *pView, OpType
 	return (nOpMatrix & op) != 0;
 }
 
-BOOL TreeViewVirtualFolderRoot::GetLocationPath(MemoSelectView *pView, TString *pPath)
-{
-	return FALSE;
-}
-
 BOOL TreeViewVirtualFolderRoot::GetURIItem(MemoSelectView *pView, TString *pItem)
 {
 	return pItem->Set(TEXT("@vfolder"));
@@ -1003,9 +957,4 @@ BOOL TreeViewVirtualFolder::IsOperationEnabled(MemoSelectView *pView, OpType op)
 {
 	DWORD nOpMatrix = OpNewMemo;
 	return (nOpMatrix & op) != 0;
-}
-
-BOOL TreeViewVirtualFolder::GetLocationPath(MemoSelectView *pView, TString *pPath)
-{
-	return FALSE;
 }

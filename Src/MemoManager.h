@@ -23,7 +23,7 @@ protected:
 	MainFrame *pMainFrame;
 	PasswordManager *pPassMgr;
 
-	MemoNote *AllocNewMemo(LPCTSTR pText, MemoNote *pTemplate = NULL);
+	BOOL AllocNewMemo(LPCTSTR pText, LPCTSTR pTemplateURI = NULL);
 
 	SearchEngineA *pSearchEngineA;
 

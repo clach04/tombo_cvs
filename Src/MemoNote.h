@@ -36,11 +36,11 @@ public:
 
 	///////////////////////////////////////////
 
-	virtual MemoNote *GetNewInstance() = 0;
+	virtual MemoNote *GetNewInstance() const = 0;
 	virtual LPCTSTR GetExtension() = 0;
 	virtual DWORD GetMemoIcon() = 0;
 
-	MemoNote *Clone();
+	MemoNote *Clone() const;
 	BOOL Equal(MemoNote *pTarget);
 
 	//////////////////////////////////
@@ -50,8 +50,8 @@ public:
 	BOOL InitNewMemo(LPCTSTR pMemoPath, LPCTSTR pText, TString *pHeadLine);
 
 	// get memo data
-	virtual LPTSTR GetMemoBody(PasswordManager *pMgr);
-	virtual char *GetMemoBodyA(PasswordManager *pMgr);
+	virtual LPTSTR GetMemoBody(PasswordManager *pMgr) const;
+	virtual char *GetMemoBodyA(PasswordManager *pMgr) const;
 
 	// save memo
 	virtual BOOL SaveData(PasswordManager *pMgr, const char *pMemo, LPCTSTR pWriteFile);
@@ -63,27 +63,27 @@ public:
 	//     if headline string is changed, *pIsModified is set to TURE and
 	//     new headline string is set to buffer.
 
-	virtual MemoNote *Encrypt(PasswordManager *pMgr, TString *pHeadLine, BOOL *pIsModified);
-	virtual MemoNote *Decrypt(PasswordManager *pMgr, TString *pHeadLine, BOOL *pIsModified);
+	virtual MemoNote *Encrypt(PasswordManager *pMgr, TString *pHeadLine, BOOL *pIsModified) const;
+	virtual MemoNote *Decrypt(PasswordManager *pMgr, TString *pHeadLine, BOOL *pIsModified) const;
 
 	//////////////////////////////////
 	// File operation
 
-	virtual BOOL DeleteMemoData();
+	virtual BOOL DeleteMemoData() const ;
 	BOOL Rename(LPCTSTR pNewName);
-	static MemoNote *CopyMemo(MemoNote *pOrig, LPCTSTR pMemoPath, TString *pHeadLine);
+	static MemoNote *CopyMemo(const MemoNote *pOrig, LPCTSTR pMemoPath, TString *pHeadLine);
 
 	//////////////////////////////////
 	// path related functions
 
-	LPCTSTR MemoPath() { return pPath; }
-	BOOL GetURI(TomboURI *pURI);
+	LPCTSTR MemoPath() const { return pPath; }
+	BOOL GetURI(TomboURI *pURI) const;
 
 	//////////////////////////////////
 	// notes attributes
 
 	BOOL IsReadOnly(BOOL *pReadOnly);
-	virtual BOOL IsEncrypted() { return FALSE; }
+	virtual BOOL IsEncrypted() const { return FALSE; }
 
 	//////////////////////////////////
 	// Release buffer
@@ -117,16 +117,16 @@ public:
 
 class PlainMemoNote : public MemoNote {
 public:
-	MemoNote *GetNewInstance();
+	MemoNote *GetNewInstance() const ;
 	LPCTSTR GetExtension();
 	DWORD GetMemoIcon();
 
-	LPTSTR GetMemoBody(PasswordManager *pMgr);
-	char *GetMemoBodyA(PasswordManager *pMgr);
+	LPTSTR GetMemoBody(PasswordManager *pMgr) const;
+	char *GetMemoBodyA(PasswordManager *pMgr) const;
 
 	BOOL SaveData(PasswordManager *pMgr, const char *pMemo, LPCTSTR pWriteFile);
 
-	MemoNote *Encrypt(PasswordManager *pMgr, TString *pHeadLine, BOOL *pIsModified);
+	MemoNote *Encrypt(PasswordManager *pMgr, TString *pHeadLine, BOOL *pIsModified) const;
 };
 
 ////////////////////////////////////////
@@ -135,20 +135,20 @@ public:
 
 class CryptedMemoNote : public MemoNote {
 protected:
-	LPBYTE GetMemoBodySub(PasswordManager *pMgr, LPDWORD pSize);
+	LPBYTE GetMemoBodySub(PasswordManager *pMgr, LPDWORD pSize) const;
 public:
-	MemoNote *GetNewInstance();
+	MemoNote *GetNewInstance() const ;
 	LPCTSTR GetExtension();
 	DWORD GetMemoIcon();
 
-	LPTSTR GetMemoBody(PasswordManager *pMgr);
-	char *GetMemoBodyA(PasswordManager *pMgr);
+	LPTSTR GetMemoBody(PasswordManager *pMgr) const;
+	char *GetMemoBodyA(PasswordManager *pMgr) const;
 
 	BOOL SaveData(PasswordManager *pMgr, const char *pMemo, LPCTSTR pWriteFile);
 
-	BOOL IsEncrypted() { return TRUE; }
+	BOOL IsEncrypted() const { return TRUE; }
 
-	MemoNote *Decrypt(PasswordManager *pMgr, TString *pHeadLine, BOOL *pIsModified);
+	MemoNote *Decrypt(PasswordManager *pMgr, TString *pHeadLine, BOOL *pIsModified) const;
 };
 
 #endif

@@ -87,7 +87,6 @@ public:
 
 	// if the URI is tombo://default/aaa/bbb/ccc/ddd.txt ,
 	// result of the GetFolderPath is \aaa\bbb\ccc\ 
-	virtual BOOL GetLocationPath(MemoSelectView *pView, TString *pPath) = 0;
 	virtual BOOL GetURIItem(MemoSelectView *pView, TString *pItem) = 0;
 
 	virtual BOOL OpenMemo(MemoSelectView *pView, DWORD nOption);
@@ -100,7 +99,17 @@ public:
 /////////////////////////////////////////////
 class TreeViewFileItem : public TreeViewItem {
 protected:
-	MemoNote *pNote;
+	class Locator {
+		TomboURI *pURI;
+	public:
+		Locator() : pURI(NULL) {}
+		~Locator();
+		const TomboURI *getURI() const { return pURI; }
+		void set(MemoNote *p);
+		void set(TomboURI *pURI);
+	};
+
+	Locator loc;
 	BOOL bIsEncrypted;
 public:
 	TreeViewFileItem();
@@ -126,11 +135,12 @@ public:
 	DWORD GetIcon(MemoSelectView *pView, DWORD nStatus);
 	DWORD ItemOrder();
 
-	BOOL GetLocationPath(MemoSelectView *pView, TString *pPath);
 	BOOL GetURIItem(MemoSelectView *pView, TString *pItem);
 
 	BOOL OpenMemo(MemoSelectView *pView, DWORD nOption);
 	BOOL LoadMemo(MemoSelectView *pView, BOOL bAskPass);
+
+	BOOL GetURI(TString *pURI); 
 
 	BOOL IsUseDetailsView();
 	BOOL IsEncrypted() { return bIsEncrypted; }
@@ -165,7 +175,6 @@ public:
 	DWORD GetIcon(MemoSelectView *pView, DWORD nStatus);
 	DWORD ItemOrder();
 
-	BOOL GetLocationPath(MemoSelectView *pView, TString *pPath);
 	BOOL GetURIItem(MemoSelectView *pView, TString *pItem);
 };
 
@@ -175,14 +184,12 @@ public:
 /////////////////////////////////////////////
 class TreeViewFileLink : public TreeViewFileItem {
 public:
-	MemoNote *GetNote() { return pNote; }
+	const TomboURI *GetRealURI() const { return loc.getURI(); }
 
 	////////////////////////////////
 	// inherited methods
 
 	BOOL IsOperationEnabled(MemoSelectView *pView, OpType op);
-
-	BOOL GetLocationPath(MemoSelectView *pView, TString *pPath);
 
 	BOOL OpenMemo(MemoSelectView *pView, DWORD nOption);
 	BOOL LoadMemo(MemoSelectView *pView, BOOL bAskPass);
@@ -217,8 +224,6 @@ public:
 	BOOL IsOperationEnabled(MemoSelectView *pView, OpType op);
 
 	DWORD GetIcon(MemoSelectView *pView, DWORD nStatus);
-
-	BOOL GetLocationPath(MemoSelectView *pView, TString *pPath);
 	BOOL GetURIItem(MemoSelectView *pView, TString *pItem);
 };
 
@@ -257,8 +262,6 @@ public:
 	BOOL IsOperationEnabled(MemoSelectView *pView, OpType op);
 
 	DWORD GetIcon(MemoSelectView *pView, DWORD nStatus);
-
-	BOOL GetLocationPath(MemoSelectView *pView, TString *pPath);
 };
 
 

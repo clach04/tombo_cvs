@@ -19,8 +19,9 @@
 #include "Message.h"
 #include "TomboURI.h"
 
-#include "RepositoryFactory.h"
 #include "Repository.h"
+
+#include "AutoPtr.h"
 
 /////////////////////////////////////////////
 // ctor & dtor
@@ -50,67 +51,6 @@ BOOL MemoManager::Init(MainFrame *mf, MemoDetailsView *md, MemoSelectView *ms)
 	return TRUE; 
 }
 
-////////////////////////////////////////////////////////
-// allocate new memo
-////////////////////////////////////////////////////////
-
-// TODO: CHECK
-MemoNote *MemoManager::AllocNewMemo(LPCTSTR pText, MemoNote *pTemplate)
-{
-	TString sMemoPath;
-
-	// get note path
-	{
-		TString sURIstr;
-		if (!pMemoSelectView->GetURI(&sURIstr)) return NULL;
-		TomboURI sURI;
-		if (!sURI.Init(sURIstr.Get())) return NULL;
-
-		if (sURI.IsLeaf()) {
-			TomboURI sParent;
-			if (!sURI.GetParent(&sParent)) return FALSE;
-			if (!sParent.GetFilePath(&sMemoPath)) return FALSE;
-		} else {
-			if (!sURI.GetFilePath(&sMemoPath)) return FALSE;
-		}
-	}
-
-	HTREEITEM hParent;
-	if (_tcscmp(sMemoPath.Get(), TEXT("\0")) == 0) {
-		// the path is root
-		hParent = pMemoSelectView->ShowItem(sMemoPath.Get(), FALSE);
-	} else {
-		// the path is not root
-		ChopFileSeparator(sMemoPath.Get());
-		hParent = pMemoSelectView->ShowItem(sMemoPath.Get(), FALSE);
-		if (!sMemoPath.StrCat(TEXT("\\"))) return NULL;
-	}
-
-	// assert
-	// if current item is root, sMemoPath == ""
-	// if current item is not root, sMemoPath == "...\"
-
-	if (hParent == NULL) return NULL;
-
-	// allocate new MemoNote instance and associate to tree view
-	TString sHeadLine;
-	MemoNote *pNote;
-	if (pTemplate) {
-		pNote = pTemplate->GetNewInstance();
-	} else {
-		pNote = new PlainMemoNote();
-	}
-	if (pNote == NULL || !(pNote->InitNewMemo(sMemoPath.Get(), pText, &sHeadLine))) {
-		delete pNote;
-		return NULL;
-	}
-
-	TomboURI sURI;
-	if (!pNote->GetURI(&sURI)) return NULL;
-
-	HTREEITEM hNewItem = pMemoSelectView->InsertFile(hParent, &sURI, sHeadLine.Get(), FALSE, FALSE);
-	return pNote;
-}
 
 /////////////////////////////////////////////
 // get current selected path
@@ -228,42 +168,31 @@ BOOL MemoManager::SaveIfModify(LPDWORD pYNC, BOOL bDupMode)
 		}
 	}
 
+	////////////////////////////////////////////
+
 	// get memo data
-	LPTSTR p = pMemoDetailsView->GetMemo();
-	SecureBufferT sbData(p);
-	if (p == NULL) {
-		return FALSE;
-	}
+	LPTSTR pText = pMemoDetailsView->GetMemo();
+	SecureBufferT sbData(pText);
+	if (pText == NULL) return FALSE;
+
+	////////////////////////////////////////////
 
 	if (bDupMode) {
 		// if duplicate mode
-
-		MemoNote *pNote;
 		if (pMemoDetailsView->pCurrentURI == NULL) {
 			// this is new note
-			pNote = AllocNewMemo(p);
-		} else {
-			// exist note
-			MemoNote *pCurrent = MemoNote::MemoNoteFactory(pMemoDetailsView->pCurrentURI);
-			if (pCurrent == NULL) return FALSE;
-			pNote = AllocNewMemo(p, pCurrent);
-			delete pCurrent;
-		}
-		if (pNote == NULL) return FALSE;
+			if (!AllocNewMemo(pText)) return FALSE;
 
-		TomboURI sURI;
-		if (!pNote->GetURI(&sURI)) return FALSE;
-		pMemoDetailsView->SetCurrentNote(sURI.GetFullURI());
+		} else {
+			// note is exist
+			if (!AllocNewMemo(pText, pMemoDetailsView->pCurrentURI)) return FALSE;
+		}
+		// duplicate mode notes are treated as update because pCurrentURI has set.
 	}
 
 	// Create node if the note is new
 	if (pMemoDetailsView->pCurrentURI == NULL) {
-		MemoNote *pNote = AllocNewMemo(p);
-		if (pNote == NULL) return FALSE;
-
-		TomboURI sURI;
-		if (!pNote->GetURI(&sURI)) return FALSE;
-		pMemoDetailsView->SetCurrentNote(sURI.GetFullURI());
+		if (!AllocNewMemo(pText)) return FALSE;
 
 		// change status because the note is not new note at this point.
 		pMainFrame->SetNewMemoStatus(FALSE);
@@ -275,17 +204,13 @@ BOOL MemoManager::SaveIfModify(LPDWORD pYNC, BOOL bDupMode)
 	TomboURI sCurrentURI;
 	if (!sCurrentURI.Init(pMemoDetailsView->pCurrentURI)) return FALSE;
 
-	Repository *pRepo = g_RepositoryFactory.GetRepository(&sCurrentURI);
-
 	TomboURI sNewURI;
 	TString sNewHeadLine;
 
-	if (!pRepo->Update(&sCurrentURI, p, &sNewURI, &sNewHeadLine)) {
+	if (!g_Repository.Update(&sCurrentURI, pText, &sNewURI, &sNewHeadLine)) {
 		return FALSE;
 	}
-	// reset modify status
 	pMemoDetailsView->ResetModify();
-
 	// UpdateHeadLine causes TVN_SELCHANGING and call SaveIfModify.
 	// So if not ResetModify is called, infinite calling causes GPF.
 
@@ -298,6 +223,74 @@ BOOL MemoManager::SaveIfModify(LPDWORD pYNC, BOOL bDupMode)
 	pMainFrame->SetWindowTitle(&sNewURI);
 	// save caret position
 	StoreCursorPos();
+
+	return TRUE;
+}
+
+////////////////////////////////////////////////////////
+// allocate new memo
+////////////////////////////////////////////////////////
+
+// TODO: CHECK
+BOOL MemoManager::AllocNewMemo(LPCTSTR pText, LPCTSTR pTemplateURI)
+{
+	TString sMemoPath;
+	TomboURI sParentURI;
+
+	// get note path
+	{
+		TString sURIstr;
+		if (!pMemoSelectView->GetURI(&sURIstr)) return FALSE;
+		if (!sParentURI.Init(sURIstr.Get())) return FALSE;
+
+		if (sParentURI.IsLeaf()) {
+			TomboURI sParent;
+			if (!sParentURI.GetParent(&sParent)) return FALSE;
+			if (!sParent.GetFilePath(&sMemoPath)) return FALSE;
+		} else {
+			if (!sParentURI.GetFilePath(&sMemoPath)) return FALSE;
+		}
+	}
+
+	// get parent node
+	HTREEITEM hParent;
+	if (_tcscmp(sMemoPath.Get(), TEXT("\0")) == 0) {
+		// the path is root
+		hParent = pMemoSelectView->ShowItem(sMemoPath.Get(), FALSE);
+	} else {
+		// the path is not root
+		ChopFileSeparator(sMemoPath.Get());
+		hParent = pMemoSelectView->ShowItem(sMemoPath.Get(), FALSE);
+		if (!sMemoPath.StrCat(TEXT("\\"))) return FALSE;
+	}
+
+	if (hParent == NULL) return FALSE;
+
+	// allocate new MemoNote instance and associate to tree view
+	TString sHeadLine;
+	MemoNote *pNote;
+	if (pTemplateURI) {
+		MemoNote *pCurrent = MemoNote::MemoNoteFactory(pTemplateURI);
+		if (pCurrent == NULL) return FALSE;
+		AutoPointer<MemoNote> apNote(pCurrent);
+
+		pNote = pCurrent->GetNewInstance();
+	} else {
+		pNote = new PlainMemoNote();
+	}
+
+	if (pNote == NULL || !(pNote->InitNewMemo(sMemoPath.Get(), pText, &sHeadLine))) {
+		delete pNote;
+		return FALSE;
+	}
+
+	TomboURI sNewURI;
+	if (!pNote->GetURI(&sNewURI)) return FALSE;
+
+	delete pNote;
+
+	HTREEITEM hNewItem = pMemoSelectView->InsertFile(hParent, &sNewURI, sHeadLine.Get(), FALSE, FALSE);
+	pMemoDetailsView->SetCurrentNote(sNewURI.GetFullURI());
 
 	return TRUE;
 }
@@ -329,7 +322,7 @@ BOOL MemoManager::SetMemo(TomboURI *pURI)
 		}
 	} while (bLoop);
 
-	MemoInfo mi;
+	MemoInfo mi(g_Property.TopDir());
 	DWORD nPos = 0;
 	if (pNote && pNote->MemoPath()) {
 		if (!mi.ReadInfo(pNote->MemoPath(), &nPos)) nPos = 0;
@@ -382,7 +375,7 @@ BOOL MemoManager::StoreCursorPos()
 		DWORD nPos = pMemoDetailsView->GetCursorPos();
 		DWORD nInitPos = pMemoDetailsView->GetInitialPos();
 
-		MemoInfo mi;
+		MemoInfo mi(g_Property.TopDir());
 		if (pMemoDetailsView->pCurrentURI && nPos != nInitPos) {
 			MemoNote *pNote = MemoNote::MemoNoteFactory(pMemoDetailsView->pCurrentURI);
 			if (pNote == NULL) return FALSE;

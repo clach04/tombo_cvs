@@ -1,7 +1,7 @@
 #include <windows.h>
 #include <tchar.h>
 #include "Tombo.h"
-#include "Property.h"
+#include "TString.h"
 #include "File.h"
 #include "MemoInfo.h"
 
@@ -13,7 +13,7 @@ BOOL MemoInfo::WriteInfo(LPCTSTR pMemoPath, DWORD nPos)
 	BYTE cVer = VERSION_INFO;
 
 	TString sFileName;
-	if (!sFileName.Join(g_Property.TopDir(), TEXT("\\"), pMemoPath, TDT_FILE_EXT)) return FALSE;
+	if (!sFileName.Join(pTopDir, TEXT("\\"), pMemoPath, TDT_FILE_EXT)) return FALSE;
 
 	File fInfo;
 	if (!fInfo.Open(sFileName.Get(), GENERIC_WRITE, 0, CREATE_ALWAYS)) {
@@ -32,7 +32,7 @@ BOOL MemoInfo::ReadInfo(LPCTSTR pMemoPath, LPDWORD pPos)
 	BYTE cVer;
 
 	TString sFileName;
-	if (!sFileName.Join(g_Property.TopDir(), TEXT("\\"), pMemoPath, TDT_FILE_EXT)) return FALSE;
+	if (!sFileName.Join(pTopDir, TEXT("\\"), pMemoPath, TDT_FILE_EXT)) return FALSE;
 
 	File fInfo;
 	if (!fInfo.Open(sFileName.Get(), GENERIC_READ, 0, OPEN_EXISTING)) {
@@ -55,7 +55,7 @@ BOOL MemoInfo::ReadInfo(LPCTSTR pMemoPath, LPDWORD pPos)
 BOOL MemoInfo::DeleteInfo(LPCTSTR pMemoPath)
 {
 	TString sFileName;
-	if (!sFileName.Join(g_Property.TopDir(), TEXT("\\"), pMemoPath, TDT_FILE_EXT)) return FALSE;
+	if (!sFileName.Join(pTopDir, TEXT("\\"), pMemoPath, TDT_FILE_EXT)) return FALSE;
 	return DeleteFile(sFileName.Get());
 }
 
@@ -63,6 +63,7 @@ BOOL MemoInfo::RenameInfo(LPCTSTR pOld, LPCTSTR pNew)
 {
 	TString sOldFileName;
 	TString sNewFileName;
-	if (!sOldFileName.Join(pOld, TDT_FILE_EXT) || !sNewFileName.Join(pNew, TDT_FILE_EXT)) return FALSE;
+	if (!sOldFileName.Join(pTopDir, pOld, TDT_FILE_EXT) || !sNewFileName.Join(pTopDir, pNew, TDT_FILE_EXT)) return FALSE;
+	DeleteFile(sNewFileName.Get());
 	return MoveFile(sOldFileName.Get(), sNewFileName.Get());
 }

@@ -813,3 +813,14 @@ Not fully tested on both platform, probably it will work.
 ////////////////////////////////
 
 * DEV: Move MemoNote::Save to LocalFileRepository::Save
+
+////////////////////////////////
+// B162
+////////////////////////////////
+
+* DEV: remove RepositoryFactory from CVS.
+* DEV: add RepositoryImpl to CVS.
+
+to manage Note/folder tree as single virtual tree.
+
+* DEV: Replace MemoNote to TomboURI in TreeViewFileItem

@@ -1,9 +1,13 @@
 #ifndef FF_FILE_H
 #define FF_FILE_H
 
-// WIN32 APIでは64bitのファイルサイズをサポートしているが、
-// 通常のアプリケーションでは32bitで十分なのでプログラムの簡略化のため、
-// 内部では32bitで処理する。
+
+// Though WIN32 API supports 64bit file size, 
+// File object treats file size 32bit for simplify
+
+////////////////////////////////////////
+// File I/O
+////////////////////////////////////////
 
 class File {
 protected:
@@ -11,19 +15,20 @@ protected:
 	DWORD nSize;
 public:
 
-	// コンストラクタ&デストラクタ
+	// ctor & dtor
 	File() : hFile(INVALID_HANDLE_VALUE) {}
 	~File();
 
 	BOOL Open(LPCTSTR pFileName, DWORD nMode, DWORD nShareMode, DWORD nOpenMode);
 	void Close();
 
-	// ファイルサイズの取得
+	// Get file size
 	DWORD FileSize() { return nSize; }
 
-	// ファイルポインタのシーク
+	// Seek file pointer
 	BOOL Seek(DWORD nPos);
-	// 現在のファイルポインタの取得
+
+	// Get current file pointer
 	DWORD CurrentPos();
 
 	BOOL Read(LPBYTE pBuf, LPDWORD pSize);

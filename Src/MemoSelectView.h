@@ -126,7 +126,7 @@ public:
 
 	HIMAGELIST GetImageList() { return hSelectViewImgList; }
 
-	HTREEITEM InsertFile(HTREEITEM hParent, TomboURI *pURI, LPCTSTR pTitle, BOOL bInsertLast, BOOL bLink);
+	HTREEITEM InsertFile(HTREEITEM hParent, const TomboURI *pURI, LPCTSTR pTitle, BOOL bInsertLast, BOOL bLink);
 
 	// update headline string
 	BOOL UpdateHeadLine(LPCTSTR pOldURI, TomboURI *pNewURI, LPCTSTR pNewHeadLine);
@@ -161,9 +161,9 @@ public:
 	BOOL SetTVItem(HTREEITEM h, TreeViewItem *p);
 
 	LPTSTR GeneratePath(HTREEITEM hItem, LPTSTR pBuf, DWORD nSiz);
-	BOOL GetCurrentItemPath(TString *pPath);
 
 	BOOL GetURI(TString *pURI, HTREEITEM hTarget = NULL);
+	BOOL GetURI(TomboURI *pURI, HTREEITEM hTarget = NULL);
 
 	BOOL GetURINodeName(HTREEITEM h, LPTSTR pBuf, DWORD nBufLen);
 

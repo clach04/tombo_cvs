@@ -240,7 +240,7 @@ SOURCE=..\..\Src\Repository.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\Src\RepositoryFactory.cpp
+SOURCE=..\..\Src\RepositoryImpl.cpp
 # End Source File
 # Begin Source File
 
@@ -464,7 +464,7 @@ SOURCE=..\..\Src\Repository.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\Src\RepositoryFactory.h
+SOURCE=..\..\Src\RepositoryImpl.h
 # End Source File
 # Begin Source File
 

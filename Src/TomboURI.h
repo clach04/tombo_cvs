@@ -24,7 +24,7 @@ public:
 	BOOL GetRepositoryName(TString *pRepo);
 
 	// get full path of URI.
-	LPCTSTR GetFullURI() { return Get(); }
+	LPCTSTR GetFullURI() const { return Get(); }
 
 	// get path part of URI.
 	// ex. tombo://default/aa/bb/cc.txt -> /aa/bb/cc.txt
@@ -34,18 +34,18 @@ public:
 	// ex. tombo://default/aa/bb/cc.txt -> tombo://default/aa/bb/cc/
 	//     tombo://default/aa/bb/cc/    -> tombo://default/aa/bb/
 	// return empty if the URI is repository root.
-	//     tombo://default/ -> ""
-	BOOL GetParent(TomboURI *pParent);
+	//     tombo://default/ -> "tombo://default/"
+	BOOL GetParent(TomboURI *pParent) const;
 
 	DWORD GetMaxPathItem() const { return nMaxPathItem; }
 
 	// Is the URI point to crypted file?
 	// Checking does only to URI string. Not confirm to repository.
-	BOOL IsEncrypted();
+	BOOL IsEncrypted() const;
 
 	// Is the URI point to leaf node?
 	// Checking does only to URI string. Not confirm to repository.
-	BOOL IsLeaf();
+	BOOL IsLeaf() const;
 
 	// Get path string
 	// This method will be obsoleted in future version.

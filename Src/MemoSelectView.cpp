@@ -143,44 +143,8 @@ static HTREEITEM InsertNode(HWND hTree, TV_INSERTSTRUCT *ti)
 /////////////////////////////////////////
 // Insert file node
 /////////////////////////////////////////
-#ifdef COMMENT
-HTREEITEM MemoSelectView::InsertFile(HTREEITEM hParent, MemoNote *pNote, 
-									 LPCTSTR pTitle, BOOL bInsertToLast, BOOL bLink)
-{
-	TV_INSERTSTRUCT ti;
-	ti.hParent = hParent;
-	ti.hInsertAfter = TVI_LAST;
-	ti.item.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE | TVIF_PARAM;
-	ti.item.iImage = ti.item.iSelectedImage = pNote->GetMemoIcon();
 
-	TreeViewFileItem *tvi;
-	if (bLink) {
-		tvi = new TreeViewFileLink();
-	} else {
-		tvi = new TreeViewFileItem();
-	}
-
-	if (!tvi) {
-		delete pNote;
-		return NULL;
-	}
-
-	tvi->SetNote(pNote);
-	ti.item.lParam = (LPARAM)tvi;
-
-	ti.item.pszText = (LPTSTR)pTitle;
-	HTREEITEM hItem;
-	if (bInsertToLast) {
-		hItem = TreeView_InsertItem(hViewWnd, &ti);
-	} else {
-		hItem = InsertNode(hViewWnd, &ti);
-	}
-	tvi->SetViewItem(hItem);
-	return hItem;
-}
-#endif
-
-HTREEITEM MemoSelectView::InsertFile(HTREEITEM hParent, TomboURI *pURI, 
+HTREEITEM MemoSelectView::InsertFile(HTREEITEM hParent, const TomboURI *pURI, 
 								LPCTSTR pTitle, BOOL bInsertToLast, BOOL bLink)
 {
 	MemoNote *pNote = MemoNote::MemoNoteFactory(pURI);
@@ -610,7 +574,7 @@ void MemoSelectView::OnNotify_RClick(POINT pt)
 	case IDM_TRACELINK:
 		{
 			TreeViewFileLink *p = (TreeViewFileLink*)pItem;
-			ShowItem(p->GetNote()->MemoPath(), TRUE, FALSE);
+			ShowItemByURI(p->GetRealURI()->GetFullURI(), TRUE, FALSE);
 		}
 		break;
 	case IDM_ASSOC:
@@ -806,24 +770,29 @@ LPTSTR MemoSelectView::GeneratePath(HTREEITEM hItem, LPTSTR pBuf, DWORD nSiz)
 	return pPrev;
 }
 
-BOOL MemoSelectView::GetCurrentItemPath(TString *pPath)
+BOOL MemoSelectView::GetURI(TomboURI *pURI, HTREEITEM hTarget)
 {
-	HTREEITEM h;
-	TreeViewItem *pItem = GetCurrentItem(&h);
-	if (pItem == NULL) return FALSE;
-
-	if (!pItem->GetLocationPath(this, pPath)) return FALSE;
-	return TRUE;
+	TString sCur;
+	if (!GetURI(&sCur, hTarget)) return FALSE;
+	return pURI->Init(sCur.Get());
 }
 
 BOOL MemoSelectView::GetURI(TString *pURI, HTREEITEM hTarget)
 {
 	HTREEITEM hBase;
+	TreeViewItem *pItem;
 	if (hTarget == NULL) {
-		TreeViewItem *pItem = GetCurrentItem(&hBase);
+		pItem = GetCurrentItem(&hBase);
 		if (pItem == NULL) return FALSE;
 	} else {
 		hBase = hTarget;
+		pItem = GetTVItem(hTarget);
+	}
+	if (!pItem->HasMultiItem()) {
+		// this node is leaf -> TreeViewFileItem
+		TreeViewFileItem *pfi = (TreeViewFileItem*)pItem;
+		pfi->GetURI(pURI);
+		return TRUE;
 	}
 
 	HTREEITEM h;
@@ -1488,7 +1457,7 @@ HTREEITEM MemoSelectView::ShowItemByURI(LPCTSTR pURI, BOOL bSelChange, BOOL bOpe
 		TreeView_Expand(hViewWnd, hCurrent, TVE_EXPAND);
 	}
 
-	TreeView_SelectItem(hViewWnd, hCurrent);
+	if (bSelChange) TreeView_SelectItem(hViewWnd, hCurrent);
 
 	TomboURIItemIterator itr(&tURI);
 	if (!itr.Init()) return NULL;
