@@ -691,3 +691,11 @@ Not fully tested on both platform, probably it will work.
 
 * i18nized dialog messages(PocketPC).
 * Change dialog font to Tahoma(PocketPC).
+
+////////////////////////////////
+//B146
+////////////////////////////////
+
+* i18nized on BE-x00 platform.(finished)
+* i18nized on HPC platform.(menu is not yet)
+

@@ -30,7 +30,7 @@ CSOBAR_BUTTONINFO	aSVCSOBarButtons[NUM_SV_CMDBAR_BUTTONS] =
 
 #define NUM_DV_CMDBAR_BUTTONS 12
 
-// ビットマップを張る場合にはOnCreateでInstanceを設定すること
+// Set hInstance on Oncreate if put bitmaps.
 CSOBAR_BUTTONINFO	aDVCSOBarButtons[NUM_DV_CMDBAR_BUTTONS] = 
 {
 	IDM_RETURNLIST, CSOBAR_COMMON_BUTTON,       CSO_BUTTON_DISP, (-1),            NULL, NULL,     NULL,   CSOBAR_CODEPOS_CENTER, 1, (-1), (-1), (-1), (-1), CSO_ID_BACK, CLR_INVALID, CLR_INVALID, CLR_INVALID, FALSE, FALSE,
@@ -72,10 +72,14 @@ void LagendaPlatform::Create(HWND hWnd, HINSTANCE hInst)
 {
 	// Tree view 
 	hMSCmdBar = MakeCSOBar(hInst, hWnd, ID_CMDBAR_MAIN);
-	HMENU hMSMenu = LoadMenu(hInst, MAKEINTRESOURCE(IDR_MENU_MAIN));
-	hMSMemoMenu     = aSVCSOBarButtons[0].SubMenu = GetSubMenu(hMSMenu, 0);
-	hMSToolMenu     = aSVCSOBarButtons[1].SubMenu = GetSubMenu(hMSMenu, 1);
-	hMSBookMarkMenu = aSVCSOBarButtons[3].SubMenu = GetSubMenu(hMSMenu, 2);
+//	HMENU hMSMenu = LoadMenu(hInst, MAKEINTRESOURCE(IDR_MENU_MAIN));
+//	hMSMemoMenu     = aSVCSOBarButtons[0].SubMenu = GetSubMenu(hMSMenu, 0);
+//	hMSToolMenu     = aSVCSOBarButtons[1].SubMenu = GetSubMenu(hMSMenu, 1);
+//	hMSBookMarkMenu = aSVCSOBarButtons[3].SubMenu = GetSubMenu(hMSMenu, 2);
+
+	hMSMemoMenu     = aSVCSOBarButtons[0].SubMenu = LagendaPlatform::LoadMSMemoMenu();
+	hMSToolMenu     = aSVCSOBarButtons[1].SubMenu = LagendaPlatform::LoadMSToolMenu();
+	hMSBookMarkMenu = aSVCSOBarButtons[3].SubMenu = LagendaPlatform::LoadMSBookmarkMenu();
 
 	aSVCSOBarButtons[0].FaceText = (LPTSTR)MSG_MEMO;
 
@@ -89,7 +93,8 @@ void LagendaPlatform::Create(HWND hWnd, HINSTANCE hInst)
 
 	hMDCmdBar = MakeCSOBar(hInst, hWnd, ID_CMDBAR_DETAILS);
 	HMENU hMDMenu = LoadMenu(hInst, MAKEINTRESOURCE(IDR_MENU_DETAILS));
-	hMDEditMenu = aDVCSOBarButtons[2].SubMenu	= GetSubMenu(hMDMenu, 0);
+//	hMDEditMenu = aDVCSOBarButtons[2].SubMenu	= GetSubMenu(hMDMenu, 0);
+	hMDEditMenu = aDVCSOBarButtons[2].SubMenu	= LagendaPlatform::LoadMDEditMenu();
 	for (i = 0; i < NUM_DV_CMDBAR_BUTTONS; i++) {
 		aDVCSOBarButtons[i].reshInst = hInst;
 	}
@@ -193,6 +198,91 @@ void LagendaPlatform::AdjustUserRect(RECT *r)
 		RECT rSip = sc.GetRect();	
 		r->bottom -= (rSip.bottom - rSip.top);
 	}
+}
+
+////////////////////////////////////
+// load menu
+////////////////////////////////////
+
+static MenuMsgRes aMSMemoMenu[] = {
+	{  0, IDM_CUT,         0, MSG_ID_MENUITEM_MAIN_CUT },
+	{  1, IDM_COPY,        0, MSG_ID_MENUITEM_MAIN_COPY },
+	{  2, IDM_PASTE,       0, MSG_ID_MENUITEM_MAIN_PASTE },
+	{  3, -1,              0, 0 },
+	{  4, IDM_NEWMEMO,     0, MSG_ID_TOOLTIPS_NEWMEMO },
+	{  5, IDM_DELETEITEM,  0, MSG_ID_MENUITEM_MAIN_DELETE },
+	{  6, IDM_RENAME,      0, MSG_ID_MENUITEM_MAIN_RENAME },
+	{  7, -1,              0, 0 },
+	{  8, IDM_SEARCH,      0, MSG_ID_MENUITEM_MAIN_FIND },
+	{  9, IDM_SEARCH_NEXT, 0, MSG_ID_MENUITEM_MAIN_FIND_NEXT },
+	{ 10, IDM_SEARCH_PREV, 0, MSG_ID_MENUITEM_MAIN_FIND_PREV },
+	{ 11, -1,              0, 0 },
+	{ 12, IDM_GREP,        0, MSG_ID_MENUITEM_MAIN_QUICKFILTER },
+	{ 13, -1,              0, 0 },
+	{ 14, IDM_ENCRYPT,     0, MSG_ID_MENUITEM_MAIN_ENCRYPT },
+	{ 15, IDM_DECRYPT,     0, MSG_ID_MENUITEM_MAIN_DECRYPT },
+};
+
+HMENU LagendaPlatform::LoadMSMemoMenu()
+{
+	HMENU hMenu = CreatePopupMenu();
+	OverrideMenuTitle(hMenu, aMSMemoMenu, sizeof(aMSMemoMenu)/sizeof(MenuMsgRes));
+	return hMenu;
+}
+
+static MenuMsgRes aMSToolMenu[] = {
+	{ 0, IDM_NEWFOLDER,   0, MSG_ID_MENUITEM_MAIN_NEWFOLDER },
+	{ 1, -1,              0, 0 },
+	{ 2, IDM_TOGGLEPANE,  0, MSG_ID_MENUITEM_TOOL_WRAP },
+	{ 3, -1,              0, 0 },
+	{ 4, IDM_PROPERTY,    0, MSG_ID_MENUITEM_TOOL_PROPERTY },
+	{ 5, IDM_VFOLDER_DEF, 0, MSG_ID_MENUITEM_TOOL_VFOLDER_DEF },
+	{ 6, IDM_FORGETPASS,  0, MSG_ID_MENUITEM_TOOL_FORGETPASS },
+	{ 7, IDM_ABOUT,       0, MSG_ID_MENUITEM_TOOL_ABOUT },
+};
+
+HMENU LagendaPlatform::LoadMSToolMenu()
+{
+	HMENU hMenu = CreatePopupMenu();
+	OverrideMenuTitle(hMenu, aMSToolMenu, sizeof(aMSToolMenu)/sizeof(MenuMsgRes));
+	return hMenu;
+}
+
+static MenuMsgRes aMSBookmarkMenu[] = {
+	{ 0, IDM_BOOKMARK_ADD,    0, MSG_ID_MENUITEM_W32_B_ADDBM },
+	{ 1, IDM_BOOKMARK_CONFIG, 0, MSG_ID_MENUITEM_W32_B_EDITBM },
+	{ 2, -1,                  0, 0 },
+};
+
+HMENU LagendaPlatform::LoadMSBookmarkMenu()
+{
+	HMENU hMenu = CreatePopupMenu();
+	OverrideMenuTitle(hMenu, aMSBookmarkMenu, sizeof(aMSBookmarkMenu)/sizeof(MenuMsgRes));
+	return hMenu;
+}
+
+static MenuMsgRes aMDEditMenu[] = {
+	{  0, IDM_CUT,             0,          MSG_ID_MENUITEM_MAIN_CUT },
+	{  1, IDM_COPY,            0,          MSG_ID_MENUITEM_MAIN_COPY },
+	{  2, IDM_PASTE,           0,          MSG_ID_MENUITEM_MAIN_PASTE },
+	{  3, -1,                  0,          0 },
+	{  4, IDM_SELALL,          0,          MSG_ID_MENUITEM_DETAILS_SELALL },
+	{  5, -1,                  0,          0 },
+	{  6, IDM_SEARCH,          0,          MSG_ID_MENUITEM_MAIN_FIND }, 
+	{  7, IDM_SEARCH_NEXT,     0,          MSG_ID_MENUITEM_MAIN_FIND_NEXT },
+	{  8, IDM_SEARCH_PREV,     0,          MSG_ID_MENUITEM_MAIN_FIND_PREV },
+	{  9, -1,                  0,          0 },
+	{ 10, IDM_DETAILS_HSCROLL, MF_CHECKED, MSG_ID_MENUITEM_TOOL_WRAP },
+	{ 11, -1,                  0,          0 },
+	{ 12, IDM_INSDATE1,        0,          MSG_ID_TOOLTIPS_INSDATE1 },
+	{ 13, IDM_INSDATE2,        0,          MSG_ID_TOOLTIPS_INSDATE2 },
+};
+
+HMENU LagendaPlatform::LoadMDEditMenu()
+{
+	HMENU hMenu = CreatePopupMenu();
+	OverrideMenuTitle(hMenu, aMDEditMenu, sizeof(aMDEditMenu)/sizeof(MenuMsgRes));
+	return hMenu;
 }
 
 

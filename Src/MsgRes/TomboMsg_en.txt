@@ -262,3 +262,5 @@ Button5
 Assigin Appliction button to action button. It is enabled after restarting TOMBO
 Disable close notes on edit view
 Keep space over the SIP
+Default(English)
+Greek

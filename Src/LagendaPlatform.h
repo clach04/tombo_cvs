@@ -37,6 +37,12 @@ public:
 	void GetStatusWindowRect(RECT *pRect);
 
 	static LagendaPlatform *PlatformFactory() { return new LagendaPlatform(); }
+
+	static HMENU LoadMSMemoMenu();
+	static HMENU LoadMSToolMenu();
+	static HMENU LoadMSBookmarkMenu();
+	static HMENU LoadMDEditMenu();
+
 };
 
 #endif // PLATFORM_BE500

@@ -264,4 +264,6 @@ static LPCTSTR defaultMsg[] = {
 	TEXT("Assigin Appliction button to action button. It is enabled after restarting TOMBO"),
 	TEXT("Disable close notes on edit view"),
 	TEXT("Keep space over the SIP"),
+	TEXT("Default(English)"),
+	TEXT("Greek"),
 };
