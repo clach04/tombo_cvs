@@ -1,6 +1,8 @@
 #ifndef TREEVIEWITEM_H
 #define TREEVIEWITEM_H
 
+#include <commctrl.h>
+
 class MemoNote;
 class MemoSelectView;
 class MemoManager;
@@ -72,12 +74,12 @@ public:
 	virtual DWORD ItemOrder() = 0;
 	virtual DWORD GetIcon(MemoSelectView *pView, DWORD nStatus) = 0;
 
-	virtual MemoLocator ToLocator();
-
 	// Get path information
 	virtual BOOL GetFolderPath(MemoSelectView *pView, TString *pPath) = 0;
 	virtual BOOL GetLocationPath(MemoSelectView *pView, TString *pPath) = 0;
 	virtual BOOL GetURIItem(MemoSelectView *pView, TString *pItem) = 0;
+
+	virtual BOOL OpenMemo(MemoSelectView *pView, DWORD nOption);
 
 	virtual BOOL IsUseDetailsView();
 };
@@ -88,6 +90,7 @@ public:
 class TreeViewFileItem : public TreeViewItem {
 protected:
 	MemoNote *pNote;
+	BOOL bIsEncrypted;
 public:
 	TreeViewFileItem();
 	~TreeViewFileItem();
@@ -95,8 +98,7 @@ public:
 	////////////////////////////////
 	// class specific methods
 
-	void SetNote(MemoNote *p) { pNote = p; }
-	MemoNote *GetNote() { return pNote; }
+	void SetNote(MemoNote *p);
 
 	////////////////////////////////
 	// inherited methods
@@ -112,11 +114,11 @@ public:
 	DWORD GetIcon(MemoSelectView *pView, DWORD nStatus);
 	DWORD ItemOrder();
 
-	MemoLocator ToLocator();
-
 	BOOL GetFolderPath(MemoSelectView *pView, TString *pPath);
 	BOOL GetLocationPath(MemoSelectView *pView, TString *pPath);
 	BOOL GetURIItem(MemoSelectView *pView, TString *pItem);
+
+	BOOL OpenMemo(MemoSelectView *pView, DWORD nOption);
 
 	BOOL IsUseDetailsView();
 };
@@ -160,6 +162,8 @@ public:
 /////////////////////////////////////////////
 class TreeViewFileLink : public TreeViewFileItem {
 public:
+	MemoNote *GetNote() { return pNote; }
+
 	////////////////////////////////
 	// inherited methods
 
@@ -167,6 +171,8 @@ public:
 
 	BOOL GetFolderPath(MemoSelectView *pView, TString *pPath);
 	BOOL GetLocationPath(MemoSelectView *pView, TString *pPath);
+
+	BOOL OpenMemo(MemoSelectView *pView, DWORD nOption);
 };
 
 /////////////////////////////////////////////

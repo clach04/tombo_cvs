@@ -9,6 +9,7 @@
 #include "UniConv.h"
 #include "Property.h"
 #include "MemoManager.h"
+#include "MainFrame.h"
 #include "PasswordManager.h"
 #include "MemoFolder.h"
 #include "DirectoryScanner.h"
@@ -46,11 +47,6 @@ void TreeViewItem::SetViewItem(HTREEITEM h)
 	hItem = h;
 }
 
-MemoLocator TreeViewItem::ToLocator()
-{
-	return MemoLocator(NULL, NULL);
-}
-
 BOOL TreeViewItem::IsOperationEnabled(MemoSelectView *pView, OpType op)
 {
 	DWORD nOpMatrix = OpNewMemo | OpNewFolder | OpCut | OpCopy | OpPaste;
@@ -60,6 +56,11 @@ BOOL TreeViewItem::IsOperationEnabled(MemoSelectView *pView, OpType op)
 BOOL TreeViewItem::IsUseDetailsView()
 {
 	return FALSE;
+}
+
+BOOL TreeViewItem::OpenMemo(MemoSelectView *pView, DWORD nOption)
+{
+	return TRUE;
 }
 
 /////////////////////////////////////////////
@@ -77,12 +78,21 @@ TreeViewFileItem::~TreeViewFileItem()
 	delete pNote;
 }
 
+void TreeViewFileItem::SetNote(MemoNote *p)
+{ 
+	pNote = p;
+	bIsEncrypted = pNote->IsEncrypted();
+}
+
 BOOL TreeViewFileItem::Move(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR *ppErr)
 {
 	if (!Copy(pMgr, pView, ppErr)) {
 		return FALSE;
 	}
-	if (g_Property.IsUseTwoPane() && pMgr->IsNoteDisplayed(pNote->MemoPath())) {
+	TString uri;
+	if (!pView->GetURI(&uri, GetViewItem())) return FALSE;
+
+	if (g_Property.IsUseTwoPane() && pMgr->IsNoteDisplayed(uri.Get())) {
 		// 現在表示されているメモの表示をキャンセルする
 		pMgr->NewMemo();
 	}
@@ -110,7 +120,10 @@ BOOL TreeViewFileItem::Delete(MemoManager *pMgr, MemoSelectView *pView)
 	// ユーザへの意思確認
 	if (TomboMessageBox(NULL, MSG_CONFIRM_DELETE, MSG_DELETE_TTL, MB_ICONQUESTION | MB_OKCANCEL) != IDOK) return FALSE;
 
-	if (g_Property.IsUseTwoPane() && pMgr->IsNoteDisplayed(pNote->MemoPath())) {
+	TString uri;
+	if (!pView->GetURI(&uri, GetViewItem())) return FALSE;
+
+	if (g_Property.IsUseTwoPane() && pMgr->IsNoteDisplayed(uri.Get())) {
 		// 現在表示されているメモの表示をキャンセルする
 		pMgr->NewMemo();
 	}
@@ -129,7 +142,10 @@ BOOL TreeViewFileItem::Encrypt(MemoManager *pMgr, MemoSelectView *pView)
 
 	// 詳細ビューに表示されているメモを暗号化しようとしているのであれば、
 	// 保存しておく
-	if (g_Property.IsUseTwoPane() && pMgr->IsNoteDisplayed(pNote->MemoPath())) {
+	TString uri;
+	if (!pView->GetURI(&uri, GetViewItem())) return FALSE;
+
+	if (g_Property.IsUseTwoPane() && pMgr->IsNoteDisplayed(uri.Get())) {
 		pMgr->InactiveDetailsView();
 	}
 
@@ -147,6 +163,7 @@ BOOL TreeViewFileItem::Encrypt(MemoManager *pMgr, MemoSelectView *pView)
 	// TreeViewItemの保持するMemoNoteを暗号化されたものに置き換える
 	delete pNote;
 	pNote = p;
+	bIsEncrypted = TRUE;
 
 	// 暗号化に伴いアイコン・ヘッドラインが変更になる可能性があるので更新依頼
 	if (!pView->UpdateItemStatusNotify(this, sHeadLine.Get())) {
@@ -163,7 +180,10 @@ BOOL TreeViewFileItem::Decrypt(MemoManager *pMgr, MemoSelectView *pView)
 
 	// 詳細ビューに表示されているメモを復号化しようとしているのであれば、
 	// 保存しておく
-	if (g_Property.IsUseTwoPane() && pMgr->IsNoteDisplayed(pNote->MemoPath())) {
+	TString uri;
+	if (!pView->GetURI(&uri, GetViewItem())) return FALSE;
+
+	if (g_Property.IsUseTwoPane() && pMgr->IsNoteDisplayed(uri.Get())) {
 		pMgr->InactiveDetailsView();
 	}
 
@@ -181,6 +201,7 @@ BOOL TreeViewFileItem::Decrypt(MemoManager *pMgr, MemoSelectView *pView)
 	// TreeViewItemの保持するMemoNoteを復号化されたものに置き換える
 	delete pNote;
 	pNote = p;
+	bIsEncrypted = FALSE;
 
 	// 暗号化に伴いアイコン・ヘッドラインが変更になる可能性があるので更新依頼
 	if (!pView->UpdateItemStatusNotify(this, sHeadLine.Get())) {
@@ -192,13 +213,9 @@ BOOL TreeViewFileItem::Decrypt(MemoManager *pMgr, MemoSelectView *pView)
 BOOL TreeViewFileItem::IsOperationEnabled(MemoSelectView *pView, OpType op)
 {
 	if (op == OpEncrypt) {
-		MemoNote *p = GetNote();
-		if (p == NULL) return FALSE;
-		return !p->IsEncrypted();
+		return !bIsEncrypted;
 	} else if (op == OpDecrypt) {
-		MemoNote *p = GetNote();
-		if (p == NULL) return FALSE;
-		return p->IsEncrypted();
+		return bIsEncrypted;
 	} else {
 		DWORD nOpMatrix = OpDelete | OpRename | OpNewMemo | OpNewFolder | OpCut | OpCopy | OpPaste;
 		return (nOpMatrix & op) != 0;
@@ -226,7 +243,7 @@ BOOL TreeViewFileItem::Rename(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR 
 DWORD TreeViewFileItem::GetIcon(MemoSelectView *, DWORD nStatus)
 {
 	if (nStatus & MEMO_VIEW_STATE_INIT) {
-		if (pNote->IsEncrypted()) {
+		if (bIsEncrypted) {
 			return IMG_ARTICLE_ENCRYPTED;
 		} else {
 			return IMG_ARTICLE;
@@ -234,13 +251,13 @@ DWORD TreeViewFileItem::GetIcon(MemoSelectView *, DWORD nStatus)
 	}
 
 	if (nStatus & MEMO_VIEW_STATE_CLIPED_SET) {
-		if (pNote->IsEncrypted()) {
+		if (bIsEncrypted) {
 			return IMG_ARTICLE_ENC_MASKED;
 		} else {
 			return IMG_ARTICLE_MASKED;
 		}
 	} else {
-		if (pNote->IsEncrypted()) {
+		if (bIsEncrypted) {
 			return IMG_ARTICLE_ENCRYPTED;
 		} else {
 			return IMG_ARTICLE;
@@ -251,11 +268,6 @@ DWORD TreeViewFileItem::GetIcon(MemoSelectView *, DWORD nStatus)
 DWORD TreeViewFileItem::ItemOrder()
 {
 	return ITEM_ORDER_FILE;
-}
-
-MemoLocator TreeViewFileItem::ToLocator()
-{
-	return MemoLocator(pNote, GetViewItem());
 }
 
 BOOL TreeViewFileItem::GetFolderPath(MemoSelectView *pView, TString *pPath)
@@ -307,6 +319,15 @@ TreeViewFileItem::IsUseDetailsView()
 {
 	return TRUE;
 }
+
+BOOL TreeViewFileItem::OpenMemo(MemoSelectView *pView, DWORD nOption)
+{
+	TString sURI;
+	if (!pView->GetURI(&sURI, GetViewItem())) return FALSE;
+	pView->GetManager()->GetMainFrame()->RequestOpenMemo(sURI.Get(), nOption);
+	return TRUE;
+}
+
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 //  Folder
@@ -656,6 +677,14 @@ BOOL TreeViewFileLink::GetFolderPath(MemoSelectView *pView, TString *pPath)
 BOOL TreeViewFileLink::GetLocationPath(MemoSelectView *pView, TString *pPath)
 {
 	return FALSE;
+}
+
+BOOL TreeViewFileLink::OpenMemo(MemoSelectView *pView, DWORD nOption)
+{
+	TString sURI;
+	pNote->GetURI(&sURI);
+	pView->GetManager()->GetMainFrame()->RequestOpenMemo(sURI.Get(), nOption);
+	return TRUE;
 }
 
 /////////////////////////////////////////////

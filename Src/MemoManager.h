@@ -1,8 +1,6 @@
 #ifndef MEMOMANAGER_H
 #define MEMOMANAGER_H
 
-#include <commctrl.h>
-
 class MemoDetailsView;
 class MemoSelectView;
 class MainFrame;
@@ -11,25 +9,7 @@ class PasswordManager;
 class SearchEngineA;
 class TreeViewItem;
 class TString;
-
-/////////////////////////////////////
-// Memo location info
-/////////////////////////////////////
-//
-// This class is helper class. Object life-time is only in functions.
-// If you want to have these info, you should not keep pointer but copy member variables.
-
-class MemoLocator {
-	MemoNote *pNote;
-	HTREEITEM hItem;
-	BOOL bDeleteReceived;
-public:
-	MemoLocator(MemoNote *p, HTREEITEM h, BOOL bDel = FALSE) : pNote(p), hItem(h), bDeleteReceived(bDel) {}
-
-	MemoNote *GetNote() { return pNote; }
-	HTREEITEM GetHITEM() { return hItem; }
-	BOOL IsDeleteReceived() { return bDeleteReceived; }
-};
+class TomboURI;
 
 /////////////////////////////////////
 // Control other view
@@ -44,10 +24,9 @@ protected:
 	PasswordManager *pPassMgr;
 
 	// Current edit-view displaying item info
-	MemoNote *pCurrentNote;
-	HTREEITEM hCurrentItem;
+	LPTSTR pCurrentURI;
 
-	MemoLocator AllocNewMemo(LPCTSTR pText, MemoNote *pTemplate = NULL);
+	MemoNote *AllocNewMemo(LPCTSTR pText, MemoNote *pTemplate = NULL);
 
 	SearchEngineA *pSearchEngineA;
 
@@ -56,7 +35,7 @@ protected:
 
 	/////////////////////////////////////
 	// maintain pCurrentNote;
-	void SetCurrentNote(MemoLocator *pLoc);
+	void SetCurrentNote(LPCTSTR pURI);
 
 public:
 	/////////////////////////////////////
@@ -89,12 +68,10 @@ public:
 	BOOL SaveIfModify(LPDWORD pYNC, BOOL bDupMode);
 
 	// メモのロード
-	BOOL SetMemo(MemoLocator *pLoc);
+	BOOL SetMemo(TomboURI *pURI);
 
 	// メモのクリア
 	BOOL ClearMemo();
-
-//	void UpdateMenu(TreeViewItem *pItem);
 
 	BOOL MakeNewFolder(HWND hWnd, TreeViewItem *pItem);	// フォルダの新規作成
 
@@ -105,7 +82,7 @@ public:
 	void SelectAll();	// 全選択(詳細ビュー)
 
 	// 指定したメモが現在詳細ビューで表示されているか
-	BOOL IsNoteDisplayed(LPCTSTR pFile);
+	BOOL IsNoteDisplayed(LPCTSTR pURI);
 
 	// 詳細ビューに表示されている場合に必要なら保存し、一覧ビューにフォーカスを移す
 	// TODO: 保存依頼に置き換えられる気がする
@@ -121,30 +98,22 @@ public:
 	BOOL SearchDetailsView(BOOL bFirstSearch, BOOL bForward, BOOL bNFMsg, BOOL bSearchFromTop);
 
 	/////////////////////////////////////
-	// データアクセサ
+	// data accessor
 
 	PasswordManager *GetPasswordManager() { return pPassMgr; }
-	MemoNote *CurrentNote() { return pCurrentNote; }
+	LPCTSTR GetCurrentURI() { return pCurrentURI; }
+
 	MainFrame *GetMainFrame() { return pMainFrame; }
-	MemoLocator CurrentLoc();
 
 	BOOL GetCurrentSelectedPath(TString *pPath);
 
 	/////////////////////////////////////
-	// Notify from MemoSelectView
-
-	void ReleaseItemNotify(MemoLocator *pLoc);
-	void InsertItemNotify(MemoLocator *pLoc);
-
-	/////////////////////////////////////
-	// 検索フラグ
+	// searching
 
 	// 「次を検索」で現在選択されている項目を検索対象に含めるか?
-
 	// 一覧ビューの場合、ユーザが選択を変更したら含める
 	BOOL MSSearchFlg() { return bMSSearchFlg; }
 	void SetMSSearchFlg(BOOL b) { bMSSearchFlg = b; }
-
 
 	BOOL MDSearchFlg() { return bMDSearchFlg; }
 	void SetMDSearchFlg(BOOL b) { bMDSearchFlg = b; }

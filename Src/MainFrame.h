@@ -45,7 +45,6 @@ class MainFrame {
 #endif
 
 	MemoSelectView msView;
-//	MemoDetailsView mdView;
 	MemoDetailsView *pDetailsView;
 
 	MemoManager mmMemoManager;
@@ -153,9 +152,8 @@ public:
 	//////////////////////////
 	// open notes
 
-	void RequestOpenMemo(MemoLocator *pLoc, DWORD nSwitchView);
-	void SendRequestOpen(MemoLocator *pLoc, DWORD nSwitchFlg) { SendMessage(hMainWnd, MWM_OPEN_REQUEST, (WPARAM)nSwitchFlg, (LPARAM)pLoc); }
-	void PostRequestOpen(MemoLocator *pLoc, DWORD nSwitchFlg) { PostMessage(hMainWnd, MWM_OPEN_REQUEST, (WPARAM)nSwitchFlg, (LPARAM)pLoc); }
+	void RequestOpenMemo(LPCTSTR pURI, DWORD nSwitchView);
+	void PostSwitchView(DWORD nView) { PostMessage(hMainWnd, MWM_SWITCH_VIEW, (WPARAM)nView, (LPARAM)0); }
 
 	void OnList(BOOL bAskSave);
 

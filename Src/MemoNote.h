@@ -3,6 +3,7 @@
 
 class PasswordManager;
 class TString;
+class TomboURI;
 
 #include "TreeViewItem.h"
 
@@ -75,6 +76,7 @@ public:
 	// path related functions
 
 	LPCTSTR MemoPath() { return pPath; }
+	BOOL GetURI(TString *pURI);
 
 	static BOOL GetHeadLineFromPath(LPCTSTR pPath, TString *pHeadLine);
 
@@ -104,7 +106,8 @@ public:
 	// if creation failed, return FALSE.
 	// if pFile is not memo, return TRUE and *ppNote sets to NULL.
 	static BOOL MemoNoteFactory(LPCTSTR pPrefix, LPCTSTR pFile, MemoNote **ppNote);
-
+	static MemoNote *MemoNoteFactory(TomboURI *pURI);
+	static MemoNote *MemoNoteFactory(LPCTSTR pURI);
 };
 
 ////////////////////////////////////////

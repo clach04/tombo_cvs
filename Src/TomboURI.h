@@ -15,7 +15,7 @@ public:
 	// ctor, dtor and initializer
 	TomboURI() {}
 	~TomboURI() { }
-	BOOL Init(LPCTSTR p);
+	BOOL Init(LPCTSTR pURI);
 
 	///////////////////////////////
 	// accessor
@@ -23,9 +23,11 @@ public:
 	BOOL GetHeadLine(TString *pHeadLine);
 
 	LPCTSTR GetFull() { return sURI.Get(); }
+	LPCTSTR GetPath();
 
 	DWORD GetMaxPathItem() { return nMaxPathItem; }
 
+	BOOL IsEncrypted();
 
 	///////////////////////////////
 	// helper functions

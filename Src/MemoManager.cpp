@@ -17,12 +17,13 @@
 #include "TreeViewItem.h"
 #include "SearchEngine.h"
 #include "Message.h"
+#include "TomboURI.h"
 
 /////////////////////////////////////////////
 // ctor & dtor
 /////////////////////////////////////////////
 
-MemoManager::MemoManager() : pSearchEngineA(NULL), bMSSearchFlg(FALSE), bMDSearchFlg(FALSE), pCurrentNote(NULL)
+MemoManager::MemoManager() : pSearchEngineA(NULL), bMSSearchFlg(FALSE), bMDSearchFlg(FALSE), pCurrentURI(NULL)
 {
 }
 
@@ -31,10 +32,11 @@ MemoManager::~MemoManager()
 	if(pSearchEngineA) {
 		delete pSearchEngineA;
 	}
+	delete [] pCurrentURI;
 }
 
 /////////////////////////////////////////////
-// オブジェクト初期化
+// initialize
 /////////////////////////////////////////////
 
 BOOL MemoManager::Init(MainFrame *mf, MemoDetailsView *md, MemoSelectView *ms) 
@@ -42,7 +44,7 @@ BOOL MemoManager::Init(MainFrame *mf, MemoDetailsView *md, MemoSelectView *ms)
 	pMainFrame = mf;
 	pMemoDetailsView = md;
 	pMemoSelectView = ms;
-	pCurrentNote = NULL;
+	pCurrentURI = NULL;
 	return TRUE; 
 }
 
@@ -50,70 +52,47 @@ BOOL MemoManager::Init(MainFrame *mf, MemoDetailsView *md, MemoSelectView *ms)
 // create & hold memonote
 ////////////////////////////////////////////////////////
 
-void MemoManager::SetCurrentNote(MemoLocator *pLoc)
+void MemoManager::SetCurrentNote(LPCTSTR pURI)
 {
-	if (pLoc == NULL) {
-		pCurrentNote = NULL;
-		hCurrentItem = NULL;
-		return;
-	}
-
-	MemoNote *pNote = pLoc->GetNote();
-
-	if (pNote == NULL) {
-		pCurrentNote = NULL;
-		hCurrentItem = NULL;
-	} else {
-		if (pCurrentNote != pNote) {
-			delete pCurrentNote;
-			pCurrentNote = pNote->Clone();
-			hCurrentItem = pLoc->GetHITEM();
-		}
+	delete [] pCurrentURI;
+	pCurrentURI = NULL;
+	if (pURI) {
+		pCurrentURI = StringDup(pURI);
 	}
 }
 
 ////////////////////////////////////////////////////////
-// Get MemoLocator keeps now
-////////////////////////////////////////////////////////
-
-MemoLocator MemoManager::CurrentLoc()
-{
-	return MemoLocator(pCurrentNote, hCurrentItem);
-}
-
-////////////////////////////////////////////////////////
-// 新規メモの割り当て
+// allocate new memo
 ////////////////////////////////////////////////////////
 
 // TODO: CHECK
-MemoLocator MemoManager::AllocNewMemo(LPCTSTR pText, MemoNote *pTemplate)
+MemoNote *MemoManager::AllocNewMemo(LPCTSTR pText, MemoNote *pTemplate)
 {
-	TString sHeadLine;
 	TString sMemoPath;
 
 	// get note path
 	TreeViewItem *pItem = pMemoSelectView->GetCurrentItem();
-	if (!pItem->GetFolderPath(pMemoSelectView, &sMemoPath)) return MemoLocator(NULL, NULL);
+	if (!pItem->GetFolderPath(pMemoSelectView, &sMemoPath)) return NULL;
 
 	HTREEITEM hParent;
 	if (_tcscmp(sMemoPath.Get(), TEXT("\0")) == 0) {
+		// the path is root
 		hParent = pMemoSelectView->ShowItem(sMemoPath.Get(), FALSE);
 	} else {
+		// the path is not root
 		ChopFileSeparator(sMemoPath.Get());
 		hParent = pMemoSelectView->ShowItem(sMemoPath.Get(), FALSE);
-		if (!sMemoPath.StrCat(TEXT("\\"))) return MemoLocator(NULL, NULL);
+		if (!sMemoPath.StrCat(TEXT("\\"))) return NULL;
 	}
 
 	// assert
 	// if current item is root, sMemoPath == ""
 	// if current item is not root, sMemoPath == "...\"
 
-	if (hParent == NULL) return MemoLocator(NULL, NULL);
+	if (hParent == NULL) return NULL;
 
-
-//	HTREEITEM hParent;
-//	pMemoSelectView->GetCurrentItem(&hParent);
-
+	// allocate new MemoNote instance and associate to tree view
+	TString sHeadLine;
 	MemoNote *pNote;
 	if (pTemplate) {
 		pNote = pTemplate->GetNewInstance();
@@ -122,10 +101,10 @@ MemoLocator MemoManager::AllocNewMemo(LPCTSTR pText, MemoNote *pTemplate)
 	}
 	if (pNote == NULL || !(pNote->InitNewMemo(sMemoPath.Get(), pText, &sHeadLine))) {
 		delete pNote;
-		return MemoLocator(NULL, NULL);
+		return NULL;
 	}
 	HTREEITEM hNewItem = pMemoSelectView->NewMemoCreated(pNote, sHeadLine.Get(), hParent);
-	return MemoLocator(pNote, hNewItem);
+	return pNote;
 }
 
 /////////////////////////////////////////////
@@ -134,9 +113,14 @@ MemoLocator MemoManager::AllocNewMemo(LPCTSTR pText, MemoNote *pTemplate)
 
 BOOL MemoManager::GetCurrentSelectedPath(TString *pPath)
 {
-	if (pCurrentNote) {
+	if (pCurrentURI) {
+		MemoNote *pNote = MemoNote::MemoNoteFactory(pCurrentURI);
 		TString sMemoPath;
-		if (!sMemoPath.Set(pCurrentNote->MemoPath())) return FALSE;
+		if (!sMemoPath.Set(pNote->MemoPath())) {
+			delete pNote;
+			return FALSE;
+		}
+		delete pNote;
 		if (!pPath->GetDirectoryPath(sMemoPath.Get())) return FALSE;
 		ChopFileSeparator(pPath->Get());
 		return TRUE;
@@ -190,7 +174,6 @@ BOOL MemoManager::MakeNewFolder(HWND hWnd, TreeViewItem *pItem)
 		hItem = pMemoSelectView->GetPathForNewItem(&sPartPath, pItem);
 		if (hItem == NULL) return FALSE;
 
-//		if (!sPath.AllocFullPath(sPartPath.Get())) return FALSE;
 		if (!sPath.Join(g_Property.TopDir(), TEXT("\\"), sPartPath.Get())) return FALSE;		
 
 		if (!sPath.StrCat(pFolder)) return FALSE;
@@ -230,55 +213,78 @@ BOOL MemoManager::SaveIfModify(LPDWORD pYNC, BOOL bDupMode)
 		if (*pYNC == IDNO || *pYNC == IDCANCEL) return TRUE;
 	}
 
-	// メモの取得
+	// get memo data
 	LPTSTR p = pMemoDetailsView->GetMemo();
 	if (p == NULL) {
 		return FALSE;
 	}
 
 	if (bDupMode) {
-		MemoLocator loc(NULL, NULL);
-		if (pCurrentNote == NULL) {
-			loc = AllocNewMemo(p);
+		MemoNote *pNote;
+		if (pCurrentURI == NULL) {
+			pNote = AllocNewMemo(p);
 		} else {
-			loc = AllocNewMemo(p, pCurrentNote);
+			MemoNote *pCurrent = MemoNote::MemoNoteFactory(pCurrentURI);
+			if (pCurrent == NULL) return FALSE;
+			pNote = AllocNewMemo(p, pCurrent);
+			delete pCurrent;
 		}
-		if (loc.GetNote() == NULL) return FALSE;
-		SetCurrentNote(&loc);
+		if (pNote == NULL) return FALSE;
+		TString sURI;
+		if (!pNote->GetURI(&sURI)) return FALSE;
+		SetCurrentNote(sURI.Get());
 	}
 
 	// 新規メモの場合、ノードの作成
-	if (pCurrentNote == NULL) {
-		MemoLocator loc(NULL, NULL);
-		loc = AllocNewMemo(p);
-		if (loc.GetNote() == NULL) return FALSE;
-		SetCurrentNote(&loc);
+	if (pCurrentURI == NULL) {
+		MemoNote *pNote = AllocNewMemo(p);
+		if (pNote == NULL) return FALSE;
+
+		TString sURI;
+		if (!pNote->GetURI(&sURI)) return FALSE;
+		SetCurrentNote(sURI.Get());
 
 		// この時点で新規メモではなくなるのでステータスを変える
 		pMainFrame->SetNewMemoStatus(FALSE);
 	}
-	// ヘッドライン文字列の取得
-	TString sHeadLine;
 
-	//　メモの保存
-	if (!pCurrentNote->Save(pPassMgr, p, &sHeadLine)) {
+	///////////////////////////////////////
+	// save notes and update treeview
+
+	TString sHeadLine;
+	TString sOldURI, sNewURI;
+	//　save notes
+//	if (!pCurrentNote->GetURI(&sOldURI)) {
+//		MemoNote::WipeOutAndDelete(p);
+//		return FALSE;
+//	}
+	if (!sOldURI.Set(pCurrentURI)) {
 		MemoNote::WipeOutAndDelete(p);
 		return FALSE;
 	}
+	MemoNote *pNote = MemoNote::MemoNoteFactory(pCurrentURI);
+	if (!pNote->Save(pPassMgr, p, &sHeadLine)) {
+		MemoNote::WipeOutAndDelete(p);
+		delete pNote;
+		return FALSE;
+	}
+	if (!pNote->GetURI(&sNewURI)) {
+		MemoNote::WipeOutAndDelete(p);
+		delete pNote;
+		return FALSE;
+	}
 
-	// 変更ステータスの解除
+	// reset modify status
 	pMemoDetailsView->ResetModify();
 	pMainFrame->SetModifyStatus(FALSE);
 
-	// ヘッドライン文字列の変更
-	if (hCurrentItem) {
-		MemoLocator loc(pCurrentNote, hCurrentItem);
-		pMemoSelectView->UpdateHeadLine(&loc, sHeadLine.Get());
-	}
+	// update headline string
+	pMemoSelectView->UpdateHeadLine(sOldURI.Get(), sNewURI.Get(), pNote);
 
+	delete pNote;
 	MemoNote::WipeOutAndDelete(p);
 
-	// カーソル位置の保存
+	// save caret position
 	StoreCursorPos();
 
 	return TRUE;
@@ -288,9 +294,10 @@ BOOL MemoManager::SaveIfModify(LPDWORD pYNC, BOOL bDupMode)
 // メモ内容の表示
 ////////////////////////////////////////////////////////
 
-BOOL MemoManager::SetMemo(MemoLocator *pLoc)
+BOOL MemoManager::SetMemo(TomboURI *pURI)
 {
-	MemoNote *pNote = pLoc->GetNote();
+	MemoNote *pNote = MemoNote::MemoNoteFactory(pURI);
+	if (pNote == NULL) return FALSE;
 
 	BOOL bLoop = FALSE;
 	LPTSTR p;
@@ -304,6 +311,7 @@ BOOL MemoManager::SetMemo(MemoLocator *pLoc)
 				bLoop = TRUE;
 			} else {
 				pMemoDetailsView->SetMemo(MSG_CANT_OPEN_MEMO, 0, TRUE);
+				delete pNote;
 				return TRUE;
 			}
 		}
@@ -316,13 +324,18 @@ BOOL MemoManager::SetMemo(MemoLocator *pLoc)
 	}
 	BOOL bReadOnly;
 	if (!g_Property.OpenReadOnly()) {
-		if (!pNote->IsReadOnly(&bReadOnly)) return FALSE;
+		if (!pNote->IsReadOnly(&bReadOnly)) {
+			delete pNote;
+			return FALSE;
+		}
 	} else {
 		bReadOnly = TRUE;
 	}
 	pMemoDetailsView->SetMemo(p, nPos, bReadOnly);
 	MemoNote::WipeOutAndDelete(p);
-	SetCurrentNote(pLoc);
+	SetCurrentNote(pURI->GetFull());
+
+	delete pNote;
 	return TRUE;
 }
 
@@ -347,8 +360,7 @@ BOOL MemoManager::NewMemo()
 BOOL MemoManager::ClearMemo()
 {
 	pMemoDetailsView->SetMemo(TEXT(""), 0, FALSE);
-	MemoLocator loc(NULL, NULL);
-	SetCurrentNote(&loc);
+	SetCurrentNote(NULL);
 	return TRUE;
 }
 
@@ -364,8 +376,11 @@ BOOL MemoManager::StoreCursorPos()
 		DWORD nInitPos = pMemoDetailsView->GetInitialPos();
 
 		MemoInfo mi;
-		if (pCurrentNote && nPos != nInitPos) {
-			mi.WriteInfo(pCurrentNote->MemoPath(), nPos);
+		if (pCurrentURI && nPos != nInitPos) {
+			MemoNote *pNote = MemoNote::MemoNoteFactory(pCurrentURI);
+			if (pNote == NULL) return FALSE;
+			mi.WriteInfo(pNote->MemoPath(), nPos);
+			delete pNote;
 		}
 	}
 	return TRUE;
@@ -421,40 +436,8 @@ BOOL MemoManager::SearchDetailsView(BOOL bFirstSearch, BOOL bForward, BOOL bNFMs
 // Is this note are displayed in detailsview?
 ////////////////////////////////////////////////////////
 
-BOOL MemoManager::IsNoteDisplayed(LPCTSTR pFile)
+BOOL MemoManager::IsNoteDisplayed(LPCTSTR pURI)
 {
-	if (pCurrentNote == NULL) return FALSE;
-	return _tcsicmp(pFile, pCurrentNote->MemoPath()) == 0;
-}
-
-////////////////////////////////////////////////////////
-// Release select view items notify
-////////////////////////////////////////////////////////
-//
-// unlink items - detailsview mappings.
-
-void MemoManager::ReleaseItemNotify(MemoLocator *pLoc)
-{
-	if (pLoc->GetHITEM() == NULL && pLoc->GetNote() == NULL) return;
-
-	if (pLoc->GetHITEM() == hCurrentItem) {
-		hCurrentItem = NULL;
-	}
-}
-
-////////////////////////////////////////////////////////
-// Release select view items notify
-////////////////////////////////////////////////////////
-//
-// link items - detailsview mappings.
-
-void MemoManager::InsertItemNotify(MemoLocator *pLoc)
-{
-	MemoNote *pNote = pLoc->GetNote();
-	HTREEITEM hItem = pLoc->GetHITEM();
-	if (hItem == NULL && pNote == NULL) return;
-	
-	if (pCurrentNote && pNote->Equal(pCurrentNote)) {
-			hCurrentItem = hItem;
-	}
+	if (pCurrentURI == NULL) return FALSE;
+	return _tcsicmp(pURI, pCurrentURI) == 0;
 }

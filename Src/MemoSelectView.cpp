@@ -20,17 +20,17 @@
 #include "TreeViewItem.h"
 #include "Message.h"
 
+/////////////////////////////////////////
+//  static functions
+/////////////////////////////////////////
+
+static void InsertDummyNode(HWND hTree, HTREEITEM hItem);
+static HTREEITEM FindItem2(HWND hWnd, HTREEITEM hParent, LPCTSTR pStr, DWORD nLen);
 void SelectViewSetWndProc(WNDPROC wp, HWND hParent, HINSTANCE h, MemoSelectView *p);
 LRESULT CALLBACK NewSelectViewProc( HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam );
 
 /////////////////////////////////////////
-// 
-/////////////////////////////////////////
-
-static void InsertDummyNode(HWND hTree, HTREEITEM hItem);
-
-/////////////////////////////////////////
-// ウィンドウ生成
+// create window
 /////////////////////////////////////////
 
 BOOL MemoSelectView::Create(LPCTSTR pName, RECT &r, HWND hParent, DWORD nID, HINSTANCE hInst, HFONT hFont, HIMAGELIST hImgList)
@@ -57,7 +57,6 @@ BOOL MemoSelectView::Create(LPCTSTR pName, RECT &r, HWND hParent, DWORD nID, HIN
 
 	TreeView_SetImageList(hViewWnd, hImgList, TVSIL_NORMAL);
 
-	// フォント設定
 	if (hFont != NULL) {
 		SendMessage(hViewWnd, WM_SETFONT, (WPARAM)hFont, MAKELPARAM(TRUE, 0));
 	}
@@ -130,7 +129,7 @@ static HTREEITEM InsertNode(HWND hTree, TV_INSERTSTRUCT *ti)
 BOOL MemoSelectView::InsertFile(HTREEITEM hParent, LPCTSTR pPrefix, LPCTSTR pFile)
 {
 	MemoNote *pNote;
-	if (!MemoNote::MemoNoteFactory(pPrefix, pFile, &pNote)) return FALSE;
+	if (!MemoNote::MemoNoteFactory(pPrefix, pFile, &pNote)) return NULL;
 	if (pNote == NULL) return TRUE;
 
 	TCHAR disp[MAX_PATH];
@@ -138,10 +137,10 @@ BOOL MemoSelectView::InsertFile(HTREEITEM hParent, LPCTSTR pPrefix, LPCTSTR pFil
 	_tcscpy(disp, pFile);
 	*(disp + len - 4) = TEXT('\0');
 
-	return InsertFile(hParent, pNote, disp, FALSE, FALSE);
+	return InsertFile(hParent, pNote, disp, FALSE, FALSE) != NULL;
 }
 
-BOOL MemoSelectView::InsertFile(HTREEITEM hParent, MemoNote *pNote, LPCTSTR pTitle, BOOL bInsertToLast, BOOL bLink)
+HTREEITEM MemoSelectView::InsertFile(HTREEITEM hParent, MemoNote *pNote, LPCTSTR pTitle, BOOL bInsertToLast, BOOL bLink)
 {
 	TV_INSERTSTRUCT ti;
 	ti.hParent = hParent;
@@ -158,7 +157,7 @@ BOOL MemoSelectView::InsertFile(HTREEITEM hParent, MemoNote *pNote, LPCTSTR pTit
 
 	if (!ptvi) {
 		delete pNote;
-		return FALSE;
+		return NULL;
 	}
 	ptvi->SetNote(pNote);
 	ti.item.lParam = (LPARAM)ptvi;
@@ -171,11 +170,7 @@ BOOL MemoSelectView::InsertFile(HTREEITEM hParent, MemoNote *pNote, LPCTSTR pTit
 		hItem = InsertNode(hViewWnd, &ti);
 	}
 	ptvi->SetViewItem(hItem);
-
-	// Notify to MemoManager
-	MemoLocator loc(pNote, hItem);
-	pMemoMgr->InsertItemNotify(&loc);
-	return TRUE;
+	return hItem;
 }
 
 /////////////////////////////////////////
@@ -246,16 +241,6 @@ void MemoSelectView::DeleteOneItem(HTREEITEM hItem)
 
 	// if deleting item is clipped, release clipping.
 	if (pClipItem == tvi) pClipItem = NULL;
-
-	// if node is file item, notify to MemoManager.
-	if (tvi && !tvi->HasMultiItem()) {
-		MemoNote *p = ((TreeViewFileItem *)tvi)->GetNote();
-
-		if (p) {
-			MemoLocator loc(p, hItem);
-			pMemoMgr->ReleaseItemNotify(&loc);
-		}
-	}
 
 	delete tvi;
 	TreeView_DeleteItem(hViewWnd, hItem);
@@ -334,12 +319,11 @@ TreeViewItem* MemoSelectView::GetCurrentItem(HTREEITEM *pItem)
 	return NULL;
 }
 
-
 BOOL MemoSelectView::Show(int nCmdShow)
 {
 	ShowWindow(hViewWnd, nCmdShow);
 #if defined(PLATFORM_PKTPC)
-	// タップ&ホールドメニューが出たまま画面が切り替わった際にメニューを閉じさせる
+	// close menu if switch to other view
 	if (nCmdShow == SW_HIDE) {
 		ReleaseCapture();
 	}
@@ -378,7 +362,7 @@ LRESULT MemoSelectView::OnNotify(HWND hWnd, WPARAM wParam, LPARAM lParam)
 #if defined(PLATFORM_PKTPC)
 	NMRGINFO *pnmrginfo = (PNMRGINFO)lParam;
 	if (pnmrginfo->hdr.code == GN_CONTEXTMENU) {
-		// タップ&ホールド処理
+		// tap & hold
 
 		TV_HITTESTINFO hti;
 		hti.pt = pnmrginfo->ptAction;
@@ -407,13 +391,9 @@ LRESULT MemoSelectView::OnNotify(HWND hWnd, WPARAM wParam, LPARAM lParam)
 			TreeViewItem *tvi = (TreeViewItem*)it.lParam;
 			if (!tvi) break;
 
-
-			// Viewの切り替えだけではSelectViewにフォーカスがあたってしまう。なぜ？
 			if (!tvi->HasMultiItem()) {
-				TreeViewFileItem *ptvfi = (TreeViewFileItem*)tvi;
-				// If 3rd parameter is TRUE, object are deleted by MainFrame::RequestOpenMemo() 
-				MemoLocator *ploc = new MemoLocator(ptvfi->GetNote(), ptvfi->GetViewItem(), TRUE);
-				pMemoMgr->GetMainFrame()->PostRequestOpen(ploc, OPEN_REQUEST_MSVIEW_ACTIVE);
+				tvi->OpenMemo(this, OPEN_REQUEST_MSVIEW_ACTIVE);
+				pMemoMgr->GetMainFrame()->PostSwitchView(OPEN_REQUEST_MSVIEW_ACTIVE);
 			}
 			// 暗黙でExpand/Collapseが発生
 		}
@@ -434,10 +414,9 @@ LRESULT MemoSelectView::OnNotify(HWND hWnd, WPARAM wParam, LPARAM lParam)
 			if (tvi->HasMultiItem()) {
 				ToggleExpandFolder(hItem, it.state & TVIS_EXPANDED);
 			} else {
-				// open request
-				TreeViewFileItem *ptvfi = (TreeViewFileItem*)tvi;
-				MemoLocator loc(ptvfi->GetNote(), ptvfi->GetViewItem()); 
-				pMemoMgr->GetMainFrame()->SendRequestOpen(&loc, OPEN_REQUEST_MSVIEW_ACTIVE);
+				// switch to edit view
+				tvi->OpenMemo(this, OPEN_REQUEST_MSVIEW_ACTIVE);
+				pMemoMgr->GetMainFrame()->ActivateView(FALSE);
 			}
 		}
 		break;
@@ -451,24 +430,23 @@ LRESULT MemoSelectView::OnNotify(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 			DWORD nYNC;
 			if (!pMemoMgr->SaveIfModify(&nYNC, FALSE)) {
-				// セーブに失敗...
 				TCHAR buf[1024];
 				wsprintf(buf, MSG_SAVE_FAILED, GetLastError());
 				pMemoMgr->GetMainFrame()->MessageBox(buf, TEXT("ERROR"), MB_ICONSTOP | MB_OK | MB_APPLMODAL);
 
-				// 切り替えられると困るので阻止
+				// stop the change
 				return TRUE;
 			}
 			switch(nYNC) {
 			case IDCANCEL:
-				// 切り替えてほしくないとユーザが言っているので阻止
+				// cancel
 				return TRUE;
 			case IDOK:
 				/* fall through */
 			case IDYES:
 				return FALSE;
 			case IDNO:
-				// データの破棄
+				// celar note
 				pMemoMgr->ClearMemo();
 				return FALSE;
 			}
@@ -487,14 +465,9 @@ LRESULT MemoSelectView::OnNotify(HWND hWnd, WPARAM wParam, LPARAM lParam)
 			ControlMenu();
 
 			if (g_Property.IsUseTwoPane() && (p->action == TVC_BYMOUSE || p->action == TVC_BYKEYBOARD)) {
-				// ユーザ操作の場合、メモの切り替えを発生させる
-				// プログラムによるものの場合、切り替えは発生させない
+				// change notes if operated by user. Otherwise no switching occured.
 				pMemoMgr->SetMSSearchFlg(TRUE);
-				if (!tvi->HasMultiItem()) {
-					TreeViewFileItem *ptvfi = (TreeViewFileItem*)tvi;
-					MemoLocator loc(ptvfi->GetNote(), ptvfi->GetViewItem());
-					pMemoMgr->GetMainFrame()->SendRequestOpen(&loc, OPEN_REQUEST_MDVIEW_ACTIVE);
-				}
+				tvi->OpenMemo(this, OPEN_REQUEST_MDVIEW_ACTIVE);
 			}
 		}
 		break;
@@ -521,7 +494,7 @@ LRESULT MemoSelectView::OnNotify(HWND hWnd, WPARAM wParam, LPARAM lParam)
 #endif
 
 	}
-	// WM_NOTIFYの返答になるため、必要ない場合以外は各Notifyでreturnすること
+	// return for each handler if it need return values.
 	return 0xFFFFFFFF;
 }
 
@@ -568,6 +541,7 @@ void MemoSelectView::OnNotify_RClick()
 		OnPaste();
 		break;
 	case IDM_ENCRYPT:
+#ifdef COMMENT
 		{
 			if (pItem->IsUseDetailsView()) {
 				MemoNote *pNote = ((TreeViewFileItem*)pItem)->GetNote();
@@ -585,6 +559,8 @@ void MemoSelectView::OnNotify_RClick()
 
 			OnEncrypt(pItem);
 		}
+#endif
+		OnEncrypt(pItem);
 		break;
 	case IDM_DECRYPT:
 		OnDecrypt(pItem);
@@ -610,7 +586,7 @@ void MemoSelectView::OnNotify_RClick()
 }
 #endif
 ///////////////////////////////////////////
-// OnCommandハンドラ
+// OnCommand handler
 ///////////////////////////////////////////
 
 BOOL MemoSelectView::OnCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
@@ -650,7 +626,7 @@ BOOL MemoSelectView::OnCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 }
 
 ///////////////////////////////////////////
-// HotKeyの処理
+// HotKey
 ///////////////////////////////////////////
 
 BOOL MemoSelectView::OnHotKey(HWND hWnd, WPARAM wParam)
@@ -722,7 +698,7 @@ void MemoSelectView::OnDelete(HTREEITEM hItem, TreeViewItem *pItem)
 }
 
 ///////////////////////////////////////////
-// ウィンドウサイズ取得
+// get window size
 ///////////////////////////////////////////
 
 void MemoSelectView::GetSize(LPWORD pWidth, LPWORD pHeight)
@@ -734,7 +710,7 @@ void MemoSelectView::GetSize(LPWORD pWidth, LPWORD pHeight)
 }
 
 ///////////////////////////////////////////
-// メモの階層の取得
+// get path
 ///////////////////////////////////////////
 
 LPTSTR MemoSelectView::GeneratePath(HTREEITEM hItem, LPTSTR pBuf, DWORD nSiz)
@@ -779,12 +755,19 @@ BOOL MemoSelectView::GetCurrentItemPath(TString *pPath)
 	return TRUE;
 }
 
-BOOL MemoSelectView::GetCurrentURI(TString *pURI)
+BOOL MemoSelectView::GetURI(TString *pURI, HTREEITEM hTarget)
 {
-	HTREEITEM h;
-	TreeViewItem *pItem = GetCurrentItem(&h);
-	if (pItem == NULL) return FALSE;
+	HTREEITEM hBase;
+	if (hTarget == NULL) {
+		TreeViewItem *pItem = GetCurrentItem(&hBase);
+		if (pItem == NULL) return FALSE;
+	} else {
+		hBase = hTarget;
+	}
 
+	HTREEITEM h;
+	// count length 
+	h = hBase;
 	TString s;
 	DWORD n = 0;
 	while(h) {
@@ -797,8 +780,9 @@ BOOL MemoSelectView::GetCurrentURI(TString *pURI)
 		h = TreeView_GetParent(hViewWnd, h);
 	}
 	if (!pURI->Alloc(n + 8 + 1)) return FALSE;
-	GetCurrentItem(&h);
 
+	// copy to buffer
+	h = hBase;
 	LPTSTR pTail = pURI->Get() + n + 8;
 	*pTail = TEXT('\0');
 	while(h) {
@@ -815,8 +799,6 @@ BOOL MemoSelectView::GetCurrentURI(TString *pURI)
 	}
 	pTail -= 8;
 	_tcsncpy(pTail, TEXT("tombo://"), 8);
-
-	DWORD x = _tcslen(pURI->Get());
 	return TRUE;
 }
 
@@ -869,13 +851,10 @@ void MemoSelectView::TreeCollapse(HTREEITEM hItem)
 {
 	HTREEITEM h = TreeView_GetChild(hViewWnd, hItem);
 
-	// ノードの削除
-	DeleteItemsRec(h);
+	DeleteItemsRec(h); // delete nodes
+	InsertDummyNode(hViewWnd, hItem); // insert dummy child
 
-	// ダミーのノードを挿入
-	InsertDummyNode(hViewWnd, hItem);
-
-	// イメージを閉じているものに変更
+	// set icon
 	TreeViewItem *pItem = GetTVItem(hItem);
 	SetIcon(pItem, MEMO_VIEW_STATE_OPEN_CLEAR); 
 
@@ -883,9 +862,9 @@ void MemoSelectView::TreeCollapse(HTREEITEM hItem)
 }
 
 ///////////////////////////////////////////////////////
-// 新規ノードの作成
+// create new note
 ///////////////////////////////////////////////////////
-// メモの新規作成に対応してノードを追加する。
+// insert new leaf
 
 HTREEITEM MemoSelectView::NewMemoCreated(MemoNote *pNote, LPCTSTR pHeadLine, HTREEITEM hParent)
 {
@@ -908,7 +887,7 @@ HTREEITEM MemoSelectView::NewMemoCreated(MemoNote *pNote, LPCTSTR pHeadLine, HTR
 }
 
 ///////////////////////////////////////////
-// ウィンドウサイズの移動
+// move window or resize window
 ///////////////////////////////////////////
 
 void MemoSelectView::MoveWindow(DWORD x, DWORD y, DWORD nWidth, DWORD nHeight)
@@ -933,10 +912,6 @@ BOOL MemoSelectView::UpdateItemStatusNotify(TreeViewItem *pItem, LPCTSTR pNewHea
 		hParent = TVI_ROOT;
 	}
 
-	// New HTREEITEM may be change, once release mapping.
-	// Notify to memomanager
-	pMemoMgr->ReleaseItemNotify(&(pItem->ToLocator()));
-
 	// Delete from Tree. (TreeViewItem is not deleted because it will deleted at caller.)
 	TreeView_DeleteItem(hViewWnd, hOrigNode);
 
@@ -952,14 +927,11 @@ BOOL MemoSelectView::UpdateItemStatusNotify(TreeViewItem *pItem, LPCTSTR pNewHea
 	// link TreeViewItem <-> HTREEITEM assosiation
 	pItem->SetViewItem(hItem);
 	TreeView_SelectItem(hViewWnd, hItem);
-
-	// notify to MemoManager.
-	pMemoMgr->InsertItemNotify(&(pItem->ToLocator()));
 	return TRUE;
 }
 
 ///////////////////////////////////////////
-// アクションボタンに対する処理
+// Action(Hardware) buttons
 ///////////////////////////////////////////
 
 void MemoSelectView::OnActionButton(HWND hWnd)
@@ -967,10 +939,7 @@ void MemoSelectView::OnActionButton(HWND hWnd)
 	HTREEITEM hItem;
 	TreeViewItem *p = GetCurrentItem(&hItem);
 	if (p && !p->HasMultiItem()) {
-		// メモの場合にはMainFrameに対してオープン要求を出す
-		TreeViewFileItem *ptvfi = (TreeViewFileItem*)p;
-		MemoLocator loc(ptvfi->GetNote(), ptvfi->GetViewItem());
-		pMemoMgr->GetMainFrame()->SendRequestOpen(&loc, OPEN_REQUEST_MSVIEW_ACTIVE);
+		p->OpenMemo(this, OPEN_REQUEST_MSVIEW_ACTIVE);
 		return;
 	}
 	
@@ -980,8 +949,10 @@ void MemoSelectView::OnActionButton(HWND hWnd)
 }
 
 ///////////////////////////////////////////
-// 選択しているアイテムのパスの取得
+// get item path for insert
 ///////////////////////////////////////////
+// if the item is node, return itself.
+// if the item is leaf, return the parent node of the leaf
 
 HTREEITEM MemoSelectView::GetPathForNewItem(TString *pPath, TreeViewItem *pItem)
 {
@@ -993,10 +964,6 @@ HTREEITEM MemoSelectView::GetPathForNewItem(TString *pPath, TreeViewItem *pItem)
 	} else {
 		hItem = pItem->GetViewItem();
 	}
-	MemoNote *pNote = NULL;
-	if (pItem && !pItem->HasMultiItem()) {
-		pNote = ((TreeViewFileItem*)pItem)->GetNote();
-	}
 	if (hItem == NULL) {
 		if (!pPath->Alloc(1)) return NULL;
 		_tcscpy(pPath->Get(), TEXT(""));
@@ -1004,7 +971,7 @@ HTREEITEM MemoSelectView::GetPathForNewItem(TString *pPath, TreeViewItem *pItem)
 		return TreeView_GetRoot(hViewWnd);
 	}
 
-	if (pNote != NULL) {
+	if (pItem && !pItem->HasMultiItem()) {
 		hItem = TreeView_GetParent(hViewWnd, hItem);
 	}
 
@@ -1014,17 +981,17 @@ HTREEITEM MemoSelectView::GetPathForNewItem(TString *pPath, TreeViewItem *pItem)
 }
 
 ///////////////////////////////////////////
-// フォルダの挿入
+// carete new folder
 ///////////////////////////////////////////
 
 BOOL MemoSelectView::CreateNewFolder(HTREEITEM hItem, LPCTSTR pFolder)
 {
-	// ツリーが閉じている場合には開く
+	// expand the tree if it collapsed
 	if (!IsExpand(hItem) && (TreeView_GetChild(hViewWnd, hItem) != NULL)) {
-		// 開くことで作成したフォルダは自動的に読み込まれる
+		// the folder inserted is automatically reloaded by expanding the tree
 		TreeView_Expand(hViewWnd, hItem, TVE_EXPAND);
 	} else {
-		// 開いている場合には挿入
+		// if node is already expanded, insert it
 		TreeViewFolderItem *pItem = new TreeViewFolderItem();
 		InsertFolder(hItem, pFolder, pItem, FALSE);
 		if (TreeView_GetChild(hViewWnd, hItem) != NULL) {
@@ -1035,67 +1002,92 @@ BOOL MemoSelectView::CreateNewFolder(HTREEITEM hItem, LPCTSTR pFolder)
 }
 
 /////////////////////////////////////////
-// ヘッドライン文字列の変更
+// Change headline string
 /////////////////////////////////////////
-// 再ソートが必要となるため、一旦削除して再挿入・ソートしている
+// It needs re-ordering, delete once and re-insert again.
+// New URI should locate same as old URI
+// URI should point to file
 
-BOOL MemoSelectView::UpdateHeadLine(MemoLocator *pLoc, LPCTSTR pHeadLine)
+BOOL MemoSelectView::UpdateHeadLine(LPCTSTR pOldURI, LPCTSTR pNewURI, MemoNote *pNNote)
 {
-	MemoNote *pNote = pLoc->GetNote();
-	HTREEITEM hItem = pLoc->GetHITEM();
+	// get HTREEITEM from old URI
+	HTREEITEM hOld = GetItemFromURI(pOldURI);
+	if (hOld == NULL) return TRUE; // if node is collapsed, nothing to do
 
-#if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
-	HTREEITEM hCurrentSel;
-	if (g_Property.IsUseTwoPane()) {
-		hCurrentSel = TreeView_GetSelection(hViewWnd);
+	// if URI is not changed, only focusing
+	if (_tcscmp(pOldURI, pNewURI) == 0) {
+		TreeView_SelectItem(hViewWnd, hOld);
+		return TRUE;
 	}
-#endif
 
-	// Get parent item
-	HTREEITEM hParent = TreeView_GetParent(hViewWnd, hItem);
+	// get parent
+	HTREEITEM hParent = TreeView_GetParent(hViewWnd, hOld);
 
-	// 新しいノードの挿入・MemoNoteとの関連付け
-	TV_INSERTSTRUCT ti;
-	ti.hParent = hParent;
-	ti.item.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE | TVIF_PARAM;
-	ti.item.pszText = (LPTSTR)pHeadLine;
-	ti.item.iImage = ti.item.iSelectedImage = pNote->GetMemoIcon();
+	// remove current node
+	DeleteOneItem(hOld);
 
-	TreeViewFileItem *tvi = new TreeViewFileItem();
-	MemoNote *pNewNote = pNote->Clone();
-
-	// Delete current item
-	DeleteOneItem(hItem);
-
+	// get MemoNote instance
+	MemoNote *pNewNote = pNNote->Clone();
 	if (pNewNote == NULL) return FALSE;
-	tvi->SetNote(pNewNote);
-	ti.item.lParam = (LPARAM)tvi;
 
-	// TODO:
-	// 親がcloseされているときにはhCurrentItemの関連が切り離されているので
-	// そもそもUpdateHeadLineが呼び出されることはない
-	if (IsExpand(hParent)) {
-		HTREEITEM hItem = ::InsertNode(hViewWnd, &ti);
-		tvi->SetViewItem(hItem);
-		TreeView_SelectItem(hViewWnd, hItem);
+	// get new headline
+	TomboURI uri;
+	if (!uri.Init(pNewURI)) return FALSE;
+	TString sNewHeadLine;
+	if (!uri.GetHeadLine(&sNewHeadLine)) return FALSE;
 
-		// Notify to MemoManager
-		MemoLocator loc(pNewNote, hItem);
-		pMemoMgr->InsertItemNotify(&loc);
+	// insert node
+	HTREEITEM hNew = InsertFile(hParent, pNewNote, sNewHeadLine.Get(), FALSE, FALSE);
+	if (hNew == NULL) return FALSE;
 
-	} else {
-#if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
-		if (g_Property.IsUseTwoPane()) {
-			// 削除・挿入により選択されているアイテムが変わるので戻す
-			TreeView_SelectItem(hViewWnd, hCurrentSel);
-		}
-#endif
-	}
+	TreeView_SelectItem(hViewWnd, hNew);
 	return TRUE;
 }
 
+HTREEITEM MemoSelectView::GetItemFromURI(LPCTSTR pURI)
+{
+	TomboURI uri;
+	if (!uri.Init(pURI)) return NULL;
+
+	TString sRep;
+	if (!uri.GetRepository(&sRep)) return NULL;
+
+	HTREEITEM hCurrent = GetRootItem(sRep.Get());
+	if (hCurrent == NULL) return NULL;
+
+	TomboURIItemIterator itr(&uri);
+	if (!itr.Init()) return NULL;
+
+	LPCTSTR p;
+	for (itr.First(); p = itr.Current(); itr.Next()) {
+		if (itr.IsLeaf()) {
+			DWORD n = _tcslen(p);
+			if (n >= 4) {
+				hCurrent = FindItem2(hViewWnd, hCurrent, p, n - 4);
+			} else {
+				hCurrent = FindItem2(hViewWnd, hCurrent, p, n);
+			}
+		} else {
+			hCurrent = FindItem2(hViewWnd, hCurrent, p, _tcslen(p));
+		}
+	}
+	return hCurrent;
+}
+
+HTREEITEM MemoSelectView::GetRootItem(LPCTSTR pRep)
+{
+	// In current version, pRep takes only  "default" or "@vfolder".
+	if (_tcscmp(pRep, TEXT("default")) == 0) {
+		return hMemoRoot;
+	} else if (_tcscmp(pRep, TEXT("@vfolder")) == 0) {
+		return hSearchRoot;
+	} else {
+		return NULL;
+	}
+}
+
 /////////////////////////////////////////
-// アイコンの設定
+// set icon
 /////////////////////////////////////////
 
 void MemoSelectView::SetIcon(TreeViewItem *ptv, DWORD nStatus)
@@ -1112,7 +1104,7 @@ void MemoSelectView::SetIcon(TreeViewItem *ptv, DWORD nStatus)
 }
 
 /////////////////////////////////////////
-// 擬似クリップボードへの設定
+// set item to psudo clipboard 
 /////////////////////////////////////////
 
 void MemoSelectView::SetShareArea(TreeViewItem *pItem)
@@ -1127,7 +1119,7 @@ void MemoSelectView::SetShareArea(TreeViewItem *pItem)
 }
 
 /////////////////////////////////////////
-// 移動するメモの選択
+// prepare move the item
 /////////////////////////////////////////
 
 void MemoSelectView::OnCut(TreeViewItem *pItem)
@@ -1137,7 +1129,7 @@ void MemoSelectView::OnCut(TreeViewItem *pItem)
 }
 
 /////////////////////////////////////////
-// コピーするメモの選択
+// prepare copy the item
 /////////////////////////////////////////
 
 void MemoSelectView::OnCopy(TreeViewItem *pItem)
@@ -1147,7 +1139,7 @@ void MemoSelectView::OnCopy(TreeViewItem *pItem)
 }
 
 /////////////////////////////////////////
-// 移動・コピーの実行
+// move/copy notes
 /////////////////////////////////////////
 
 void MemoSelectView::OnPaste()
@@ -1155,7 +1147,7 @@ void MemoSelectView::OnPaste()
 	if (pClipItem == NULL) return;
 
 	if (bCut) {
-		// メモの移動
+		// move notes
 		HTREEITEM hItem = pClipItem->GetViewItem();
 		LPCTSTR pErr = NULL;
 		if (!pClipItem->Move(pMemoMgr, this, &pErr)) {
@@ -1168,7 +1160,7 @@ void MemoSelectView::OnPaste()
 		}
 		DeleteOneItem(hItem);
 	} else {
-		// メモのコピー
+		// copy notes
 		LPCTSTR pErr = NULL;
 		if (!pClipItem->Copy(pMemoMgr, this, &pErr)) {
 			if (pErr) {
@@ -1219,7 +1211,7 @@ void MemoSelectView::ControlMenu()
 }
 
 /////////////////////////////////////////
-// フォーカスの取得
+// acquire forcusing
 /////////////////////////////////////////
 
 void MemoSelectView::OnGetFocus()
@@ -1232,7 +1224,7 @@ void MemoSelectView::OnGetFocus()
 }
 
 /////////////////////////////////////////
-// フォントの設定
+// set font
 /////////////////////////////////////////
 
 void MemoSelectView::SetFont(HFONT hFont)
@@ -1241,7 +1233,7 @@ void MemoSelectView::SetFont(HFONT hFont)
 }
 
 ///////////////////////////////////////////
-// ツリーの開閉
+// expand/collapse tree
 ///////////////////////////////////////////
 
 void MemoSelectView::ToggleExpandFolder(HTREEITEM hItem, UINT status)
@@ -1255,7 +1247,7 @@ void MemoSelectView::ToggleExpandFolder(HTREEITEM hItem, UINT status)
 }
 
 /////////////////////////////////////////////
-//  HTREEITEMからTreeViewItem*の取得
+//  get TreeViewItem from HTREEITEM
 /////////////////////////////////////////////
 
 TreeViewItem *MemoSelectView::GetTVItem(HTREEITEM h)
@@ -1268,7 +1260,7 @@ TreeViewItem *MemoSelectView::GetTVItem(HTREEITEM h)
 }
 
 /////////////////////////////////////////////
-// HTREEITEMにTreeViewItem*を設定
+// associate HTREEITEM to TreeViewItem*
 /////////////////////////////////////////////
 
 BOOL MemoSelectView::SetTVItem(HTREEITEM h, TreeViewItem *p)
@@ -1282,12 +1274,12 @@ BOOL MemoSelectView::SetTVItem(HTREEITEM h, TreeViewItem *p)
 }
 
 /////////////////////////////////////////////
-//
+// Insert dummy node
 /////////////////////////////////////////////
+// to add "+" icon, insert dummy node if a folder which don't have no chil.
 
 static void InsertDummyNode(HWND hTree, HTREEITEM hItem)
 {
-	// ダミーノード
 	TV_INSERTSTRUCT tisub;
 	tisub.hParent = hItem;
 	tisub.hInsertAfter = TVI_LAST;
@@ -1297,11 +1289,11 @@ static void InsertDummyNode(HWND hTree, HTREEITEM hItem)
 }
 
 /////////////////////////////////////////////
-// ファイル名の変更
+// Rename
 /////////////////////////////////////////////
 //
-// 戻り値： TRUE = ラベル変更をaccept
-//			FALSE = ラベル変更をreject
+// Result:  TRUE = accept label change
+//			FALSE = refuse label change
 
 LRESULT MemoSelectView::EditLabel(TVITEM *pItem)
 {
@@ -1418,16 +1410,9 @@ HTREEITEM MemoSelectView::ShowItem(LPCTSTR pPath, BOOL bSelChange, BOOL bOpenNot
 
 		// if selected item is note, open it.
 		if (bNote) {
+			DWORD nOption = bOpenNotes ? OPEN_REQUEST_MSVIEW_ACTIVE : OPEN_REQUEST_MDVIEW_ACTIVE;
 			TreeViewItem *ptv = GetTVItem(hTargetItem);
-			if (!ptv->HasMultiItem()) {
-				TreeViewFileItem *p = (TreeViewFileItem*)ptv;
-				MemoLocator loc(p->GetNote(), p->GetViewItem());
-				if (bOpenNotes) {
-					pMemoMgr->GetMainFrame()->SendRequestOpen(&loc, OPEN_REQUEST_MSVIEW_ACTIVE);
-				} else {
-					pMemoMgr->GetMainFrame()->SendRequestOpen(&loc, OPEN_REQUEST_MDVIEW_ACTIVE);
-				}
-			}
+			ptv->OpenMemo(this, nOption);
 		}
 	}
 	return hTargetItem;
@@ -1456,23 +1441,18 @@ static HTREEITEM FindItem2(HWND hWnd, HTREEITEM hParent, LPCTSTR pStr, DWORD nLe
 	return NULL;
 }
 
-HTREEITEM MemoSelectView::ShowItemByURI(LPCTSTR pPath, BOOL bSelChange, BOOL bOpenNotes)
+HTREEITEM MemoSelectView::ShowItemByURI(LPCTSTR pURI, BOOL bSelChange, BOOL bOpenNotes)
 {
 	TomboURI tURI;
-	if (!tURI.Init(pPath)) return NULL;
+	if (!tURI.Init(pURI)) return NULL;
 
 	HTREEITEM hCurrent;
 
 	// get root node
 	TString sRepo;
 	if (!tURI.GetRepository(&sRepo)) return FALSE;
-	if (_tcscmp(sRepo.Get(), TEXT("default")) == 0) {
-		hCurrent = hMemoRoot;
-	} else if (_tcscmp(sRepo.Get(), TEXT("@vfolder")) == 0) {
-		hCurrent = hSearchRoot;
-	} else {
-		return NULL;
-	}
+	hCurrent = GetRootItem(sRepo.Get());
+	if (hCurrent == NULL) return NULL;
 
 	// expand root node
 	if (!IsExpand(hCurrent)) {
@@ -1508,20 +1488,17 @@ HTREEITEM MemoSelectView::ShowItemByURI(LPCTSTR pPath, BOOL bSelChange, BOOL bOp
 			if (pItem->HasMultiItem() && !IsExpand(hCurrent)) {
 				TreeView_Expand(hViewWnd, hCurrent, TVE_EXPAND);
 			}
-			TreeView_SelectItem(hViewWnd, hCurrent);
 		}
 	}
 
-	if (pItem && !pItem->HasMultiItem()) {
-		TreeViewFileItem *p = (TreeViewFileItem*)pItem;
-		MemoLocator loc(p->GetNote(), p->GetViewItem());
-		if (bOpenNotes) {
-			pMemoMgr->GetMainFrame()->SendRequestOpen(&loc, OPEN_REQUEST_MSVIEW_ACTIVE);
-		} else {
-			pMemoMgr->GetMainFrame()->SendRequestOpen(&loc, OPEN_REQUEST_MDVIEW_ACTIVE);
-		}
+	if (hCurrent && bSelChange) {
+		TreeView_SelectItem(hViewWnd, hCurrent);
 	}
 
+	if (pItem) {
+		DWORD nOption = bOpenNotes ? OPEN_REQUEST_MSVIEW_ACTIVE : OPEN_REQUEST_MDVIEW_ACTIVE;
+		pItem->OpenMemo(this, nOption);
+	}
 	return hCurrent;
 }
 

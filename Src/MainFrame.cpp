@@ -41,6 +41,9 @@ UINT WINAPI ImmGetVirtualKey(HWND);
 #include "SearchDlg.h"
 #include "SearchEngine.h"
 #include "SearchTree.h"
+#include "TomboURI.h"
+
+//#include "YAEditor.h"
 
 #include "YAEditor.h"
 
@@ -336,8 +339,12 @@ static LRESULT CALLBACK MainFrameWndProc(HWND hWnd, UINT nMessage, WPARAM wParam
 		bRes = frm->OnNotify(hWnd, wParam, lParam);
 		if (bRes != 0xFFFFFFFF) return bRes;
 		break;
-	case MWM_OPEN_REQUEST:
-		frm->RequestOpenMemo((MemoLocator*)lParam, (BOOL)wParam);
+	case MWM_SWITCH_VIEW:
+		if (lParam == OPEN_REQUEST_MDVIEW_ACTIVE) {
+			frm->ActivateView(FALSE);
+		} else if (lParam == OPEN_REQUEST_MSVIEW_ACTIVE) {
+			frm->ActivateView(TRUE);
+		}
 		return 0;
 	case WM_SETFOCUS:
 		frm->SetFocus();
@@ -503,7 +510,6 @@ BOOL MainFrame::Create(LPCTSTR pWndName, HINSTANCE hInst, int nCmdShow)
 
 	YAEditor *pYAE = new YAEditor();
 	pDetailsView = pYAE;
-
 
 	mmMemoManager.Init(this, pDetailsView, &msView);
 	msView.Init(&mmMemoManager);
@@ -1551,15 +1557,19 @@ void MainFrame::OnList(BOOL bAskSave)
 		// 2Paneの場合、暗号化されたメモのみクリアする
 		if (nYNC == IDNO) {
 			// メモを破棄し、旧メモをリロード
-			RequestOpenMemo(&(mmMemoManager.CurrentLoc()), OPEN_REQUEST_MDVIEW_ACTIVE);
-		} else {
-			MemoNote *pCurrent = mmMemoManager.CurrentNote();
-			if (pCurrent && pCurrent->IsEncrypted()) {
-				mmMemoManager.NewMemo();
+			if (mmMemoManager.GetCurrentURI()) {
+				RequestOpenMemo(mmMemoManager.GetCurrentURI(), OPEN_REQUEST_MDVIEW_ACTIVE);
 			} else {
-#if defined(PLATFORM_HPC)
-				RequestOpenMemo(&(mmMemoManager.CurrentLoc()), OPEN_REQUEST_MDVIEW_ACTIVE);
-#endif
+				mmMemoManager.NewMemo();
+			}
+		} else {
+			// nYNC == YES so note has been saved.
+			if (mmMemoManager.GetCurrentURI()) {
+				TomboURI uri;
+				if (!uri.Init(mmMemoManager.GetCurrentURI())) return;
+				if (uri.IsEncrypted()) {
+					mmMemoManager.NewMemo();
+				}
 			}
 		}
 	} else {
@@ -1587,57 +1597,49 @@ void MainFrame::About()
 }
 
 ///////////////////////////////////////////////////
-// メモオープン要求
+// Request open the note
 ///////////////////////////////////////////////////
 // bSwitchViewがTRUEの場合には詳細ビューに切り替える
 
-void MainFrame::RequestOpenMemo(MemoLocator *pLoc, DWORD nSwitchView)
+void MainFrame::RequestOpenMemo(LPCTSTR pURI, DWORD nSwitchView)
 {
-	MemoNote *pNote = pLoc->GetNote();
-	if (pNote == NULL) {
-		if (pLoc->IsDeleteReceived()) delete pLoc;
-		return; // フォルダの場合
-	}
-	if (((nSwitchView & OPEN_REQUEST_MSVIEW_ACTIVE) == 0) && (pNote->IsEncrypted() && !pmPasswordMgr.IsRememberPassword())) {
+	TomboURI uri;
+	if (!uri.Init(pURI)) return;
+
+	if (((nSwitchView & OPEN_REQUEST_MSVIEW_ACTIVE) == 0) && (uri.IsEncrypted() && !pmPasswordMgr.IsRememberPassword())) {
 		// bSwitchViewがFALSEで、メモを開くためにパスワードを問い合わせる必要がある場合には
 		// メモは開かない
-		if (pLoc->IsDeleteReceived()) delete pLoc;
 		return;
 	}
-	mmMemoManager.SetMemo(pLoc);
+	mmMemoManager.SetMemo(&uri);
+	SetNewMemoStatus(FALSE);
 
 #if defined(PLATFORM_WIN32) || defined(PLATFORM_PKTPC)
-	LPCTSTR pPath = pNote->MemoPath();
-	LPCTSTR pPrefix = TEXT("Tombo - ");
-	if (pPath) {
-		LPCTSTR pBase = _tcsrchr(pPath, TEXT('\\'));
-		if (pBase) {
-			pBase++;
+	if (g_Property.SwitchWindowTitle()) {
+		// change window title
+		LPCTSTR pPrefix = TEXT("Tombo - ");
+		LPCTSTR pBase;
+		TString sHeadLine;
+		if (uri.GetHeadLine(&sHeadLine)) {
+			pBase = sHeadLine.Get();
 		} else {
-			pBase = pPath;
+			pBase = TEXT("");
 		}
-		LPTSTR p = new TCHAR[_tcslen(pBase) + 1 + _tcslen(pPrefix)];
-		if (p) {
-			// PocketPCの場合画面が狭いのでアプリ名は表示させない
-#if defined(PLATFORM_WIN32)
-			wsprintf(p, TEXT("%s%s"), pPrefix, pBase);
-#endif
+		LPCTSTR pWinTitle;
 #if defined(PLATFORM_PKTPC)
-			wsprintf(p, TEXT("%s"), pBase);
-#endif
-			DWORD l = _tcslen(p);
-			if (l > 4) {
-				*(p + l - 4) = TEXT('\0');
-			}
-			if (g_Property.SwitchWindowTitle()) {
-				SetWindowText(hMainWnd, p);
-			}
-			delete [] p;
+		pWinTitle = pBase;
+#else
+		TString sWinTitle;
+		if (sWinTitle.Join(pPrefix, pBase)) {
+			pWinTitle = sWinTitle.Get();
+		} else {
+			pWinTitle = pPrefix;
 		}
-	}	
+#endif
+		SetWindowText(hMainWnd, pWinTitle);
+	}
 #endif
 
-	SetNewMemoStatus(FALSE);
 	if (!(nSwitchView & OPEN_REQUEST_NO_ACTIVATE_VIEW)) {
 		if (g_Property.IsUseTwoPane()) {
 			if (nSwitchView & OPEN_REQUEST_MSVIEW_ACTIVE) {
@@ -1647,12 +1649,13 @@ void MainFrame::RequestOpenMemo(MemoLocator *pLoc, DWORD nSwitchView)
 			ActivateView(FALSE);
 		}
 	}
-	if (pLoc->IsDeleteReceived()) delete pLoc;
 }
 
 ///////////////////////////////////////////////////
-// ビューの切り替え処理
+// switch view
 ///////////////////////////////////////////////////
+// if bList is TRUE, activate TreeView.
+// if FALSE, activate EditView
 
 void MainFrame::ActivateView(BOOL bList)
 {
@@ -1993,8 +1996,7 @@ void MainFrame::OnProperty()
 	mmMemoManager.NewMemo();
 
 	TString sPath;
-//	if (!msView.GetCurrentItemPath(&sPath)) {
-	if (!msView.GetCurrentURI(&sPath)) {
+	if (!msView.GetURI(&sPath)) {
 		sPath.Set(TEXT(""));
 	}
 
@@ -2027,10 +2029,17 @@ void MainFrame::OnTimer(WPARAM nTimerID)
 {
 	if (nTimerID == 0) {
 		if (!bSelectViewActive) {
-			MemoNote *pCurrent = mmMemoManager.CurrentNote();
-			if (pCurrent && pCurrent->IsEncrypted()) {
-				OnList(FALSE);
+			if (mmMemoManager.GetCurrentURI()) {
+				TomboURI uri;
+				if (!uri.Init(mmMemoManager.GetCurrentURI())) return;
+				if (uri.IsEncrypted()) {
+					OnList(FALSE);
+				}
 			}
+//			MemoNote *pCurrent = mmMemoManager.CurrentNote();
+//			if (pCurrent && pCurrent->IsEncrypted()) {
+//				OnList(FALSE);
+//			}
 		}
 		pmPasswordMgr.ForgetPassword();
 	} else if (nTimerID == ID_PASSWORDTIMER) {
@@ -2425,13 +2434,7 @@ void MainFrame::DoSearchTree(BOOL bFirst, BOOL bForward)
 	TString sPath, sFullPath;
 	// Get path of selecting on treeview.
 	TreeViewItem *pItem = msView.GetCurrentItem();
-	if (pItem->HasMultiItem()) {
-		// folder
-		if (!msView.GetPathForNewItem(&sPath)) return;
-	} else {
-		// file
-		if (!sPath.Set(((TreeViewFileItem *)pItem)->GetNote()->MemoPath())) return;
-	}
+	if (pItem == NULL || !pItem->GetLocationPath(&msView, &sPath)) return;
 	if (!sFullPath.Join(g_Property.TopDir(), TEXT("\\"), sPath.Get())) return;
 
 	// Create dialog and do search.
@@ -2639,7 +2642,7 @@ void MainFrame::OnBookMarkAdd(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
 	// get note's path
 	TString sURI;
-	if (!msView.GetCurrentURI(&sURI)) return;
+	if (!msView.GetURI(&sURI)) return;
 
 	// add to bookmark manager
 	const BookMarkItem *pItem = pBookMark->Assign(sURI.Get());
