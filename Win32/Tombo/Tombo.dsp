@@ -289,6 +289,10 @@ SOURCE=..\..\Src\regex\util.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\Src\VarBuffer.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\Src\VFStream.cpp
 # End Source File
 # End Group
@@ -452,6 +456,10 @@ SOURCE=..\..\Src\TString.h
 # Begin Source File
 
 SOURCE=..\..\Src\Uniconv.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\VarBuffer.h
 # End Source File
 # Begin Source File
 
