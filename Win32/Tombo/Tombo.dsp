@@ -145,6 +145,10 @@ SOURCE=..\..\Src\DirectoryScanner.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\Src\DirList.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\Src\File.cpp
 # End Source File
 # Begin Source File
@@ -226,6 +230,10 @@ SOURCE=..\..\Src\SearchDlg.cpp
 # Begin Source File
 
 SOURCE=..\..\Src\SearchEngine.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\SearchTree.cpp
 # End Source File
 # Begin Source File
 
@@ -322,6 +330,10 @@ SOURCE=..\..\Src\CryptManager.h
 # Begin Source File
 
 SOURCE=..\..\Src\DirectoryScanner.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\DirList.h
 # End Source File
 # Begin Source File
 
@@ -432,6 +444,10 @@ SOURCE=..\..\Src\SearchDlg.h
 # Begin Source File
 
 SOURCE=..\..\Src\SearchEngine.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\SearchTree.h
 # End Source File
 # Begin Source File
 

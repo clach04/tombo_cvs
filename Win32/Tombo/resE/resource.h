@@ -49,6 +49,7 @@
 #define IDD_PROPTAB_SELECTMEMO          130
 #define IDD_SEARCH                      132
 #define IDR_CONTEXTMENU                 133
+#define IDD_SEARCHING                   134
 #define IDC_PASS                        1000
 #define IDC_PROP_PASSWORD_DESC          1001
 #define IDC_PASS_TIMEOUT                1002
@@ -76,6 +77,7 @@
 #define IDC_VERSIONINFO                 1027
 #define IDC_SEARCH_DIRECTION_UP         1028
 #define IDC_SEARCH_DIRECTION_DOWN       1029
+#define IDC_SEARCHMSG                   1030
 #define IDM_EXIT                        40001
 #define IDM_NEWMEMO                     40002
 #define IDM_RETURNLIST                  40003
@@ -108,9 +110,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        134
+#define _APS_NEXT_RESOURCE_VALUE        135
 #define _APS_NEXT_COMMAND_VALUE         40027
-#define _APS_NEXT_CONTROL_VALUE         1030
+#define _APS_NEXT_CONTROL_VALUE         1031
 #define _APS_NEXT_SYMED_VALUE           108
 #endif
 #endif

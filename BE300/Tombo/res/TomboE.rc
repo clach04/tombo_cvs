@@ -210,6 +210,14 @@ BEGIN
                     WS_TABSTOP
 END
 
+IDD_SEARCHING DIALOG DISCARDABLE  0, 0, 74, 54
+STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP
+FONT 9, "System"
+BEGIN
+    PUSHBUTTON      "Cancel",IDCANCEL,10,35,50,14
+    CTEXT           "Searching...",IDC_SEARCHMSG,5,16,65,8
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -323,6 +331,14 @@ BEGIN
         RIGHTMARGIN, 99
         TOPMARGIN, 7
         BOTTOMMARGIN, 89
+    END
+
+    IDD_SEARCHING, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 67
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 47
     END
 END
 #endif    // APSTUDIO_INVOKED

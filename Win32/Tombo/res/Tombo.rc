@@ -302,6 +302,14 @@ BEGIN
     GROUPBOX        "åüçıï˚å¸",IDC_STATIC,130,30,50,40
 END
 
+IDD_SEARCHING DIALOG DISCARDABLE  0, 0, 79, 82
+STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP
+FONT 9, "ÇlÇr ÇoÉSÉVÉbÉN"
+BEGIN
+    PUSHBUTTON      "∑¨›æŸ",IDCANCEL,15,60,50,14
+    CTEXT           "åüçıíÜ...",IDC_SEARCHMSG,7,30,65,8
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -373,6 +381,14 @@ BEGIN
         RIGHTMARGIN, 180
         TOPMARGIN, 7
         BOTTOMMARGIN, 88
+    END
+
+    IDD_SEARCHING, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 72
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 75
     END
 END
 #endif    // APSTUDIO_INVOKED

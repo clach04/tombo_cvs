@@ -1008,6 +1008,123 @@ DEP_CPP_DIREC=\
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\Src\DirList.cpp
+
+!IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
+
+DEP_CPP_DIRLI=\
+	"..\..\Src\DirList.h"\
+	"..\..\Src\MemoManager.h"\
+	"..\..\Src\MemoNote.h"\
+	"..\..\Src\TreeViewItem.h"\
+	"..\..\Src\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
+
+DEP_CPP_DIRLI=\
+	"..\..\Src\DirList.h"\
+	"..\..\Src\MemoManager.h"\
+	"..\..\Src\MemoNote.h"\
+	"..\..\Src\TreeViewItem.h"\
+	"..\..\Src\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Release"
+
+DEP_CPP_DIRLI=\
+	"..\..\Src\DirList.h"\
+	"..\..\Src\MemoManager.h"\
+	"..\..\Src\MemoNote.h"\
+	"..\..\Src\TreeViewItem.h"\
+	"..\..\Src\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Debug"
+
+DEP_CPP_DIRLI=\
+	"..\..\Src\DirList.h"\
+	"..\..\Src\MemoManager.h"\
+	"..\..\Src\MemoNote.h"\
+	"..\..\Src\TreeViewItem.h"\
+	"..\..\Src\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Release"
+
+DEP_CPP_DIRLI=\
+	"..\..\Src\DirList.h"\
+	"..\..\Src\MemoManager.h"\
+	"..\..\Src\MemoNote.h"\
+	"..\..\Src\TreeViewItem.h"\
+	"..\..\Src\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Debug"
+
+DEP_CPP_DIRLI=\
+	"..\..\Src\DirList.h"\
+	"..\..\Src\MemoManager.h"\
+	"..\..\Src\MemoNote.h"\
+	"..\..\Src\TreeViewItem.h"\
+	"..\..\Src\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Release"
+
+DEP_CPP_DIRLI=\
+	"..\..\Src\DirList.h"\
+	"..\..\Src\MemoManager.h"\
+	"..\..\Src\MemoNote.h"\
+	"..\..\Src\TreeViewItem.h"\
+	"..\..\Src\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Debug"
+
+DEP_CPP_DIRLI=\
+	"..\..\Src\DirList.h"\
+	"..\..\Src\MemoManager.h"\
+	"..\..\Src\MemoNote.h"\
+	"..\..\Src\TreeViewItem.h"\
+	"..\..\Src\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) ReleaseE"
+
+DEP_CPP_DIRLI=\
+	"..\..\Src\DirList.h"\
+	"..\..\Src\MemoManager.h"\
+	"..\..\Src\MemoNote.h"\
+	"..\..\Src\TreeViewItem.h"\
+	"..\..\Src\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) ReleaseE"
+
+DEP_CPP_DIRLI=\
+	"..\..\Src\DirList.h"\
+	"..\..\Src\MemoManager.h"\
+	"..\..\Src\MemoNote.h"\
+	"..\..\Src\TreeViewItem.h"\
+	"..\..\Src\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) ReleaseE"
+
+DEP_CPP_DIRLI=\
+	"..\..\Src\DirList.h"\
+	"..\..\Src\MemoManager.h"\
+	"..\..\Src\MemoNote.h"\
+	"..\..\Src\TreeViewItem.h"\
+	"..\..\Src\VarBuffer.h"\
+	
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\Src\File.cpp
 
 !IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
@@ -1360,9 +1477,7 @@ DEP_CPP_MAIN_=\
 	"..\..\Src\PasswordManager.h"\
 	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
-	"..\..\Src\TVector.h"\
 	"..\..\Src\Uniconv.h"\
-	"..\..\Src\VarBuffer.h"\
 	{$(INCLUDE)}"aygshell.h"\
 	{$(INCLUDE)}"sipapi.h"\
 	
@@ -1431,10 +1546,10 @@ DEP_CPP_MAIN_=\
 	"..\..\Src\PasswordManager.h"\
 	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
-	"..\..\Src\TVector.h"\
 	"..\..\Src\Uniconv.h"\
 	
 NODEP_CPP_MAIN_=\
+	"..\..\Src\TVector.h"\
 	".\ipapi.h"\
 	".\ygshell.h"\
 	
@@ -1557,10 +1672,13 @@ DEP_CPP_MAINF=\
 	"..\..\Src\Property.h"\
 	"..\..\Src\SearchDlg.h"\
 	"..\..\Src\SearchEngine.h"\
+	"..\..\Src\SearchTree.h"\
 	"..\..\Src\SipControl.h"\
 	"..\..\Src\Tombo.h"\
 	"..\..\Src\TreeViewItem.h"\
+	"..\..\Src\TString.h"\
 	"..\..\Src\Uniconv.h"\
+	"..\..\Src\VarBuffer.h"\
 	{$(INCLUDE)}"aygshell.h"\
 	{$(INCLUDE)}"sipapi.h"\
 	
@@ -3634,6 +3752,123 @@ DEP_CPP_SEARCH=\
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\Src\SearchTree.cpp
+
+!IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
+
+DEP_CPP_SEARCHT=\
+	"..\..\Src\DirList.h"\
+	"..\..\Src\SearchEngine.h"\
+	"..\..\Src\SearchTree.h"\
+	"..\..\Src\TString.h"\
+	"..\..\Src\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
+
+DEP_CPP_SEARCHT=\
+	"..\..\Src\DirList.h"\
+	"..\..\Src\SearchEngine.h"\
+	"..\..\Src\SearchTree.h"\
+	"..\..\Src\TString.h"\
+	"..\..\Src\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Release"
+
+DEP_CPP_SEARCHT=\
+	"..\..\Src\DirList.h"\
+	"..\..\Src\SearchEngine.h"\
+	"..\..\Src\SearchTree.h"\
+	"..\..\Src\TString.h"\
+	"..\..\Src\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Debug"
+
+DEP_CPP_SEARCHT=\
+	"..\..\Src\DirList.h"\
+	"..\..\Src\SearchEngine.h"\
+	"..\..\Src\SearchTree.h"\
+	"..\..\Src\TString.h"\
+	"..\..\Src\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Release"
+
+DEP_CPP_SEARCHT=\
+	"..\..\Src\DirList.h"\
+	"..\..\Src\SearchEngine.h"\
+	"..\..\Src\SearchTree.h"\
+	"..\..\Src\TString.h"\
+	"..\..\Src\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Debug"
+
+DEP_CPP_SEARCHT=\
+	"..\..\Src\DirList.h"\
+	"..\..\Src\SearchEngine.h"\
+	"..\..\Src\SearchTree.h"\
+	"..\..\Src\TString.h"\
+	"..\..\Src\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Release"
+
+DEP_CPP_SEARCHT=\
+	"..\..\Src\DirList.h"\
+	"..\..\Src\SearchEngine.h"\
+	"..\..\Src\SearchTree.h"\
+	"..\..\Src\TString.h"\
+	"..\..\Src\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Debug"
+
+DEP_CPP_SEARCHT=\
+	"..\..\Src\DirList.h"\
+	"..\..\Src\SearchEngine.h"\
+	"..\..\Src\SearchTree.h"\
+	"..\..\Src\TString.h"\
+	"..\..\Src\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) ReleaseE"
+
+DEP_CPP_SEARCHT=\
+	"..\..\Src\DirList.h"\
+	"..\..\Src\SearchEngine.h"\
+	"..\..\Src\SearchTree.h"\
+	"..\..\Src\TString.h"\
+	"..\..\Src\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) ReleaseE"
+
+DEP_CPP_SEARCHT=\
+	"..\..\Src\DirList.h"\
+	"..\..\Src\SearchEngine.h"\
+	"..\..\Src\SearchTree.h"\
+	"..\..\Src\TString.h"\
+	"..\..\Src\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) ReleaseE"
+
+DEP_CPP_SEARCHT=\
+	"..\..\Src\DirList.h"\
+	"..\..\Src\SearchEngine.h"\
+	"..\..\Src\SearchTree.h"\
+	"..\..\Src\TString.h"\
+	"..\..\Src\VarBuffer.h"\
+	
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\Src\SelectViewWndProc.cpp
 
 !IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
@@ -4040,6 +4275,7 @@ DEP_CPP_TREEV=\
 
 DEP_CPP_TREEV=\
 	"..\..\Src\DirectoryScanner.h"\
+	"..\..\Src\DirList.h"\
 	"..\..\Src\File.h"\
 	"..\..\Src\Logger.h"\
 	"..\..\Src\MemoFolder.h"\
@@ -4054,6 +4290,7 @@ DEP_CPP_TREEV=\
 	"..\..\Src\TSParser.h"\
 	"..\..\Src\TString.h"\
 	"..\..\Src\Uniconv.h"\
+	"..\..\Src\VarBuffer.h"\
 	"..\..\Src\VFStream.h"\
 	
 
@@ -4362,79 +4599,6 @@ DEP_CPP_TSTRI=\
 	"..\..\Src\Tombo.h"\
 	"..\..\Src\TString.h"\
 	"..\..\Src\Uniconv.h"\
-	
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\TVector.cpp
-
-!IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
-
-DEP_CPP_TVECT=\
-	"..\..\Src\TVector.h"\
-	
-
-!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
-
-DEP_CPP_TVECT=\
-	"..\..\Src\TVector.h"\
-	
-
-!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Release"
-
-DEP_CPP_TVECT=\
-	"..\..\Src\TVector.h"\
-	
-
-!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Debug"
-
-DEP_CPP_TVECT=\
-	"..\..\Src\TVector.h"\
-	
-
-!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Release"
-
-DEP_CPP_TVECT=\
-	"..\..\Src\TVector.h"\
-	
-
-!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Debug"
-
-DEP_CPP_TVECT=\
-	"..\..\Src\TVector.h"\
-	
-
-!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Release"
-
-DEP_CPP_TVECT=\
-	"..\..\Src\TVector.h"\
-	
-
-!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Debug"
-
-DEP_CPP_TVECT=\
-	"..\..\Src\TVector.h"\
-	
-
-!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) ReleaseE"
-
-DEP_CPP_TVECT=\
-	"..\..\Src\TVector.h"\
-	
-
-!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) ReleaseE"
-
-DEP_CPP_TVECT=\
-	"..\..\Src\TVector.h"\
-	
-
-!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) ReleaseE"
-
-DEP_CPP_TVECT=\
-	"..\..\Src\TVector.h"\
 	
 
 !ENDIF 
@@ -4813,6 +4977,10 @@ SOURCE=..\..\Src\DirectoryScanner.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\Src\DirList.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\Src\File.h
 # End Source File
 # Begin Source File
@@ -4889,6 +5057,10 @@ SOURCE=..\..\Src\SearchEngine.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\Src\SearchTree.h
+# End Source File
+# Begin Source File
+
 SOURCE="C:\Program Files\Windows CE Tools\wce300\MS Pocket PC\include\sip.h"
 # End Source File
 # Begin Source File
@@ -4914,10 +5086,6 @@ SOURCE=..\..\Src\TSParser.h
 # Begin Source File
 
 SOURCE=..\..\Src\TString.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\TVector.h
 # End Source File
 # Begin Source File
 

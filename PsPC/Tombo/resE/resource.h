@@ -29,6 +29,7 @@
 #define IDR_ACCEL_DETAIL                120
 #define IDD_PROPTAB_KEEPCARET           121
 #define IDD_SEARCH                      122
+#define IDD_SEARCHING                   123
 #define IDM_MAIN_MENUITEM1              401
 #define IDM_MAIN_MENUITEM2              402
 #define IDS_MAIN_MENUITEM1              410
@@ -67,6 +68,7 @@
 #define IDC_VERSIONINFO                 1031
 #define IDC_SEARCH_DIRECTION_UP         1032
 #define IDC_SEARCH_DIRECTION_DOWN       1033
+#define IDC_SEARCHMSG                   1034
 #define IDM_ACTIONBUTTON                30001
 #define IDM_FILE_EXIT                   40002
 #define IDM_HELP_ABOUT                  40003
@@ -122,9 +124,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        123
+#define _APS_NEXT_RESOURCE_VALUE        124
 #define _APS_NEXT_COMMAND_VALUE         40054
-#define _APS_NEXT_CONTROL_VALUE         1034
+#define _APS_NEXT_CONTROL_VALUE         1035
 #define _APS_NEXT_SYMED_VALUE           108
 #endif
 #endif

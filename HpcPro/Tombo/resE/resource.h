@@ -36,6 +36,7 @@
 #define IDD_SEARCH                      126
 #define IDI_REBAR                       127
 #define IDB_REBAR                       128
+#define IDD_SEARCHING                   129
 #define IDM_MAIN_MENUITEM1              401
 #define IDM_MAIN_MENUITEM2              402
 #define IDS_MAIN_MENUITEM1              410
@@ -77,6 +78,7 @@
 #define IDC_SEARCH_DIRECTION_UP         1029
 #define IDC_SEARCH_STRING_DOWN          1030
 #define IDC_SEARCH_DIRECTION_DOWN       1030
+#define IDC_SEARCHMSG                   1031
 #define IDM_ACTIONBUTTON                30001
 #define IDM_FILE_EXIT                   40002
 #define IDM_HELP_ABOUT                  40003
@@ -133,9 +135,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        129
+#define _APS_NEXT_RESOURCE_VALUE        130
 #define _APS_NEXT_COMMAND_VALUE         40055
-#define _APS_NEXT_CONTROL_VALUE         1031
+#define _APS_NEXT_CONTROL_VALUE         1032
 #define _APS_NEXT_SYMED_VALUE           113
 #endif
 #endif

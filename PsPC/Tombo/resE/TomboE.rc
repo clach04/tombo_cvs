@@ -194,6 +194,14 @@ BEGIN
     GROUPBOX        "Direction",IDC_STATIC,20,50,75,25
 END
 
+IDD_SEARCHING DIALOG DISCARDABLE  0, 0, 83, 75
+STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP
+FONT 9, "System"
+BEGIN
+    PUSHBUTTON      "Cancel",IDCANCEL,15,50,50,14
+    CTEXT           "Searching...",IDC_SEARCHMSG,5,20,75,8
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -305,6 +313,14 @@ BEGIN
         RIGHTMARGIN, 108
         TOPMARGIN, 7
         BOTTOMMARGIN, 121
+    END
+
+    IDD_SEARCHING, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 76
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 68
     END
 END
 #endif    // APSTUDIO_INVOKED
