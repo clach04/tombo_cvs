@@ -184,6 +184,31 @@ BOOL FilterCtlDlg::OnOK(HWND hDlg)
 }
 
 /////////////////////////////////////////
+// Delete node from listview
+/////////////////////////////////////////
+
+void FilterCtlDlg::DeleteSelectedItem(HWND hDlg)
+{
+	HWND hList = GetDlgItem(hDlg, IDC_FILTERCTL_LIST);
+
+	int iSel = ListView_GetNextItem(hList, -1, LVNI_SELECTED);
+	if (iSel < 0 ) return;
+
+	if (MessageBox(hDlg, MSG_CONFIRM_DEL_VFOLDER, MSG_DEL_VFOLDER_TTL, MB_YESNO | MB_ICONQUESTION) != IDYES) return;
+
+	LVITEM li;
+	li.mask = LVIF_PARAM;
+	li.iItem = iSel;
+	li.iSubItem = 0;
+	ListView_GetItem(hList, &li);
+	VFInfo *pInfo = (VFInfo*)li.lParam;
+
+	pInfo->Release();
+	delete pInfo;
+	ListView_DeleteItem(hList, iSel);
+}
+
+/////////////////////////////////////////
 // "Save" checkbox
 /////////////////////////////////////////
 
@@ -318,6 +343,15 @@ void FilterCtlDlg::Command_New(HWND hDlg)
 }
 
 /////////////////////////////////////////
+// "Delete" button
+/////////////////////////////////////////
+
+void FilterCtlDlg::Command_Delete(HWND hDlg)
+{
+	DeleteSelectedItem(hDlg);
+}
+
+/////////////////////////////////////////
 // WM_NOTIFY handler
 /////////////////////////////////////////
 
@@ -390,23 +424,7 @@ BOOL FilterCtlDlg::Notify_Keydown(HWND hDlg, LPARAM lParam)
 	NMLVKEYDOWN *pKd = (NMLVKEYDOWN*)lParam;
 	if (pKd->wVKey != VK_DELETE) return TRUE;
 
-	HWND hList = pHdr->hwndFrom;
-	int iSel = ListView_GetNextItem(hList, -1, LVNI_SELECTED);
-	if (iSel < 0 ) return TRUE;
-
-	if (MessageBox(hDlg, MSG_CONFIRM_DEL_VFOLDER, MSG_DEL_VFOLDER_TTL, MB_YESNO | MB_ICONQUESTION) != IDYES) return TRUE;
-
-	LVITEM li;
-	li.mask = LVIF_PARAM;
-	li.iItem = iSel;
-	li.iSubItem = 0;
-	ListView_GetItem(hList, &li);
-	VFInfo *pInfo = (VFInfo*)li.lParam;
-
-	pInfo->Release();
-	delete pInfo;
-	ListView_DeleteItem(hList, iSel);
-	
+	DeleteSelectedItem(hDlg);
 	return TRUE;
 }
 
@@ -488,6 +506,9 @@ static LRESULT CALLBACK FilterCtlDlgProc(HWND hDlg, UINT nMessage, WPARAM wParam
 			break;
 		case IDC_FILTERCTL_NEW:
 			pDlg->Command_New(hDlg);
+			break;
+		case IDC_FILTERCTL_DELETE:
+			pDlg->Command_Delete(hDlg);
 			break;
 		}
 		return TRUE;

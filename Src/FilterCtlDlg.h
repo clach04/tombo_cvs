@@ -11,6 +11,9 @@ class FilterCtlDlg {
 
 	DWORD nNotKeepPos;
 
+protected:
+	void DeleteSelectedItem(HWND hDlg);
+
 public:
 	BOOL Init(MemoSelectView *pView, VFManager *pManager);
 
@@ -25,6 +28,7 @@ public:
 	BOOL Command_UpDown(HWND hDlg, int delta);
 	void Command_ToggleKeep(HWND hDlg);
 	void Command_New(HWND hDlg);
+	void Command_Delete(HWND hDlg);
 
 	BOOL Notify_ItemChanged(HWND hDlg, LPARAM lParam);
 	BOOL Notify_EndLabelEdit(HWND hDlg, LPARAM lParam);

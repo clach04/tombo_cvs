@@ -62,6 +62,7 @@ class FilterDlgFilterTab : public PropertyTab {
 	FilterDefDlg *pDialog;
 protected:
 	BOOL InsertItem(HWND hList, DWORD iPos, VFStream *pStream, BOOL bFocus);
+	void DeleteSelectedItem(HWND hDlg);
 public:
 	FilterDlgFilterTab(FilterDefDlg *pDlg) : pDialog(pDlg), 
 		PropertyTab(IDD_FILTERDEF_FILTER, MSG_FILTERDEFPROPTTL_FILTER, 
@@ -81,6 +82,7 @@ public:
 	BOOL Command_Limit(HWND hDlg);
 	BOOL Command_Timestamp(HWND hDlg);
 	BOOL Command_Sort(HWND hDlg);
+	BOOL Command_Delete(HWND hDlg);
 };
 
 void FilterDlgFilterTab::Init(HWND hDlg)
@@ -207,8 +209,8 @@ BOOL FilterDlgFilterTab::OnCommand(HWND hDlg, WPARAM wParam, LPARAM lParam)
 		return Command_Timestamp(hDlg);
 	case IDC_FILTERDEF_FILTER_SORT:
 		return Command_Sort(hDlg);
-		break;
-
+	case IDC_FILTERDEF_FILTER_DELETE:
+		return Command_Delete(hDlg);
 	}
 	return TRUE;
 }
@@ -323,6 +325,12 @@ BOOL FilterDlgFilterTab::Command_Sort(HWND hDlg)
 	return TRUE;
 }
 
+BOOL FilterDlgFilterTab::Command_Delete(HWND hDlg)
+{
+	DeleteSelectedItem(hDlg);
+	return TRUE;
+}
+
 /////////////////////////////////////////
 // WM_NOTIFY handler
 /////////////////////////////////////////
@@ -353,11 +361,17 @@ BOOL FilterDlgFilterTab::Notify_Keydown(HWND hDlg, LPARAM lParam)
 	NMLVKEYDOWN *pKd = (NMLVKEYDOWN*)lParam;
 	if (pKd->wVKey != VK_DELETE) return TRUE;
 
-	// DEL key handling
-	int iSel = ListView_GetNextItem(hList, -1, LVNI_SELECTED);
-	if (iSel < 0 ) return TRUE;
+	DeleteSelectedItem(hDlg);
+	return TRUE;
+}
 
-	// delete Item
+void FilterDlgFilterTab::DeleteSelectedItem(HWND hDlg)
+{
+	HWND hList = GetDlgItem(hDlg, IDC_FILTERDEF_FILTER_LIST);
+
+	int iSel = ListView_GetNextItem(hList, -1, LVNI_SELECTED);
+	if (iSel < 0 ) return;
+
 	LV_ITEM li;
 	li.mask = LVIF_PARAM;
 	li.iItem = iSel;
@@ -372,8 +386,6 @@ BOOL FilterDlgFilterTab::Notify_Keydown(HWND hDlg, LPARAM lParam)
 	li.iItem = (iSel == 0) ? 0 : iSel - 1;
 	li.state = li.stateMask = LVIS_FOCUSED | LVIS_SELECTED;
 	ListView_SetItem(hList, &li);
-
-	return TRUE;
 }
 
 BOOL FilterDlgFilterTab::Notify_ItemChanged(HWND hDlg, LPARAM lParam)
