@@ -350,6 +350,8 @@ END
 
 IDR_ACCEL_SELECT ACCELERATORS DISCARDABLE 
 BEGIN
+    "8",            IDM_SEARCH_PREV,        VIRTKEY, CONTROL, NOINVERT
+    "9",            IDM_SEARCH_NEXT,        VIRTKEY, CONTROL, NOINVERT
     "A",            IDM_SELALL,             VIRTKEY, CONTROL, NOINVERT
     "C",            IDM_COPY,               VIRTKEY, CONTROL, NOINVERT
     "E",            IDM_ENCRYPT,            VIRTKEY, CONTROL, NOINVERT
@@ -368,6 +370,8 @@ IDR_ACCEL_DETAIL ACCELERATORS DISCARDABLE
 BEGIN
     "1",            IDM_INSDATE1,           VIRTKEY, CONTROL, NOINVERT
     "2",            IDM_INSDATE2,           VIRTKEY, CONTROL, NOINVERT
+    "8",            IDM_SEARCH_PREV,        VIRTKEY, CONTROL, NOINVERT
+    "9",            IDM_SEARCH_NEXT,        VIRTKEY, CONTROL, NOINVERT
     "A",            IDM_SELALL,             VIRTKEY, CONTROL, NOINVERT
     "C",            IDM_COPY,               VIRTKEY, CONTROL, NOINVERT
     "F",            IDM_SEARCH,             VIRTKEY, CONTROL, NOINVERT
