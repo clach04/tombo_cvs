@@ -154,9 +154,10 @@ public:
 
 	BOOL OpenReadOnly() { return bOpenReadOnly; }
 
-	// ウィンドウサイズ関連の保存・復元
-	static BOOL SaveWinSize(LPRECT pWinRect, WORD nSelectViewWidth);
-	static BOOL GetWinSize(LPRECT pWinRect, LPWORD pSelectViewWidth);
+
+	// save restore main window size
+	static BOOL SaveWinSize(UINT flags, UINT showCmd, LPRECT pWinRect, WORD nSelectViewWidth);
+	static BOOL GetWinSize(UINT *pFlags, UINT *pShowCmd, LPRECT pWinRect, LPWORD pSelectViewWidth);
 
 	BOOL SaveStatusBarStat();
 	BOOL SaveTopMostStat();

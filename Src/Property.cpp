@@ -58,6 +58,7 @@
 #define HIDESTATUSBAR_ATTR_NAME TEXT("HideStatusBar")
 #define STAYTOPMOST_ATTR_NAME TEXT("StayTopMost")
 #define TOMBO_WINSIZE_ATTR_NAME TEXT("WinSize")
+#define TOMBO_WINSIZE_ATTR_NAME2 TEXT("WinSize2")
 #define TOMBO_REBARHIST_ATTR_NAME TEXT("RebarPos")
 
 #if defined(PLATFORM_PKTPC) || (defined(PLATFORM_BE500) && defined(TOMBO_LANG_ENGLISH))
@@ -1537,8 +1538,6 @@ static DWORD GetDWORDFromReg(HKEY hKey, LPCTSTR pAttr, DWORD nDefault)
 	return nValue;
 }
 
-
-
 static LPTSTR GetMultiSZFromReg(HKEY hKey, LPCTSTR pAttr, LPDWORD pSize)
 {
 	DWORD res, siz, typ;
@@ -1620,7 +1619,7 @@ static BOOL MakeFont(HFONT *phFont, LPCTSTR pName, DWORD nSize, BYTE bQuality)
 // save window size
 ///////////////////////////////////////////////////
 
-BOOL Property::SaveWinSize(LPRECT pWinRect, WORD nSelectViewWidth)
+BOOL Property::SaveWinSize(UINT flags, UINT showCmd, LPRECT pWinRect, WORD nSelectViewWidth)
 {
 #if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
 	TCHAR buf[1024];
@@ -1628,12 +1627,13 @@ BOOL Property::SaveWinSize(LPRECT pWinRect, WORD nSelectViewWidth)
 	HKEY hTomboRoot = GetTomboRootKey();
 	if (!hTomboRoot) return FALSE;
 
-	wsprintf(buf, TEXT("%d,%d,%d,%d,%d"), 
-		pWinRect->left, pWinRect->top, 
-		pWinRect->right, pWinRect->bottom, 
+	wsprintf(buf, TEXT("%d,%d,%d,%d,%d,%d,%d"), 
+		flags, showCmd,
+		pWinRect->left, pWinRect->top,
+		pWinRect->right, pWinRect->bottom,
 		nSelectViewWidth);
 
-	if (!SetSZToReg(hTomboRoot, TOMBO_WINSIZE_ATTR_NAME, buf)) {
+	if (!SetSZToReg(hTomboRoot, TOMBO_WINSIZE_ATTR_NAME2, buf)) {
 		RegCloseKey(hTomboRoot);
 		return FALSE;
 	}
@@ -1647,7 +1647,7 @@ BOOL Property::SaveWinSize(LPRECT pWinRect, WORD nSelectViewWidth)
 // get window size
 ///////////////////////////////////////////////////
 
-BOOL Property::GetWinSize(LPRECT pWinRect, LPWORD pSelectViewWidth)
+BOOL Property::GetWinSize(UINT *pFlags, UINT *pShowCmd, LPRECT pWinRect, LPWORD pSelectViewWidth)
 {
 #if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
 	HKEY hTomboRoot = GetTomboRootKey();
@@ -1657,20 +1657,22 @@ BOOL Property::GetWinSize(LPRECT pWinRect, LPWORD pSelectViewWidth)
 	TCHAR buf[1024];
 
 	siz = 1024;
-	res = RegQueryValueEx(hTomboRoot, TOMBO_WINSIZE_ATTR_NAME, NULL, &typ, (LPBYTE)buf, &siz);
+	res = RegQueryValueEx(hTomboRoot, TOMBO_WINSIZE_ATTR_NAME2, NULL, &typ, (LPBYTE)buf, &siz);
 	if (res != ERROR_SUCCESS || typ != REG_SZ) {
 		SetLastError(res);
 		RegCloseKey(hTomboRoot);
 		return FALSE;
 	}
-	if (_stscanf(buf, TEXT("%d,%d,%d,%d,%d"),
-			&(pWinRect->left), &(pWinRect->top), &(pWinRect->right), &(pWinRect->bottom),
-			pSelectViewWidth) != 5) {
+	if (_stscanf(buf, TEXT("%d,%d,%d,%d,%d,%d,%d"),
+		pFlags, pShowCmd,
+		&(pWinRect->left), &(pWinRect->top),
+		&(pWinRect->right), &(pWinRect->bottom),
+		pSelectViewWidth) != 7) {
+
 		SetLastError(ERROR_INVALID_DATA);
 		RegCloseKey(hTomboRoot);
 		return FALSE;
 	}
-
 	// check and modify window position
 	if (pWinRect->left < 0) pWinRect->left = 0;
 	if (pWinRect->top < 0) pWinRect->top = 0;

@@ -529,8 +529,19 @@ BOOL MainFrame::Create(LPCTSTR pWndName, HINSTANCE hInst, int nCmdShow)
 	SendMessage(hMainWnd, WM_SETICON, (WPARAM)ICON_SMALL, (LPARAM)hIcon);
 #endif
 
+
+#if defined(PLATFORM_WIN32)
+	WINDOWPLACEMENT wpl;
+	wpl.length = sizeof(wpl);
+	WORD nSelectViewWidth;
+	Property::GetWinSize(&(wpl.flags), &(wpl.showCmd), &(wpl.rcNormalPosition), &nSelectViewWidth);
+	if (!SetWindowPlacement(hMainWnd, &wpl)) {
+		UpdateWindow(hMainWnd);
+	}
+#else
 	ShowWindow(hMainWnd, nCmdShow);
 	UpdateWindow(hMainWnd);
+#endif
 
 	// パスワードマネージャ初期化
 	pmPasswordMgr.Init(hMainWnd, hInstance);
@@ -2002,13 +2013,18 @@ void MainFrame::SaveWinSize()
 #if defined(PLATFORM_HPC) || defined(PLATFORM_WIN32)
 
 	RECT r;
+	UINT flags, showCmd;
+
 #if defined(PLATFORM_HPC)
 	GetWindowRect(hMainWnd,&r);
+	flags = showCmd = 0;
 #else
 	WINDOWPLACEMENT wpl;
 	wpl.length = sizeof(wpl);
 	GetWindowPlacement(hMainWnd, &wpl);
 	r = wpl.rcNormalPosition;
+	flags = wpl.flags;
+	showCmd = wpl.showCmd;
 #endif
 
 	WORD nWidth;
@@ -2016,14 +2032,18 @@ void MainFrame::SaveWinSize()
 		WORD nHeight;
 		msView.GetSize(&nWidth, &nHeight);
 	} else {
+		UINT u1, u2;
 		RECT r2;
-		if (!Property::GetWinSize(&r2, &nWidth)) {
+		if (!Property::GetWinSize(&u1, &u2, &r2, &nWidth)) {
 			nWidth = (r.right - r.left) / 3;	
 		}
 	}
-	r.bottom = r.bottom - r.top;
-	r.right = r.right - r.left;
-	Property::SaveWinSize(&r, nWidth);
+//	r.bottom = r.bottom - r.top;
+//	r.right = r.right - r.left;
+//	Property::SaveWinSize(0, 0, &r, nWidth);
+
+//	Property::SaveWinSize2(wpl.flags, wpl.showCmd, &(wpl.rcNormalPosition), nWidth);
+	Property::SaveWinSize(flags, showCmd, &r, nWidth);
 #endif
 }
 
@@ -2039,7 +2059,8 @@ void MainFrame::LoadWinSize(HWND hWnd)
 	RECT rClientRect;
 	GetClientRect(hWnd, &rClientRect);
 
-	if (!Property::GetWinSize(&rMainFrame, &nSelectViewWidth)) {
+	UINT u1, u2;
+	if (!Property::GetWinSize(&u1, &u2, &rMainFrame, &nSelectViewWidth)) {
 		nSelectViewWidth = (rClientRect.right - rClientRect.left) / 3;	
 	} else {
 #if defined(PLATFORM_HPC)
@@ -2189,9 +2210,10 @@ void MainFrame::TogglePane()
 
 	if (g_Property.IsUseTwoPane()) {
 		// 1->2Pane
+		UINT u1, u2;
 		RECT rr;
 		WORD nWidth;
-		g_Property.GetWinSize(&rr, &nWidth);
+		g_Property.GetWinSize(&u1, &u2, &rr, &nWidth);
 		msView.MoveWindow(0, 0, nWidth, rr.bottom - rr.top);
 		OnResize(0, MAKELPARAM(r.right - r.left, r.bottom - r.top));
 		msView.Show(SW_SHOW);
