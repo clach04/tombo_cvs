@@ -57,6 +57,11 @@ BOOL TreeViewItem::IsOperationEnabled(MemoSelectView *pView, OpType op)
 	return (nOpMatrix & op) != 0;
 }
 
+BOOL TreeViewItem::IsUseDetailsView()
+{
+	return FALSE;
+}
+
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 //  File
@@ -298,6 +303,10 @@ BOOL TreeViewFileItem::GetURIItem(MemoSelectView *pView, TString *pItem)
 	}
 }
 
+TreeViewFileItem::IsUseDetailsView()
+{
+	return TRUE;
+}
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 //  Folder

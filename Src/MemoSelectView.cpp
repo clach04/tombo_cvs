@@ -534,7 +534,7 @@ void MemoSelectView::OnNotify_RClick()
 	ScreenToClient(hViewWnd, &pth);
 	TV_HITTESTINFO hti;
 	hti.pt = pth;
-	TreeView_HitTest(hViewWnd, &hti);
+	HTREEITEM hX = TreeView_HitTest(hViewWnd, &hti);
 
 	if (hti.hItem == NULL) return;
 
@@ -569,10 +569,13 @@ void MemoSelectView::OnNotify_RClick()
 		break;
 	case IDM_ENCRYPT:
 		{
-			MemoNote *pNote = ((TreeViewFileItem*)pItem)->GetNote();
-			if (g_Property.IsUseTwoPane() && pMemoMgr->IsNoteDisplayed(pNote->MemoPath())) {
-				pMemoMgr->InactiveDetailsView();
+			if (pItem->IsUseDetailsView()) {
+				MemoNote *pNote = ((TreeViewFileItem*)pItem)->GetNote();
+				if (g_Property.IsUseTwoPane() && pMemoMgr->IsNoteDisplayed(pNote->MemoPath())) {
+					pMemoMgr->InactiveDetailsView();
+				}
 			}
+
 			TV_HITTESTINFO hti;
 			hti.pt = pth;
 			TreeView_HitTest(hViewWnd, &hti);

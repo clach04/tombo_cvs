@@ -42,6 +42,8 @@ UINT WINAPI ImmGetVirtualKey(HWND);
 #include "SearchEngine.h"
 #include "SearchTree.h"
 
+//#include "YAEditor.h"
+
 LPCTSTR MainFrame::pClassName = TOMBO_MAIN_FRAME_WINDOW_CLSS;
 
 static LRESULT CALLBACK MainFrameWndProc(HWND, UINT, WPARAM, LPARAM);
@@ -256,7 +258,7 @@ CSOBAR_BUTTONINFO	aDVCSOBarButtons[NUM_DV_CMDBAR_BUTTONS] =
 // ctor
 ///////////////////////////////////////
 
-MainFrame::MainFrame() : bResizePane(FALSE), bSelectViewActive(FALSE), pBookMark(NULL)
+MainFrame::MainFrame() : bResizePane(FALSE), bSelectViewActive(FALSE), pBookMark(NULL), pDetailsView(NULL)
 {
 }
 
@@ -266,6 +268,7 @@ MainFrame::MainFrame() : bResizePane(FALSE), bSelectViewActive(FALSE), pBookMark
 
 MainFrame::~MainFrame()
 {
+	if (pDetailsView) delete pDetailsView;
 	if (pBookMark) delete pBookMark;
 }
 
@@ -495,9 +498,18 @@ BOOL MainFrame::Create(LPCTSTR pWndName, HINSTANCE hInst, int nCmdShow)
 {
 	hInstance = hInst;
 
-	mmMemoManager.Init(this, &mdView, &msView);
+	SimpleEditor *pSe = new SimpleEditor();
+	pDetailsView = pSe;
+
+//	YAEditor *pYAE = new YAEditor();
+//	pDetailsView = pYAE;
+
+
+	mmMemoManager.Init(this, pDetailsView, &msView);
 	msView.Init(&mmMemoManager);
-	mdView.Init(&mmMemoManager);
+
+	pSe->Init(&mmMemoManager, IDC_MEMODETAILSVIEW, IDC_MEMODETAILSVIEW_NF);
+//	pYAE->Init(&mmMemoManager, IDC_TOMBOEDIT);
 
 	pVFManager = new VFManager();
 	if (!pVFManager || !pVFManager->Init()) return FALSE;
@@ -505,8 +517,6 @@ BOOL MainFrame::Create(LPCTSTR pWndName, HINSTANCE hInst, int nCmdShow)
 	pBookMark = new BookMark();
 	if (!pBookMark || !pBookMark->Init(BOOKMARK_ID_BASE)) return FALSE;
 
-//	nMaxBookMarkID = BOOKMARK_ID_BASE;
-//	if (!vBookMark.Init(5, 5)) return FALSE;
 
 #ifdef _WIN32_WCE
 	hMainWnd = CreateWindow(pClassName, pWndName,
@@ -532,7 +542,7 @@ BOOL MainFrame::Create(LPCTSTR pWndName, HINSTANCE hInst, int nCmdShow)
 						hInst,
 						this);
 #else 
-	// CE版デバッグモード
+	// debug mode 
 	hMainWnd = CreateWindow(pClassName, pWndName,
 						WS_SYSMENU | WS_THICKFRAME,
 						0,
@@ -547,7 +557,7 @@ BOOL MainFrame::Create(LPCTSTR pWndName, HINSTANCE hInst, int nCmdShow)
 #endif
 
 #if defined(PLATFORM_WIN32)
-	// アイコンの設定
+	// set app icon
 	HICON hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_TOMBO));
 	SendMessage(hMainWnd, WM_SETICON, (WPARAM)ICON_BIG, (LPARAM)hIcon);
 #endif
@@ -563,10 +573,6 @@ BOOL MainFrame::Create(LPCTSTR pWndName, HINSTANCE hInst, int nCmdShow)
 	WINDOWPLACEMENT wpl;
 	wpl.length = sizeof(wpl);
 	WORD nSelectViewWidth;
-//	Property::GetWinSize(&(wpl.flags), &(wpl.showCmd), &(wpl.rcNormalPosition), &nSelectViewWidth);
-//	if (!SetWindowPlacement(hMainWnd, &wpl)) {
-//		UpdateWindow(hMainWnd);
-//	}
 
 	if (Property::GetWinSize(&(wpl.flags), &(wpl.showCmd), &(wpl.rcNormalPosition), &nSelectViewWidth)) {
 		if (!SetWindowPlacement(hMainWnd, &wpl)) {
@@ -580,11 +586,6 @@ BOOL MainFrame::Create(LPCTSTR pWndName, HINSTANCE hInst, int nCmdShow)
 	ShowWindow(hMainWnd, nCmdShow);
 	UpdateWindow(hMainWnd);
 #endif
-
-	// パスワードマネージャ初期化
-//	pmPasswordMgr.Init(hMainWnd, hInstance);
-//	mmMemoManager.SetPasswordManager(&pmPasswordMgr);
-//	g_pPasswordManager = &pmPasswordMgr;
 
 	return TRUE;
 }
@@ -889,7 +890,7 @@ void MainFrame::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 #endif
 
 	// Create edit view
-	mdView.Create(TEXT("MemoDetails"), r, hWnd, IDC_MEMODETAILSVIEW, IDC_MEMODETAILSVIEW_NF, hInstance, g_Property.DetailsViewFont());
+	pDetailsView->Create(TEXT("MemoDetails"), r, hWnd,  hInstance, g_Property.DetailsViewFont());
 
 	if (!g_Property.WrapText()) {
 		SetWrapText(g_Property.WrapText());
@@ -908,7 +909,7 @@ void MainFrame::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		// マルチペインに伴うウィンドウの再レイアウト
 	}
 	LoadWinSize(hWnd);
-	mdView.SetMemo(TEXT(""), 0, FALSE);
+	pDetailsView->SetMemo(TEXT(""), 0, FALSE);
 
 	if (!EnableApplicationButton(hWnd)) {
 		TomboMessageBox(hMainWnd, MSG_INITAPPBTN_FAIL, TEXT("Warning"), MB_ICONEXCLAMATION | MB_OK);
@@ -1091,7 +1092,7 @@ void MainFrame::OnCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	if (bSelectViewActive) {
 		if (msView.OnCommand(hWnd, wParam, lParam)) return;
 	} else {
-		if (mdView.OnCommand(hWnd, wParam, lParam)) return;
+		if (pDetailsView->OnCommand(hWnd, wParam, lParam)) return;
 	}
 
 	// if active view can't handle, try to handle main window.
@@ -1252,11 +1253,11 @@ void MainFrame::OnSIPResize(BOOL bImeOn, RECT *pSipRect)
 
 	if (bImeOn) {
 		msView.MoveWindow(rWinRect.left, rWinRect.top, rWinRect.right, nClientBottom - rx.top - nDelta);
-		mdView.MoveWindow(rWinRect.left, rWinRect.top, rWinRect.right, nClientBottom - rx.top - nDelta);
+		pDetailsView->MoveWindow(rWinRect.left, rWinRect.top, rWinRect.right, nClientBottom - rx.top - nDelta);
 	} else {
 		DWORD nBottom = rWinRect.bottom - (r.bottom - r.top); 
 		msView.MoveWindow(rWinRect.left, rWinRect.top, rWinRect.right, nBottom);
-		mdView.MoveWindow(rWinRect.left, rWinRect.top, rWinRect.right, nBottom);
+		pDetailsView->MoveWindow(rWinRect.left, rWinRect.top, rWinRect.right, nBottom);
 	}
 #endif
 #if defined(PLATFORM_PSPC) || defined(PLATFORM_BE500)
@@ -1273,13 +1274,13 @@ void MainFrame::OnSIPResize(BOOL bImeOn, RECT *pSipRect)
 		RECT rx;
 		GetWindowRect(hMainWnd, &rx);
 		msView.MoveWindow(0, nTop, 240, nClientBottom - rx.top - nTop);
-		mdView.MoveWindow(0, nTop, 240, nClientBottom - rx.top - nTop);
+		pDetailsView->MoveWindow(0, nTop, 240, nClientBottom - rx.top - nTop);
 		
 //		msView.MoveWindow(0, nTop, 240, nBottom - nSipHeight);
 //		mdView.MoveWindow(0, nTop, 240, nBottom - nSipHeight);
 	} else {
 		msView.MoveWindow(0, nTop, 240, nBottom);
-		mdView.MoveWindow(0, nTop, 240, nBottom);
+		pDetailsView->MoveWindow(0, nTop, 240, nBottom);
 	}
 #endif
 #endif
@@ -1295,7 +1296,7 @@ BOOL MainFrame::OnHotKey(WPARAM wParam, LPARAM lParam)
 	if (bSelectViewActive) {
 		return msView.OnHotKey(hMainWnd, wParam);
 	} else {
-		return mdView.OnHotKey(hMainWnd, wParam);
+		return pDetailsView->OnHotKey(hMainWnd, wParam);
 	}
 }
 
@@ -1335,13 +1336,13 @@ void MainFrame::OnResize(WPARAM wParam, LPARAM lParam)
 
 	if (g_Property.IsUseTwoPane()) {
 		msView.MoveWindow(0, nRebarH , wLeftWidth, nHeight-nRebarH - nStatusHeight);
-		mdView.MoveWindow(wLeftWidth + BORDER_WIDTH, nRebarH, nWidth - wLeftWidth - BORDER_WIDTH, nHeight-nRebarH - nStatusHeight);
+		pDetailsView->MoveWindow(wLeftWidth + BORDER_WIDTH, nRebarH, nWidth - wLeftWidth - BORDER_WIDTH, nHeight-nRebarH - nStatusHeight);
 	} else {
 		RECT rc;
 		GetClientRect(hMainWnd, &rc);
 
 		msView.MoveWindow(0, nRebarH, rc.right, rc.bottom - nRebarH - nStatusHeight);
-		mdView.MoveWindow(0, nRebarH, rc.right, rc.bottom - nRebarH - nStatusHeight);
+		pDetailsView->MoveWindow(0, nRebarH, rc.right, rc.bottom - nRebarH - nStatusHeight);
 	}
 
 #endif // PLATFORM_WIN32 || PLATFORM_HPC
@@ -1466,7 +1467,7 @@ void MainFrame::MovePane(WORD width)
 	WORD nRebarH = CommandBands_Height(hMSCmdBar);
 #endif
 	msView.MoveWindow(0, nRebarH, width, wHeight);
-	mdView.MoveWindow(width + BORDER_WIDTH , nRebarH, 
+	pDetailsView->MoveWindow(width + BORDER_WIDTH , nRebarH, 
 						wTotalWidth - width - BORDER_WIDTH, wHeight);
 #endif
 }
@@ -1480,7 +1481,7 @@ void MainFrame::SetFocus()
 	if (bSelectViewActive) {
 		msView.SetFocus();
 	} else {
-		mdView.SetFocus();
+		pDetailsView->SetFocus();
 	}
 }
 
@@ -1673,7 +1674,7 @@ void MainFrame::ActivateView(BOOL bList)
 
 	if (g_Property.IsUseTwoPane()) {
 		// 2-Pane版では両ビューを同時表示
-		mdView.Show(SW_SHOW);
+		pDetailsView->Show(SW_SHOW);
 		msView.Show(SW_SHOW);
 	} else {
 		// CE版(& CEデバグ版 on Win32) ではビューの切り替えを行う
@@ -1683,7 +1684,7 @@ void MainFrame::ActivateView(BOOL bList)
 
 		if (bSelectViewActive) {
 			// tree view
-			mdView.Show(SW_HIDE);
+			pDetailsView->Show(SW_HIDE);
 			msView.Show(SW_SHOW);
 #if defined(PLATFORM_PKTPC)
 			ShowWindow(hMDCmdBar, SW_HIDE);
@@ -1700,7 +1701,7 @@ void MainFrame::ActivateView(BOOL bList)
 		} else {
 			// edit view
 			msView.Show(SW_HIDE);
-			mdView.Show(SW_SHOW);
+			pDetailsView->Show(SW_SHOW);
 
 #if defined(PLATFORM_PKTPC)
 			ShowWindow(hMSCmdBar, SW_HIDE);
@@ -2003,10 +2004,10 @@ void MainFrame::OnProperty()
 
 	// font setting
 	msView.SetFont(g_Property.SelectViewFont());
-	mdView.SetFont(g_Property.DetailsViewFont());
+	pDetailsView->SetFont(g_Property.DetailsViewFont());
 
 	// tabstop setting
-	mdView.SetTabstop();
+	pDetailsView->SetTabstop();
 
 	// reload notes and folders
 	msView.DeleteAllItem();
@@ -2259,7 +2260,7 @@ void MainFrame::SetWrapText(BOOL bWrap)
 	}
 
 	// Change edit view status
-	if (!mdView.SetFolding(bWrap)) {
+	if (!pDetailsView->SetFolding(bWrap)) {
 		TomboMessageBox(NULL, MSG_FOLDING_FAILED, TOMBO_APP_NAME, MB_ICONERROR | MB_OK);
 		return;
 	}
@@ -2335,16 +2336,16 @@ void MainFrame::TogglePane()
 		msView.MoveWindow(0, 0, nWidth, rr.bottom - rr.top);
 		OnResize(0, MAKELPARAM(r.right - r.left, r.bottom - r.top));
 		msView.Show(SW_SHOW);
-		mdView.Show(SW_SHOW);
+		pDetailsView->Show(SW_SHOW);
 	} else {
 		// 2->1Pane
 		if (bSelectViewActive) {
 			OnResize(0, MAKELPARAM(r.right - r.left, r.bottom - r.top));
-			mdView.Show(SW_HIDE);
+			pDetailsView->Show(SW_HIDE);
 			msView.Show(SW_SHOW);
 		} else {
 			OnResize(0, MAKELPARAM(r.right - r.left, r.bottom - r.top));
-			mdView.Show(SW_SHOW);
+			pDetailsView->Show(SW_SHOW);
 			msView.Show(SW_HIDE);
 		}
 	}
@@ -2411,7 +2412,7 @@ void MainFrame::OnSearch()
 		DoSearchTree(TRUE, !sd.IsSearchDirectionUp());
 		mmMemoManager.SetMSSearchFlg(FALSE);
 	} else {
-		mdView.Search(TRUE, TRUE, TRUE, FALSE);
+		pDetailsView->Search(TRUE, TRUE, TRUE, FALSE);
 		mmMemoManager.SetMDSearchFlg(FALSE);
 	}
 }
@@ -2477,7 +2478,7 @@ void MainFrame::OnSearchNext(BOOL bForward)
 	} else {
 		// if search starts at edit view, show message when match failed.
 		// if starts at tree view, search next item.
-		BOOL bMatched = mdView.Search(mmMemoManager.MDSearchFlg(), bForward, !bSearchStartFromTreeView, FALSE);
+		BOOL bMatched = pDetailsView->Search(mmMemoManager.MDSearchFlg(), bForward, !bSearchStartFromTreeView, FALSE);
 		mmMemoManager.SetMDSearchFlg(FALSE);
 		if (bSearchStartFromTreeView && !bMatched) {
 			ActivateView(TRUE);

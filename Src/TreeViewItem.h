@@ -78,6 +78,8 @@ public:
 	virtual BOOL GetFolderPath(MemoSelectView *pView, TString *pPath) = 0;
 	virtual BOOL GetLocationPath(MemoSelectView *pView, TString *pPath) = 0;
 	virtual BOOL GetURIItem(MemoSelectView *pView, TString *pItem) = 0;
+
+	virtual BOOL IsUseDetailsView();
 };
 
 /////////////////////////////////////////////
@@ -115,6 +117,8 @@ public:
 	BOOL GetFolderPath(MemoSelectView *pView, TString *pPath);
 	BOOL GetLocationPath(MemoSelectView *pView, TString *pPath);
 	BOOL GetURIItem(MemoSelectView *pView, TString *pItem);
+
+	BOOL IsUseDetailsView();
 };
 
 /////////////////////////////////////////////
