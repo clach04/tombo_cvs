@@ -7,6 +7,8 @@
 #include "MemoDetailsView.h"
 #include "MemoManager.h"
 
+//#define PLATFORM_SIG3
+
 #include "Property.h"
 
 static MemoManager *pManager; 
@@ -37,6 +39,10 @@ void SetWndProc(SUPER_WND_PROC wp, HWND hParent, HINSTANCE h, MemoDetailsView *p
 // Window procedure for sub classing editview
 /////////////////////////////////////////
 
+#if defined(PLATFORM_SIG3)
+INT nSelBase = -1;
+#endif
+
 LRESULT CALLBACK NewDetailsViewProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch(msg) {
@@ -50,6 +56,49 @@ LRESULT CALLBACK NewDetailsViewProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM l
 		if (pView->IsReadOnly()) return 0;
 		break;
 	case WM_KEYDOWN:
+#if defined(PLATFORM_SIG3)
+		{
+			BOOL bShiftDown = (GetKeyState(VK_SHIFT) & 0x8000) != 0;
+			if (bShiftDown && wParam == VK_UP) {
+				INT nPrevStart, nPrevEnd;
+				INT nAftStart, nAftEnd;
+				SendMessage(hwnd, EM_GETSEL, (WPARAM)&nPrevStart, (LPARAM)&nPrevEnd);
+				LRESULT lResult = CallWindowProc(gSuperProc, hwnd, msg, wParam, lParam);
+				SendMessage(hwnd, EM_GETSEL, (WPARAM)&nAftStart, (LPARAM)&nAftEnd);
+
+				if (nAftStart < nSelBase) {
+					SendMessage(hwnd, EM_SETSEL, (WPARAM)nSelBase, (LPARAM)nAftStart);
+					return lResult;
+				} else {
+					return lResult;
+				}
+			}
+			if (bShiftDown && wParam == VK_DOWN) {
+				INT nPrevStart, nPrevEnd;
+				INT nAftStart, nAftEnd;
+				SendMessage(hwnd, EM_GETSEL, (WPARAM)&nPrevStart, (LPARAM)&nPrevEnd);
+				LRESULT lResult = CallWindowProc(gSuperProc, hwnd, msg, wParam, lParam);
+				SendMessage(hwnd, EM_GETSEL, (WPARAM)&nAftStart, (LPARAM)&nAftEnd);
+
+				if (nAftStart < nSelBase) {
+					SendMessage(hwnd, EM_SETSEL, (WPARAM)nSelBase, (LPARAM)nAftEnd);
+					return lResult;
+				} else {
+					return lResult;
+				}
+
+			}
+
+			if (!(bShiftDown && wParam == VK_LEFT) && 
+				!(bShiftDown && wParam == VK_RIGHT)) {
+				POINT pt;
+				GetCaretPos(&pt);
+				LPARAM l = MAKELPARAM(pt.x, pt.y);
+				nSelBase = SendMessage(hwnd, EM_CHARFROMPOS, 0, l) & 0xFFFF;
+			}
+		}
+#endif
+
 		if (pView->IsReadOnly()) {
 			if (wParam == VK_DELETE) return 0;
 			if (wParam == VK_BACK || wParam == VK_CONVERT || wParam == VK_LEFT) {
@@ -116,6 +165,15 @@ LRESULT CALLBACK NewDetailsViewProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM l
 	case WM_LBUTTONDOWN:
 		// clear search status
 		pManager->SetMDSearchFlg(TRUE);
+#if defined(PLATFORM_SIG3)
+		{
+			INT xPos, yPos;
+			xPos = (INT)LOWORD(lParam);
+			yPos = (INT)HIWORD(lParam);
+			LPARAM l = MAKELPARAM(xPos, yPos);
+			nSelBase = SendMessage(hwnd, EM_CHARFROMPOS, 0, l) & 0xFFFF;
+		}
+#endif
 		break;
 #endif
 	case WM_SETFOCUS:
