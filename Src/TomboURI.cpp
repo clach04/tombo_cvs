@@ -105,6 +105,13 @@ LPCTSTR TomboURI::GetPath()
 	return p;
 }
 
+BOOL TomboURI::IsEncrypted()
+{
+	DWORD n = _tcslen(sURI.Get());
+	if (n > 4 && _tcscmp(sURI.Get() + n - 4, TEXT(".chi")) == 0) return TRUE;
+	else return FALSE;		
+}
+
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 // iterator implimentation

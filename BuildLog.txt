@@ -574,3 +574,11 @@ Changes
 
 * remove MemoLocator
 * many refactoring
+
+////////////////////////////////
+// B130
+////////////////////////////////
+// main trunk
+
+* remove MemoManager::pCurrentNote
+

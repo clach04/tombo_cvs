@@ -27,6 +27,8 @@ public:
 
 	DWORD GetMaxPathItem() { return nMaxPathItem; }
 
+	BOOL IsEncrypted();
+
 	///////////////////////////////
 	// helper functions
 	static LPCTSTR GetNextSep(LPCTSTR p);

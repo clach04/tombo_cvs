@@ -1009,3 +1009,9 @@ MemoNote *MemoNote::MemoNoteFactory(TomboURI *pURI)
 	return pNote;
 }
 
+MemoNote *MemoNote::MemoNoteFactory(LPCTSTR pURI)
+{
+	TomboURI uri;
+	if (!uri.Init(pURI)) return NULL;
+	return MemoNote::MemoNoteFactory(&uri);
+}

@@ -89,7 +89,10 @@ BOOL TreeViewFileItem::Move(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR *p
 	if (!Copy(pMgr, pView, ppErr)) {
 		return FALSE;
 	}
-	if (g_Property.IsUseTwoPane() && pMgr->IsNoteDisplayed(pNote->MemoPath())) {
+	TString uri;
+	if (!pView->GetURI(&uri, GetViewItem())) return FALSE;
+
+	if (g_Property.IsUseTwoPane() && pMgr->IsNoteDisplayed(uri.Get())) {
 		// 現在表示されているメモの表示をキャンセルする
 		pMgr->NewMemo();
 	}
@@ -117,7 +120,10 @@ BOOL TreeViewFileItem::Delete(MemoManager *pMgr, MemoSelectView *pView)
 	// ユーザへの意思確認
 	if (TomboMessageBox(NULL, MSG_CONFIRM_DELETE, MSG_DELETE_TTL, MB_ICONQUESTION | MB_OKCANCEL) != IDOK) return FALSE;
 
-	if (g_Property.IsUseTwoPane() && pMgr->IsNoteDisplayed(pNote->MemoPath())) {
+	TString uri;
+	if (!pView->GetURI(&uri, GetViewItem())) return FALSE;
+
+	if (g_Property.IsUseTwoPane() && pMgr->IsNoteDisplayed(uri.Get())) {
 		// 現在表示されているメモの表示をキャンセルする
 		pMgr->NewMemo();
 	}
@@ -136,7 +142,10 @@ BOOL TreeViewFileItem::Encrypt(MemoManager *pMgr, MemoSelectView *pView)
 
 	// 詳細ビューに表示されているメモを暗号化しようとしているのであれば、
 	// 保存しておく
-	if (g_Property.IsUseTwoPane() && pMgr->IsNoteDisplayed(pNote->MemoPath())) {
+	TString uri;
+	if (!pView->GetURI(&uri, GetViewItem())) return FALSE;
+
+	if (g_Property.IsUseTwoPane() && pMgr->IsNoteDisplayed(uri.Get())) {
 		pMgr->InactiveDetailsView();
 	}
 
@@ -171,7 +180,10 @@ BOOL TreeViewFileItem::Decrypt(MemoManager *pMgr, MemoSelectView *pView)
 
 	// 詳細ビューに表示されているメモを復号化しようとしているのであれば、
 	// 保存しておく
-	if (g_Property.IsUseTwoPane() && pMgr->IsNoteDisplayed(pNote->MemoPath())) {
+	TString uri;
+	if (!pView->GetURI(&uri, GetViewItem())) return FALSE;
+
+	if (g_Property.IsUseTwoPane() && pMgr->IsNoteDisplayed(uri.Get())) {
 		pMgr->InactiveDetailsView();
 	}
 
@@ -231,7 +243,7 @@ BOOL TreeViewFileItem::Rename(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR 
 DWORD TreeViewFileItem::GetIcon(MemoSelectView *, DWORD nStatus)
 {
 	if (nStatus & MEMO_VIEW_STATE_INIT) {
-		if (pNote->IsEncrypted()) {
+		if (bIsEncrypted) {
 			return IMG_ARTICLE_ENCRYPTED;
 		} else {
 			return IMG_ARTICLE;
@@ -239,13 +251,13 @@ DWORD TreeViewFileItem::GetIcon(MemoSelectView *, DWORD nStatus)
 	}
 
 	if (nStatus & MEMO_VIEW_STATE_CLIPED_SET) {
-		if (pNote->IsEncrypted()) {
+		if (bIsEncrypted) {
 			return IMG_ARTICLE_ENC_MASKED;
 		} else {
 			return IMG_ARTICLE_MASKED;
 		}
 	} else {
-		if (pNote->IsEncrypted()) {
+		if (bIsEncrypted) {
 			return IMG_ARTICLE_ENCRYPTED;
 		} else {
 			return IMG_ARTICLE;

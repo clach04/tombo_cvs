@@ -24,7 +24,6 @@ protected:
 	PasswordManager *pPassMgr;
 
 	// Current edit-view displaying item info
-	MemoNote *pCurrentNote;
 	LPTSTR pCurrentURI;
 
 	MemoNote *AllocNewMemo(LPCTSTR pText, MemoNote *pTemplate = NULL);
@@ -36,7 +35,7 @@ protected:
 
 	/////////////////////////////////////
 	// maintain pCurrentNote;
-	void SetCurrentNote(MemoNote *Note);
+	void SetCurrentNote(LPCTSTR pURI);
 
 public:
 	/////////////////////////////////////
@@ -69,7 +68,7 @@ public:
 	BOOL SaveIfModify(LPDWORD pYNC, BOOL bDupMode);
 
 	// メモのロード
-	BOOL SetMemo(MemoNote *pNote);
+	BOOL SetMemo(TomboURI *pURI);
 
 	// メモのクリア
 	BOOL ClearMemo();
@@ -83,7 +82,7 @@ public:
 	void SelectAll();	// 全選択(詳細ビュー)
 
 	// 指定したメモが現在詳細ビューで表示されているか
-	BOOL IsNoteDisplayed(LPCTSTR pFile);
+	BOOL IsNoteDisplayed(LPCTSTR pURI);
 
 	// 詳細ビューに表示されている場合に必要なら保存し、一覧ビューにフォーカスを移す
 	// TODO: 保存依頼に置き換えられる気がする
@@ -102,7 +101,6 @@ public:
 	// data accessor
 
 	PasswordManager *GetPasswordManager() { return pPassMgr; }
-	MemoNote *CurrentNote() { return pCurrentNote; }
 	LPCTSTR GetCurrentURI() { return pCurrentURI; }
 
 	MainFrame *GetMainFrame() { return pMainFrame; }

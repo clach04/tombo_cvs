@@ -1556,19 +1556,19 @@ void MainFrame::OnList(BOOL bAskSave)
 		// 2Paneの場合、暗号化されたメモのみクリアする
 		if (nYNC == IDNO) {
 			// メモを破棄し、旧メモをリロード
-			TString sURI;
-			if (!mmMemoManager.CurrentNote()->GetURI(&sURI)) return;
-			RequestOpenMemo(sURI.Get(), OPEN_REQUEST_MDVIEW_ACTIVE);
-		} else {
-			MemoNote *pCurrent = mmMemoManager.CurrentNote();
-			if (pCurrent && pCurrent->IsEncrypted()) {
-				mmMemoManager.NewMemo();
+			if (mmMemoManager.GetCurrentURI()) {
+				RequestOpenMemo(mmMemoManager.GetCurrentURI(), OPEN_REQUEST_MDVIEW_ACTIVE);
 			} else {
-#if defined(PLATFORM_HPC)
-				TString sURI;
-				if (!mmMemoManager.CurrentNote()->GetURI(&sURI)) return;
-				RequestOpenMemo(sURI.Get(), OPEN_REQUEST_MDVIEW_ACTIVE);
-#endif
+				mmMemoManager.NewMemo();
+			}
+		} else {
+			// nYNC == YES so note has been saved.
+			if (mmMemoManager.GetCurrentURI()) {
+				TomboURI uri;
+				if (!uri.Init(mmMemoManager.GetCurrentURI())) return;
+				if (uri.IsEncrypted()) {
+					mmMemoManager.NewMemo();
+				}
 			}
 		}
 	} else {
@@ -1605,15 +1605,12 @@ void MainFrame::RequestOpenMemo(LPCTSTR pURI, DWORD nSwitchView)
 	TomboURI uri;
 	if (!uri.Init(pURI)) return;
 
-	MemoNote *pNote = MemoNote::MemoNoteFactory(&uri);
-	if (pNote == NULL) return;
-
-	if (((nSwitchView & OPEN_REQUEST_MSVIEW_ACTIVE) == 0) && (pNote->IsEncrypted() && !pmPasswordMgr.IsRememberPassword())) {
+	if (((nSwitchView & OPEN_REQUEST_MSVIEW_ACTIVE) == 0) && (uri.IsEncrypted() && !pmPasswordMgr.IsRememberPassword())) {
 		// bSwitchViewがFALSEで、メモを開くためにパスワードを問い合わせる必要がある場合には
 		// メモは開かない
 		return;
 	}
-	mmMemoManager.SetMemo(pNote);
+	mmMemoManager.SetMemo(&uri);
 	SetNewMemoStatus(FALSE);
 
 #if defined(PLATFORM_WIN32) || defined(PLATFORM_PKTPC)
@@ -2031,10 +2028,17 @@ void MainFrame::OnTimer(WPARAM nTimerID)
 {
 	if (nTimerID == 0) {
 		if (!bSelectViewActive) {
-			MemoNote *pCurrent = mmMemoManager.CurrentNote();
-			if (pCurrent && pCurrent->IsEncrypted()) {
-				OnList(FALSE);
+			if (mmMemoManager.GetCurrentURI()) {
+				TomboURI uri;
+				if (!uri.Init(mmMemoManager.GetCurrentURI())) return;
+				if (uri.IsEncrypted()) {
+					OnList(FALSE);
+				}
 			}
+//			MemoNote *pCurrent = mmMemoManager.CurrentNote();
+//			if (pCurrent && pCurrent->IsEncrypted()) {
+//				OnList(FALSE);
+//			}
 		}
 		pmPasswordMgr.ForgetPassword();
 	} else if (nTimerID == ID_PASSWORDTIMER) {
