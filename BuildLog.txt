@@ -59,13 +59,18 @@ TOMBO 1.4
 
 2002/11/22
 * To fix #754(#793), get HTREEITEM from notes file path for each saving time.
+* Disable up/down radio button when dialog are used from edit view
+
+2002/11/23
+* for release 1.5, disable "get HTREEITEM from notes file path for each saving time."
+
+TOMBO 1.5
 
 /////////////////////////////////////////////////////////////////////////
 // TODO
 /////////////////////////////////////////////////////////////////////////
 
 * buffer overflow fix when encrypt/decrypt notes.
-* disable Up/Down button in search dialog used from edit view.
 
 == entire
 
