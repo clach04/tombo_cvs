@@ -455,6 +455,7 @@ BEGIN
     "P",            IDM_DECRYPT,            VIRTKEY, CONTROL, NOINVERT
     "S",            IDM_SAVE,               VIRTKEY, CONTROL, NOINVERT
     "V",            IDM_PASTE,              VIRTKEY, CONTROL, NOINVERT
+    VK_F2,          IDM_RENAME,             VIRTKEY, NOINVERT
     VK_F3,          IDM_SEARCH_NEXT,        VIRTKEY, NOINVERT
     VK_F3,          IDM_SEARCH_PREV,        VIRTKEY, SHIFT, NOINVERT
     "X",            IDM_CUT,                VIRTKEY, CONTROL, NOINVERT
