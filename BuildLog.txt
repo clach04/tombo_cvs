@@ -849,3 +849,9 @@ Encryption is not work correctly at this version.
 
 Finding and encrypting to the folder may not work.
 
+////////////////////////////////
+//
+////////////////////////////////
+
+* FIX: GPF occured when pURIBase is NULL.
+* FIX: create new note failed when choosing a notes.

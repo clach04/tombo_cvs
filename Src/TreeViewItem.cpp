@@ -129,7 +129,7 @@ BOOL TreeViewFileItem::Copy(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR *p
 	if (!pView->GetURI(&sCurURI)) return FALSE;
 	if (!g_Repository.GetAttachURI(&sCurURI, &sCopyToURI)) return FALSE;
 
-	HTREEITEM hParent = pView->ShowItemByURI(sCopyToURI.GetFullURI(), FALSE, FALSE);
+	HTREEITEM hParent = pView->ShowItemByURI(&sCopyToURI, FALSE, FALSE);
 	URIOption opt;
 	if (!g_Repository.Copy(loc.getURI(), &sCopyToURI, &opt)) return FALSE;
 

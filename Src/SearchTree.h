@@ -1,8 +1,6 @@
 #ifndef SEARCHTREE_H
 #define SEARCHTREE_H
 
-#include "VarBuffer.h"
-
 enum SearchResult;
 class SearchEngineA;
 class DirList;
@@ -37,7 +35,6 @@ protected:
 	DWORD nBaseOffset;
 
 	SearchResult srResult;
-
 protected:
 	SearchResult SearchTreeRec(LPCTSTR pNextParse, LPTSTR pBase);
 
@@ -47,7 +44,7 @@ public:
 	////////////////////////
 	// ctor & dtor
 
-	SearchTree() : pRegex(NULL), hSearchThread(NULL), hDlgWnd(NULL){}
+	SearchTree() : pRegex(NULL), hSearchThread(NULL), hDlgWnd(NULL) {}
 	~SearchTree();
 	BOOL Init(SearchEngineA *p, LPCTSTR pFullPath, DWORD nInitialOffset, BOOL bDirectionForward, BOOL bSkipOne);
 

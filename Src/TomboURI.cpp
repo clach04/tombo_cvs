@@ -126,7 +126,7 @@ LPCTSTR TomboURI::GetNextSep(LPCTSTR pPartPath)
 // get repository name
 /////////////////////////////////////////////
 
-BOOL TomboURI::GetRepositoryName(TString *pRepo)
+BOOL TomboURI::GetRepositoryName(TString *pRepo) const
 {
 	LPCTSTR p = uri.Get() + 8;
 	LPCTSTR q = GetNextSep(p);
@@ -189,21 +189,29 @@ BOOL TomboURI::GetParent(TomboURI *pParent) const
 
 	LPCTSTR q = NULL;
 	while (*p) {
-		if (*p == TEXT('/')) {
+		if (*p == TEXT('/') && *(p+1) != TEXT('\0')) {
 			q = p;
 		}
 		p = CharNext(p);
 	}
+
+	TString s;
 	if (q == NULL) {
 		// result is root node.
-		q = pBase + 1;
-	}
-	TString s;
-	if (!s.Alloc(q - uri.Get() + 1)) return FALSE;
-	_tcsncpy(s.Get(), uri.Get(), q - uri.Get());
-	*(s.Get() + (q - uri.Get())) = TEXT('\0');
+		DWORD n = GetPath() - uri.Get() + 1;
+		if (!s.Alloc(n + 1)) return FALSE;
+		_tcsncpy(s.Get(), uri.Get(), n);
+		*(s.Get() + n) = TEXT('\0');
 
+	} else {
+		if (!s.Alloc(q - uri.Get() + 2)) return FALSE;
+		_tcsncpy(s.Get(), uri.Get(), q - uri.Get());
+		*(s.Get() + (q - uri.Get())) = TEXT('\0');
+
+		_tcscat(s.Get(), TEXT("/"));
+	}
 	if (!pParent->Init(s.Get())) return FALSE;
+
 	return TRUE;
 }
 

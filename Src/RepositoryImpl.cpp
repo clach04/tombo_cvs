@@ -19,15 +19,8 @@
 
 #define DEFAULT_HEADLINE MSG_DEFAULT_HEADLINE
 
-static BOOL GetHeadLineFromMemoText(LPCTSTR pMemo, TString *pHeadLine);
 static int ChopFileNumberLen(LPTSTR pHeadLine);
 static BOOL IsFileExist(LPCTSTR pFileName);
-static BOOL GetHeadLineFromFilePath(LPCTSTR pFilePath, TString *pHeadLine);
-
-
-static BOOL GetHeadLinePath(LPCTSTR pTopDir, LPCTSTR pMemoPath, LPCTSTR pHeadLine, LPCTSTR pExt,
-							TString *pFullPath, LPTSTR *ppNotePath, TString *pNewHeadLine);
-
 
 /////////////////////////////////////////
 // Repository ctor & dtor, initializer
@@ -124,7 +117,7 @@ BOOL LocalFileRepository::Save(const TomboURI *pCurrentURI, LPCTSTR pMemo,
 	} else {
 		// Get new headline from memo text
 		TString sHeadLine;
-		if (!GetHeadLineFromMemoText(pMemo, &sHeadLine)) return FALSE;
+		if (!MemoNote::GetHeadLineFromMemoText(pMemo, &sHeadLine)) return FALSE;
 
 		DWORD nH = ChopFileNumberLen(pNewHeadLine->Get());
 		DWORD nH2 = ChopFileNumberLen(sHeadLine.Get());
@@ -154,7 +147,7 @@ BOOL LocalFileRepository::SaveIfHeadLineIsChanged(
 		TString sNewFile;
 
 		if (!sMemoDir.GetDirectoryPath(pNote->pPath)) return FALSE;
-		if (!GetHeadLinePath(pTopDir, sMemoDir.Get(), pHeadLine, pNote->GetExtension(),
+		if (!MemoNote::GetHeadLinePath(sMemoDir.Get(), pHeadLine, pNote->GetExtension(),
 							 &sNewFile, &pNotePath, pNewHeadLine)) return FALSE;
 
 		BOOL bResult = pNote->SaveData(g_pPassManager, pText, sNewFile.Get());
@@ -204,52 +197,6 @@ BOOL LocalFileRepository::SaveIfHeadLineIsNotChanged(MemoNote *pNote, const char
 	}
 	// remove backup file
 	DeleteFile(sBackupFile.Get());
-	return TRUE;
-}
-
-
-/////////////////////////////////////////////
-// ヘッドラインの取得
-/////////////////////////////////////////////
-// メモ本文からヘッドラインとなる文字列を取得する。
-//
-// ヘッドラインは
-// ・メモの1行目である
-// ・1行目が一定以上の長さの場合、その先頭部分
-// とする。
-
-static BOOL GetHeadLineFromMemoText(LPCTSTR pMemo, TString *pHeadLine)
-{
-	// ヘッドライン長のカウント
-	LPCTSTR p = pMemo;
-	DWORD n = 0;
-	while(*p) {
-		if ((*p == TEXT('\r')) || (*p == TEXT('\n'))) break;
-#ifndef _WIN32_WCE
-		if (IsDBCSLeadByte(*p)) {
-			p += 2;
-			n += 2;
-			continue;
-		}
-#endif
-		n++;
-		p++;
-	}
-
-	TString sHeadLineCand;
-	if (!sHeadLineCand.Alloc(n + 1)) return FALSE;
-	_tcsncpy(sHeadLineCand.Get(), pMemo, n);
-	*(sHeadLineCand.Get() + n) = TEXT('\0');
-
-	// 領域確保・コピー
-	if (!pHeadLine->Alloc(n + 1)) return FALSE;
-	DropInvalidFileChar(pHeadLine->Get(), sHeadLineCand.Get());
-	TrimRight(pHeadLine->Get());
-
-	if (_tcslen(pHeadLine->Get()) == 0) {
-		if (!pHeadLine->Set(DEFAULT_HEADLINE)) return FALSE;
-	}
-
 	return TRUE;
 }
 
@@ -311,7 +258,7 @@ BOOL LocalFileRepository::GetHeadLine(const TomboURI *pURI, TString *pHeadLine)
 			LPTSTR p = cn.GetMemoBody(g_pPassManager);
 			if (p == NULL) return FALSE;
 			SecureBufferT sbt(p);
-			if (!GetHeadLineFromMemoText(p, pHeadLine)) return FALSE;
+			if (!MemoNote::GetHeadLineFromMemoText(p, pHeadLine)) return FALSE;
 			return TRUE;
 		}
 	}
@@ -379,96 +326,6 @@ BOOL LocalFileRepository::SetOption(const TomboURI *pCurrentURI, URIOption *pOpt
 }
 
 /////////////////////////////////////////
-// Encrypt/decrypt subroutines
-/////////////////////////////////////////
-
-static BOOL GetHeadLineFromFilePath(LPCTSTR pFilePath, TString *pHeadLine)
-{
-	LPCTSTR p = pFilePath;
-	LPCTSTR q = NULL;
-#ifdef _WIN32_WCE
-	while (*p) {
-		if (*p == TEXT('\\')) q = p;
-		p++;
-	}
-#else
-	while (*p) {
-		if (*p == TEXT('\\')) q = p;
-		if (IsDBCSLeadByte(*p)) {
-			p++;
-		}
-		p++;
-	}
-#endif
-	if (q == NULL) {
-		if (!pHeadLine->Set(pFilePath)) return FALSE;
-	} else {
-		if (!pHeadLine->Set(q + 1)) return FALSE;
-	}
-
-	pHeadLine->ChopExtension();
-	pHeadLine->ChopFileNumber();
-	return TRUE;
-}
-
-static BOOL GetRandomName(LPCTSTR pBaseDir, TString *pFileName)
-{
-	int n = rand() % 10000;
-
-	return TRUE;
-}
-
-/////////////////////////////////////////////
-// 与えられた文字列からファイル名を生成する
-/////////////////////////////////////////////
-
-// IN:	pTopDir		: Top directory
-//		pMemoPath	: メモのパス(TOPDIRからの相対パス,ファイル名は含まず)
-//		pHeadLine	: ヘッドライン文字列
-//		pExt		: 付与する拡張子
-// OUT:	pFullPath	: メモのフルパス
-//		ppNotePath	: メモのパス(TOPDIRからの相対パス,ファイル名を含み、
-//					  必要なら"(n)"でディレクトリで一意となるように調整されている
-//		pNewHeadLine: 一覧表示用新ヘッドライン(必要に応じて"(n)"が付与されている)
-
-static BOOL GetHeadLinePath(LPCTSTR pTopDir, LPCTSTR pMemoPath, LPCTSTR pHeadLine, LPCTSTR pExt,
-							TString *pFullPath, LPTSTR *ppNotePath, TString *pNewHeadLine)
-{
-	DWORD n = _tcslen(pHeadLine);
-	if (n < _tcslen(DEFAULT_HEADLINE)) n = _tcslen(DEFAULT_HEADLINE);
-
-	DWORD nHeadLineLen = n + 20;
-	DWORD nFullPathLen = _tcslen(pTopDir) + 1 + 
-						 _tcslen(pMemoPath) + nHeadLineLen + _tcslen(pExt);
-	if (!pNewHeadLine->Alloc(nHeadLineLen + 1)) return FALSE;
-	if (!pFullPath->Alloc(nFullPathLen + 1)) return FALSE;
-
-	DropInvalidFileChar(pNewHeadLine->Get(), pHeadLine);
-	if (_tcslen(pNewHeadLine->Get()) == 0) _tcscpy(pNewHeadLine->Get(), DEFAULT_HEADLINE);
-
-	wsprintf(pFullPath->Get(), TEXT("%s\\%s%s"), pTopDir, pMemoPath, pNewHeadLine->Get());
-
-	LPTSTR p = pFullPath->Get();
-	LPTSTR q = p + _tcslen(p);
-	LPTSTR r = pNewHeadLine->Get() + _tcslen(pNewHeadLine->Get());
-
-	*ppNotePath = pFullPath->Get() + _tcslen(pTopDir) + 1;
-
-	// ファイル名の確定
-	// 同名のファイルが存在した場合には"(n)"を付加する
-	_tcscpy(q, pExt);
-	if (!IsFileExist(p)) return TRUE;
-
-	DWORD i = 1;
-	do {
-		wsprintf(q, TEXT("(%d)%s"), i, pExt);
-		wsprintf(r, TEXT("(%d)"), i);
-		i++;
-	} while(IsFileExist(p));
-	return TRUE;
-}
-
-/////////////////////////////////////////
 // Decide new allocated filename
 /////////////////////////////////////////
 
@@ -496,15 +353,15 @@ BOOL LocalFileRepository::NegotiateNewName(LPCTSTR pMemoPath, LPCTSTR pText, LPC
 		} while(IsFileExist(pFullPath->Get())); // if same name exists, retry it
 
 		*ppNotePath = pFullPath->Get() + _tcslen(pTopDir) + 1;
-		if (!GetHeadLineFromMemoText(pText, pNewHeadLine)) return FALSE;
+		if (!MemoNote::GetHeadLineFromMemoText(pText, pNewHeadLine)) return FALSE;
 	} else {
 		if (pOpt->bKeepTitle) {
-			if (!GetHeadLineFromFilePath(pMemoPath, &sHeadLine)) return FALSE;
+			if (!MemoNote::GetHeadLineFromFilePath(pMemoPath, &sHeadLine)) return FALSE;
 		} else {
-			if (!GetHeadLineFromMemoText(pText, &sHeadLine)) return FALSE;
+			if (!MemoNote::GetHeadLineFromMemoText(pText, &sHeadLine)) return FALSE;
 		}
 	
-		if (!GetHeadLinePath(pTopDir, pMemoDir, sHeadLine.Get(), TEXT(".chi"), 
+		if (!MemoNote::GetHeadLinePath(pMemoDir, sHeadLine.Get(), TEXT(".chi"), 
 								pFullPath, ppNotePath, pNewHeadLine)) {
 			return FALSE;
 		}
@@ -623,7 +480,6 @@ BOOL LocalFileRepository::Delete(const TomboURI *pURI, URIOption *pOption)
 /////////////////////////////////////////
 BOOL LocalFileRepository::GetPhysicalPath(const TomboURI *pURI, TString *pFullPath)
 {
-
 	if (!pFullPath->Alloc(_tcslen(pTopDir) + _tcslen(pURI->GetPath()) + 1)) return FALSE;
 	LPCTSTR p = pURI->GetPath();
 	_tcscpy(pFullPath->Get(), pTopDir);

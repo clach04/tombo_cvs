@@ -71,6 +71,8 @@ public:
 	// ex. :  tombo://repo/a/b/c/ -> tombo://repo/a/b/c/
 	//     :  tombo://repo/a/b/c/d.txt -> tombo://repo/a/b/c/
 	BOOL GetAttachURI(const TomboURI *pBase, TomboURI *pAttached);
+
+
 };
 
 //////////////////////////////////////////////////////////////

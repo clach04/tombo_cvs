@@ -231,7 +231,6 @@ BOOL MemoManager::SaveIfModify(LPDWORD pYNC, BOOL bDupMode)
 // allocate new memo
 ////////////////////////////////////////////////////////
 
-// TODO: CHECK
 BOOL MemoManager::AllocNewMemo(LPCTSTR pText, LPCTSTR pTemplateURI)
 {
 	TString sMemoPath;
@@ -254,16 +253,7 @@ BOOL MemoManager::AllocNewMemo(LPCTSTR pText, LPCTSTR pTemplateURI)
 
 	// get parent node
 	HTREEITEM hParent;
-	if (_tcscmp(sMemoPath.Get(), TEXT("\0")) == 0) {
-		// the path is root
-		hParent = pMemoSelectView->ShowItem(sMemoPath.Get(), FALSE);
-	} else {
-		// the path is not root
-		ChopFileSeparator(sMemoPath.Get());
-		hParent = pMemoSelectView->ShowItem(sMemoPath.Get(), FALSE);
-		if (!sMemoPath.StrCat(TEXT("\\"))) return FALSE;
-	}
-
+	hParent = pMemoSelectView->ShowItem(sMemoPath.Get(), FALSE);
 	if (hParent == NULL) return FALSE;
 
 	// allocate new MemoNote instance and associate to tree view
@@ -278,16 +268,12 @@ BOOL MemoManager::AllocNewMemo(LPCTSTR pText, LPCTSTR pTemplateURI)
 	} else {
 		pNote = new PlainMemoNote();
 	}
+	AutoPointer<MemoNote> ap(pNote);
 
-	if (pNote == NULL || !(pNote->InitNewMemo(sMemoPath.Get(), pText, &sHeadLine))) {
-		delete pNote;
-		return FALSE;
-	}
+	if (pNote == NULL || !(pNote->InitNewMemo(sMemoPath.Get(), pText, &sHeadLine))) return FALSE;
 
 	TomboURI sNewURI;
 	if (!pNote->GetURI(&sNewURI)) return FALSE;
-
-	delete pNote;
 
 	HTREEITEM hNewItem = pMemoSelectView->InsertFile(hParent, &sNewURI, sHeadLine.Get(), FALSE, FALSE);
 	pMemoDetailsView->SetCurrentNote(sNewURI.GetFullURI());

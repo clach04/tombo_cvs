@@ -20,6 +20,9 @@
 #include "TreeViewItem.h"
 #include "Message.h"
 
+#include "AutoPtr.h"
+#include "Repository.h"
+
 /////////////////////////////////////////
 //  defs
 /////////////////////////////////////////
@@ -41,7 +44,7 @@
 /////////////////////////////////////////
 
 static void InsertDummyNode(HWND hTree, HTREEITEM hItem);
-static HTREEITEM FindItem2(HWND hWnd, HTREEITEM hParent, LPCTSTR pStr, DWORD nLen);
+static HTREEITEM FindItem2(HWND hWnd, HTREEITEM hParent, LPCTSTR pHeadLine, DWORD nLen);
 void SelectViewSetWndProc(SUPER_WND_PROC wp, HWND hParent, HINSTANCE h, MemoSelectView *p);
 LRESULT CALLBACK NewSelectViewProc( HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam );
 static HIMAGELIST CreateSelectViewImageList(HINSTANCE hInst);
@@ -572,7 +575,7 @@ void MemoSelectView::OnNotify_RClick(POINT pt)
 	case IDM_TRACELINK:
 		{
 			TreeViewFileLink *p = (TreeViewFileLink*)pItem;
-			ShowItemByURI(p->GetRealURI()->GetFullURI(), TRUE, FALSE);
+			ShowItemByURI(p->GetRealURI(), TRUE, FALSE);
 		}
 		break;
 	case IDM_ASSOC:
@@ -1304,117 +1307,14 @@ LRESULT MemoSelectView::EditLabel(TVITEM *pItem)
 /////////////////////////////////////////////
 // Expand tree and show note
 /////////////////////////////////////////////
-
-static HTREEITEM FindItem(HWND hWnd, HTREEITEM hParent, LPCTSTR pStr, BOOL bNote)
-{
-	HTREEITEM hItem = TreeView_GetChild(hWnd, hParent);
-	TV_ITEM ti;
-
-	TCHAR buf[MAX_PATH + 1];
-	ti.mask = TVIF_TEXT | TVIF_PARAM;
-	ti.cchTextMax = MAX_PATH;
-	ti.pszText = buf;
-
-	while(hItem) {
-		ti.hItem = hItem;
-		TreeView_GetItem(hWnd, &ti);
-
-		if (_tcsicmp(buf, pStr) == 0) {
-			if (((TreeViewItem*)ti.lParam)->HasMultiItem() == !bNote) {
-				return hItem;
-			}
-		}
-
-		hItem = TreeView_GetNextSibling(hWnd, hItem);
-	}
-	return NULL;
-}
-
 // ex.
 //	msView.ShowItem(TEXT("temp\\Hello.txt"));
 
 HTREEITEM MemoSelectView::ShowItem(LPCTSTR pPath, BOOL bSelChange, BOOL bOpenNotes)
 {
-	while(*pPath == TEXT('\\')) pPath++;
-
-	if (_tcslen(pPath) == 0) {
-		if (bSelChange) {
-			TreeView_SelectItem(hViewWnd, hMemoRoot);
-		}
-		return hMemoRoot;
-	}
-
-	TString sPath;
-	HTREEITEM hTargetItem;
-
-	if (!sPath.Join(g_Property.TopDir(), TEXT("\\"), pPath)) return NULL;
-	LPTSTR p = sPath.Get();
-	p += _tcslen(g_Property.TopDir());
-
-	hTargetItem = TreeView_GetRoot(hViewWnd);
-
-	LPTSTR q, pPartPath;
-	BOOL bEndFlg = FALSE;
-	BOOL bNote = FALSE;
-	do {
-		// get path item
-		q = p + 1;
-		pPartPath = q;
-		while(*q) {
-#if defined(PLATFORM_WIN32)
-			if (IsDBCSLeadByte(*q)) {
-				q++;
-				if (*q) q++;
-				continue;
-			}
-#endif
-			if (*q == TEXT('\\')) break;
-			q++;
-		}
-		if (*q == TEXT('\0')) {
-			bEndFlg = TRUE;
-		}
-		*p = TEXT('\0');
-		*q = TEXT('\0');
-
-		// if tree is not expanding, expand it.
-		if (!IsExpand(hTargetItem)) {
-			TreeView_Expand(hViewWnd, hTargetItem, TVE_EXPAND);
-		}
-
-		DWORD nt = MemoNote::IsNote(pPartPath);
-		if (bEndFlg &&
-			(nt != NOTE_TYPE_NO && nt != NOTE_TYPE_TDT)) {
-			*(pPartPath + _tcslen(pPartPath) - 4) = TEXT('\0');
-			bNote = TRUE;
-		}
-
-		if (bSelChange) TreeView_SelectItem(hViewWnd, hTargetItem);
-		// Get Target Item
-		hTargetItem = FindItem(hViewWnd, hTargetItem, pPartPath, bNote);
-		if (hTargetItem == NULL) {
-			return NULL;
-		}
-		if (bSelChange) TreeView_SelectItem(hViewWnd, hTargetItem);
-
-		// restore path
-		*p = TEXT('\\');
-		*q = TEXT('\\');
-		p = q;
-	} while(!bEndFlg);
-
-
-	if (bSelChange) {
-		TreeView_SelectItem(hViewWnd, hTargetItem);
-
-		// if selected item is note, open it.
-		if (bNote) {
-			DWORD nOption = bOpenNotes ? OPEN_REQUEST_MSVIEW_ACTIVE : OPEN_REQUEST_MDVIEW_ACTIVE;
-			TreeViewItem *ptv = GetTVItem(hTargetItem);
-			ptv->OpenMemo(this, nOption);
-		}
-	}
-	return hTargetItem;
+	TomboURI sURI;
+	if (!sURI.InitByNotePath(pPath)) return NULL;
+	return ShowItemByURI(&sURI, bSelChange, bOpenNotes);
 }
 
 static HTREEITEM FindItem2(HWND hWnd, HTREEITEM hParent, LPCTSTR pStr, DWORD nLen)
@@ -1440,16 +1340,13 @@ static HTREEITEM FindItem2(HWND hWnd, HTREEITEM hParent, LPCTSTR pStr, DWORD nLe
 	return NULL;
 }
 
-HTREEITEM MemoSelectView::ShowItemByURI(LPCTSTR pURI, BOOL bSelChange, BOOL bOpenNotes)
+HTREEITEM MemoSelectView::ShowItemByURI(const TomboURI *pURI, BOOL bSelChange, BOOL bOpenNotes)
 {
-	TomboURI tURI;
-	if (!tURI.Init(pURI)) return NULL;
-
 	HTREEITEM hCurrent;
 
 	// get root node
 	TString sRepo;
-	if (!tURI.GetRepositoryName(&sRepo)) return FALSE;
+	if (!pURI->GetRepositoryName(&sRepo)) return FALSE;
 	hCurrent = GetRootItem(sRepo.Get());
 	if (hCurrent == NULL) return NULL;
 
@@ -1460,7 +1357,7 @@ HTREEITEM MemoSelectView::ShowItemByURI(LPCTSTR pURI, BOOL bSelChange, BOOL bOpe
 
 	if (bSelChange) TreeView_SelectItem(hViewWnd, hCurrent);
 
-	TomboURIItemIterator itr(&tURI);
+	TomboURIItemIterator itr(pURI);
 	if (!itr.Init()) return NULL;
 
 	TreeViewItem *pItem = NULL;
@@ -1468,13 +1365,9 @@ HTREEITEM MemoSelectView::ShowItemByURI(LPCTSTR pURI, BOOL bSelChange, BOOL bOpe
 	for (itr.First(); p = itr.Current(); itr.Next()) {
 		HTREEITEM h;
 		if (itr.IsLeaf()) {
-			// item is file, ignore extensions
-			DWORD n = _tcslen(p);
-			if (n >= 4) {
-				h = FindItem2(hViewWnd, hCurrent, p, n - 4);
-			} else {
-				h = FindItem2(hViewWnd, hCurrent, p, n);
-			}
+			TString sHeadLine;
+			if (!g_Repository.GetHeadLine(pURI, &sHeadLine)) return NULL;
+			h = FindItem2(hViewWnd, hCurrent, sHeadLine.Get(), _tcslen(sHeadLine.Get()));
 		} else {
 			h = FindItem2(hViewWnd, hCurrent, p, _tcslen(p));
 		}

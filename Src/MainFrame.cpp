@@ -490,6 +490,13 @@ void MainFrame::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	hMainWnd = hWnd;
 	LPCREATESTRUCT pcs = (LPCREATESTRUCT)lParam;
 
+	// init password manager
+	pmPasswordMgr.Init(hMainWnd, hInstance);
+	g_pPassManager = &pmPasswordMgr;
+
+	mmMemoManager.SetPasswordManager(&pmPasswordMgr);
+	g_pPasswordManager = &pmPasswordMgr;
+
 	pPlatform = PLATFORM_TYPE::PlatformFactory();
 	if (!pPlatform || !pPlatform->Init(hMainWnd)) return;
 
@@ -514,7 +521,10 @@ void MainFrame::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	RepositoryOption roOpt;
 	roOpt.bKeepCaret = g_Property.KeepCaret();
 	roOpt.bKeepTitle = g_Property.KeepTitle();
-	roOpt.bSafeFileName = TRUE;
+
+//	roOpt.bSafeFileName = TRUE;
+	roOpt.bSafeFileName = FALSE;
+
 	g_Repository.Init(g_Property.TopDir(), &roOpt);
 
 	// create toolbar
@@ -578,12 +588,6 @@ void MainFrame::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 //	ActivateView(TRUE);
 	ActivateView(VT_SelectView);
 
-	// init password manager
-	pmPasswordMgr.Init(hMainWnd, hInstance);
-	g_pPassManager = &pmPasswordMgr;
-
-	mmMemoManager.SetPasswordManager(&pmPasswordMgr);
-	g_pPasswordManager = &pmPasswordMgr;
 
 	// load bookmark
 	LPTSTR pBM = LoadBookMarkFromReg();
@@ -594,7 +598,9 @@ void MainFrame::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 	// open top page
 	if (_tcslen(g_Property.GetDefaultNote()) != 0) {
-		msView.ShowItemByURI(g_Property.GetDefaultNote());
+		TomboURI sURI;
+		if (!sURI.Init(g_Property.GetDefaultNote())) return;
+		msView.ShowItemByURI(&sURI);
 	}
 }
 
@@ -1656,8 +1662,6 @@ void MainFrame::DoSearchTree(BOOL bFirst, BOOL bForward)
 	st.Init(pSE, sFullPath.Get(), _tcslen(g_Property.TopDir()), bForward, !bFirst);
 	st.Popup(g_hInstance, hMainWnd);
 
-	TCHAR buf[1024];
-
 	switch(st.GetResult()) {
 	case SR_FOUND:
 		msView.ShowItem(st.GetPartPath());
@@ -1671,9 +1675,12 @@ void MainFrame::DoSearchTree(BOOL bFirst, BOOL bForward)
 		MessageBox(MSG_STRING_SEARCH_CANCELED, TOMBO_APP_NAME, MB_OK | MB_ICONINFORMATION);
 		break;
 	case SR_FAILED:
-		wsprintf(buf, MSG_SEARCH_FAILED, GetLastError());
-		msView.ShowItem(st.GetPartPath());
-		MessageBox(buf, TOMBO_APP_NAME, MB_OK | MB_ICONERROR);
+		{
+			TCHAR buf[1024];
+			wsprintf(buf, MSG_SEARCH_FAILED, GetLastError());
+			msView.ShowItem(st.GetPartPath());
+			MessageBox(buf, TOMBO_APP_NAME, MB_OK | MB_ICONERROR);
+		}
 		break;
 	}
 }
@@ -1867,7 +1874,9 @@ void MainFrame::OnBookMark(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
 	const BookMarkItem *pItem = pBookMark->Find(LOWORD(wParam));
 	if (pItem) {
-		msView.ShowItemByURI(pItem->pPath);
+		TomboURI sURI;
+		if (sURI.Init(pItem->pPath)) return;
+		msView.ShowItemByURI(&sURI);
 	}
 }
 

@@ -18,25 +18,9 @@
 
 #define DEFAULT_HEADLINE MSG_DEFAULT_HEADLINE
 
-/////////////////////////////////////////////
-//
-/////////////////////////////////////////////
-
-// IN:
-//		pHeadLine   : ヘッドライン文字列 or ラベル文字列
-//		pMemoPath   : メモのパス
-//		pExt	    : 拡張子(".txt" or ".chi")
-// OUT:
-//		pFullPath	: フルパス
-//		pNewHeadLine: 修正後ヘッドライン文字列(=ラベル文字列)
-//		*ppNodePath	: メモのパス(フルパスからTOMBOROOTPATHを除いたもの)
-
-static BOOL GetHeadLinePath(LPCTSTR pMemoPath, LPCTSTR pHeadLine, LPCTSTR pExt, 
-							TString *pFullPath, LPTSTR *ppNotePath, TString *pNewHeadLine);
-
 // ヘッドライン文字列の取得
-static BOOL GetHeadLineFromMemoText(LPCTSTR pMemo, TString *pHeadLine);
-static BOOL GetHeadLineFromFilePath(LPCTSTR pFilePath, TString *pHeadLine);
+//static BOOL GetHeadLineFromMemoText(LPCTSTR pMemo, TString *pHeadLine);
+//static BOOL GetHeadLineFromFilePath(LPCTSTR pFilePath, TString *pHeadLine);
 
 /////////////////////////////////////////////
 //
@@ -479,7 +463,7 @@ DWORD CryptedMemoNote::GetMemoIcon()
 // ・1行目が一定以上の長さの場合、その先頭部分
 // とする。
 
-static BOOL GetHeadLineFromMemoText(LPCTSTR pMemo, TString *pHeadLine)
+BOOL MemoNote::GetHeadLineFromMemoText(LPCTSTR pMemo, TString *pHeadLine)
 {
 	// ヘッドライン長のカウント
 	LPCTSTR p = pMemo;
@@ -506,6 +490,10 @@ static BOOL GetHeadLineFromMemoText(LPCTSTR pMemo, TString *pHeadLine)
 	if (!pHeadLine->Alloc(n + 1)) return FALSE;
 	DropInvalidFileChar(pHeadLine->Get(), sHeadLineCand.Get());
 	TrimRight(pHeadLine->Get());
+
+	if (_tcslen(pHeadLine->Get()) == 0) {
+		if (!pHeadLine->Set(DEFAULT_HEADLINE)) return FALSE;
+	}
 
 	return TRUE;
 }
@@ -536,7 +524,7 @@ static BOOL IsFileExist(LPCTSTR pFileName)
 //					  必要なら"(n)"でディレクトリで一意となるように調整されている
 //		pNewHeadLine: 一覧表示用新ヘッドライン(必要に応じて"(n)"が付与されている)
 
-static BOOL GetHeadLinePath(LPCTSTR pMemoPath, LPCTSTR pHeadLine, LPCTSTR pExt, 
+BOOL MemoNote::GetHeadLinePath(LPCTSTR pMemoPath, LPCTSTR pHeadLine, LPCTSTR pExt, 
 							TString *pFullPath, LPTSTR *ppNotePath, TString *pNewHeadLine)
 {
 	DWORD n = _tcslen(pHeadLine);
@@ -572,14 +560,12 @@ static BOOL GetHeadLinePath(LPCTSTR pMemoPath, LPCTSTR pHeadLine, LPCTSTR pExt,
 	return TRUE;
 }
 
-
-
 ////////////////////////////////////////////////////////
 // ファイルパスからヘッドラインを取得
 ////////////////////////////////////////////////////////
 // 本文は参照しないため、実際のヘッドライン文字列と必ずしも一致しないことに注意。
 
-static BOOL GetHeadLineFromFilePath(LPCTSTR pFilePath, TString *pHeadLine)
+BOOL MemoNote::GetHeadLineFromFilePath(LPCTSTR pFilePath, TString *pHeadLine)
 {
 	LPCTSTR p = pFilePath;
 	LPCTSTR q = NULL;

@@ -108,6 +108,14 @@ public:
 	static MemoNote *MemoNoteFactory(const TomboURI *pURI);
 	static MemoNote *MemoNoteFactory(LPCTSTR pURI);
 
+	//////////////////////////////////
+	// Headline related funcs
+
+	static BOOL GetHeadLinePath(LPCTSTR pMemoPath, LPCTSTR pHeadLine, LPCTSTR pExt, 
+								TString *pFullPath, LPTSTR *ppNotePath, TString *pNewHeadLine);
+	static BOOL GetHeadLineFromMemoText(LPCTSTR pMemo, TString *pHeadLine);
+	static BOOL GetHeadLineFromFilePath(LPCTSTR pFilePath, TString *pHeadLine);
+
 	friend class LocalFileRepository;
 };
 

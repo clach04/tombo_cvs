@@ -25,7 +25,7 @@ public:
 	///////////////////////////////
 	// accessor
 
-	BOOL GetRepositoryName(TString *pRepo);
+	BOOL GetRepositoryName(TString *pRepo) const;
 
 	// get full path of URI.
 	LPCTSTR GetFullURI() const { return uri.Get(); }
@@ -72,14 +72,14 @@ public:
 /////////////////////////////////////////////
 
 class TomboURIItemIterator {
-	TomboURI *pURI;
+	const TomboURI *pURI;
 	LPTSTR pBuf;
 	DWORD nPos;
 public:
 
 	///////////////////////////////
 	// ctor, dtor and initializer
-	TomboURIItemIterator(TomboURI *p) : pURI(p), pBuf(NULL) {}
+	TomboURIItemIterator(const TomboURI *p) : pURI(p), pBuf(NULL) {}
 	~TomboURIItemIterator() { if (pBuf) delete[] pBuf; }
 	BOOL Init();
 
