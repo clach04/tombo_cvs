@@ -818,7 +818,7 @@ BOOL TreeViewVirtualFolderRoot::Expand(MemoSelectView *pView)
 {
 	HTREEITEM hParent = GetViewItem();
 
-	////////
+	/// Add virtual folders.
 	TCHAR buf[MAX_PATH + 1];
 	TCHAR buf2[MAX_PATH + 1];
 	GetModuleFileName(NULL, buf, MAX_PATH);
@@ -829,10 +829,8 @@ BOOL TreeViewVirtualFolderRoot::Expand(MemoSelectView *pView)
 
 	TSParser tp;
 	tp.Parse(sVFpath.Get(), pView, hParent);
-//	if (!tp.Parse(sVFpath.Get(), pView, hParent)) return FALSE;
-	////////
 
-
+	// Add grep results
 	TreeViewVirtualFolder *pVf;
 	VFDirectoryGenerator *pGen;
 	VFStore *pStore;
