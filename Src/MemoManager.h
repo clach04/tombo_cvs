@@ -1,15 +1,36 @@
 #ifndef MEMOMANAGER_H
 #define MEMOMANAGER_H
 
+#include <commctrl.h>
+
 class MemoDetailsView;
 class MemoSelectView;
 class MainFrame;
 class MemoNote;
 class PasswordManager;
-class TreeViewItem;
-class TreeViewFileItem;
-
 class SearchEngineA;
+
+/////////////////////////////////////
+// Memo location info
+/////////////////////////////////////
+//
+// This class is helper class. Object life-time is only in functions.
+// If you want to have these info, you should not keep pointer but copy member variables.
+
+class MemoLocator {
+	MemoNote *pNote;
+	HTREEITEM hItem;
+public:
+	MemoLocator(MemoNote *p, HTREEITEM h) : pNote(p), hItem(h) {}
+
+	MemoNote *GetNote() { return pNote; }
+	HTREEITEM GetHITEM() { return hItem; }
+};
+
+/////////////////////////////////////
+// Control other view
+/////////////////////////////////////
+// control select - detail view relation and mainframe items(menu, toolbar, etc.)
 
 class MemoManager {
 protected:
@@ -18,14 +39,21 @@ protected:
 	MainFrame *pMainFrame;
 	PasswordManager *pPassMgr;
 
-	TreeViewFileItem *pCurrentItem;
+	// Current edit-view displaying item info
+	MemoNote *pCurrentNote;
+	HTREEITEM hCurrentItem;
 
-	TreeViewFileItem *AllocNewMemo(LPCTSTR pText, MemoNote *pTemplate = NULL);
+	MemoLocator AllocNewMemo(LPCTSTR pText, MemoNote *pTemplate = NULL);
 
 	SearchEngineA *pSearchEngineA;
 
 	BOOL bMSSearchFlg;
 	BOOL bMDSearchFlg;
+
+	/////////////////////////////////////
+	// maintain pCurrentNote;
+	void SetCurrentNote(MemoLocator *pLoc);
+
 public:
 	/////////////////////////////////////
 	// ctor & dtor
@@ -57,7 +85,7 @@ public:
 	BOOL SaveIfModify(LPDWORD pYNC, BOOL bDupMode);
 
 	// メモのロード
-	BOOL SetMemo(TreeViewFileItem *pItem);
+	BOOL SetMemo(MemoLocator *pLoc);
 
 	// メモのクリア
 	BOOL ClearMemo();
@@ -73,10 +101,10 @@ public:
 	void SelectAll();	// 全選択(詳細ビュー)
 
 	// 指定したメモが現在詳細ビューで表示されているか
-	BOOL IsNoteDisplayed(MemoNote *pNote);
+	BOOL IsNoteDisplayed(LPCTSTR pFile);
 
 	// 詳細ビューに表示されている場合に必要なら保存し、一覧ビューにフォーカスを移す
-	// TOOD: 保存依頼に置き換えられる気がする
+	// TODO: 保存依頼に置き換えられる気がする
 	void InactiveDetailsView();
 
 	/////////////////////////////////////
@@ -92,9 +120,14 @@ public:
 	// データアクセサ
 
 	PasswordManager *GetPasswordManager() { return pPassMgr; }
-	MemoNote *CurrentNote();
-	TreeViewFileItem *CurrentItem();
+	MemoNote *CurrentNote() { return pCurrentNote; }
 	MainFrame *GetMainFrame() { return pMainFrame; }
+
+	/////////////////////////////////////
+	// Notify from MemoSelectView
+
+	void ReleaseItemNotify(MemoLocator *pLoc);
+	void InsertItemNotify(MemoLocator *pLoc);
 
 	/////////////////////////////////////
 	// 検索フラグ
