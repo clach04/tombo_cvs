@@ -67,16 +67,6 @@ BOOL TString::Join(LPCTSTR p1, LPCTSTR p2, LPCTSTR p3, LPCTSTR p4)
 	return TRUE;
 }
 
-#ifdef COMMENT
-BOOL TString::AllocFullPath(LPCTSTR pPath)
-{
-	DWORD n = _tcslen(pPath) + _tcslen(g_Property.TopDir()) + 1;
-	if (!Alloc(n + 1)) return FALSE;
-	wsprintf(pString, TEXT("%s\\%s"), g_Property.TopDir(), pPath);
-	return TRUE;
-}
-#endif
-
 BOOL TString::GetDirectoryPath(LPCTSTR pFullPath)
 {
 	//最後の'\'の位置の取得
@@ -341,4 +331,27 @@ void GetFilePath(LPTSTR pFilePath, LPCTSTR pFileName)
 	}
 	_tcsncpy(pFilePath, pFileName, q - pFileName + 1);
 	*(pFilePath + (q - pFileName + 1)) = TEXT('\0');
+}
+
+/////////////////////////////////////////////
+// セキュアなバッファ
+/////////////////////////////////////////////
+// 領域開放時に0クリアする
+
+SecureBufferT::~SecureBufferT()
+{
+	if (pBuf) {
+		LPTSTR p = pBuf;
+		for (DWORD i = 0; i < nBufLen; i++) *p++ = TEXT('\0');
+		delete [] pBuf;
+	}
+}
+
+SecureBufferA::~SecureBufferA()
+{
+	if (pBuf) {
+		char *p = pBuf;
+		for (DWORD i = 0; i < nBufLen; i++) *p++ = '\0';
+		delete [] pBuf;
+	}
 }

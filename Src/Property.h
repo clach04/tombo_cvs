@@ -84,6 +84,7 @@ public:
 	// accessor
 
 	LPCTSTR TopDir() { return aTopDir; }
+
 	const LPBYTE FingerPrint() { return bValidSum ? aPasswordSum : NULL; }
 
 	DWORD PassTimeout() { return nPassTimeOut; }

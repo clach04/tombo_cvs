@@ -55,4 +55,10 @@ public:
 BOOL GetFingerPrint(LPBYTE pFp, const char *pPassword);
 BOOL CheckFingerPrint(LPBYTE pFp, const char *pPassword);
 
+//////////////////////////////////////////////
+// global definitions
+//////////////////////////////////////////////
+
+extern PasswordManager *g_pPassManager;
+
 #endif

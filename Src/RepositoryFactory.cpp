@@ -3,6 +3,8 @@
 #include "Repository.h"
 #include "RepositoryFactory.h"
 #include "Property.h"
+#include "TString.h"
+#include "TomboURI.h"
 
 /////////////////////////////////////////
 // global variable
@@ -38,7 +40,15 @@ BOOL RepositoryFactory::Init(Property *pProp)
 // factory method
 /////////////////////////////////////////
 
-Repository *RepositoryFactory::GetRepository(LPCTSTR pRepoName)
+Repository *RepositoryFactory::GetRepository(TomboURI *pURI)
 {
 	return pDefaultRepo;
+}
+
+// for convinient funcs
+Repository *RepositoryFactory::GetRepository(LPCTSTR pURI)
+{
+	TomboURI uri;
+	if (!uri.Init(pURI)) return NULL;
+	return GetRepository(&uri);
 }

@@ -3,6 +3,7 @@
 
 class Repository;
 class Property;
+class TomboURI;
 
 /////////////////////////////////////////
 // Repository factory
@@ -17,7 +18,8 @@ public:
 
 	BOOL Init(Property *pProp);
 
-	Repository *GetRepository(LPCTSTR pRepoName);
+	Repository *GetRepository(TomboURI *pURI);
+	Repository *GetRepository(LPCTSTR pURI);
 };
 
 /////////////////////////////////////////

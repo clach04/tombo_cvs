@@ -40,49 +40,6 @@ static BOOL GetHeadLineFromFilePath(LPCTSTR pFilePath, TString *pHeadLine);
 static int ChopFileNumberLen(LPTSTR pHeadLine);
 
 /////////////////////////////////////////////
-// セキュアなバッファ
-/////////////////////////////////////////////
-// 領域開放時に0クリアする
-
-class SecureBufferT {
-	LPTSTR pBuf;
-	DWORD nBufLen;
-public:
-	SecureBufferT(LPTSTR p) { pBuf = p; nBufLen = _tcslen(p); }
-	~SecureBufferT();
-
-	LPTSTR Get() { return pBuf; }
-};
-
-SecureBufferT::~SecureBufferT()
-{
-	if (pBuf) {
-		LPTSTR p = pBuf;
-		for (DWORD i = 0; i < nBufLen; i++) *p++ = TEXT('\0');
-		delete [] pBuf;
-	}
-}
-
-class SecureBufferA {
-	char *pBuf;
-	DWORD nBufLen;
-public:
-	SecureBufferA(char *p) { pBuf = p; nBufLen = strlen(p); }
-	~SecureBufferA();
-
-	char *Get() { return pBuf; }
-};
-
-SecureBufferA::~SecureBufferA()
-{
-	if (pBuf) {
-		char *p = pBuf;
-		for (DWORD i = 0; i < nBufLen; i++) *p++ = '\0';
-		delete [] pBuf;
-	}
-}
-
-/////////////////////////////////////////////
 //
 /////////////////////////////////////////////
 
@@ -289,7 +246,7 @@ LPTSTR CryptedMemoNote::GetMemoBody(PasswordManager *pMgr)
 //
 // IN : pMgr, pMemo
 // OUT: pHeadLine
-BOOL MemoNote::Save(PasswordManager *pMgr, LPCTSTR pMemo, TString *pHeadLine)
+BOOL MemoNote::Save(LPCTSTR pMemo, TString *pHeadLine)
 {
 	TString sOrigFile;
 	if (!sOrigFile.Join(g_Property.TopDir(), TEXT("\\"), pPath)) return FALSE;
@@ -337,7 +294,7 @@ BOOL MemoNote::Save(PasswordManager *pMgr, LPCTSTR pMemo, TString *pHeadLine)
 			if (GetLastError() != ERROR_FILE_NOT_FOUND) return FALSE;
 		}
 		// Save to file
-		if (!SaveData(pMgr, pText, sOrigFile.Get())) {
+		if (!SaveData(g_pPassManager, pText, sOrigFile.Get())) {
 			// When save failed, try to rollback original file.
 			DeleteFile(sOrigFile.Get());
 			MoveFile(sBackupFile.Get(), sOrigFile.Get());
@@ -354,7 +311,7 @@ BOOL MemoNote::Save(PasswordManager *pMgr, LPCTSTR pMemo, TString *pHeadLine)
 		if (!sMemoDir.GetDirectoryPath(pPath)) return FALSE;
 		if (!GetHeadLinePath(sMemoDir.Get(), sHeadLine.Get(), GetExtension() , &sNewFile, &pNotePath, pHeadLine)) return FALSE;
 
-		bResult = SaveData(pMgr, pText, sNewFile.Get());
+		bResult = SaveData(g_pPassManager, pText, sNewFile.Get());
 		if (bResult) {
 			// delete original file
 			DeleteFile(sOrigFile.Get());
@@ -377,38 +334,6 @@ BOOL MemoNote::Save(PasswordManager *pMgr, LPCTSTR pMemo, TString *pHeadLine)
 		}
 	}
 	return bResult;
-}
-
-////////////////////////////////////////////////////
-// get headline
-////////////////////////////////////////////////////
-BOOL MemoNote::GetHeadLineFromPath(LPCTSTR pPath, TString *pHeadLine)
-{
-	if (pPath == NULL) {
-		SetLastError(ERROR_INVALID_DATA);
-		return FALSE;
-	}
-
-	TString sTitle;
-	if (!sTitle.Set(pPath)) return FALSE;
-
-	LPTSTR p = _tcstok(sTitle.Get(), TEXT("\\"));
-	LPTSTR pTitle = p;
-	while(p) {
-		pTitle = p;
-		p = _tcstok(NULL, TEXT("\\"));
-	}
-	if (pTitle == NULL) {
-		return pHeadLine->Set(TEXT(""));
-	} else {
-		if (_tcslen(pTitle) > 4) {
-			if (_tcscmp(pTitle + _tcslen(pTitle) - 4, TEXT(".txt")) == 0 ||
-				_tcscmp(pTitle + _tcslen(pTitle) - 4, TEXT(".chi")) == 0) {
-				*(pTitle + _tcslen(pTitle) - 4) = TEXT('\0');
-			}
-		}
-		return pHeadLine->Set(pTitle);
-	}
 }
 
 /////////////////////////////////////////////
@@ -866,8 +791,6 @@ BOOL MemoNote::Rename(LPCTSTR pNewName)
 	// ファイル名リネーム用パス生成
 	TString sOldFullPath;
 	TString sNewFullPath;
-//	if (!sOldFullPath.AllocFullPath(pPath) ||
-//		!sNewFullPath.AllocFullPath(pNewPath)) {
 	if (!sOldFullPath.Join(g_Property.TopDir(), TEXT("\\"), pPath) ||
 		!sNewFullPath.Join(g_Property.TopDir(), TEXT("\\"), pNewPath)) {
 		delete [] pNewPath;
@@ -931,7 +854,6 @@ DWORD MemoNote::IsNote(LPCTSTR pFile)
 	}
 	return nType;
 }
-
 
 /////////////////////////////////////////////
 // MemoNote object factory

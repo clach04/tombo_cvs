@@ -52,7 +52,7 @@ public:
 	virtual char *GetMemoBodyA(PasswordManager *pMgr);
 
 	// save memo
-	BOOL Save(PasswordManager *pMgr, LPCTSTR pMemo, TString *pHeadLine);
+	BOOL Save(LPCTSTR pMemo, TString *pHeadLine);
 	virtual BOOL SaveData(PasswordManager *pMgr, const char *pMemo, LPCTSTR pWriteFile);
 
 	//////////////////////////////////
@@ -76,10 +76,7 @@ public:
 	// path related functions
 
 	LPCTSTR MemoPath() { return pPath; }
-//	BOOL GetURI(TString *pURI);
 	BOOL GetURI(TomboURI *pURI);
-
-	static BOOL GetHeadLineFromPath(LPCTSTR pPath, TString *pHeadLine);
 
 	//////////////////////////////////
 	// notes attributes

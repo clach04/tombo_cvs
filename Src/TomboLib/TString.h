@@ -55,6 +55,31 @@ public:
 };
 
 ////////////////////////////////////
+//  Secure buffer
+////////////////////////////////////
+// secure auto ptr string buffer
+
+class SecureBufferT {
+	LPTSTR pBuf;
+	DWORD nBufLen;
+public:
+	SecureBufferT(LPTSTR p) { pBuf = p; nBufLen = _tcslen(p); }
+	~SecureBufferT();
+
+	LPTSTR Get() { return pBuf; }
+};
+
+class SecureBufferA {
+	char *pBuf;
+	DWORD nBufLen;
+public:
+	SecureBufferA(char *p) { pBuf = p; nBufLen = strlen(p); }
+	~SecureBufferA();
+
+	char *Get() { return pBuf; }
+};
+
+////////////////////////////////////
 //  File path operation funcs.
 ////////////////////////////////////
 

@@ -576,6 +576,8 @@ void MainFrame::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 	// init password manager
 	pmPasswordMgr.Init(hMainWnd, hInstance);
+	g_pPassManager = &pmPasswordMgr;
+
 	mmMemoManager.SetPasswordManager(&pmPasswordMgr);
 	g_pPasswordManager = &pmPasswordMgr;
 

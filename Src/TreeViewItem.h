@@ -87,7 +87,6 @@ public:
 
 	// if the URI is tombo://default/aaa/bbb/ccc/ddd.txt ,
 	// result of the GetFolderPath is \aaa\bbb\ccc\ 
-	virtual BOOL GetFolderPath(MemoSelectView *pView, TString *pPath) = 0;
 	virtual BOOL GetLocationPath(MemoSelectView *pView, TString *pPath) = 0;
 	virtual BOOL GetURIItem(MemoSelectView *pView, TString *pItem) = 0;
 
@@ -127,7 +126,6 @@ public:
 	DWORD GetIcon(MemoSelectView *pView, DWORD nStatus);
 	DWORD ItemOrder();
 
-	BOOL GetFolderPath(MemoSelectView *pView, TString *pPath);
 	BOOL GetLocationPath(MemoSelectView *pView, TString *pPath);
 	BOOL GetURIItem(MemoSelectView *pView, TString *pItem);
 
@@ -167,7 +165,6 @@ public:
 	DWORD GetIcon(MemoSelectView *pView, DWORD nStatus);
 	DWORD ItemOrder();
 
-	BOOL GetFolderPath(MemoSelectView *pView, TString *pPath);
 	BOOL GetLocationPath(MemoSelectView *pView, TString *pPath);
 	BOOL GetURIItem(MemoSelectView *pView, TString *pItem);
 };
@@ -185,7 +182,6 @@ public:
 
 	BOOL IsOperationEnabled(MemoSelectView *pView, OpType op);
 
-	BOOL GetFolderPath(MemoSelectView *pView, TString *pPath);
 	BOOL GetLocationPath(MemoSelectView *pView, TString *pPath);
 
 	BOOL OpenMemo(MemoSelectView *pView, DWORD nOption);
@@ -222,7 +218,6 @@ public:
 
 	DWORD GetIcon(MemoSelectView *pView, DWORD nStatus);
 
-	BOOL GetFolderPath(MemoSelectView *pView, TString *pPath);
 	BOOL GetLocationPath(MemoSelectView *pView, TString *pPath);
 	BOOL GetURIItem(MemoSelectView *pView, TString *pItem);
 };
@@ -263,7 +258,6 @@ public:
 
 	DWORD GetIcon(MemoSelectView *pView, DWORD nStatus);
 
-	BOOL GetFolderPath(MemoSelectView *pView, TString *pPath);
 	BOOL GetLocationPath(MemoSelectView *pView, TString *pPath);
 };
 

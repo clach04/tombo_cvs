@@ -1045,14 +1045,14 @@ BOOL MemoSelectView::CreateNewFolder(HTREEITEM hItem, LPCTSTR pFolder)
 // New URI should locate same as old URI
 // URI should point to file
 
-BOOL MemoSelectView::UpdateHeadLine(LPCTSTR pOldURI, LPCTSTR pNewURI, MemoNote *pNNote)
+BOOL MemoSelectView::UpdateHeadLine(LPCTSTR pOldURI, TomboURI *pNewURI, LPCTSTR pNewHeadLine)
 {
 	// get HTREEITEM from old URI
 	HTREEITEM hOld = GetItemFromURI(pOldURI);
 	if (hOld == NULL) return TRUE; // if node is collapsed, nothing to do
 
 	// if URI is not changed, only focusing
-	if (_tcscmp(pOldURI, pNewURI) == 0) {
+	if (_tcscmp(pOldURI, pNewURI->GetFullURI()) == 0) {
 		TreeView_SelectItem(hViewWnd, hOld);
 		return TRUE;
 	}
@@ -1063,18 +1063,8 @@ BOOL MemoSelectView::UpdateHeadLine(LPCTSTR pOldURI, LPCTSTR pNewURI, MemoNote *
 	// remove current node
 	DeleteOneItem(hOld);
 
-	// get MemoNote instance
-	MemoNote *pNewNote = pNNote->Clone();
-	if (pNewNote == NULL) return FALSE;
-
-	// get new headline
-	TomboURI uri;
-	if (!uri.Init(pNewURI)) return FALSE;
-	TString sNewHeadLine;
-	if (!uri.GetHeadLine(&sNewHeadLine)) return FALSE;
-
 	// insert node
-	HTREEITEM hNew = InsertFile(hParent, &uri, sNewHeadLine.Get(), FALSE, FALSE);
+	HTREEITEM hNew = InsertFile(hParent, pNewURI, pNewHeadLine, FALSE, FALSE);
 	if (hNew == NULL) return FALSE;
 
 	TreeView_SelectItem(hViewWnd, hNew);

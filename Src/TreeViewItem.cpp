@@ -284,14 +284,6 @@ DWORD TreeViewFileItem::ItemOrder()
 	return ITEM_ORDER_FILE;
 }
 
-BOOL TreeViewFileItem::GetFolderPath(MemoSelectView *pView, TString *pPath)
-{
-	LPCTSTR pNotePath = pNote->MemoPath();
-	if (!pPath->Alloc(_tcslen(pNotePath))) return FALSE;
-	GetFilePath(pPath->Get(), pNotePath);	
-	return TRUE;
-}
-
 BOOL TreeViewFileItem::GetLocationPath(MemoSelectView *pView, TString *pPath)
 {
 	if (!pPath->Set(pNote->MemoPath())) return FALSE;
@@ -647,14 +639,9 @@ BOOL TreeViewFolderItem::IsOperationEnabled(MemoSelectView *pView, OpType op)
 	}
 }
 
-BOOL TreeViewFolderItem::GetFolderPath(MemoSelectView *pView, TString *pPath)
-{
-	return pView->GetPathForNewItem(pPath, this) != NULL;
-}
-
 BOOL TreeViewFolderItem::GetLocationPath(MemoSelectView *pView, TString *pPath)
 {
-	return GetFolderPath(pView, pPath);
+	return pView->GetPathForNewItem(pPath, this) != NULL;
 }
 
 BOOL TreeViewFolderItem::GetURIItem(MemoSelectView *pView, TString *pItem)
@@ -787,15 +774,6 @@ BOOL TreeViewFileLink::IsOperationEnabled(MemoSelectView *pView, OpType op)
 	return (nOpMatrix & op) != 0;
 }
 
-
-BOOL TreeViewFileLink::GetFolderPath(MemoSelectView *pView, TString *pPath)
-{
-	LPCTSTR pNotePath = pNote->MemoPath();
-	if (!pPath->Alloc(_tcslen(pNotePath))) return FALSE;
-	GetFilePath(pPath->Get(), pNotePath);	
-	return TRUE;
-}
-
 BOOL TreeViewFileLink::GetLocationPath(MemoSelectView *pView, TString *pPath)
 {
 	return FALSE;
@@ -923,12 +901,6 @@ BOOL TreeViewVirtualFolderRoot::IsOperationEnabled(MemoSelectView *pView, OpType
 	return (nOpMatrix & op) != 0;
 }
 
-
-BOOL TreeViewVirtualFolderRoot::GetFolderPath(MemoSelectView *pView, TString *pPath)
-{
-	return pPath->Set(TEXT(""));
-}
-
 BOOL TreeViewVirtualFolderRoot::GetLocationPath(MemoSelectView *pView, TString *pPath)
 {
 	return FALSE;
@@ -1031,11 +1003,6 @@ BOOL TreeViewVirtualFolder::IsOperationEnabled(MemoSelectView *pView, OpType op)
 {
 	DWORD nOpMatrix = OpNewMemo;
 	return (nOpMatrix & op) != 0;
-}
-
-BOOL TreeViewVirtualFolder::GetFolderPath(MemoSelectView *pView, TString *pPath)
-{
-	return pPath->Set(TEXT(""));
 }
 
 BOOL TreeViewVirtualFolder::GetLocationPath(MemoSelectView *pView, TString *pPath)

@@ -794,3 +794,11 @@ Not fully tested on both platform, probably it will work.
 * DEV: TomboURI inherits TString now.
 * DEV: MemoNote::GetURI logic moved to TombURI::InitByNotePath.
 * DEV: Some other refactorings.
+
+////////////////////////////////
+// B159
+////////////////////////////////
+
+* DEV:remove TreeViewItem::GetFolderPath
+* DEV:Refactoring about update notes.
+

@@ -129,7 +129,7 @@ public:
 	HTREEITEM InsertFile(HTREEITEM hParent, TomboURI *pURI, LPCTSTR pTitle, BOOL bInsertLast, BOOL bLink);
 
 	// update headline string
-	BOOL UpdateHeadLine(LPCTSTR pOldURI, LPCTSTR pNewURI, MemoNote *pNewNote);
+	BOOL UpdateHeadLine(LPCTSTR pOldURI, TomboURI *pNewURI, LPCTSTR pNewHeadLine);
 
 	// if bInsertLast is TRUE, Insert folder without sorting.
 	HTREEITEM InsertFolder(HTREEITEM hParent, LPCTSTR pName, TreeViewItem *tvi, BOOL bInsertLast);

@@ -19,6 +19,9 @@
 #include "Message.h"
 #include "TomboURI.h"
 
+#include "RepositoryFactory.h"
+#include "Repository.h"
+
 /////////////////////////////////////////////
 // ctor & dtor
 /////////////////////////////////////////////
@@ -57,8 +60,20 @@ MemoNote *MemoManager::AllocNewMemo(LPCTSTR pText, MemoNote *pTemplate)
 	TString sMemoPath;
 
 	// get note path
-	TreeViewItem *pItem = pMemoSelectView->GetCurrentItem();
-	if (!pItem->GetFolderPath(pMemoSelectView, &sMemoPath)) return NULL;
+	{
+		TString sURIstr;
+		if (!pMemoSelectView->GetURI(&sURIstr)) return NULL;
+		TomboURI sURI;
+		if (!sURI.Init(sURIstr.Get())) return NULL;
+
+		if (sURI.IsLeaf()) {
+			TomboURI sParent;
+			if (!sURI.GetParent(&sParent)) return FALSE;
+			if (!sParent.GetFilePath(&sMemoPath)) return FALSE;
+		} else {
+			if (!sURI.GetFilePath(&sMemoPath)) return FALSE;
+		}
+	}
 
 	HTREEITEM hParent;
 	if (_tcscmp(sMemoPath.Get(), TEXT("\0")) == 0) {
@@ -215,15 +230,20 @@ BOOL MemoManager::SaveIfModify(LPDWORD pYNC, BOOL bDupMode)
 
 	// get memo data
 	LPTSTR p = pMemoDetailsView->GetMemo();
+	SecureBufferT sbData(p);
 	if (p == NULL) {
 		return FALSE;
 	}
 
 	if (bDupMode) {
+		// if duplicate mode
+
 		MemoNote *pNote;
 		if (pMemoDetailsView->pCurrentURI == NULL) {
+			// this is new note
 			pNote = AllocNewMemo(p);
 		} else {
+			// exist note
 			MemoNote *pCurrent = MemoNote::MemoNoteFactory(pMemoDetailsView->pCurrentURI);
 			if (pCurrent == NULL) return FALSE;
 			pNote = AllocNewMemo(p, pCurrent);
@@ -252,35 +272,28 @@ BOOL MemoManager::SaveIfModify(LPDWORD pYNC, BOOL bDupMode)
 	///////////////////////////////////////
 	// save notes and update treeview
 
-	TString sHeadLine;
-	TString sOldURI;
-	TomboURI sNewURI;
-	if (!sOldURI.Set(pMemoDetailsView->pCurrentURI)) {
-		MemoNote::WipeOutAndDelete(p);
-		return FALSE;
-	}
-	MemoNote *pNote = MemoNote::MemoNoteFactory(pMemoDetailsView->pCurrentURI);
-	if (!pNote->Save(pPassMgr, p, &sHeadLine)) {
-		MemoNote::WipeOutAndDelete(p);
-		delete pNote;
-		return FALSE;
-	}
-	if (!pNote->GetURI(&sNewURI)) {
-		MemoNote::WipeOutAndDelete(p);
-		delete pNote;
-		return FALSE;
-	}
+	TomboURI sCurrentURI;
+	if (!sCurrentURI.Init(pMemoDetailsView->pCurrentURI)) return FALSE;
 
+	Repository *pRepo = g_RepositoryFactory.GetRepository(&sCurrentURI);
+
+	TomboURI sNewURI;
+	TString sNewHeadLine;
+
+	if (!pRepo->Update(&sCurrentURI, p, &sNewURI, &sNewHeadLine)) {
+		return FALSE;
+	}
 	// reset modify status
 	pMemoDetailsView->ResetModify();
-	pMainFrame->SetModifyStatus(FALSE);
+
+	// UpdateHeadLine causes TVN_SELCHANGING and call SaveIfModify.
+	// So if not ResetModify is called, infinite calling causes GPF.
 
 	// update headline string
-	pMemoSelectView->UpdateHeadLine(sOldURI.Get(), sNewURI.GetFullURI(), pNote);
-	pMemoDetailsView->SetCurrentNote(sNewURI.GetFullURI());
+	pMemoSelectView->UpdateHeadLine(pMemoDetailsView->pCurrentURI, &sNewURI, sNewHeadLine.Get());
 
-	delete pNote;
-	MemoNote::WipeOutAndDelete(p);
+	pMainFrame->SetModifyStatus(FALSE);
+	pMemoDetailsView->SetCurrentNote(sNewURI.GetFullURI());
 
 	// save caret position
 	StoreCursorPos();

@@ -43,7 +43,6 @@ BOOL VFNote::Init(MemoNote *p, LPCTSTR pFile)
 
 	// Get file update time
 	TString aFullPath;
-//	if (!aFullPath.AllocFullPath(pNote->MemoPath())) return FALSE;
 	if (!aFullPath.Join(g_Property.TopDir(), TEXT("\\"), pNote->MemoPath())) return FALSE;
 
 	WIN32_FIND_DATA wfd;
