@@ -521,12 +521,41 @@ PG: Delete not used function MemoSelectView::SelectNote.
 PG: Delete not used function MemoSelectView::GetHeadLine.
 PG: Merge TreeViewFileItem::hItem and TreeViewFolderItem::hItem to TreeViewItem::hItem
 
-■ 
+■ B069 2002/10/19
+
+PG: Move InsertFile from static to MemoSelectView::InsertFile.
+PG: Move InsertFolder from static to MemoSelectView::InsertFolder.
+PG: Move LoadNodeUnderItem from MemoSelectView to TreeViewFolderItem.
+
+* impliment virtual folder feature.
+
+PG: add VFStream.* TSParser.* as virtual folder classes.
+PG: chagne 1st argument of MemoSelectView::GeneratePath
+
+■
 
 TODO: 
 
+== VFまわり
+#vfolder.txtが読めない場合には仮想フォルダを表示しないようにする
+ストリームで暗号化メモを扱えるようにする
+メモの取得をMemoNoteのメソッドで行うようにする
+MemoNote生成部分のFactorMethod化
+Change icon at virtual node.
+Disable Cut/Copy/Paste/Disable/Encrypt/Decrypt etc. when virtual node selected.
+matchフィルタの追加
+スクリプトコンパイルエラー処理
+TSファイル指定Property I/F
+ツリーへの挿入時のソート
+
+== 全体
+#665 ツリーを閉じて編集するとアプリケーションエラー 直す
+MemoManager::SaveIfModify中のUpdateHeadlineでのメモリリーク直す
 フォルダかどうかの判定をpMemoNoteがNULLかどうかでチェックしている部分の洗い出し・修正
+メニューEnable/Disableの見直し・整理
+フォルダをRenameして編集して大丈夫かの確認
+
 MemoInfoについてMemoManager管理からMemoNote管理になるように修正する
-ツリーオープン時のノードの列挙をMemoSelectViewからTreeViewItemに移動
 OpenRequestをMemoSelectViewからTreeViewItemに移動
 MemoManager::MakeNewFolderをどーにかする
+
