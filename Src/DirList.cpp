@@ -40,7 +40,7 @@ DirList::~DirList()
 {
 }
 
-BOOL DirList::GetList(LPCTSTR pPrefix, LPCTSTR pMatchPath)
+BOOL DirList::GetList(LPCTSTR pPrefix, LPCTSTR pMatchPath, BOOL bSkipEncrypt)
 {
 	// make folder/file list
 	WIN32_FIND_DATA wfd;
@@ -73,19 +73,25 @@ BOOL DirList::GetList(LPCTSTR pPrefix, LPCTSTR pMatchPath)
 				if (!sbDirList.Add(TEXT(""), 1, &d)) return FALSE;
 			}
 
+			TomboURI sURI;
+			TString sHeadLine;
+			if (!sURI.Init(GetFileName(di.nURIPos))) return FALSE;
+
+			URIOption opt(NOTE_OPTIONMASK_ENCRYPTED);
+			g_Repository.GetOption(&sURI, &opt);
+
 			if (bAllocHeadLine) {
-				TomboURI sURI;
-				TString sHeadLine;
-				if (!sURI.Init(GetFileName(di.nURIPos))) return FALSE;
-				if (!g_Repository.GetHeadLine(&sURI, &sHeadLine)) return FALSE;
-				if (!sbDirList.Add(sHeadLine.Get(), _tcslen(sHeadLine.Get()) + 1, &(di.nHeadLinePos))) return FALSE;
+				if (!opt.bEncrypt || !bSkipEncrypt) {
+					if (!g_Repository.GetHeadLine(&sURI, &sHeadLine)) return FALSE;
+					if (!sbDirList.Add(sHeadLine.Get(), _tcslen(sHeadLine.Get()) + 1, &(di.nHeadLinePos))) return FALSE;
+				}
 			}
 	
 			// Add file name to buffer
-			if (!sbDirList.Add(wfd.cFileName, l + 1, &(di.nFileNamePos))) return FALSE;
-
-			if (!vDirList.Add(&di)) return FALSE;
-
+			if (!opt.bEncrypt || !bSkipEncrypt) {
+				if (!sbDirList.Add(wfd.cFileName, l + 1, &(di.nFileNamePos))) return FALSE;
+				if (!vDirList.Add(&di)) return FALSE;
+			}
 		} while(FindNextFile(hHandle, &wfd));
 		FindClose(hHandle);
 	}

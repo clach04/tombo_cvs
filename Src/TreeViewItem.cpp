@@ -673,7 +673,7 @@ BOOL TreeViewFolderItem::Expand(MemoSelectView *pView)
 	DirList dlDirList;
 	if (!dlDirList.Init(DIRLIST_OPT_ALLOCURI | DIRLIST_OPT_ALLOCHEADLINE,
 						sURI.GetFullURI())) return FALSE;
-	if (!dlDirList.GetList(pPrefix, pMatchPath)) return FALSE;
+	if (!dlDirList.GetList(pPrefix, pMatchPath, FALSE)) return FALSE;
 
 	// Insert to folder
 	DWORD n = dlDirList.NumItems();

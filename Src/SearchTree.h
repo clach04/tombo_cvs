@@ -46,7 +46,7 @@ public:
 
 	SearchTree() : pRegex(NULL), hSearchThread(NULL), hDlgWnd(NULL) {}
 	~SearchTree();
-	BOOL Init(SearchEngineA *p, LPCTSTR pFullPath, DWORD nInitialOffset, BOOL bDirectionForward, BOOL bSkipOne);
+	BOOL Init(SearchEngineA *p, LPCTSTR pFullPath, DWORD nInitialOffset, BOOL bDirectionForward, BOOL bSkipOne, BOOL bSkipEncrypt);
 
 	////////////////////////
 	// Dialog callback

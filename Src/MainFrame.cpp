@@ -1647,7 +1647,6 @@ void MainFrame::OnSearch()
 
 void MainFrame::DoSearchTree(BOOL bFirst, BOOL bForward)
 {
-
 	SearchEngineA *pSE = mmMemoManager.GetSearchEngine();
 
 	TomboURI sURI;
@@ -1657,7 +1656,7 @@ void MainFrame::DoSearchTree(BOOL bFirst, BOOL bForward)
 
 	// Create dialog and do search.
 	SearchTree st;
-	st.Init(pSE, sFullPath.Get(), _tcslen(g_Property.TopDir()), bForward, !bFirst);
+	st.Init(pSE, sFullPath.Get(), _tcslen(g_Property.TopDir()), bForward, !bFirst, !pSE->IsSearchEncryptMemo());
 	st.Popup(g_hInstance, hMainWnd);
 
 	switch(st.GetResult()) {

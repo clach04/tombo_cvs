@@ -41,7 +41,7 @@ public:
 	BOOL Init(DWORD nOption, LPCTSTR pURIBase);
 	~DirList();
 
-	BOOL GetList(LPCTSTR pPrefix, LPCTSTR pMatchPath);
+	BOOL GetList(LPCTSTR pPrefix, LPCTSTR pMatchPath, BOOL bSkipEncrypt);
 
 	DWORD NumItems() { return vDirList.NumItems(); }
 	DirListItem *GetItem(DWORD n) { return vDirList.GetUnit(n); }

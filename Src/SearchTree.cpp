@@ -8,6 +8,7 @@
 #include "DirList.h"
 #include "MemoNote.h"
 #include "TString.h"
+#include "TomboURI.h"
 #include "DialogTemplate.h"
 #include "Message.h"
 
@@ -17,13 +18,14 @@ static DWORD FindList(DirList *pDl, LPCTSTR pString);
 // ctor & dtor
 ////////////////////////////////
 
-BOOL SearchTree::Init(SearchEngineA *p, LPCTSTR path, DWORD offset, BOOL bDirection, BOOL skip)
+BOOL SearchTree::Init(SearchEngineA *p, LPCTSTR path, DWORD offset, BOOL bDirection, BOOL skip, BOOL skipEncrypt)
 {
 	pStartPath = path;
 	pRegex = p;
 	nBaseOffset = offset;
 	bSearchDirectionForward = bDirection;
 	bSkipOne = skip;
+	bSearchEncryptedMemo = !skipEncrypt;
 	return TRUE;
 }
 
@@ -148,11 +150,15 @@ SearchResult SearchTree::Search()
 
 SearchResult SearchTree::SearchTreeRec(LPCTSTR pNextParse, LPTSTR pBase)
 {
+	TomboURI sBaseURI;
+	if (!sBaseURI.InitByNotePath(aPath + nBaseOffset)) return SR_FAILED;
+
 	// expand directory list
 	DirList dl;
-	if (!dl.Init(DIRLIST_OPT_NONE, NULL)) return SR_FAILED;
+//	if (!dl.Init(DIRLIST_OPT_NONE, NULL)) return SR_FAILED;
+	if (!dl.Init(DIRLIST_OPT_ALLOCURI | DIRLIST_OPT_ALLOCHEADLINE, sBaseURI.GetFullURI())) return SR_FAILED;
 	_tcscpy(pBase, TEXT("*.*"));
-	if (!dl.GetList(TEXT(""), aPath)) return SR_FAILED;
+	if (!dl.GetList(TEXT(""), aPath, !bSearchEncryptedMemo)) return SR_FAILED;
 
 	// check current selecting path
 	DWORD nCurrentSelP;
