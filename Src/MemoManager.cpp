@@ -23,7 +23,7 @@
 // ctor & dtor
 /////////////////////////////////////////////
 
-MemoManager::MemoManager() : pSearchEngineA(NULL), bMSSearchFlg(FALSE), bMDSearchFlg(FALSE), pCurrentURI(NULL)
+MemoManager::MemoManager() : pSearchEngineA(NULL), bMSSearchFlg(FALSE), bMDSearchFlg(FALSE)
 {
 }
 
@@ -32,7 +32,6 @@ MemoManager::~MemoManager()
 	if(pSearchEngineA) {
 		delete pSearchEngineA;
 	}
-	delete [] pCurrentURI;
 }
 
 /////////////////////////////////////////////
@@ -44,21 +43,8 @@ BOOL MemoManager::Init(MainFrame *mf, MemoDetailsView *md, MemoSelectView *ms)
 	pMainFrame = mf;
 	pMemoDetailsView = md;
 	pMemoSelectView = ms;
-	pCurrentURI = NULL;
+	pMemoDetailsView->pCurrentURI = NULL;
 	return TRUE; 
-}
-
-////////////////////////////////////////////////////////
-// create & hold memonote
-////////////////////////////////////////////////////////
-
-void MemoManager::SetCurrentNote(LPCTSTR pURI)
-{
-	delete [] pCurrentURI;
-	pCurrentURI = NULL;
-	if (pURI) {
-		pCurrentURI = StringDup(pURI);
-	}
 }
 
 ////////////////////////////////////////////////////////
@@ -103,7 +89,11 @@ MemoNote *MemoManager::AllocNewMemo(LPCTSTR pText, MemoNote *pTemplate)
 		delete pNote;
 		return NULL;
 	}
-	HTREEITEM hNewItem = pMemoSelectView->NewMemoCreated(pNote, sHeadLine.Get(), hParent);
+
+	TomboURI sURI;
+	if (!pNote->GetURI(&sURI)) return NULL;
+
+	HTREEITEM hNewItem = pMemoSelectView->InsertFile(hParent, &sURI, sHeadLine.Get(), FALSE, FALSE);
 	return pNote;
 }
 
@@ -113,23 +103,28 @@ MemoNote *MemoManager::AllocNewMemo(LPCTSTR pText, MemoNote *pTemplate)
 
 BOOL MemoManager::GetCurrentSelectedPath(TString *pPath)
 {
-	if (pCurrentURI) {
-		MemoNote *pNote = MemoNote::MemoNoteFactory(pCurrentURI);
-		TString sMemoPath;
-		if (!sMemoPath.Set(pNote->MemoPath())) {
-			delete pNote;
-			return FALSE;
-		}
-		delete pNote;
-		if (!pPath->GetDirectoryPath(sMemoPath.Get())) return FALSE;
-		ChopFileSeparator(pPath->Get());
-		return TRUE;
+	LPCTSTR pURI;
+	TString sURIstr;
+
+	if (pMemoDetailsView->pCurrentURI) {
+		pURI = pMemoDetailsView->pCurrentURI;
+	} else {
+		if (!pMemoSelectView->GetURI(&sURIstr)) return FALSE;
+		pURI = sURIstr.Get();
 	}
 
-	TreeViewItem *pItem = pMemoSelectView->GetCurrentItem();
-	if (pItem == NULL) return FALSE;
-	if (!pItem->GetFolderPath(pMemoSelectView, pPath)) return FALSE;
+	TomboURI sURI;
+	if (!sURI.Init(pURI)) return FALSE;
+
+	if (sURI.IsLeaf()) {
+		TomboURI sParent;
+		if (!sURI.GetParent(&sParent)) return FALSE;
+		if (!sParent.GetFilePath(pPath)) return FALSE;
+	} else {
+		if (!sURI.GetFilePath(pPath)) return FALSE;
+	}
 	ChopFileSeparator(pPath->Get());
+
 	return TRUE;
 }
 
@@ -226,30 +221,31 @@ BOOL MemoManager::SaveIfModify(LPDWORD pYNC, BOOL bDupMode)
 
 	if (bDupMode) {
 		MemoNote *pNote;
-		if (pCurrentURI == NULL) {
+		if (pMemoDetailsView->pCurrentURI == NULL) {
 			pNote = AllocNewMemo(p);
 		} else {
-			MemoNote *pCurrent = MemoNote::MemoNoteFactory(pCurrentURI);
+			MemoNote *pCurrent = MemoNote::MemoNoteFactory(pMemoDetailsView->pCurrentURI);
 			if (pCurrent == NULL) return FALSE;
 			pNote = AllocNewMemo(p, pCurrent);
 			delete pCurrent;
 		}
 		if (pNote == NULL) return FALSE;
-		TString sURI;
+
+		TomboURI sURI;
 		if (!pNote->GetURI(&sURI)) return FALSE;
-		SetCurrentNote(sURI.Get());
+		pMemoDetailsView->SetCurrentNote(sURI.GetFullURI());
 	}
 
-	// 新規メモの場合、ノードの作成
-	if (pCurrentURI == NULL) {
+	// Create node if the note is new
+	if (pMemoDetailsView->pCurrentURI == NULL) {
 		MemoNote *pNote = AllocNewMemo(p);
 		if (pNote == NULL) return FALSE;
 
-		TString sURI;
+		TomboURI sURI;
 		if (!pNote->GetURI(&sURI)) return FALSE;
-		SetCurrentNote(sURI.Get());
+		pMemoDetailsView->SetCurrentNote(sURI.GetFullURI());
 
-		// この時点で新規メモではなくなるのでステータスを変える
+		// change status because the note is not new note at this point.
 		pMainFrame->SetNewMemoStatus(FALSE);
 	}
 
@@ -257,12 +253,13 @@ BOOL MemoManager::SaveIfModify(LPDWORD pYNC, BOOL bDupMode)
 	// save notes and update treeview
 
 	TString sHeadLine;
-	TString sOldURI, sNewURI;
-	if (!sOldURI.Set(pCurrentURI)) {
+	TString sOldURI;
+	TomboURI sNewURI;
+	if (!sOldURI.Set(pMemoDetailsView->pCurrentURI)) {
 		MemoNote::WipeOutAndDelete(p);
 		return FALSE;
 	}
-	MemoNote *pNote = MemoNote::MemoNoteFactory(pCurrentURI);
+	MemoNote *pNote = MemoNote::MemoNoteFactory(pMemoDetailsView->pCurrentURI);
 	if (!pNote->Save(pPassMgr, p, &sHeadLine)) {
 		MemoNote::WipeOutAndDelete(p);
 		delete pNote;
@@ -279,8 +276,8 @@ BOOL MemoManager::SaveIfModify(LPDWORD pYNC, BOOL bDupMode)
 	pMainFrame->SetModifyStatus(FALSE);
 
 	// update headline string
-	pMemoSelectView->UpdateHeadLine(sOldURI.Get(), sNewURI.Get(), pNote);
-	SetCurrentNote(sNewURI.Get());
+	pMemoSelectView->UpdateHeadLine(sOldURI.Get(), sNewURI.GetFullURI(), pNote);
+	pMemoDetailsView->SetCurrentNote(sNewURI.GetFullURI());
 
 	delete pNote;
 	MemoNote::WipeOutAndDelete(p);
@@ -334,7 +331,7 @@ BOOL MemoManager::SetMemo(TomboURI *pURI)
 	}
 	pMemoDetailsView->SetMemo(p, nPos, bReadOnly);
 	MemoNote::WipeOutAndDelete(p);
-	SetCurrentNote(pURI->GetFull());
+	pMemoDetailsView->SetCurrentNote(pURI->GetFullURI());
 
 	delete pNote;
 	return TRUE;
@@ -357,12 +354,9 @@ BOOL MemoManager::NewMemo()
 ////////////////////////////////////////////////////////
 // メモのクリア
 ////////////////////////////////////////////////////////
-
 BOOL MemoManager::ClearMemo()
 {
-	pMemoDetailsView->SetMemo(TEXT(""), 0, FALSE);
-	SetCurrentNote(NULL);
-	return TRUE;
+	return pMemoDetailsView->ClearMemo();
 }
 
 ////////////////////////////////////////////////////////
@@ -377,8 +371,8 @@ BOOL MemoManager::StoreCursorPos()
 		DWORD nInitPos = pMemoDetailsView->GetInitialPos();
 
 		MemoInfo mi;
-		if (pCurrentURI && nPos != nInitPos) {
-			MemoNote *pNote = MemoNote::MemoNoteFactory(pCurrentURI);
+		if (pMemoDetailsView->pCurrentURI && nPos != nInitPos) {
+			MemoNote *pNote = MemoNote::MemoNoteFactory(pMemoDetailsView->pCurrentURI);
 			if (pNote == NULL) return FALSE;
 			mi.WriteInfo(pNote->MemoPath(), nPos);
 			delete pNote;
@@ -434,6 +428,6 @@ BOOL MemoManager::SearchDetailsView(BOOL bFirstSearch, BOOL bForward, BOOL bNFMs
 
 BOOL MemoManager::IsNoteDisplayed(LPCTSTR pURI)
 {
-	if (pCurrentURI == NULL) return FALSE;
-	return _tcsicmp(pURI, pCurrentURI) == 0;
+	if (pMemoDetailsView->pCurrentURI == NULL) return FALSE;
+	return _tcsicmp(pURI, pMemoDetailsView->pCurrentURI) == 0;
 }

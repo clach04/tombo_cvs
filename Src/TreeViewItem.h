@@ -14,6 +14,7 @@ class TreeViewVirtualFolder;
 class TString;
 class VFManager;
 class VFInfo;
+class TomboURI;
 
 #include "MemoManager.h"
 #include "VarBuffer.h"
@@ -83,6 +84,9 @@ public:
 	virtual DWORD GetIcon(MemoSelectView *pView, DWORD nStatus) = 0;
 
 	// Get path information
+
+	// if the URI is tombo://default/aaa/bbb/ccc/ddd.txt ,
+	// result of the GetFolderPath is \aaa\bbb\ccc\ 
 	virtual BOOL GetFolderPath(MemoSelectView *pView, TString *pPath) = 0;
 	virtual BOOL GetLocationPath(MemoSelectView *pView, TString *pPath) = 0;
 	virtual BOOL GetURIItem(MemoSelectView *pView, TString *pItem) = 0;

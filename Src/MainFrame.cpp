@@ -28,6 +28,8 @@
 #include "PsPCPlatform.h"
 #include "HPCPlatform.h"
 #include "LagendaPlatform.h"
+#include "RepositoryFactory.h"
+
 #if defined(PLATFORM_PKTPC)
 #include "DialogTemplate.h"
 #include "DetailsViewDlg.h"
@@ -507,6 +509,10 @@ void MainFrame::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 			return;
 		}
 	}
+
+	// Initialize RepositoryFactory
+	g_RepositoryFactory.Init(&g_Property);
+
 	// create toolbar
 	pPlatform->Create(hWnd, pcs->hInstance);
 
@@ -1155,16 +1161,16 @@ void MainFrame::LeaveDetailsView(BOOL bAskSave)
 		// clear encrypted notes if two pane mode
 		if (nYNC == IDNO) {
 			// discard current note and load old one.
-			if (mmMemoManager.GetCurrentURI()) {
-				OpenDetailsView(mmMemoManager.GetCurrentURI(), OPEN_REQUEST_MDVIEW_ACTIVE);
+			if (pDetailsView->GetCurrentURI()) {
+				OpenDetailsView(pDetailsView->GetCurrentURI(), OPEN_REQUEST_MDVIEW_ACTIVE);
 			} else {
 				mmMemoManager.NewMemo();
 			}
 		} else {
 			// nYNC == YES so note has been saved.
-			if (mmMemoManager.GetCurrentURI()) {
+			if (pDetailsView->GetCurrentURI()) {
 				TomboURI uri;
-				if (!uri.Init(mmMemoManager.GetCurrentURI())) return;
+				if (!uri.Init(pDetailsView->GetCurrentURI())) return;
 				if (uri.IsEncrypted()) {
 					mmMemoManager.NewMemo();
 				}
@@ -1422,9 +1428,9 @@ void MainFrame::OnTimer(WPARAM nTimerID)
 {
 	if (nTimerID == 0) {
 		if (!SelectViewActive()) {
-			if (mmMemoManager.GetCurrentURI()) {
+			if (pDetailsView->GetCurrentURI()) {
 				TomboURI uri;
-				if (!uri.Init(mmMemoManager.GetCurrentURI())) return;
+				if (!uri.Init(pDetailsView->GetCurrentURI())) return;
 				if (uri.IsEncrypted()) {
 					LeaveDetailsView(FALSE);
 				}

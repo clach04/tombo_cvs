@@ -6,6 +6,7 @@
 #include "MemoSelectView.h"
 #include "MemoNote.h"
 #include "TString.h"
+#include "TomboURI.h"
 #include "UniConv.h"
 #include "Property.h"
 #include "MemoManager.h"
@@ -120,7 +121,11 @@ BOOL TreeViewFileItem::Copy(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR *p
 
 	MemoNote *pNewNote = MemoNote::CopyMemo(pNote, sPath.Get(), &sHeadLine);
 	if (pNewNote == NULL) return FALSE;
-	pView->NewMemoCreated(pNewNote, sHeadLine.Get(), hParent);
+
+	TomboURI sURI;
+	pNewNote->GetURI(&sURI);
+
+	pView->InsertFile(hParent, &sURI, sHeadLine.Get(), FALSE, FALSE);
 	return TRUE;
 }
 
@@ -725,7 +730,9 @@ BOOL TreeViewFolderItem::Expand(MemoSelectView *pView)
 			pView->InsertFolder(hParent, q, pItem, TRUE);
 		} else {
 			// note
-			if (!pView->InsertFile(hParent, p->pNote, q, TRUE, FALSE)) return FALSE;
+			TomboURI sURI;
+			if (!p->pNote->GetURI(&sURI)) return FALSE;
+			if (!pView->InsertFile(hParent, &sURI, q, TRUE, FALSE)) return FALSE;
 		}
 	}
 	return TRUE;
@@ -796,17 +803,17 @@ BOOL TreeViewFileLink::GetLocationPath(MemoSelectView *pView, TString *pPath)
 
 BOOL TreeViewFileLink::OpenMemo(MemoSelectView *pView, DWORD nOption)
 {
-	TString sURI;
+	TomboURI sURI;
 	pNote->GetURI(&sURI);
-	pView->GetManager()->GetMainFrame()->OpenDetailsView(sURI.Get(), nOption);
+	pView->GetManager()->GetMainFrame()->OpenDetailsView(sURI.GetFullURI(), nOption);
 	return TRUE;
 }
 
 BOOL TreeViewFileLink::LoadMemo(MemoSelectView *pView, BOOL bAskPass)
 {
-	TString sURI;
+	TomboURI sURI;
 	pNote->GetURI(&sURI);
-	pView->GetManager()->GetMainFrame()->LoadMemo(sURI.Get(), bAskPass);
+	pView->GetManager()->GetMainFrame()->LoadMemo(sURI.GetFullURI(), bAskPass);
 	return TRUE;
 }
 
@@ -1011,7 +1018,10 @@ BOOL TreeViewVirtualFolder::Expand(MemoSelectView *pView)
 		MemoNote *p = pNote->GetNote();
 		pNote->ClearNote(); // to prevent deleting p
 		LPCTSTR pTitle = pNote->GetFileName();
-		pView->InsertFile(hItem, p, pTitle, TRUE, TRUE);
+
+		TomboURI sURI;
+		if (!p->GetURI(&sURI)) return FALSE;
+		pView->InsertFile(hItem, &sURI, pTitle, TRUE, TRUE);
 	}
 	pStore->FreeArray();
 	return TRUE;

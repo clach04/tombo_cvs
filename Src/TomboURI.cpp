@@ -11,6 +11,10 @@ static LPCTSTR pURIPrefix = TEXT("tombo://");
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 
+/////////////////////////////////////////////
+// initialize
+/////////////////////////////////////////////
+
 BOOL TomboURI::Init(LPCTSTR pURI)
 {
 	// check header string
@@ -43,8 +47,45 @@ BOOL TomboURI::Init(LPCTSTR pURI)
 		return FALSE;
 	}
 
-	return sURI.Set(pURI);
+	return Set(pURI);
 }
+
+/////////////////////////////////////////////
+// Yet another initializer
+/////////////////////////////////////////////
+// This function is obsoleted and will be removed in the future.
+
+BOOL TomboURI::InitByNotePath(LPCTSTR pNotePath)
+{
+	LPCTSTR pPrefix = TEXT("tombo://default/");
+	if (!Alloc(_tcslen(pPrefix) + _tcslen(pNotePath) + 1)) return FALSE;
+
+	_tcscpy(Get(), pPrefix);
+	LPTSTR p = Get() + _tcslen(pPrefix);
+	LPCTSTR q = pNotePath;
+	if (*q == TEXT('\\')) q++;
+
+	while(*q) {
+		if (*q == TEXT('\\')) {
+			*p++ = TEXT('/');
+			q++;
+			continue;
+		}
+#if defined(PLATFORM_WIN32)
+		if (IsDBCSLeadByte(*q)) {
+			*p++ = *q++;
+		}
+#endif
+		*p++ = *q++;
+	}
+	*p = TEXT('\0');
+
+	return TRUE;
+}
+
+/////////////////////////////////////////////
+// skip to next separator
+/////////////////////////////////////////////
 
 LPCTSTR TomboURI::GetNextSep(LPCTSTR pPartPath)
 {
@@ -56,9 +97,13 @@ LPCTSTR TomboURI::GetNextSep(LPCTSTR pPartPath)
 	return NULL;
 }
 
+/////////////////////////////////////////////
+// get repository name
+/////////////////////////////////////////////
+
 BOOL TomboURI::GetRepository(TString *pRepo)
 {
-	LPCTSTR p = sURI.Get() + 8;
+	LPCTSTR p = Get() + 8;
 	LPCTSTR q = GetNextSep(p);
 
 	if (!pRepo->Alloc(q - p + 1)) return FALSE;
@@ -98,18 +143,80 @@ BOOL TomboURI::GetHeadLine(TString *pHeadLine)
 
 LPCTSTR TomboURI::GetPath()
 {
-	LPCTSTR p = sURI.Get() + _tcslen(pURIPrefix);
+	LPCTSTR p = Get() + _tcslen(pURIPrefix);
 
 	// skip repository part
 	p = _tcschr(p, TEXT('/'));
 	return p;
 }
 
+/////////////////////////////////////////////
+// Is the URI encrypted?
+/////////////////////////////////////////////
+
 BOOL TomboURI::IsEncrypted()
 {
-	DWORD n = _tcslen(sURI.Get());
-	if (n > 4 && _tcscmp(sURI.Get() + n - 4, TEXT(".chi")) == 0) return TRUE;
+	DWORD n = _tcslen(Get());
+	if (n > 4 && _tcscmp(Get() + n - 4, TEXT(".chi")) == 0) return TRUE;
 	else return FALSE;		
+}
+
+/////////////////////////////////////////////
+// Is the URI point to leaf node?
+/////////////////////////////////////////////
+
+BOOL TomboURI::IsLeaf()
+{
+	if (_tcslen(GetPath() + 1) == 0) return FALSE; // root
+	LPCTSTR p = Get();
+	return *(p + _tcslen(p) - 1) != TEXT('/');
+}
+
+/////////////////////////////////////////////
+// get parent path
+/////////////////////////////////////////////
+
+BOOL TomboURI::GetParent(TomboURI *pParent)
+{
+	LPCTSTR p = GetPath();
+	LPCTSTR pBase = p;
+
+	if (*p) p++;
+
+	LPCTSTR q = NULL;
+	while (*p) {
+		if (*p == TEXT('/')) {
+			q = p;
+		}
+		p = CharNext(p);
+	}
+	if (q == NULL) {
+		// result is root node.
+		q = pBase + 1;
+	}
+	if (!pParent->Alloc(q - Get() + 1)) return FALSE;
+	_tcsncpy(pParent->Get(), Get(), q - Get());
+	*(pParent->Get() + (q - Get())) = TEXT('\0');
+	return TRUE;
+}
+
+/////////////////////////////////////////////
+// get parent path
+/////////////////////////////////////////////
+
+BOOL TomboURI::GetFilePath(TString *pPath)
+{
+	LPCTSTR p = GetPath();
+	if (*p) *p++;
+
+	if (!pPath->Alloc(_tcslen(p) + 1)) return FALSE;
+	_tcscpy(pPath->Get(), p);
+
+	LPTSTR q = pPath->Get();
+	while(q = _tcschr(q, TEXT('/'))) {
+		*q = TEXT('\\');
+	}
+	return TRUE;
 }
 
 /////////////////////////////////////////////
@@ -131,9 +238,9 @@ BOOL TomboURIItemIterator::Init()
 void TomboURIItemIterator::First()
 {
 	// seek head of path
-	LPCTSTR p = TomboURI::GetNextSep(pURI->GetFull() + 8);
+	LPCTSTR p = TomboURI::GetNextSep(pURI->GetFullURI() + 8);
 	p++;
-	nPos = p - pURI->GetFull();
+	nPos = p - pURI->GetFullURI();
 
 	Next();
 }
@@ -146,7 +253,7 @@ LPCTSTR TomboURIItemIterator::Current()
 
 void TomboURIItemIterator::Next()
 {
-	LPCTSTR p = pURI->GetFull() + nPos;
+	LPCTSTR p = pURI->GetFullURI() + nPos;
 
 	LPTSTR q = pBuf;
 	while (*p && *p != TEXT('/')) {
@@ -160,11 +267,11 @@ void TomboURIItemIterator::Next()
 	*q = TEXT('\0');
 	if (*p == TEXT('/')) p++;
 
-	nPos = p - pURI->GetFull();
+	nPos = p - pURI->GetFullURI();
 }
 
 BOOL TomboURIItemIterator::IsLeaf()
 {
-	LPCTSTR p = pURI->GetFull() + nPos;
+	LPCTSTR p = pURI->GetFullURI() + nPos;
 	return (*p == TEXT('\0')) && (*(p-1) != TEXT('/'));
 }

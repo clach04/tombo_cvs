@@ -785,3 +785,12 @@ Not fully tested on both platform, probably it will work.
 ////////////////////////////////
 
 * Save properties when exit.
+
+////////////////////////////////
+// B158
+////////////////////////////////
+
+* DEV: Change MemoSelectView::InsertFile for removing MemoNote.
+* DEV: TomboURI inherits TString now.
+* DEV: MemoNote::GetURI logic moved to TombURI::InitByNotePath.
+* DEV: Some other refactorings.

@@ -31,6 +31,8 @@ class MemoDetailsView {
 protected:
 	MemoDetailsViewCallback *pCallback;
 public:
+	LPTSTR pCurrentURI;
+
 	MemoDetailsView(MemoDetailsViewCallback *p);
 	virtual ~MemoDetailsView();
 
@@ -65,6 +67,11 @@ public:
 	virtual void SelectAll() = 0;
 
 	virtual BOOL Search(BOOL bFirstSearch, BOOL bForward, BOOL bNFMsg, BOOL bSearchFromTop) = 0;
+
+	LPCTSTR GetCurrentURI();
+	void SetCurrentNote(LPCTSTR pURI);
+
+	BOOL ClearMemo();
 };
 
 //////////////////////////////////////////

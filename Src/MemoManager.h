@@ -23,19 +23,12 @@ protected:
 	MainFrame *pMainFrame;
 	PasswordManager *pPassMgr;
 
-	// Current edit-view displaying item info
-	LPTSTR pCurrentURI;
-
 	MemoNote *AllocNewMemo(LPCTSTR pText, MemoNote *pTemplate = NULL);
 
 	SearchEngineA *pSearchEngineA;
 
 	BOOL bMSSearchFlg;
 	BOOL bMDSearchFlg;
-
-	/////////////////////////////////////
-	// maintain pCurrentNote;
-	void SetCurrentNote(LPCTSTR pURI);
 
 public:
 	/////////////////////////////////////
@@ -99,7 +92,6 @@ public:
 	// data accessor
 
 	PasswordManager *GetPasswordManager() { return pPassMgr; }
-	LPCTSTR GetCurrentURI() { return pCurrentURI; }
 
 	MainFrame *GetMainFrame() { return pMainFrame; }
 

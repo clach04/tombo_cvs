@@ -5,29 +5,53 @@
 // Notes path information
 /////////////////////////////////////////////
 
-class TomboURI {
-	TString sURI;
+class TomboURI : TString {
 	int nMaxPathItem;
 
 	friend class TomboURITest;
 public:
 	///////////////////////////////
 	// ctor, dtor and initializer
-	TomboURI() {}
-	~TomboURI() { }
+	TomboURI() : TString() {}
+	~TomboURI() {}
+
 	BOOL Init(LPCTSTR pURI);
+	BOOL InitByNotePath(LPCTSTR pNotePath);
 
 	///////////////////////////////
 	// accessor
+
 	BOOL GetRepository(TString *pRepo);
 	BOOL GetHeadLine(TString *pHeadLine);
 
-	LPCTSTR GetFull() { return sURI.Get(); }
+	// get full path of URI.
+	LPCTSTR GetFullURI() { return Get(); }
+
+	// get path part of URI.
+	// ex. tombo://default/aa/bb/cc.txt -> /aa/bb/cc.txt
 	LPCTSTR GetPath();
+
+	// get parent path of URI.
+	// ex. tombo://default/aa/bb/cc.txt -> tombo://default/aa/bb/cc/
+	//     tombo://default/aa/bb/cc/    -> tombo://default/aa/bb/
+	// return empty if the URI is repository root.
+	//     tombo://default/ -> ""
+	BOOL GetParent(TomboURI *pParent);
 
 	DWORD GetMaxPathItem() { return nMaxPathItem; }
 
+	// Is the URI point to crypted file?
+	// Checking does only to URI string. Not confirm to repository.
 	BOOL IsEncrypted();
+
+	// Is the URI point to leaf node?
+	// Checking does only to URI string. Not confirm to repository.
+	BOOL IsLeaf();
+
+	// Get path string
+	// This method will be obsoleted in future version.
+	// ex. tombo://default/aaa/bbb/ccc.txt -> aaa\bbb\ccc.txt
+	BOOL GetFilePath(TString *pPath);
 
 	///////////////////////////////
 	// helper functions

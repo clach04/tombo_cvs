@@ -9,6 +9,7 @@ class MemoLocator;
 class TreeViewVirtualFolderRoot;
 class VFManager;
 class VFInfo;
+class TomboURI;
 
 class MemoSelectView {
 
@@ -125,11 +126,10 @@ public:
 
 	HIMAGELIST GetImageList() { return hSelectViewImgList; }
 
-	// 新規メモ生成時処理
-	HTREEITEM NewMemoCreated(MemoNote *pNote, LPCTSTR pHeadLine, HTREEITEM hItem);
+	HTREEITEM InsertFile(HTREEITEM hParent, TomboURI *pURI, LPCTSTR pTitle, BOOL bInsertLast, BOOL bLink);
 
-	BOOL InsertFile(HTREEITEM hParent, LPCTSTR pPrefix, LPCTSTR pFile);
-	HTREEITEM InsertFile(HTREEITEM hParent, MemoNote *pNote, LPCTSTR pTitle, BOOL bInsertLast, BOOL bLink);
+	// update headline string
+	BOOL UpdateHeadLine(LPCTSTR pOldURI, LPCTSTR pNewURI, MemoNote *pNewNote);
 
 	// if bInsertLast is TRUE, Insert folder without sorting.
 	HTREEITEM InsertFolder(HTREEITEM hParent, LPCTSTR pName, TreeViewItem *tvi, BOOL bInsertLast);
@@ -144,10 +144,9 @@ public:
 	HTREEITEM GetParentItem(HTREEITEM hItem) { return TreeView_GetParent(hViewWnd, hItem); }
 
 	BOOL CreateNewFolder(HTREEITEM hItem, LPCTSTR pFolder);
-	BOOL GetHeadLine(MemoNote *pNote, LPTSTR pHeadLine, DWORD nLen);
 
-	// update headline string
-	BOOL UpdateHeadLine(LPCTSTR pOldURI, LPCTSTR pNewURI, MemoNote *pNewNote);
+
+	// Search tree and get HTREEITEM
 	HTREEITEM GetItemFromURI(LPCTSTR pURI);
 
 	// 現在選択されているアイテムと関連付けられているTreeViewItemを返す。

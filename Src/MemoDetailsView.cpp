@@ -40,13 +40,35 @@ LPCTSTR pWeekE[7] = {
 // 
 ///////////////////////////////////////////
 
-MemoDetailsView::MemoDetailsView(MemoDetailsViewCallback *p) : pCallback(p)
+MemoDetailsView::MemoDetailsView(MemoDetailsViewCallback *p) : pCallback(p), pCurrentURI(NULL)
 {
 }
 
 MemoDetailsView::~MemoDetailsView()
 {
 	delete pCallback;
+	delete [] pCurrentURI;
+}
+
+LPCTSTR MemoDetailsView::GetCurrentURI()
+{
+	return pCurrentURI;
+}
+
+void MemoDetailsView::SetCurrentNote(LPCTSTR pURI)
+{
+	delete [] pCurrentURI;
+	pCurrentURI = NULL;
+	if (pURI) {
+		pCurrentURI = StringDup(pURI);
+	}
+}
+
+BOOL MemoDetailsView::ClearMemo()
+{
+	SetMemo(TEXT(""), 0, FALSE);
+	SetCurrentNote(NULL);
+	return TRUE;
 }
 
 ///////////////////////////////////////////
@@ -684,11 +706,6 @@ BOOL SimpleEditor::Search(BOOL bFirstSearch, BOOL bForward, BOOL bNFMsg, BOOL bS
 		nStart2 = CountMBStrings(p, nStart);
 		nEnd2 = nStart2 + CountMBStrings(p + nStart, nEnd - nStart);
 
-		// for debug code
-//		TCHAR buf[1024];
-//		wsprintf(buf, TEXT("%d - %d => %d - %d"), nStart, nEnd, nStart2, nEnd2);
-//		MessageBox(NULL, buf, TEXT("DEBUG"), MB_OK);
-
 		nStart = nStart2;
 		nEnd = nEnd2;
 #endif
@@ -732,7 +749,6 @@ void SimpleEditor::InsertDate1()
 	TString sDate;
 
 	TString sPathStr;
-//	pMemoMgr->GetCurrentSelectedPath(&sPathStr);
 	pCallback->GetCurrentSelectedPath(this, &sPathStr);
 
 	if (!GetDateText(&sDate, g_Property.DateFormat1(), &sPathStr)) {
@@ -747,7 +763,6 @@ void SimpleEditor::InsertDate2()
 	TString sDate;
 
 	TString sPathStr;
-//	pMemoMgr->GetCurrentSelectedPath(&sPathStr);
 	pCallback->GetCurrentSelectedPath(this, &sPathStr);
 
 	if (!GetDateText(&sDate, g_Property.DateFormat2(), &sPathStr)) {

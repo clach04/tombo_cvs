@@ -6,6 +6,8 @@
 #endif
 
 #include "Tombo.h"
+#include "TString.h"
+#include "TomboURI.h"
 #include "MemoSelectView.h"
 #include "resource.h"
 
@@ -15,8 +17,6 @@
 #include "MainFrame.h"
 #include "MemoNote.h"
 #include "Property.h"
-#include "TString.h"
-#include "TomboURI.h"
 #include "TreeViewItem.h"
 #include "Message.h"
 
@@ -143,22 +143,9 @@ static HTREEITEM InsertNode(HWND hTree, TV_INSERTSTRUCT *ti)
 /////////////////////////////////////////
 // Insert file node
 /////////////////////////////////////////
-
-BOOL MemoSelectView::InsertFile(HTREEITEM hParent, LPCTSTR pPrefix, LPCTSTR pFile)
-{
-	MemoNote *pNote;
-	if (!MemoNote::MemoNoteFactory(pPrefix, pFile, &pNote)) return NULL;
-	if (pNote == NULL) return TRUE;
-
-	TCHAR disp[MAX_PATH];
-	DWORD len = _tcslen(pFile);
-	_tcscpy(disp, pFile);
-	*(disp + len - 4) = TEXT('\0');
-
-	return InsertFile(hParent, pNote, disp, FALSE, FALSE) != NULL;
-}
-
-HTREEITEM MemoSelectView::InsertFile(HTREEITEM hParent, MemoNote *pNote, LPCTSTR pTitle, BOOL bInsertToLast, BOOL bLink)
+#ifdef COMMENT
+HTREEITEM MemoSelectView::InsertFile(HTREEITEM hParent, MemoNote *pNote, 
+									 LPCTSTR pTitle, BOOL bInsertToLast, BOOL bLink)
 {
 	TV_INSERTSTRUCT ti;
 	ti.hParent = hParent;
@@ -166,19 +153,20 @@ HTREEITEM MemoSelectView::InsertFile(HTREEITEM hParent, MemoNote *pNote, LPCTSTR
 	ti.item.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE | TVIF_PARAM;
 	ti.item.iImage = ti.item.iSelectedImage = pNote->GetMemoIcon();
 
-	TreeViewFileItem *ptvi;
+	TreeViewFileItem *tvi;
 	if (bLink) {
-		ptvi = new TreeViewFileLink();
+		tvi = new TreeViewFileLink();
 	} else {
-		ptvi = new TreeViewFileItem();
+		tvi = new TreeViewFileItem();
 	}
 
-	if (!ptvi) {
+	if (!tvi) {
 		delete pNote;
 		return NULL;
 	}
-	ptvi->SetNote(pNote);
-	ti.item.lParam = (LPARAM)ptvi;
+
+	tvi->SetNote(pNote);
+	ti.item.lParam = (LPARAM)tvi;
 
 	ti.item.pszText = (LPTSTR)pTitle;
 	HTREEITEM hItem;
@@ -187,7 +175,45 @@ HTREEITEM MemoSelectView::InsertFile(HTREEITEM hParent, MemoNote *pNote, LPCTSTR
 	} else {
 		hItem = InsertNode(hViewWnd, &ti);
 	}
-	ptvi->SetViewItem(hItem);
+	tvi->SetViewItem(hItem);
+	return hItem;
+}
+#endif
+
+HTREEITEM MemoSelectView::InsertFile(HTREEITEM hParent, TomboURI *pURI, 
+								LPCTSTR pTitle, BOOL bInsertToLast, BOOL bLink)
+{
+	MemoNote *pNote = MemoNote::MemoNoteFactory(pURI);
+
+	TV_INSERTSTRUCT ti;
+	ti.hParent = hParent;
+	ti.hInsertAfter = TVI_LAST;
+	ti.item.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE | TVIF_PARAM;
+	ti.item.iImage = ti.item.iSelectedImage = pNote->GetMemoIcon();
+
+	TreeViewFileItem *tvi;
+	if (bLink) {
+		tvi = new TreeViewFileLink();
+	} else {
+		tvi = new TreeViewFileItem();
+	}
+
+	if (!tvi) {
+		delete pNote;
+		return NULL;
+	}
+
+	tvi->SetNote(pNote);
+	ti.item.lParam = (LPARAM)tvi;
+
+	ti.item.pszText = (LPTSTR)pTitle;
+	HTREEITEM hItem;
+	if (bInsertToLast) {
+		hItem = TreeView_InsertItem(hViewWnd, &ti);
+	} else {
+		hItem = InsertNode(hViewWnd, &ti);
+	}
+	tvi->SetViewItem(hItem);
 	return hItem;
 }
 
@@ -896,30 +922,6 @@ void MemoSelectView::TreeCollapse(HTREEITEM hItem)
 	TreeView_Expand(hViewWnd, hItem, TVE_COLLAPSE | TVE_COLLAPSERESET);
 }
 
-///////////////////////////////////////////////////////
-// create new note
-///////////////////////////////////////////////////////
-// insert new leaf
-
-HTREEITEM MemoSelectView::NewMemoCreated(MemoNote *pNote, LPCTSTR pHeadLine, HTREEITEM hParent)
-{
-	TV_INSERTSTRUCT ti;
-	ti.hParent = hParent ? hParent : TVI_ROOT;
-	ti.hInsertAfter = TVI_LAST;
-	ti.item.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE | TVIF_PARAM;
-	
-	ti.item.pszText = (LPTSTR)pHeadLine;
-	ti.item.iImage = ti.item.iSelectedImage = pNote->GetMemoIcon();
-
-	TreeViewFileItem *tvi = new TreeViewFileItem();
-	if (tvi == NULL) return FALSE;
-	tvi->SetNote(pNote);
-	ti.item.lParam = (LPARAM)tvi;
-
-	HTREEITEM hItem = ::InsertNode(hViewWnd, &ti);
-	tvi->SetViewItem(hItem);
-	return hItem;
-}
 
 ///////////////////////////////////////////
 // move window or resize window
@@ -1039,7 +1041,7 @@ BOOL MemoSelectView::CreateNewFolder(HTREEITEM hItem, LPCTSTR pFolder)
 /////////////////////////////////////////
 // Change headline string
 /////////////////////////////////////////
-// It needs re-ordering, delete once and re-insert again.
+// For re-ordering, delete once and re-insert again.
 // New URI should locate same as old URI
 // URI should point to file
 
@@ -1072,7 +1074,7 @@ BOOL MemoSelectView::UpdateHeadLine(LPCTSTR pOldURI, LPCTSTR pNewURI, MemoNote *
 	if (!uri.GetHeadLine(&sNewHeadLine)) return FALSE;
 
 	// insert node
-	HTREEITEM hNew = InsertFile(hParent, pNewNote, sNewHeadLine.Get(), FALSE, FALSE);
+	HTREEITEM hNew = InsertFile(hParent, &uri, sNewHeadLine.Get(), FALSE, FALSE);
 	if (hNew == NULL) return FALSE;
 
 	TreeView_SelectItem(hViewWnd, hNew);

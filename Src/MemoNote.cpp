@@ -185,34 +185,10 @@ BOOL MemoNote::InitNewMemo(LPCTSTR pMemoPath, LPCTSTR pText, TString *pHeadLine)
 // get note's URI
 /////////////////////////////////////////////
 
-BOOL MemoNote::GetURI(TString *pURI)
+BOOL MemoNote::GetURI(TomboURI *pURI)
 {
-	LPCTSTR pPrefix = TEXT("tombo://default/");
-	if (!pURI->Alloc(_tcslen(pPrefix) + _tcslen(pPath) + 1)) return FALSE;
-
-	_tcscpy(pURI->Get(), pPrefix);
-	LPTSTR p = pURI->Get() + _tcslen(pPrefix);
-	LPCTSTR q = pPath;
-	if (*q == TEXT('\\')) q++;
-
-	while(*q) {
-		if (*q == TEXT('\\')) {
-			*p++ = TEXT('/');
-			q++;
-			continue;
-		}
-#if defined(PLATFORM_WIN32)
-		if (IsDBCSLeadByte(*q)) {
-			*p++ = *q++;
-		}
-#endif
-		*p++ = *q++;
-	}
-	*p = TEXT('\0');
-
-	return TRUE;
+	return pURI->InitByNotePath(pPath);
 }
-
 
 /////////////////////////////////////////////
 // ƒƒ‚“à—e‚ÌŽæ“¾(PlainMemoNote)
@@ -851,7 +827,6 @@ MemoNote *MemoNote::CopyMemo(MemoNote *pOrig, LPCTSTR pMemoPath, TString *pHeadL
 	}
 
 	TString sOrigPath;
-//	if (!sOrigPath.AllocFullPath(pOrig->MemoPath())) {
 	if (!sOrigPath.Join(g_Property.TopDir(), TEXT("\\"), pOrig->MemoPath())) {
 		delete pNote;
 		return NULL;

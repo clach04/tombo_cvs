@@ -236,6 +236,14 @@ SOURCE=..\..\Src\regex\regex.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\Src\Repository.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\RepositoryFactory.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\Src\SearchDlg.cpp
 # End Source File
 # Begin Source File
@@ -445,6 +453,14 @@ SOURCE=..\..\Src\TomboLib\PropertyPage.h
 # Begin Source File
 
 SOURCE=..\..\Src\regex\regex.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\Repository.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\RepositoryFactory.h
 # End Source File
 # Begin Source File
 
