@@ -44,7 +44,7 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /YX /FD /c
-# ADD CPP /nologo /W3 /GX /O2 /I "./res" /I "../../expat/include/" /I "../../Src/regex" /I "." /D "NDEBUG" /D "TOMBO" /D "PLATFORM_WIN32" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /YX /FD /c
+# ADD CPP /nologo /W3 /GX /O2 /I "../../Src" /I "../../Src/regex" /I "./res" /I "../../expat/include/" /I "../../Src/TomboLib" /I "." /D "NDEBUG" /D "TOMBO" /D "PLATFORM_WIN32" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /YX /FD /c
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x411 /d "NDEBUG"
@@ -70,7 +70,7 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /YX /FD /GZ /c
-# ADD CPP /nologo /W3 /Gm /GX /ZI /Od /I "./res" /I "../../lib/" /I "../../Src/regex" /I "../../expat/include/" /I "." /D "_DEBUG" /D "TOMBO" /D "PLATFORM_WIN32" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /YX /FD /GZ /c
+# ADD CPP /nologo /W3 /Gm /GX /ZI /Od /I "../../lib/" /I "../../Src" /I "../../Src/regex" /I "./res" /I "../../expat/include/" /I "../../Src/TomboLib" /I "." /D "_DEBUG" /D "TOMBO" /D "PLATFORM_WIN32" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /YX /FD /GZ /c
 # ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x411 /d "_DEBUG"
@@ -97,7 +97,7 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /I "../../Src/regex" /I "./res" /I "." /D "NDEBUG" /D "TOMBO" /D "PLATFORM_WIN32" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /YX /FD /c
-# ADD CPP /nologo /W3 /GX /O2 /I "./resE" /I "../../Src/regex" /I "./res" /I "../../expat/include/" /I "." /D "NDEBUG" /D "TOMBO" /D "PLATFORM_WIN32" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /D "TOMBO_LANG_ENGLISH" /YX /FD /c
+# ADD CPP /nologo /W3 /GX /O2 /I "./resE" /I "../../Src" /I "../../Src/regex" /I "./res" /I "../../expat/include/" /I "../../Src/TomboLib" /I "." /D "NDEBUG" /D "TOMBO" /D "PLATFORM_WIN32" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /D "TOMBO_LANG_ENGLISH" /YX /FD /c
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x411 /d "NDEBUG"
@@ -153,11 +153,11 @@ SOURCE=..\..\Src\DirList.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\Src\File.cpp
+SOURCE=..\..\Src\TomboLib\File.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\Src\FileInputStream.cpp
+SOURCE=..\..\Src\TomboLib\FileInputStream.cpp
 # End Source File
 # Begin Source File
 
@@ -181,11 +181,11 @@ SOURCE=..\..\Src\GrepDialog.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\Src\List.cpp
+SOURCE=..\..\Src\TomboLib\List.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\Src\Logger.cpp
+SOURCE=..\..\Src\TomboLib\Logger.cpp
 # End Source File
 # Begin Source File
 
@@ -265,7 +265,7 @@ SOURCE=..\..\Src\SelectViewWndProc.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\Src\SipControl.cpp
+SOURCE=..\..\Src\TomboLib\SipControl.cpp
 # End Source File
 # Begin Source File
 
@@ -309,11 +309,11 @@ SOURCE=..\..\Src\TSParser.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\Src\TString.cpp
+SOURCE=..\..\Src\TomboLib\TString.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\Src\Uniconv.cpp
+SOURCE=..\..\Src\TomboLib\Uniconv.cpp
 # End Source File
 # Begin Source File
 
@@ -321,7 +321,7 @@ SOURCE=..\..\Src\regex\util.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\Src\VarBuffer.cpp
+SOURCE=..\..\Src\TomboLib\VarBuffer.cpp
 # End Source File
 # Begin Source File
 
@@ -373,11 +373,11 @@ SOURCE=..\..\expat\include\expat.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\Src\File.h
+SOURCE=..\..\Src\TomboLib\File.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\Src\FileInputStream.h
+SOURCE=..\..\Src\TomboLib\FileInputStream.h
 # End Source File
 # Begin Source File
 
@@ -401,11 +401,11 @@ SOURCE=..\..\Src\GrepDialog.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\Src\List.h
+SOURCE=..\..\Src\TomboLib\List.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\Src\Logger.h
+SOURCE=..\..\Src\TomboLib\Logger.h
 # End Source File
 # Begin Source File
 
@@ -507,7 +507,7 @@ SOURCE=..\..\Src\SearchTree.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\Src\SipControl.h
+SOURCE=..\..\Src\TomboLib\SipControl.h
 # End Source File
 # Begin Source File
 
@@ -523,15 +523,15 @@ SOURCE=..\..\Src\TSParser.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\Src\TString.h
+SOURCE=..\..\Src\TomboLib\TString.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\Src\Uniconv.h
+SOURCE=..\..\Src\TomboLib\Uniconv.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\Src\VarBuffer.h
+SOURCE=..\..\Src\TomboLib\VarBuffer.h
 # End Source File
 # Begin Source File
 

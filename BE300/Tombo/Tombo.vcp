@@ -58,7 +58,7 @@ RSC=rc.exe
 # ADD RSC /l 0x409 /d UNDER_CE=$(CEVersion) /d _WIN32_WCE=$(CEVersion) /d "UNICODE" /d "_UNICODE" /d "NDEBUG" /d "$(CePlatform)" /d "MIPS" /d "_MIPS_" /r
 CPP=clmips.exe
 # ADD BASE CPP /nologo /W3 /D _WIN32_WCE=$(CEVersion) /D "$(CePlatform)" /D "MIPS" /D "_MIPS_" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_UNICODE" /D "NDEBUG" /YX /Oxs /M$(CECrtMT) /c
-# ADD CPP /nologo /W3 /I "./res" /I "." /I "../../expat/include" /D "MIPS" /D "_MIPS_" /D "NDEBUG" /D "TOMBO" /D UNDER_CE=$(CEVersion) /D _WIN32_WCE=$(CEVersion) /D "$(CePlatform)" /D "UNICODE" /D "_UNICODE" /D "PLATFORM_BE500" /D "TOMBO_LANG_ENGLISH" /YX /Oxs /M$(CECrtMT) /c
+# ADD CPP /nologo /W3 /I "../../Src" /I "../expat/include" /I "./res" /I "." /I "../../Src/regex" /I "../../expat/include" /I "../../Src/TomboLib" /D "MIPS" /D "_MIPS_" /D "NDEBUG" /D "TOMBO" /D UNDER_CE=$(CEVersion) /D _WIN32_WCE=$(CEVersion) /D "$(CePlatform)" /D "UNICODE" /D "_UNICODE" /D "PLATFORM_BE500" /D "TOMBO_LANG_ENGLISH" /YX /Oxs /M$(CECrtMT) /c
 MTL=midl.exe
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /o "NUL" /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /o "NUL" /win32
@@ -323,18 +323,20 @@ SOURCE=..\..\Src\AboutDialog.cpp
 
 DEP_CPP_ABOUT=\
 	"..\..\Src\AboutDialog.h"\
-	"..\..\Src\File.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboLib\File.h"\
+	"..\..\Src\TomboLib\Logger.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
 
 DEP_CPP_ABOUT=\
 	"..\..\Src\AboutDialog.h"\
+	"..\..\Src\Tombo.h"\
+	
+NODEP_CPP_ABOUT=\
 	"..\..\Src\File.h"\
 	"..\..\Src\Logger.h"\
-	"..\..\Src\Tombo.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Release"
@@ -355,11 +357,11 @@ DEP_CPP_ABOUT=\
 
 DEP_CPP_ABOUT=\
 	"..\..\Src\AboutDialog.h"\
-	"..\..\Src\File.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\Tombo.h"\
 	
 NODEP_CPP_ABOUT=\
+	"..\..\Src\File.h"\
+	"..\..\Src\Logger.h"\
 	".\ipapi.h"\
 	".\ygshell.h"\
 	
@@ -406,6 +408,10 @@ SOURCE=..\..\Src\gnupg\blowfish.c
 
 !IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
 
+DEP_CPP_BLOWF=\
+	"..\..\Src\regex\config.h"\
+	"..\..\Src\regex\ctypeutil.h"\
+	
 NODEP_CPP_BLOWF=\
 	"..\..\Src\gnupg\blowfish.h"\
 	"..\..\Src\gnupg\dynload.h"\
@@ -458,6 +464,69 @@ NODEP_CPP_BLOWF=\
 NODEP_CPP_BLOWF=\
 	"..\..\Src\gnupg\blowfish.h"\
 	"..\..\Src\gnupg\dynload.h"\
+	
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\TomboLib\Clipboard.cpp
+
+!IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
+
+DEP_CPP_CLIPB=\
+	"..\..\Src\TomboLib\Clipboard.h"\
+	"..\..\Src\TomboLib\Uniconv.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
+
+DEP_CPP_CLIPB=\
+	"..\..\Src\TomboLib\Clipboard.h"\
+	"..\..\Src\TomboLib\Uniconv.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Release"
+
+DEP_CPP_CLIPB=\
+	"..\..\Src\TomboLib\Clipboard.h"\
+	"..\..\Src\TomboLib\Uniconv.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Debug"
+
+DEP_CPP_CLIPB=\
+	"..\..\Src\TomboLib\Clipboard.h"\
+	"..\..\Src\TomboLib\Uniconv.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Release"
+
+DEP_CPP_CLIPB=\
+	"..\..\Src\TomboLib\Clipboard.h"\
+	"..\..\Src\TomboLib\Uniconv.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Debug"
+
+DEP_CPP_CLIPB=\
+	"..\..\Src\TomboLib\Clipboard.h"\
+	"..\..\Src\TomboLib\Uniconv.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Release"
+
+DEP_CPP_CLIPB=\
+	"..\..\Src\TomboLib\Clipboard.h"\
+	"..\..\Src\TomboLib\Uniconv.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Debug"
+
+DEP_CPP_CLIPB=\
+	"..\..\Src\TomboLib\Clipboard.h"\
+	"..\..\Src\TomboLib\Uniconv.h"\
 	
 
 !ENDIF 
@@ -527,7 +596,7 @@ SOURCE=..\..\Src\CryptManager.cpp
 DEP_CPP_CRYPTM=\
 	"..\..\Src\Crypt.h"\
 	"..\..\Src\CryptManager.h"\
-	"..\..\Src\File.h"\
+	"..\..\Src\TomboLib\File.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
@@ -535,6 +604,8 @@ DEP_CPP_CRYPTM=\
 DEP_CPP_CRYPTM=\
 	"..\..\Src\Crypt.h"\
 	"..\..\Src\CryptManager.h"\
+	
+NODEP_CPP_CRYPTM=\
 	"..\..\Src\File.h"\
 	
 
@@ -543,6 +614,8 @@ DEP_CPP_CRYPTM=\
 DEP_CPP_CRYPTM=\
 	"..\..\Src\Crypt.h"\
 	"..\..\Src\CryptManager.h"\
+	
+NODEP_CPP_CRYPTM=\
 	"..\..\Src\File.h"\
 	
 
@@ -551,6 +624,8 @@ DEP_CPP_CRYPTM=\
 DEP_CPP_CRYPTM=\
 	"..\..\Src\Crypt.h"\
 	"..\..\Src\CryptManager.h"\
+	
+NODEP_CPP_CRYPTM=\
 	"..\..\Src\File.h"\
 	
 
@@ -559,6 +634,8 @@ DEP_CPP_CRYPTM=\
 DEP_CPP_CRYPTM=\
 	"..\..\Src\Crypt.h"\
 	"..\..\Src\CryptManager.h"\
+	
+NODEP_CPP_CRYPTM=\
 	"..\..\Src\File.h"\
 	
 
@@ -567,6 +644,8 @@ DEP_CPP_CRYPTM=\
 DEP_CPP_CRYPTM=\
 	"..\..\Src\Crypt.h"\
 	"..\..\Src\CryptManager.h"\
+	
+NODEP_CPP_CRYPTM=\
 	"..\..\Src\File.h"\
 	
 
@@ -575,6 +654,8 @@ DEP_CPP_CRYPTM=\
 DEP_CPP_CRYPTM=\
 	"..\..\Src\Crypt.h"\
 	"..\..\Src\CryptManager.h"\
+	
+NODEP_CPP_CRYPTM=\
 	"..\..\Src\File.h"\
 	
 
@@ -583,6 +664,8 @@ DEP_CPP_CRYPTM=\
 DEP_CPP_CRYPTM=\
 	"..\..\Src\Crypt.h"\
 	"..\..\Src\CryptManager.h"\
+	
+NODEP_CPP_CRYPTM=\
 	"..\..\Src\File.h"\
 	
 
@@ -719,13 +802,15 @@ SOURCE=..\..\Src\DirectoryScanner.cpp
 
 DEP_CPP_DIREC=\
 	"..\..\Src\DirectoryScanner.h"\
-	"..\..\Src\Uniconv.h"\
+	"..\..\Src\TomboLib\Uniconv.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
 
 DEP_CPP_DIREC=\
 	"..\..\Src\DirectoryScanner.h"\
+	
+NODEP_CPP_DIREC=\
 	"..\..\Src\Uniconv.h"\
 	
 
@@ -733,6 +818,8 @@ DEP_CPP_DIREC=\
 
 DEP_CPP_DIREC=\
 	"..\..\Src\DirectoryScanner.h"\
+	
+NODEP_CPP_DIREC=\
 	"..\..\Src\Uniconv.h"\
 	
 
@@ -740,6 +827,8 @@ DEP_CPP_DIREC=\
 
 DEP_CPP_DIREC=\
 	"..\..\Src\DirectoryScanner.h"\
+	
+NODEP_CPP_DIREC=\
 	"..\..\Src\Uniconv.h"\
 	
 
@@ -747,6 +836,8 @@ DEP_CPP_DIREC=\
 
 DEP_CPP_DIREC=\
 	"..\..\Src\DirectoryScanner.h"\
+	
+NODEP_CPP_DIREC=\
 	"..\..\Src\Uniconv.h"\
 	
 
@@ -754,6 +845,8 @@ DEP_CPP_DIREC=\
 
 DEP_CPP_DIREC=\
 	"..\..\Src\DirectoryScanner.h"\
+	
+NODEP_CPP_DIREC=\
 	"..\..\Src\Uniconv.h"\
 	
 
@@ -761,6 +854,8 @@ DEP_CPP_DIREC=\
 
 DEP_CPP_DIREC=\
 	"..\..\Src\DirectoryScanner.h"\
+	
+NODEP_CPP_DIREC=\
 	"..\..\Src\Uniconv.h"\
 	
 
@@ -768,6 +863,8 @@ DEP_CPP_DIREC=\
 
 DEP_CPP_DIREC=\
 	"..\..\Src\DirectoryScanner.h"\
+	
+NODEP_CPP_DIREC=\
 	"..\..\Src\Uniconv.h"\
 	
 
@@ -784,8 +881,8 @@ DEP_CPP_DIRLI=\
 	"..\..\Src\DirList.h"\
 	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoNote.h"\
+	"..\..\Src\TomboLib\VarBuffer.h"\
 	"..\..\Src\TreeViewItem.h"\
-	"..\..\Src\VarBuffer.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
@@ -795,6 +892,8 @@ DEP_CPP_DIRLI=\
 	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoNote.h"\
 	"..\..\Src\TreeViewItem.h"\
+	
+NODEP_CPP_DIRLI=\
 	"..\..\Src\VarBuffer.h"\
 	
 
@@ -805,6 +904,8 @@ DEP_CPP_DIRLI=\
 	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoNote.h"\
 	"..\..\Src\TreeViewItem.h"\
+	
+NODEP_CPP_DIRLI=\
 	"..\..\Src\VarBuffer.h"\
 	
 
@@ -815,6 +916,8 @@ DEP_CPP_DIRLI=\
 	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoNote.h"\
 	"..\..\Src\TreeViewItem.h"\
+	
+NODEP_CPP_DIRLI=\
 	"..\..\Src\VarBuffer.h"\
 	
 
@@ -825,6 +928,8 @@ DEP_CPP_DIRLI=\
 	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoNote.h"\
 	"..\..\Src\TreeViewItem.h"\
+	
+NODEP_CPP_DIRLI=\
 	"..\..\Src\VarBuffer.h"\
 	
 
@@ -835,6 +940,8 @@ DEP_CPP_DIRLI=\
 	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoNote.h"\
 	"..\..\Src\TreeViewItem.h"\
+	
+NODEP_CPP_DIRLI=\
 	"..\..\Src\VarBuffer.h"\
 	
 
@@ -845,6 +952,8 @@ DEP_CPP_DIRLI=\
 	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoNote.h"\
 	"..\..\Src\TreeViewItem.h"\
+	
+NODEP_CPP_DIRLI=\
 	"..\..\Src\VarBuffer.h"\
 	
 
@@ -855,6 +964,8 @@ DEP_CPP_DIRLI=\
 	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoNote.h"\
 	"..\..\Src\TreeViewItem.h"\
+	
+NODEP_CPP_DIRLI=\
 	"..\..\Src\VarBuffer.h"\
 	
 
@@ -863,54 +974,109 @@ DEP_CPP_DIRLI=\
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\Src\File.cpp
+SOURCE=..\..\Src\TomboLib\File.cpp
 
 !IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
 
 DEP_CPP_FILE_=\
-	"..\..\Src\File.h"\
+	"..\..\Src\TomboLib\File.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
 
 DEP_CPP_FILE_=\
-	"..\..\Src\File.h"\
+	"..\..\Src\TomboLib\File.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Release"
 
 DEP_CPP_FILE_=\
-	"..\..\Src\File.h"\
+	"..\..\Src\TomboLib\File.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Debug"
 
 DEP_CPP_FILE_=\
-	"..\..\Src\File.h"\
+	"..\..\Src\TomboLib\File.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Release"
 
 DEP_CPP_FILE_=\
-	"..\..\Src\File.h"\
+	"..\..\Src\TomboLib\File.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Debug"
 
 DEP_CPP_FILE_=\
-	"..\..\Src\File.h"\
+	"..\..\Src\TomboLib\File.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Release"
 
 DEP_CPP_FILE_=\
-	"..\..\Src\File.h"\
+	"..\..\Src\TomboLib\File.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Debug"
 
 DEP_CPP_FILE_=\
-	"..\..\Src\File.h"\
+	"..\..\Src\TomboLib\File.h"\
+	
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\TomboLib\FileInputStream.cpp
+
+!IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
+
+DEP_CPP_FILEI=\
+	"..\..\Src\TomboLib\FileInputStream.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
+
+DEP_CPP_FILEI=\
+	"..\..\Src\TomboLib\FileInputStream.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Release"
+
+DEP_CPP_FILEI=\
+	"..\..\Src\TomboLib\FileInputStream.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Debug"
+
+DEP_CPP_FILEI=\
+	"..\..\Src\TomboLib\FileInputStream.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Release"
+
+DEP_CPP_FILEI=\
+	"..\..\Src\TomboLib\FileInputStream.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Debug"
+
+DEP_CPP_FILEI=\
+	"..\..\Src\TomboLib\FileInputStream.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Release"
+
+DEP_CPP_FILEI=\
+	"..\..\Src\TomboLib\FileInputStream.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Debug"
+
+DEP_CPP_FILEI=\
+	"..\..\Src\TomboLib\FileInputStream.h"\
 	
 
 !ENDIF 
@@ -979,14 +1145,14 @@ SOURCE=..\..\Src\FilterAddDlg.cpp
 
 DEP_CPP_FILTE=\
 	"..\..\Src\DialogTemplate.h"\
-	"..\..\Src\File.h"\
 	"..\..\Src\FilterAddDlg.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\Message.h"\
 	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
-	"..\..\Src\TString.h"\
-	"..\..\Src\VarBuffer.h"\
+	"..\..\Src\TomboLib\File.h"\
+	"..\..\Src\TomboLib\Logger.h"\
+	"..\..\Src\TomboLib\TString.h"\
+	"..\..\Src\TomboLib\VarBuffer.h"\
 	"..\..\Src\VFStream.h"\
 	
 
@@ -994,123 +1160,125 @@ DEP_CPP_FILTE=\
 
 DEP_CPP_FILTE=\
 	"..\..\Src\DialogTemplate.h"\
-	"..\..\Src\File.h"\
 	"..\..\Src\FilterAddDlg.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\Message.h"\
 	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
+	"..\..\Src\VFStream.h"\
+	
+NODEP_CPP_FILTE=\
+	"..\..\Src\File.h"\
+	"..\..\Src\Logger.h"\
 	"..\..\Src\TString.h"\
 	"..\..\Src\VarBuffer.h"\
-	"..\..\Src\VFStream.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Release"
 
 DEP_CPP_FILTE=\
 	"..\..\Src\DialogTemplate.h"\
-	"..\..\Src\File.h"\
 	"..\..\Src\FilterAddDlg.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\Message.h"\
 	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
-	"..\..\Src\TString.h"\
-	"..\..\Src\VarBuffer.h"\
 	"..\..\Src\VFStream.h"\
 	
 NODEP_CPP_FILTE=\
+	"..\..\Src\File.h"\
+	"..\..\Src\Logger.h"\
 	"..\..\Src\resource.h"\
+	"..\..\Src\TString.h"\
+	"..\..\Src\VarBuffer.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Debug"
 
 DEP_CPP_FILTE=\
 	"..\..\Src\DialogTemplate.h"\
-	"..\..\Src\File.h"\
 	"..\..\Src\FilterAddDlg.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\Message.h"\
 	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
-	"..\..\Src\TString.h"\
-	"..\..\Src\VarBuffer.h"\
 	"..\..\Src\VFStream.h"\
 	
 NODEP_CPP_FILTE=\
+	"..\..\Src\File.h"\
+	"..\..\Src\Logger.h"\
 	"..\..\Src\resource.h"\
+	"..\..\Src\TString.h"\
+	"..\..\Src\VarBuffer.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Release"
 
 DEP_CPP_FILTE=\
 	"..\..\Src\DialogTemplate.h"\
-	"..\..\Src\File.h"\
 	"..\..\Src\FilterAddDlg.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\Message.h"\
 	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
-	"..\..\Src\TString.h"\
-	"..\..\Src\VarBuffer.h"\
 	"..\..\Src\VFStream.h"\
 	
 NODEP_CPP_FILTE=\
+	"..\..\Src\File.h"\
+	"..\..\Src\Logger.h"\
 	"..\..\Src\resource.h"\
+	"..\..\Src\TString.h"\
+	"..\..\Src\VarBuffer.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Debug"
 
 DEP_CPP_FILTE=\
 	"..\..\Src\DialogTemplate.h"\
-	"..\..\Src\File.h"\
 	"..\..\Src\FilterAddDlg.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\Message.h"\
 	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
-	"..\..\Src\TString.h"\
-	"..\..\Src\VarBuffer.h"\
 	"..\..\Src\VFStream.h"\
 	
 NODEP_CPP_FILTE=\
+	"..\..\Src\File.h"\
+	"..\..\Src\Logger.h"\
 	"..\..\Src\resource.h"\
+	"..\..\Src\TString.h"\
+	"..\..\Src\VarBuffer.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Release"
 
 DEP_CPP_FILTE=\
 	"..\..\Src\DialogTemplate.h"\
-	"..\..\Src\File.h"\
 	"..\..\Src\FilterAddDlg.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\Message.h"\
 	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
-	"..\..\Src\TString.h"\
-	"..\..\Src\VarBuffer.h"\
 	"..\..\Src\VFStream.h"\
 	
 NODEP_CPP_FILTE=\
+	"..\..\Src\File.h"\
+	"..\..\Src\Logger.h"\
 	"..\..\Src\resource.h"\
+	"..\..\Src\TString.h"\
+	"..\..\Src\VarBuffer.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Debug"
 
 DEP_CPP_FILTE=\
 	"..\..\Src\DialogTemplate.h"\
-	"..\..\Src\File.h"\
 	"..\..\Src\FilterAddDlg.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\Message.h"\
 	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
-	"..\..\Src\TString.h"\
-	"..\..\Src\VarBuffer.h"\
 	"..\..\Src\VFStream.h"\
 	
 NODEP_CPP_FILTE=\
+	"..\..\Src\File.h"\
+	"..\..\Src\Logger.h"\
 	"..\..\Src\resource.h"\
+	"..\..\Src\TString.h"\
+	"..\..\Src\VarBuffer.h"\
 	
 
 !ENDIF 
@@ -1123,18 +1291,18 @@ SOURCE=..\..\Src\FilterCtlDlg.cpp
 !IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
 
 DEP_CPP_FILTER=\
-	"..\..\Src\File.h"\
 	"..\..\Src\FilterCtlDlg.h"\
 	"..\..\Src\FilterDefDlg.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoSelectView.h"\
 	"..\..\Src\Message.h"\
 	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboLib\File.h"\
+	"..\..\Src\TomboLib\Logger.h"\
+	"..\..\Src\TomboLib\TString.h"\
+	"..\..\Src\TomboLib\Uniconv.h"\
+	"..\..\Src\TomboLib\VarBuffer.h"\
 	"..\..\Src\TreeViewItem.h"\
-	"..\..\Src\TString.h"\
-	"..\..\Src\Uniconv.h"\
-	"..\..\Src\VarBuffer.h"\
 	"..\..\Src\VFManager.h"\
 	"..\..\Src\VFStream.h"\
 	
@@ -1147,6 +1315,8 @@ DEP_CPP_FILTER=\
 	"..\..\Src\MemoSelectView.h"\
 	"..\..\Src\Message.h"\
 	"..\..\Src\TreeViewItem.h"\
+	
+NODEP_CPP_FILTER=\
 	"..\..\Src\TString.h"\
 	"..\..\Src\VarBuffer.h"\
 	
@@ -1159,11 +1329,11 @@ DEP_CPP_FILTER=\
 	"..\..\Src\MemoSelectView.h"\
 	"..\..\Src\Message.h"\
 	"..\..\Src\TreeViewItem.h"\
-	"..\..\Src\TString.h"\
-	"..\..\Src\VarBuffer.h"\
 	
 NODEP_CPP_FILTER=\
 	"..\..\Src\resource.h"\
+	"..\..\Src\TString.h"\
+	"..\..\Src\VarBuffer.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Debug"
@@ -1174,11 +1344,11 @@ DEP_CPP_FILTER=\
 	"..\..\Src\MemoSelectView.h"\
 	"..\..\Src\Message.h"\
 	"..\..\Src\TreeViewItem.h"\
-	"..\..\Src\TString.h"\
-	"..\..\Src\VarBuffer.h"\
 	
 NODEP_CPP_FILTER=\
 	"..\..\Src\resource.h"\
+	"..\..\Src\TString.h"\
+	"..\..\Src\VarBuffer.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Release"
@@ -1189,11 +1359,11 @@ DEP_CPP_FILTER=\
 	"..\..\Src\MemoSelectView.h"\
 	"..\..\Src\Message.h"\
 	"..\..\Src\TreeViewItem.h"\
-	"..\..\Src\TString.h"\
-	"..\..\Src\VarBuffer.h"\
 	
 NODEP_CPP_FILTER=\
 	"..\..\Src\resource.h"\
+	"..\..\Src\TString.h"\
+	"..\..\Src\VarBuffer.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Debug"
@@ -1204,11 +1374,11 @@ DEP_CPP_FILTER=\
 	"..\..\Src\MemoSelectView.h"\
 	"..\..\Src\Message.h"\
 	"..\..\Src\TreeViewItem.h"\
-	"..\..\Src\TString.h"\
-	"..\..\Src\VarBuffer.h"\
 	
 NODEP_CPP_FILTER=\
 	"..\..\Src\resource.h"\
+	"..\..\Src\TString.h"\
+	"..\..\Src\VarBuffer.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Release"
@@ -1219,11 +1389,11 @@ DEP_CPP_FILTER=\
 	"..\..\Src\MemoSelectView.h"\
 	"..\..\Src\Message.h"\
 	"..\..\Src\TreeViewItem.h"\
-	"..\..\Src\TString.h"\
-	"..\..\Src\VarBuffer.h"\
 	
 NODEP_CPP_FILTER=\
 	"..\..\Src\resource.h"\
+	"..\..\Src\TString.h"\
+	"..\..\Src\VarBuffer.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Debug"
@@ -1234,11 +1404,11 @@ DEP_CPP_FILTER=\
 	"..\..\Src\MemoSelectView.h"\
 	"..\..\Src\Message.h"\
 	"..\..\Src\TreeViewItem.h"\
-	"..\..\Src\TString.h"\
-	"..\..\Src\VarBuffer.h"\
 	
 NODEP_CPP_FILTER=\
 	"..\..\Src\resource.h"\
+	"..\..\Src\TString.h"\
+	"..\..\Src\VarBuffer.h"\
 	
 
 !ENDIF 
@@ -1252,15 +1422,15 @@ SOURCE=..\..\Src\FilterDefDlg.cpp
 
 DEP_CPP_FILTERD=\
 	"..\..\Src\DialogTemplate.h"\
-	"..\..\Src\File.h"\
 	"..\..\Src\FilterAddDlg.h"\
 	"..\..\Src\FilterDefDlg.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\Message.h"\
 	"..\..\Src\PropertyPage.h"\
 	"..\..\Src\Tombo.h"\
-	"..\..\Src\TString.h"\
-	"..\..\Src\VarBuffer.h"\
+	"..\..\Src\TomboLib\File.h"\
+	"..\..\Src\TomboLib\Logger.h"\
+	"..\..\Src\TomboLib\TString.h"\
+	"..\..\Src\TomboLib\VarBuffer.h"\
 	"..\..\Src\VFManager.h"\
 	"..\..\Src\VFStream.h"\
 	
@@ -1269,137 +1439,139 @@ DEP_CPP_FILTERD=\
 
 DEP_CPP_FILTERD=\
 	"..\..\Src\DialogTemplate.h"\
-	"..\..\Src\File.h"\
 	"..\..\Src\FilterAddDlg.h"\
 	"..\..\Src\FilterDefDlg.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\Message.h"\
 	"..\..\Src\PropertyPage.h"\
 	"..\..\Src\Tombo.h"\
-	"..\..\Src\TString.h"\
-	"..\..\Src\VarBuffer.h"\
 	"..\..\Src\VFManager.h"\
 	"..\..\Src\VFStream.h"\
+	
+NODEP_CPP_FILTERD=\
+	"..\..\Src\File.h"\
+	"..\..\Src\Logger.h"\
+	"..\..\Src\TString.h"\
+	"..\..\Src\VarBuffer.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Release"
 
 DEP_CPP_FILTERD=\
 	"..\..\Src\DialogTemplate.h"\
-	"..\..\Src\File.h"\
 	"..\..\Src\FilterAddDlg.h"\
 	"..\..\Src\FilterDefDlg.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\Message.h"\
 	"..\..\Src\PropertyPage.h"\
 	"..\..\Src\Tombo.h"\
-	"..\..\Src\TString.h"\
-	"..\..\Src\VarBuffer.h"\
 	"..\..\Src\VFManager.h"\
 	"..\..\Src\VFStream.h"\
 	
 NODEP_CPP_FILTERD=\
+	"..\..\Src\File.h"\
+	"..\..\Src\Logger.h"\
 	"..\..\Src\resource.h"\
+	"..\..\Src\TString.h"\
+	"..\..\Src\VarBuffer.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Debug"
 
 DEP_CPP_FILTERD=\
 	"..\..\Src\DialogTemplate.h"\
-	"..\..\Src\File.h"\
 	"..\..\Src\FilterAddDlg.h"\
 	"..\..\Src\FilterDefDlg.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\Message.h"\
 	"..\..\Src\PropertyPage.h"\
 	"..\..\Src\Tombo.h"\
-	"..\..\Src\TString.h"\
-	"..\..\Src\VarBuffer.h"\
 	"..\..\Src\VFManager.h"\
 	"..\..\Src\VFStream.h"\
 	
 NODEP_CPP_FILTERD=\
+	"..\..\Src\File.h"\
+	"..\..\Src\Logger.h"\
 	"..\..\Src\resource.h"\
+	"..\..\Src\TString.h"\
+	"..\..\Src\VarBuffer.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Release"
 
 DEP_CPP_FILTERD=\
 	"..\..\Src\DialogTemplate.h"\
-	"..\..\Src\File.h"\
 	"..\..\Src\FilterAddDlg.h"\
 	"..\..\Src\FilterDefDlg.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\Message.h"\
 	"..\..\Src\PropertyPage.h"\
 	"..\..\Src\Tombo.h"\
-	"..\..\Src\TString.h"\
-	"..\..\Src\VarBuffer.h"\
 	"..\..\Src\VFManager.h"\
 	"..\..\Src\VFStream.h"\
 	
 NODEP_CPP_FILTERD=\
+	"..\..\Src\File.h"\
+	"..\..\Src\Logger.h"\
 	"..\..\Src\resource.h"\
+	"..\..\Src\TString.h"\
+	"..\..\Src\VarBuffer.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Debug"
 
 DEP_CPP_FILTERD=\
 	"..\..\Src\DialogTemplate.h"\
-	"..\..\Src\File.h"\
 	"..\..\Src\FilterAddDlg.h"\
 	"..\..\Src\FilterDefDlg.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\Message.h"\
 	"..\..\Src\PropertyPage.h"\
 	"..\..\Src\Tombo.h"\
-	"..\..\Src\TString.h"\
-	"..\..\Src\VarBuffer.h"\
 	"..\..\Src\VFManager.h"\
 	"..\..\Src\VFStream.h"\
 	
 NODEP_CPP_FILTERD=\
+	"..\..\Src\File.h"\
+	"..\..\Src\Logger.h"\
 	"..\..\Src\resource.h"\
+	"..\..\Src\TString.h"\
+	"..\..\Src\VarBuffer.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Release"
 
 DEP_CPP_FILTERD=\
 	"..\..\Src\DialogTemplate.h"\
-	"..\..\Src\File.h"\
 	"..\..\Src\FilterAddDlg.h"\
 	"..\..\Src\FilterDefDlg.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\Message.h"\
 	"..\..\Src\PropertyPage.h"\
 	"..\..\Src\Tombo.h"\
-	"..\..\Src\TString.h"\
-	"..\..\Src\VarBuffer.h"\
 	"..\..\Src\VFManager.h"\
 	"..\..\Src\VFStream.h"\
 	
 NODEP_CPP_FILTERD=\
+	"..\..\Src\File.h"\
+	"..\..\Src\Logger.h"\
 	"..\..\Src\resource.h"\
+	"..\..\Src\TString.h"\
+	"..\..\Src\VarBuffer.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Debug"
 
 DEP_CPP_FILTERD=\
 	"..\..\Src\DialogTemplate.h"\
-	"..\..\Src\File.h"\
 	"..\..\Src\FilterAddDlg.h"\
 	"..\..\Src\FilterDefDlg.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\Message.h"\
 	"..\..\Src\PropertyPage.h"\
 	"..\..\Src\Tombo.h"\
-	"..\..\Src\TString.h"\
-	"..\..\Src\VarBuffer.h"\
 	"..\..\Src\VFManager.h"\
 	"..\..\Src\VFStream.h"\
 	
 NODEP_CPP_FILTERD=\
+	"..\..\Src\File.h"\
+	"..\..\Src\Logger.h"\
 	"..\..\Src\resource.h"\
+	"..\..\Src\TString.h"\
+	"..\..\Src\VarBuffer.h"\
 	
 
 !ENDIF 
@@ -1412,14 +1584,14 @@ SOURCE=..\..\Src\GrepDialog.cpp
 !IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
 
 DEP_CPP_GREPD=\
-	"..\..\Src\File.h"\
 	"..\..\Src\GrepDialog.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\Message.h"\
 	"..\..\Src\Property.h"\
 	"..\..\Src\PropertyPage.h"\
 	"..\..\Src\Tombo.h"\
-	"..\..\Src\TString.h"\
+	"..\..\Src\TomboLib\File.h"\
+	"..\..\Src\TomboLib\Logger.h"\
+	"..\..\Src\TomboLib\TString.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
@@ -1508,78 +1680,115 @@ NODEP_CPP_GREPD=\
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\Src\Logger.cpp
+SOURCE=..\..\Src\TomboLib\List.cpp
+
+!IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Release"
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Debug"
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Release"
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Debug"
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Release"
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Debug"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\TomboLib\Logger.cpp
 
 !IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
 
 DEP_CPP_LOGGE=\
-	"..\..\Src\File.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\Tombo.h"\
-	"..\..\Src\Uniconv.h"\
+	"..\..\Src\TomboLib\File.h"\
+	"..\..\Src\TomboLib\Logger.h"\
+	"..\..\Src\TomboLib\Uniconv.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
 
 DEP_CPP_LOGGE=\
-	"..\..\Src\File.h"\
-	"..\..\Src\Logger.h"\
-	"..\..\Src\Tombo.h"\
-	"..\..\Src\Uniconv.h"\
+	"..\..\Src\TomboLib\File.h"\
+	"..\..\Src\TomboLib\Logger.h"\
+	"..\..\Src\TomboLib\Uniconv.h"\
+	
+NODEP_CPP_LOGGE=\
+	"..\..\Src\TomboLib\Tombo.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Release"
 
 DEP_CPP_LOGGE=\
-	"..\..\Src\File.h"\
-	"..\..\Src\Logger.h"\
-	"..\..\Src\Tombo.h"\
-	"..\..\Src\Uniconv.h"\
+	"..\..\Src\TomboLib\File.h"\
+	"..\..\Src\TomboLib\Logger.h"\
+	"..\..\Src\TomboLib\Uniconv.h"\
+	
+NODEP_CPP_LOGGE=\
+	"..\..\Src\TomboLib\Tombo.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Debug"
 
 DEP_CPP_LOGGE=\
-	"..\..\Src\File.h"\
-	"..\..\Src\Logger.h"\
-	"..\..\Src\Tombo.h"\
-	"..\..\Src\Uniconv.h"\
+	"..\..\Src\TomboLib\File.h"\
+	"..\..\Src\TomboLib\Logger.h"\
+	"..\..\Src\TomboLib\Uniconv.h"\
+	
+NODEP_CPP_LOGGE=\
+	"..\..\Src\TomboLib\Tombo.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Release"
 
 DEP_CPP_LOGGE=\
-	"..\..\Src\File.h"\
-	"..\..\Src\Logger.h"\
-	"..\..\Src\Tombo.h"\
-	"..\..\Src\Uniconv.h"\
+	"..\..\Src\TomboLib\File.h"\
+	"..\..\Src\TomboLib\Logger.h"\
+	"..\..\Src\TomboLib\Uniconv.h"\
+	
+NODEP_CPP_LOGGE=\
+	"..\..\Src\TomboLib\Tombo.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Debug"
 
 DEP_CPP_LOGGE=\
-	"..\..\Src\File.h"\
-	"..\..\Src\Logger.h"\
-	"..\..\Src\Tombo.h"\
-	"..\..\Src\Uniconv.h"\
+	"..\..\Src\TomboLib\File.h"\
+	"..\..\Src\TomboLib\Logger.h"\
+	"..\..\Src\TomboLib\Uniconv.h"\
+	
+NODEP_CPP_LOGGE=\
+	"..\..\Src\TomboLib\Tombo.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Release"
 
 DEP_CPP_LOGGE=\
-	"..\..\Src\File.h"\
-	"..\..\Src\Logger.h"\
-	"..\..\Src\Tombo.h"\
-	"..\..\Src\Uniconv.h"\
+	"..\..\Src\TomboLib\File.h"\
+	"..\..\Src\TomboLib\Logger.h"\
+	"..\..\Src\TomboLib\Uniconv.h"\
+	
+NODEP_CPP_LOGGE=\
+	"..\..\Src\TomboLib\Tombo.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Debug"
 
 DEP_CPP_LOGGE=\
-	"..\..\Src\File.h"\
-	"..\..\Src\Logger.h"\
-	"..\..\Src\Tombo.h"\
-	"..\..\Src\Uniconv.h"\
+	"..\..\Src\TomboLib\File.h"\
+	"..\..\Src\TomboLib\Logger.h"\
+	"..\..\Src\TomboLib\Uniconv.h"\
+	
+NODEP_CPP_LOGGE=\
+	"..\..\Src\TomboLib\Tombo.h"\
 	
 
 !ENDIF 
@@ -1592,8 +1801,6 @@ SOURCE=..\..\Src\main.cpp
 !IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
 
 DEP_CPP_MAIN_=\
-	"..\..\Src\File.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\MainFrame.h"\
 	"..\..\Src\MemoDetailsView.h"\
 	"..\..\Src\MemoManager.h"\
@@ -1602,14 +1809,14 @@ DEP_CPP_MAIN_=\
 	"..\..\Src\PasswordManager.h"\
 	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
-	"..\..\Src\Uniconv.h"\
+	"..\..\Src\TomboLib\File.h"\
+	"..\..\Src\TomboLib\Logger.h"\
+	"..\..\Src\TomboLib\Uniconv.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
 
 DEP_CPP_MAIN_=\
-	"..\..\Src\File.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\MainFrame.h"\
 	"..\..\Src\MemoDetailsView.h"\
 	"..\..\Src\MemoManager.h"\
@@ -1617,6 +1824,10 @@ DEP_CPP_MAIN_=\
 	"..\..\Src\PasswordManager.h"\
 	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
+	
+NODEP_CPP_MAIN_=\
+	"..\..\Src\File.h"\
+	"..\..\Src\Logger.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Release"
@@ -1648,8 +1859,6 @@ NODEP_CPP_MAIN_=\
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Release"
 
 DEP_CPP_MAIN_=\
-	"..\..\Src\File.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\MainFrame.h"\
 	"..\..\Src\MemoDetailsView.h"\
 	"..\..\Src\MemoManager.h"\
@@ -1660,6 +1869,8 @@ DEP_CPP_MAIN_=\
 	
 NODEP_CPP_MAIN_=\
 	"..\..\kctrl\kctrl.h"\
+	"..\..\Src\File.h"\
+	"..\..\Src\Logger.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Debug"
@@ -1712,10 +1923,8 @@ SOURCE=..\..\Src\MainFrame.cpp
 
 DEP_CPP_MAINF=\
 	"..\..\Src\AboutDialog.h"\
-	"..\..\Src\File.h"\
 	"..\..\Src\FilterCtlDlg.h"\
 	"..\..\Src\GrepDialog.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\MainFrame.h"\
 	"..\..\Src\MemoDetailsView.h"\
 	"..\..\Src\MemoManager.h"\
@@ -1727,12 +1936,14 @@ DEP_CPP_MAINF=\
 	"..\..\Src\SearchDlg.h"\
 	"..\..\Src\SearchEngine.h"\
 	"..\..\Src\SearchTree.h"\
-	"..\..\Src\SipControl.h"\
 	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboLib\File.h"\
+	"..\..\Src\TomboLib\Logger.h"\
+	"..\..\Src\TomboLib\SipControl.h"\
+	"..\..\Src\TomboLib\TString.h"\
+	"..\..\Src\TomboLib\Uniconv.h"\
+	"..\..\Src\TomboLib\VarBuffer.h"\
 	"..\..\Src\TreeViewItem.h"\
-	"..\..\Src\TString.h"\
-	"..\..\Src\Uniconv.h"\
-	"..\..\Src\VarBuffer.h"\
 	"..\..\Src\VFManager.h"\
 	{$(INCLUDE)}"CSO.h"\
 	{$(INCLUDE)}"CSOBar.h"\
@@ -1745,8 +1956,6 @@ DEP_CPP_MAINF=\
 DEP_CPP_MAINF=\
 	"..\..\Src\AboutDialog.h"\
 	"..\..\Src\DirectoryScanner.h"\
-	"..\..\Src\File.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\MainFrame.h"\
 	"..\..\Src\MemoDetailsView.h"\
 	"..\..\Src\MemoManager.h"\
@@ -1757,12 +1966,14 @@ DEP_CPP_MAINF=\
 	"..\..\Src\Property.h"\
 	"..\..\Src\SearchDlg.h"\
 	"..\..\Src\SearchEngine.h"\
-	"..\..\Src\SipControl.h"\
 	"..\..\Src\Tombo.h"\
 	"..\..\Src\TreeViewItem.h"\
-	"..\..\Src\Uniconv.h"\
 	
 NODEP_CPP_MAINF=\
+	"..\..\Src\File.h"\
+	"..\..\Src\Logger.h"\
+	"..\..\Src\SipControl.h"\
+	"..\..\Src\Uniconv.h"\
 	".\SO.h"\
 	".\SOBar.h"\
 	".\SOButton.h"\
@@ -1795,8 +2006,6 @@ DEP_CPP_MAINF=\
 
 DEP_CPP_MAINF=\
 	"..\..\Src\AboutDialog.h"\
-	"..\..\Src\File.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\MainFrame.h"\
 	"..\..\Src\MemoDetailsView.h"\
 	"..\..\Src\MemoManager.h"\
@@ -1804,11 +2013,13 @@ DEP_CPP_MAINF=\
 	"..\..\Src\MemoSelectView.h"\
 	"..\..\Src\PasswordManager.h"\
 	"..\..\Src\Property.h"\
-	"..\..\Src\SipControl.h"\
 	"..\..\Src\Tombo.h"\
-	"..\..\Src\Uniconv.h"\
 	
 NODEP_CPP_MAINF=\
+	"..\..\Src\File.h"\
+	"..\..\Src\Logger.h"\
+	"..\..\Src\SipControl.h"\
+	"..\..\Src\Uniconv.h"\
 	".\ipapi.h"\
 	".\ygshell.h"\
 	
@@ -1857,6 +2068,8 @@ SOURCE=..\..\Src\gnupg\md5.c
 
 DEP_CPP_MD5_C=\
 	"..\..\Src\gnupg\bithelp.h"\
+	"..\..\Src\regex\config.h"\
+	"..\..\Src\regex\ctypeutil.h"\
 	
 NODEP_CPP_MD5_C=\
 	"..\..\Src\gnupg\dynload.h"\
@@ -1935,8 +2148,6 @@ SOURCE=..\..\Src\MemoDetailsView.cpp
 !IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
 
 DEP_CPP_MEMOD=\
-	"..\..\Src\File.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\MainFrame.h"\
 	"..\..\Src\MemoDetailsView.h"\
 	"..\..\Src\MemoManager.h"\
@@ -1946,15 +2157,15 @@ DEP_CPP_MEMOD=\
 	"..\..\Src\Property.h"\
 	"..\..\Src\SearchEngine.h"\
 	"..\..\Src\Tombo.h"\
-	"..\..\Src\TString.h"\
-	"..\..\Src\Uniconv.h"\
+	"..\..\Src\TomboLib\File.h"\
+	"..\..\Src\TomboLib\Logger.h"\
+	"..\..\Src\TomboLib\TString.h"\
+	"..\..\Src\TomboLib\Uniconv.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
 
 DEP_CPP_MEMOD=\
-	"..\..\Src\File.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\MainFrame.h"\
 	"..\..\Src\MemoDetailsView.h"\
 	"..\..\Src\MemoManager.h"\
@@ -1964,6 +2175,10 @@ DEP_CPP_MEMOD=\
 	"..\..\Src\Property.h"\
 	"..\..\Src\SearchEngine.h"\
 	"..\..\Src\Tombo.h"\
+	
+NODEP_CPP_MEMOD=\
+	"..\..\Src\File.h"\
+	"..\..\Src\Logger.h"\
 	"..\..\Src\TString.h"\
 	"..\..\Src\Uniconv.h"\
 	
@@ -1987,8 +2202,6 @@ DEP_CPP_MEMOD=\
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Release"
 
 DEP_CPP_MEMOD=\
-	"..\..\Src\File.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\MainFrame.h"\
 	"..\..\Src\MemoDetailsView.h"\
 	"..\..\Src\MemoManager.h"\
@@ -1996,10 +2209,12 @@ DEP_CPP_MEMOD=\
 	"..\..\Src\PasswordManager.h"\
 	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
-	"..\..\Src\TString.h"\
-	"..\..\Src\Uniconv.h"\
 	
 NODEP_CPP_MEMOD=\
+	"..\..\Src\File.h"\
+	"..\..\Src\Logger.h"\
+	"..\..\Src\TString.h"\
+	"..\..\Src\Uniconv.h"\
 	".\ipapi.h"\
 	".\ygshell.h"\
 	
@@ -2039,8 +2254,6 @@ SOURCE=..\..\Src\MemoFolder.cpp
 
 DEP_CPP_MEMOF=\
 	"..\..\Src\DirectoryScanner.h"\
-	"..\..\Src\File.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\MemoFolder.h"\
 	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoNote.h"\
@@ -2048,23 +2261,27 @@ DEP_CPP_MEMOF=\
 	"..\..\Src\PasswordManager.h"\
 	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboLib\File.h"\
+	"..\..\Src\TomboLib\Logger.h"\
+	"..\..\Src\TomboLib\TString.h"\
+	"..\..\Src\TomboLib\Uniconv.h"\
+	"..\..\Src\TomboLib\VarBuffer.h"\
 	"..\..\Src\TreeViewItem.h"\
-	"..\..\Src\TString.h"\
-	"..\..\Src\Uniconv.h"\
-	"..\..\Src\VarBuffer.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
 
 DEP_CPP_MEMOF=\
 	"..\..\Src\DirectoryScanner.h"\
-	"..\..\Src\File.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\MemoFolder.h"\
 	"..\..\Src\MemoNote.h"\
 	"..\..\Src\Message.h"\
 	"..\..\Src\Tombo.h"\
 	"..\..\Src\TreeViewItem.h"\
+	
+NODEP_CPP_MEMOF=\
+	"..\..\Src\File.h"\
+	"..\..\Src\Logger.h"\
 	"..\..\Src\TString.h"\
 	"..\..\Src\Uniconv.h"\
 	
@@ -2073,10 +2290,12 @@ DEP_CPP_MEMOF=\
 
 DEP_CPP_MEMOF=\
 	"..\..\Src\DirectoryScanner.h"\
-	"..\..\Src\File.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\MemoFolder.h"\
 	"..\..\Src\Tombo.h"\
+	
+NODEP_CPP_MEMOF=\
+	"..\..\Src\File.h"\
+	"..\..\Src\Logger.h"\
 	"..\..\Src\TString.h"\
 	"..\..\Src\Uniconv.h"\
 	
@@ -2085,10 +2304,12 @@ DEP_CPP_MEMOF=\
 
 DEP_CPP_MEMOF=\
 	"..\..\Src\DirectoryScanner.h"\
-	"..\..\Src\File.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\MemoFolder.h"\
 	"..\..\Src\Tombo.h"\
+	
+NODEP_CPP_MEMOF=\
+	"..\..\Src\File.h"\
+	"..\..\Src\Logger.h"\
 	"..\..\Src\TString.h"\
 	"..\..\Src\Uniconv.h"\
 	
@@ -2097,10 +2318,12 @@ DEP_CPP_MEMOF=\
 
 DEP_CPP_MEMOF=\
 	"..\..\Src\DirectoryScanner.h"\
-	"..\..\Src\File.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\MemoFolder.h"\
 	"..\..\Src\Tombo.h"\
+	
+NODEP_CPP_MEMOF=\
+	"..\..\Src\File.h"\
+	"..\..\Src\Logger.h"\
 	"..\..\Src\TString.h"\
 	"..\..\Src\Uniconv.h"\
 	
@@ -2109,10 +2332,12 @@ DEP_CPP_MEMOF=\
 
 DEP_CPP_MEMOF=\
 	"..\..\Src\DirectoryScanner.h"\
-	"..\..\Src\File.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\MemoFolder.h"\
 	"..\..\Src\Tombo.h"\
+	
+NODEP_CPP_MEMOF=\
+	"..\..\Src\File.h"\
+	"..\..\Src\Logger.h"\
 	"..\..\Src\TString.h"\
 	"..\..\Src\Uniconv.h"\
 	
@@ -2121,10 +2346,12 @@ DEP_CPP_MEMOF=\
 
 DEP_CPP_MEMOF=\
 	"..\..\Src\DirectoryScanner.h"\
-	"..\..\Src\File.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\MemoFolder.h"\
 	"..\..\Src\Tombo.h"\
+	
+NODEP_CPP_MEMOF=\
+	"..\..\Src\File.h"\
+	"..\..\Src\Logger.h"\
 	"..\..\Src\TString.h"\
 	"..\..\Src\Uniconv.h"\
 	
@@ -2133,10 +2360,12 @@ DEP_CPP_MEMOF=\
 
 DEP_CPP_MEMOF=\
 	"..\..\Src\DirectoryScanner.h"\
-	"..\..\Src\File.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\MemoFolder.h"\
 	"..\..\Src\Tombo.h"\
+	
+NODEP_CPP_MEMOF=\
+	"..\..\Src\File.h"\
+	"..\..\Src\Logger.h"\
 	"..\..\Src\TString.h"\
 	"..\..\Src\Uniconv.h"\
 	
@@ -2151,83 +2380,97 @@ SOURCE=..\..\Src\MemoInfo.cpp
 !IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
 
 DEP_CPP_MEMOI=\
-	"..\..\Src\File.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\MemoInfo.h"\
 	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
-	"..\..\Src\TString.h"\
+	"..\..\Src\TomboLib\File.h"\
+	"..\..\Src\TomboLib\Logger.h"\
+	"..\..\Src\TomboLib\TString.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
 
 DEP_CPP_MEMOI=\
-	"..\..\Src\File.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\MemoInfo.h"\
 	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
+	
+NODEP_CPP_MEMOI=\
+	"..\..\Src\File.h"\
+	"..\..\Src\Logger.h"\
 	"..\..\Src\TString.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Release"
 
 DEP_CPP_MEMOI=\
-	"..\..\Src\File.h"\
 	"..\..\Src\MemoInfo.h"\
 	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
+	
+NODEP_CPP_MEMOI=\
+	"..\..\Src\File.h"\
 	"..\..\Src\TString.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Debug"
 
 DEP_CPP_MEMOI=\
-	"..\..\Src\File.h"\
 	"..\..\Src\MemoInfo.h"\
 	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
+	
+NODEP_CPP_MEMOI=\
+	"..\..\Src\File.h"\
 	"..\..\Src\TString.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Release"
 
 DEP_CPP_MEMOI=\
-	"..\..\Src\File.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\MemoInfo.h"\
 	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
+	
+NODEP_CPP_MEMOI=\
+	"..\..\Src\File.h"\
+	"..\..\Src\Logger.h"\
 	"..\..\Src\TString.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Debug"
 
 DEP_CPP_MEMOI=\
-	"..\..\Src\File.h"\
 	"..\..\Src\MemoInfo.h"\
 	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
+	
+NODEP_CPP_MEMOI=\
+	"..\..\Src\File.h"\
 	"..\..\Src\TString.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Release"
 
 DEP_CPP_MEMOI=\
-	"..\..\Src\File.h"\
 	"..\..\Src\MemoInfo.h"\
 	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
+	
+NODEP_CPP_MEMOI=\
+	"..\..\Src\File.h"\
 	"..\..\Src\TString.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Debug"
 
 DEP_CPP_MEMOI=\
-	"..\..\Src\File.h"\
 	"..\..\Src\MemoInfo.h"\
 	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
+	
+NODEP_CPP_MEMOI=\
+	"..\..\Src\File.h"\
 	"..\..\Src\TString.h"\
 	
 
@@ -2241,8 +2484,6 @@ SOURCE=..\..\Src\MemoManager.cpp
 !IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
 
 DEP_CPP_MEMOM=\
-	"..\..\Src\File.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\MainFrame.h"\
 	"..\..\Src\MemoDetailsView.h"\
 	"..\..\Src\MemoInfo.h"\
@@ -2255,17 +2496,17 @@ DEP_CPP_MEMOM=\
 	"..\..\Src\Property.h"\
 	"..\..\Src\SearchEngine.h"\
 	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboLib\File.h"\
+	"..\..\Src\TomboLib\Logger.h"\
+	"..\..\Src\TomboLib\TString.h"\
+	"..\..\Src\TomboLib\Uniconv.h"\
+	"..\..\Src\TomboLib\VarBuffer.h"\
 	"..\..\Src\TreeViewItem.h"\
-	"..\..\Src\TString.h"\
-	"..\..\Src\Uniconv.h"\
-	"..\..\Src\VarBuffer.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
 
 DEP_CPP_MEMOM=\
-	"..\..\Src\File.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\MainFrame.h"\
 	"..\..\Src\MemoDetailsView.h"\
 	"..\..\Src\MemoInfo.h"\
@@ -2279,6 +2520,10 @@ DEP_CPP_MEMOM=\
 	"..\..\Src\SearchEngine.h"\
 	"..\..\Src\Tombo.h"\
 	"..\..\Src\TreeViewItem.h"\
+	
+NODEP_CPP_MEMOM=\
+	"..\..\Src\File.h"\
+	"..\..\Src\Logger.h"\
 	"..\..\Src\TString.h"\
 	"..\..\Src\Uniconv.h"\
 	
@@ -2291,6 +2536,8 @@ DEP_CPP_MEMOM=\
 	"..\..\Src\MemoNote.h"\
 	"..\..\Src\MemoSelectView.h"\
 	"..\..\Src\Tombo.h"\
+	
+NODEP_CPP_MEMOM=\
 	"..\..\Src\Uniconv.h"\
 	
 
@@ -2302,14 +2549,14 @@ DEP_CPP_MEMOM=\
 	"..\..\Src\MemoNote.h"\
 	"..\..\Src\MemoSelectView.h"\
 	"..\..\Src\Tombo.h"\
+	
+NODEP_CPP_MEMOM=\
 	"..\..\Src\Uniconv.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Release"
 
 DEP_CPP_MEMOM=\
-	"..\..\Src\File.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\MainFrame.h"\
 	"..\..\Src\MemoDetailsView.h"\
 	"..\..\Src\MemoInfo.h"\
@@ -2320,6 +2567,10 @@ DEP_CPP_MEMOM=\
 	"..\..\Src\PasswordManager.h"\
 	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
+	
+NODEP_CPP_MEMOM=\
+	"..\..\Src\File.h"\
+	"..\..\Src\Logger.h"\
 	"..\..\Src\TString.h"\
 	"..\..\Src\Uniconv.h"\
 	
@@ -2332,6 +2583,8 @@ DEP_CPP_MEMOM=\
 	"..\..\Src\MemoNote.h"\
 	"..\..\Src\MemoSelectView.h"\
 	"..\..\Src\Tombo.h"\
+	
+NODEP_CPP_MEMOM=\
 	"..\..\Src\Uniconv.h"\
 	
 
@@ -2343,6 +2596,8 @@ DEP_CPP_MEMOM=\
 	"..\..\Src\MemoNote.h"\
 	"..\..\Src\MemoSelectView.h"\
 	"..\..\Src\Tombo.h"\
+	
+NODEP_CPP_MEMOM=\
 	"..\..\Src\Uniconv.h"\
 	
 
@@ -2354,6 +2609,8 @@ DEP_CPP_MEMOM=\
 	"..\..\Src\MemoNote.h"\
 	"..\..\Src\MemoSelectView.h"\
 	"..\..\Src\Tombo.h"\
+	
+NODEP_CPP_MEMOM=\
 	"..\..\Src\Uniconv.h"\
 	
 
@@ -2369,8 +2626,6 @@ SOURCE=..\..\Src\MemoNote.cpp
 DEP_CPP_MEMON=\
 	"..\..\Src\Crypt.h"\
 	"..\..\Src\CryptManager.h"\
-	"..\..\Src\File.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\MemoInfo.h"\
 	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoNote.h"\
@@ -2378,10 +2633,12 @@ DEP_CPP_MEMON=\
 	"..\..\Src\PasswordManager.h"\
 	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboLib\File.h"\
+	"..\..\Src\TomboLib\Logger.h"\
+	"..\..\Src\TomboLib\TString.h"\
+	"..\..\Src\TomboLib\Uniconv.h"\
+	"..\..\Src\TomboLib\VarBuffer.h"\
 	"..\..\Src\TreeViewItem.h"\
-	"..\..\Src\TString.h"\
-	"..\..\Src\Uniconv.h"\
-	"..\..\Src\VarBuffer.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
@@ -2389,8 +2646,6 @@ DEP_CPP_MEMON=\
 DEP_CPP_MEMON=\
 	"..\..\Src\Crypt.h"\
 	"..\..\Src\CryptManager.h"\
-	"..\..\Src\File.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\MemoInfo.h"\
 	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoNote.h"\
@@ -2399,6 +2654,10 @@ DEP_CPP_MEMON=\
 	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
 	"..\..\Src\TreeViewItem.h"\
+	
+NODEP_CPP_MEMON=\
+	"..\..\Src\File.h"\
+	"..\..\Src\Logger.h"\
 	"..\..\Src\TString.h"\
 	"..\..\Src\Uniconv.h"\
 	
@@ -2408,10 +2667,12 @@ DEP_CPP_MEMON=\
 DEP_CPP_MEMON=\
 	"..\..\Src\Crypt.h"\
 	"..\..\Src\CryptManager.h"\
-	"..\..\Src\File.h"\
 	"..\..\Src\MemoNote.h"\
 	"..\..\Src\PasswordManager.h"\
 	"..\..\Src\Tombo.h"\
+	
+NODEP_CPP_MEMON=\
+	"..\..\Src\File.h"\
 	"..\..\Src\Uniconv.h"\
 	
 
@@ -2420,10 +2681,12 @@ DEP_CPP_MEMON=\
 DEP_CPP_MEMON=\
 	"..\..\Src\Crypt.h"\
 	"..\..\Src\CryptManager.h"\
-	"..\..\Src\File.h"\
 	"..\..\Src\MemoNote.h"\
 	"..\..\Src\PasswordManager.h"\
 	"..\..\Src\Tombo.h"\
+	
+NODEP_CPP_MEMON=\
+	"..\..\Src\File.h"\
 	"..\..\Src\Uniconv.h"\
 	
 
@@ -2432,14 +2695,16 @@ DEP_CPP_MEMON=\
 DEP_CPP_MEMON=\
 	"..\..\Src\Crypt.h"\
 	"..\..\Src\CryptManager.h"\
-	"..\..\Src\File.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\MemoInfo.h"\
 	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoNote.h"\
 	"..\..\Src\PasswordManager.h"\
 	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
+	
+NODEP_CPP_MEMON=\
+	"..\..\Src\File.h"\
+	"..\..\Src\Logger.h"\
 	"..\..\Src\TString.h"\
 	"..\..\Src\Uniconv.h"\
 	
@@ -2449,10 +2714,12 @@ DEP_CPP_MEMON=\
 DEP_CPP_MEMON=\
 	"..\..\Src\Crypt.h"\
 	"..\..\Src\CryptManager.h"\
-	"..\..\Src\File.h"\
 	"..\..\Src\MemoNote.h"\
 	"..\..\Src\PasswordManager.h"\
 	"..\..\Src\Tombo.h"\
+	
+NODEP_CPP_MEMON=\
+	"..\..\Src\File.h"\
 	"..\..\Src\Uniconv.h"\
 	
 
@@ -2461,10 +2728,12 @@ DEP_CPP_MEMON=\
 DEP_CPP_MEMON=\
 	"..\..\Src\Crypt.h"\
 	"..\..\Src\CryptManager.h"\
-	"..\..\Src\File.h"\
 	"..\..\Src\MemoNote.h"\
 	"..\..\Src\PasswordManager.h"\
 	"..\..\Src\Tombo.h"\
+	
+NODEP_CPP_MEMON=\
+	"..\..\Src\File.h"\
 	"..\..\Src\Uniconv.h"\
 	
 
@@ -2473,10 +2742,12 @@ DEP_CPP_MEMON=\
 DEP_CPP_MEMON=\
 	"..\..\Src\Crypt.h"\
 	"..\..\Src\CryptManager.h"\
-	"..\..\Src\File.h"\
 	"..\..\Src\MemoNote.h"\
 	"..\..\Src\PasswordManager.h"\
 	"..\..\Src\Tombo.h"\
+	
+NODEP_CPP_MEMON=\
+	"..\..\Src\File.h"\
 	"..\..\Src\Uniconv.h"\
 	
 
@@ -2490,8 +2761,6 @@ SOURCE=..\..\Src\MemoSelectView.cpp
 !IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
 
 DEP_CPP_MEMOS=\
-	"..\..\Src\File.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\MainFrame.h"\
 	"..\..\Src\MemoDetailsView.h"\
 	"..\..\Src\MemoManager.h"\
@@ -2501,17 +2770,17 @@ DEP_CPP_MEMOS=\
 	"..\..\Src\PasswordManager.h"\
 	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboLib\File.h"\
+	"..\..\Src\TomboLib\Logger.h"\
+	"..\..\Src\TomboLib\TString.h"\
+	"..\..\Src\TomboLib\Uniconv.h"\
+	"..\..\Src\TomboLib\VarBuffer.h"\
 	"..\..\Src\TreeViewItem.h"\
-	"..\..\Src\TString.h"\
-	"..\..\Src\Uniconv.h"\
-	"..\..\Src\VarBuffer.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
 
 DEP_CPP_MEMOS=\
-	"..\..\Src\File.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\MainFrame.h"\
 	"..\..\Src\MemoDetailsView.h"\
 	"..\..\Src\MemoManager.h"\
@@ -2523,6 +2792,10 @@ DEP_CPP_MEMOS=\
 	"..\..\Src\SearchEngine.h"\
 	"..\..\Src\Tombo.h"\
 	"..\..\Src\TreeViewItem.h"\
+	
+NODEP_CPP_MEMOS=\
+	"..\..\Src\File.h"\
+	"..\..\Src\Logger.h"\
 	"..\..\Src\TString.h"\
 	"..\..\Src\Uniconv.h"\
 	
@@ -2546,8 +2819,6 @@ DEP_CPP_MEMOS=\
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Release"
 
 DEP_CPP_MEMOS=\
-	"..\..\Src\File.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\MainFrame.h"\
 	"..\..\Src\MemoDetailsView.h"\
 	"..\..\Src\MemoManager.h"\
@@ -2556,6 +2827,10 @@ DEP_CPP_MEMOS=\
 	"..\..\Src\PasswordManager.h"\
 	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
+	
+NODEP_CPP_MEMOS=\
+	"..\..\Src\File.h"\
+	"..\..\Src\Logger.h"\
 	"..\..\Src\TString.h"\
 	"..\..\Src\Uniconv.h"\
 	
@@ -2595,13 +2870,15 @@ SOURCE=..\..\Src\NewFolderDialog.cpp
 
 DEP_CPP_NEWFO=\
 	"..\..\Src\NewFolderDialog.h"\
-	"..\..\Src\SipControl.h"\
+	"..\..\Src\TomboLib\SipControl.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
 
 DEP_CPP_NEWFO=\
 	"..\..\Src\NewFolderDialog.h"\
+	
+NODEP_CPP_NEWFO=\
 	"..\..\Src\SipControl.h"\
 	
 
@@ -2621,6 +2898,8 @@ DEP_CPP_NEWFO=\
 
 DEP_CPP_NEWFO=\
 	"..\..\Src\NewFolderDialog.h"\
+	
+NODEP_CPP_NEWFO=\
 	"..\..\Src\SipControl.h"\
 	
 
@@ -2652,30 +2931,32 @@ SOURCE=..\..\Src\PasswordDialog.cpp
 !IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
 
 DEP_CPP_PASSW=\
-	"..\..\Src\File.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoNote.h"\
 	"..\..\Src\Message.h"\
 	"..\..\Src\PasswordDialog.h"\
-	"..\..\Src\SipControl.h"\
 	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboLib\File.h"\
+	"..\..\Src\TomboLib\Logger.h"\
+	"..\..\Src\TomboLib\SipControl.h"\
+	"..\..\Src\TomboLib\Uniconv.h"\
+	"..\..\Src\TomboLib\VarBuffer.h"\
 	"..\..\Src\TreeViewItem.h"\
-	"..\..\Src\Uniconv.h"\
-	"..\..\Src\VarBuffer.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
 
 DEP_CPP_PASSW=\
-	"..\..\Src\File.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\MemoNote.h"\
 	"..\..\Src\Message.h"\
 	"..\..\Src\PasswordDialog.h"\
-	"..\..\Src\SipControl.h"\
 	"..\..\Src\Tombo.h"\
 	"..\..\Src\TreeViewItem.h"\
+	
+NODEP_CPP_PASSW=\
+	"..\..\Src\File.h"\
+	"..\..\Src\Logger.h"\
+	"..\..\Src\SipControl.h"\
 	"..\..\Src\Uniconv.h"\
 	
 
@@ -2683,6 +2964,8 @@ DEP_CPP_PASSW=\
 
 DEP_CPP_PASSW=\
 	"..\..\Src\PasswordDialog.h"\
+	
+NODEP_CPP_PASSW=\
 	"..\..\Src\Uniconv.h"\
 	
 
@@ -2690,18 +2973,22 @@ DEP_CPP_PASSW=\
 
 DEP_CPP_PASSW=\
 	"..\..\Src\PasswordDialog.h"\
+	
+NODEP_CPP_PASSW=\
 	"..\..\Src\Uniconv.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Release"
 
 DEP_CPP_PASSW=\
-	"..\..\Src\File.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\MemoNote.h"\
 	"..\..\Src\PasswordDialog.h"\
-	"..\..\Src\SipControl.h"\
 	"..\..\Src\Tombo.h"\
+	
+NODEP_CPP_PASSW=\
+	"..\..\Src\File.h"\
+	"..\..\Src\Logger.h"\
+	"..\..\Src\SipControl.h"\
 	"..\..\Src\Uniconv.h"\
 	
 
@@ -2709,6 +2996,8 @@ DEP_CPP_PASSW=\
 
 DEP_CPP_PASSW=\
 	"..\..\Src\PasswordDialog.h"\
+	
+NODEP_CPP_PASSW=\
 	"..\..\Src\Uniconv.h"\
 	
 
@@ -2716,6 +3005,8 @@ DEP_CPP_PASSW=\
 
 DEP_CPP_PASSW=\
 	"..\..\Src\PasswordDialog.h"\
+	
+NODEP_CPP_PASSW=\
 	"..\..\Src\Uniconv.h"\
 	
 
@@ -2723,6 +3014,8 @@ DEP_CPP_PASSW=\
 
 DEP_CPP_PASSW=\
 	"..\..\Src\PasswordDialog.h"\
+	
+NODEP_CPP_PASSW=\
 	"..\..\Src\Uniconv.h"\
 	
 
@@ -2738,13 +3031,13 @@ SOURCE=..\..\Src\PasswordManager.cpp
 DEP_CPP_PASSWO=\
 	"..\..\Src\Crypt.h"\
 	"..\..\Src\CryptManager.h"\
-	"..\..\Src\File.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\Message.h"\
 	"..\..\Src\PasswordDialog.h"\
 	"..\..\Src\PasswordManager.h"\
 	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboLib\File.h"\
+	"..\..\Src\TomboLib\Logger.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
@@ -2752,13 +3045,15 @@ DEP_CPP_PASSWO=\
 DEP_CPP_PASSWO=\
 	"..\..\Src\Crypt.h"\
 	"..\..\Src\CryptManager.h"\
-	"..\..\Src\File.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\Message.h"\
 	"..\..\Src\PasswordDialog.h"\
 	"..\..\Src\PasswordManager.h"\
 	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
+	
+NODEP_CPP_PASSWO=\
+	"..\..\Src\File.h"\
+	"..\..\Src\Logger.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Release"
@@ -2780,12 +3075,14 @@ DEP_CPP_PASSWO=\
 DEP_CPP_PASSWO=\
 	"..\..\Src\Crypt.h"\
 	"..\..\Src\CryptManager.h"\
-	"..\..\Src\File.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\PasswordDialog.h"\
 	"..\..\Src\PasswordManager.h"\
 	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
+	
+NODEP_CPP_PASSWO=\
+	"..\..\Src\File.h"\
+	"..\..\Src\Logger.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Debug"
@@ -2819,9 +3116,7 @@ SOURCE=..\..\Src\Property.cpp
 !IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
 
 DEP_CPP_PROPE=\
-	"..\..\Src\File.h"\
 	"..\..\Src\FileSelector.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoNote.h"\
 	"..\..\Src\Message.h"\
@@ -2829,9 +3124,11 @@ DEP_CPP_PROPE=\
 	"..\..\Src\Property.h"\
 	"..\..\Src\PropertyPage.h"\
 	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboLib\File.h"\
+	"..\..\Src\TomboLib\Logger.h"\
+	"..\..\Src\TomboLib\Uniconv.h"\
+	"..\..\Src\TomboLib\VarBuffer.h"\
 	"..\..\Src\TreeViewItem.h"\
-	"..\..\Src\Uniconv.h"\
-	"..\..\Src\VarBuffer.h"\
 	{$(INCLUDE)}"GetDisk.h"\
 	{$(INCLUDE)}"notify.h"\
 	
@@ -2839,18 +3136,18 @@ DEP_CPP_PROPE=\
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
 
 DEP_CPP_PROPE=\
-	"..\..\Src\File.h"\
 	"..\..\Src\FileSelector.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\MemoNote.h"\
 	"..\..\Src\Message.h"\
 	"..\..\Src\PasswordManager.h"\
 	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
 	"..\..\Src\TreeViewItem.h"\
-	"..\..\Src\Uniconv.h"\
 	
 NODEP_CPP_PROPE=\
+	"..\..\Src\File.h"\
+	"..\..\Src\Logger.h"\
+	"..\..\Src\Uniconv.h"\
 	".\etDisk.h"\
 	".\otify.h"\
 	
@@ -2874,13 +3171,15 @@ DEP_CPP_PROPE=\
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Release"
 
 DEP_CPP_PROPE=\
-	"..\..\Src\File.h"\
 	"..\..\Src\FileSelector.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\MemoNote.h"\
 	"..\..\Src\PasswordManager.h"\
 	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
+	
+NODEP_CPP_PROPE=\
+	"..\..\Src\File.h"\
+	"..\..\Src\Logger.h"\
 	"..\..\Src\Uniconv.h"\
 	
 
@@ -3062,115 +3361,117 @@ SOURCE=..\..\Src\SearchDlg.cpp
 !IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
 
 DEP_CPP_SEARC=\
-	"..\..\Src\File.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\Property.h"\
 	"..\..\Src\SearchDlg.h"\
-	"..\..\Src\SipControl.h"\
 	"..\..\Src\Tombo.h"\
-	"..\..\Src\Uniconv.h"\
+	"..\..\Src\TomboLib\File.h"\
+	"..\..\Src\TomboLib\Logger.h"\
+	"..\..\Src\TomboLib\SipControl.h"\
+	"..\..\Src\TomboLib\Uniconv.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
 
 DEP_CPP_SEARC=\
-	"..\..\Src\File.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\Property.h"\
 	"..\..\Src\SearchDlg.h"\
-	"..\..\Src\SipControl.h"\
 	"..\..\Src\Tombo.h"\
+	
+NODEP_CPP_SEARC=\
+	"..\..\Src\File.h"\
+	"..\..\Src\Logger.h"\
+	"..\..\Src\SipControl.h"\
 	"..\..\Src\Uniconv.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Release"
 
 DEP_CPP_SEARC=\
-	"..\..\Src\File.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\Property.h"\
 	"..\..\Src\SearchDlg.h"\
-	"..\..\Src\SipControl.h"\
 	"..\..\Src\Tombo.h"\
-	"..\..\Src\Uniconv.h"\
 	
 NODEP_CPP_SEARC=\
+	"..\..\Src\File.h"\
+	"..\..\Src\Logger.h"\
 	"..\..\Src\resource.h"\
+	"..\..\Src\SipControl.h"\
+	"..\..\Src\Uniconv.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Debug"
 
 DEP_CPP_SEARC=\
-	"..\..\Src\File.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\Property.h"\
 	"..\..\Src\SearchDlg.h"\
-	"..\..\Src\SipControl.h"\
 	"..\..\Src\Tombo.h"\
-	"..\..\Src\Uniconv.h"\
 	
 NODEP_CPP_SEARC=\
+	"..\..\Src\File.h"\
+	"..\..\Src\Logger.h"\
 	"..\..\Src\resource.h"\
+	"..\..\Src\SipControl.h"\
+	"..\..\Src\Uniconv.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Release"
 
 DEP_CPP_SEARC=\
-	"..\..\Src\File.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\Property.h"\
 	"..\..\Src\SearchDlg.h"\
-	"..\..\Src\SipControl.h"\
 	"..\..\Src\Tombo.h"\
-	"..\..\Src\Uniconv.h"\
 	
 NODEP_CPP_SEARC=\
+	"..\..\Src\File.h"\
+	"..\..\Src\Logger.h"\
 	"..\..\Src\resource.h"\
+	"..\..\Src\SipControl.h"\
+	"..\..\Src\Uniconv.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Debug"
 
 DEP_CPP_SEARC=\
-	"..\..\Src\File.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\Property.h"\
 	"..\..\Src\SearchDlg.h"\
-	"..\..\Src\SipControl.h"\
 	"..\..\Src\Tombo.h"\
-	"..\..\Src\Uniconv.h"\
 	
 NODEP_CPP_SEARC=\
+	"..\..\Src\File.h"\
+	"..\..\Src\Logger.h"\
 	"..\..\Src\resource.h"\
+	"..\..\Src\SipControl.h"\
+	"..\..\Src\Uniconv.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Release"
 
 DEP_CPP_SEARC=\
-	"..\..\Src\File.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\Property.h"\
 	"..\..\Src\SearchDlg.h"\
-	"..\..\Src\SipControl.h"\
 	"..\..\Src\Tombo.h"\
-	"..\..\Src\Uniconv.h"\
 	
 NODEP_CPP_SEARC=\
+	"..\..\Src\File.h"\
+	"..\..\Src\Logger.h"\
 	"..\..\Src\resource.h"\
+	"..\..\Src\SipControl.h"\
+	"..\..\Src\Uniconv.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Debug"
 
 DEP_CPP_SEARC=\
-	"..\..\Src\File.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\Property.h"\
 	"..\..\Src\SearchDlg.h"\
-	"..\..\Src\SipControl.h"\
 	"..\..\Src\Tombo.h"\
-	"..\..\Src\Uniconv.h"\
 	
 NODEP_CPP_SEARC=\
+	"..\..\Src\File.h"\
+	"..\..\Src\Logger.h"\
 	"..\..\Src\resource.h"\
+	"..\..\Src\SipControl.h"\
+	"..\..\Src\Uniconv.h"\
 	
 
 !ENDIF 
@@ -3183,22 +3484,24 @@ SOURCE=..\..\Src\SearchEngine.cpp
 !IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
 
 DEP_CPP_SEARCH=\
-	"..\..\Src\File.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoNote.h"\
 	"..\..\Src\SearchEngine.h"\
 	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboLib\File.h"\
+	"..\..\Src\TomboLib\Logger.h"\
+	"..\..\Src\TomboLib\TString.h"\
+	"..\..\Src\TomboLib\Uniconv.h"\
+	"..\..\Src\TomboLib\VarBuffer.h"\
 	"..\..\Src\TreeViewItem.h"\
-	"..\..\Src\TString.h"\
-	"..\..\Src\Uniconv.h"\
-	"..\..\Src\VarBuffer.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
 
 DEP_CPP_SEARCH=\
 	"..\..\Src\SearchEngine.h"\
+	
+NODEP_CPP_SEARCH=\
 	"..\..\Src\Uniconv.h"\
 	
 
@@ -3249,18 +3552,18 @@ SOURCE=..\..\Src\SearchTree.cpp
 
 DEP_CPP_SEARCHT=\
 	"..\..\Src\DirList.h"\
-	"..\..\Src\File.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoNote.h"\
 	"..\..\Src\Message.h"\
 	"..\..\Src\SearchEngine.h"\
 	"..\..\Src\SearchTree.h"\
 	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboLib\File.h"\
+	"..\..\Src\TomboLib\Logger.h"\
+	"..\..\Src\TomboLib\TString.h"\
+	"..\..\Src\TomboLib\Uniconv.h"\
+	"..\..\Src\TomboLib\VarBuffer.h"\
 	"..\..\Src\TreeViewItem.h"\
-	"..\..\Src\TString.h"\
-	"..\..\Src\Uniconv.h"\
-	"..\..\Src\VarBuffer.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
@@ -3273,6 +3576,8 @@ DEP_CPP_SEARCHT=\
 	"..\..\Src\SearchEngine.h"\
 	"..\..\Src\SearchTree.h"\
 	"..\..\Src\TreeViewItem.h"\
+	
+NODEP_CPP_SEARCHT=\
 	"..\..\Src\TString.h"\
 	"..\..\Src\VarBuffer.h"\
 	
@@ -3287,11 +3592,11 @@ DEP_CPP_SEARCHT=\
 	"..\..\Src\SearchEngine.h"\
 	"..\..\Src\SearchTree.h"\
 	"..\..\Src\TreeViewItem.h"\
-	"..\..\Src\TString.h"\
-	"..\..\Src\VarBuffer.h"\
 	
 NODEP_CPP_SEARCHT=\
 	"..\..\Src\resource.h"\
+	"..\..\Src\TString.h"\
+	"..\..\Src\VarBuffer.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Debug"
@@ -3304,11 +3609,11 @@ DEP_CPP_SEARCHT=\
 	"..\..\Src\SearchEngine.h"\
 	"..\..\Src\SearchTree.h"\
 	"..\..\Src\TreeViewItem.h"\
-	"..\..\Src\TString.h"\
-	"..\..\Src\VarBuffer.h"\
 	
 NODEP_CPP_SEARCHT=\
 	"..\..\Src\resource.h"\
+	"..\..\Src\TString.h"\
+	"..\..\Src\VarBuffer.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Release"
@@ -3321,11 +3626,11 @@ DEP_CPP_SEARCHT=\
 	"..\..\Src\SearchEngine.h"\
 	"..\..\Src\SearchTree.h"\
 	"..\..\Src\TreeViewItem.h"\
-	"..\..\Src\TString.h"\
-	"..\..\Src\VarBuffer.h"\
 	
 NODEP_CPP_SEARCHT=\
 	"..\..\Src\resource.h"\
+	"..\..\Src\TString.h"\
+	"..\..\Src\VarBuffer.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Debug"
@@ -3338,11 +3643,11 @@ DEP_CPP_SEARCHT=\
 	"..\..\Src\SearchEngine.h"\
 	"..\..\Src\SearchTree.h"\
 	"..\..\Src\TreeViewItem.h"\
-	"..\..\Src\TString.h"\
-	"..\..\Src\VarBuffer.h"\
 	
 NODEP_CPP_SEARCHT=\
 	"..\..\Src\resource.h"\
+	"..\..\Src\TString.h"\
+	"..\..\Src\VarBuffer.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Release"
@@ -3355,11 +3660,11 @@ DEP_CPP_SEARCHT=\
 	"..\..\Src\SearchEngine.h"\
 	"..\..\Src\SearchTree.h"\
 	"..\..\Src\TreeViewItem.h"\
-	"..\..\Src\TString.h"\
-	"..\..\Src\VarBuffer.h"\
 	
 NODEP_CPP_SEARCHT=\
 	"..\..\Src\resource.h"\
+	"..\..\Src\TString.h"\
+	"..\..\Src\VarBuffer.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Debug"
@@ -3372,11 +3677,11 @@ DEP_CPP_SEARCHT=\
 	"..\..\Src\SearchEngine.h"\
 	"..\..\Src\SearchTree.h"\
 	"..\..\Src\TreeViewItem.h"\
-	"..\..\Src\TString.h"\
-	"..\..\Src\VarBuffer.h"\
 	
 NODEP_CPP_SEARCHT=\
 	"..\..\Src\resource.h"\
+	"..\..\Src\TString.h"\
+	"..\..\Src\VarBuffer.h"\
 	
 
 !ENDIF 
@@ -3449,15 +3754,15 @@ DEP_CPP_SELEC=\
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\Src\SipControl.cpp
+SOURCE=..\..\Src\TomboLib\SipControl.cpp
 
 !IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
 
 DEP_CPP_SIPCO=\
-	"..\..\Src\File.h"\
-	"..\..\Src\Logger.h"\
-	"..\..\Src\SipControl.h"\
 	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboLib\File.h"\
+	"..\..\Src\TomboLib\Logger.h"\
+	"..\..\Src\TomboLib\SipControl.h"\
 	{$(INCLUDE)}"sip.h"\
 	{$(INCLUDE)}"sipapi.h"\
 	
@@ -3465,74 +3770,66 @@ DEP_CPP_SIPCO=\
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
 
 DEP_CPP_SIPCO=\
-	"..\..\Src\File.h"\
-	"..\..\Src\Logger.h"\
-	"..\..\Src\SipControl.h"\
-	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboLib\SipControl.h"\
+	{$(INCLUDE)}"sip.h"\
+	{$(INCLUDE)}"sipapi.h"\
 	
 NODEP_CPP_SIPCO=\
-	".\ip.h"\
-	".\ipapi.h"\
+	"..\..\Src\TomboLib\Tombo.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Release"
 
 DEP_CPP_SIPCO=\
-	"..\..\Src\SipControl.h"\
-	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboLib\SipControl.h"\
+	
+NODEP_CPP_SIPCO=\
+	"..\..\Src\TomboLib\Tombo.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Debug"
 
 DEP_CPP_SIPCO=\
-	"..\..\Src\SipControl.h"\
-	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboLib\SipControl.h"\
+	
+NODEP_CPP_SIPCO=\
+	"..\..\Src\TomboLib\Tombo.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Release"
 
 DEP_CPP_SIPCO=\
-	"..\..\Src\File.h"\
-	"..\..\Src\Logger.h"\
-	"..\..\Src\SipControl.h"\
-	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboLib\SipControl.h"\
 	
 NODEP_CPP_SIPCO=\
-	".\ipapi.h"\
-	".\ygshell.h"\
+	"..\..\Src\TomboLib\Tombo.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Debug"
 
 DEP_CPP_SIPCO=\
-	"..\..\Src\SipControl.h"\
-	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboLib\SipControl.h"\
 	
 NODEP_CPP_SIPCO=\
-	".\ipapi.h"\
-	".\ygshell.h"\
+	"..\..\Src\TomboLib\Tombo.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Release"
 
 DEP_CPP_SIPCO=\
-	"..\..\Src\SipControl.h"\
-	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboLib\SipControl.h"\
 	
 NODEP_CPP_SIPCO=\
-	".\ipapi.h"\
-	".\ygshell.h"\
+	"..\..\Src\TomboLib\Tombo.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Debug"
 
 DEP_CPP_SIPCO=\
-	"..\..\Src\SipControl.h"\
-	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboLib\SipControl.h"\
 	
 NODEP_CPP_SIPCO=\
-	".\ipapi.h"\
-	".\ygshell.h"\
+	"..\..\Src\TomboLib\Tombo.h"\
 	
 
 !ENDIF 
@@ -3570,8 +3867,6 @@ SOURCE=..\..\Src\TreeViewItem.cpp
 DEP_CPP_TREEV=\
 	"..\..\Src\DirectoryScanner.h"\
 	"..\..\Src\DirList.h"\
-	"..\..\Src\File.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\MemoFolder.h"\
 	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoNote.h"\
@@ -3580,11 +3875,13 @@ DEP_CPP_TREEV=\
 	"..\..\Src\PasswordManager.h"\
 	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboLib\File.h"\
+	"..\..\Src\TomboLib\Logger.h"\
+	"..\..\Src\TomboLib\TString.h"\
+	"..\..\Src\TomboLib\Uniconv.h"\
+	"..\..\Src\TomboLib\VarBuffer.h"\
 	"..\..\Src\TreeViewItem.h"\
 	"..\..\Src\TSParser.h"\
-	"..\..\Src\TString.h"\
-	"..\..\Src\Uniconv.h"\
-	"..\..\Src\VarBuffer.h"\
 	"..\..\Src\VFManager.h"\
 	"..\..\Src\VFStream.h"\
 	
@@ -3593,8 +3890,6 @@ DEP_CPP_TREEV=\
 
 DEP_CPP_TREEV=\
 	"..\..\Src\DirectoryScanner.h"\
-	"..\..\Src\File.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\MemoFolder.h"\
 	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoNote.h"\
@@ -3604,6 +3899,10 @@ DEP_CPP_TREEV=\
 	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
 	"..\..\Src\TreeViewItem.h"\
+	
+NODEP_CPP_TREEV=\
+	"..\..\Src\File.h"\
+	"..\..\Src\Logger.h"\
 	"..\..\Src\TString.h"\
 	"..\..\Src\Uniconv.h"\
 	
@@ -3612,8 +3911,6 @@ DEP_CPP_TREEV=\
 
 DEP_CPP_TREEV=\
 	"..\..\Src\DirectoryScanner.h"\
-	"..\..\Src\File.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\MemoFolder.h"\
 	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoNote.h"\
@@ -3622,6 +3919,10 @@ DEP_CPP_TREEV=\
 	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
 	"..\..\Src\TreeViewItem.h"\
+	
+NODEP_CPP_TREEV=\
+	"..\..\Src\File.h"\
+	"..\..\Src\Logger.h"\
 	"..\..\Src\TString.h"\
 	"..\..\Src\Uniconv.h"\
 	
@@ -3630,8 +3931,6 @@ DEP_CPP_TREEV=\
 
 DEP_CPP_TREEV=\
 	"..\..\Src\DirectoryScanner.h"\
-	"..\..\Src\File.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\MemoFolder.h"\
 	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoNote.h"\
@@ -3640,6 +3939,10 @@ DEP_CPP_TREEV=\
 	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
 	"..\..\Src\TreeViewItem.h"\
+	
+NODEP_CPP_TREEV=\
+	"..\..\Src\File.h"\
+	"..\..\Src\Logger.h"\
 	"..\..\Src\TString.h"\
 	"..\..\Src\Uniconv.h"\
 	
@@ -3648,8 +3951,6 @@ DEP_CPP_TREEV=\
 
 DEP_CPP_TREEV=\
 	"..\..\Src\DirectoryScanner.h"\
-	"..\..\Src\File.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\MemoFolder.h"\
 	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoNote.h"\
@@ -3658,6 +3959,10 @@ DEP_CPP_TREEV=\
 	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
 	"..\..\Src\TreeViewItem.h"\
+	
+NODEP_CPP_TREEV=\
+	"..\..\Src\File.h"\
+	"..\..\Src\Logger.h"\
 	"..\..\Src\TString.h"\
 	"..\..\Src\Uniconv.h"\
 	
@@ -3666,8 +3971,6 @@ DEP_CPP_TREEV=\
 
 DEP_CPP_TREEV=\
 	"..\..\Src\DirectoryScanner.h"\
-	"..\..\Src\File.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\MemoFolder.h"\
 	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoNote.h"\
@@ -3676,6 +3979,10 @@ DEP_CPP_TREEV=\
 	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
 	"..\..\Src\TreeViewItem.h"\
+	
+NODEP_CPP_TREEV=\
+	"..\..\Src\File.h"\
+	"..\..\Src\Logger.h"\
 	"..\..\Src\TString.h"\
 	"..\..\Src\Uniconv.h"\
 	
@@ -3684,8 +3991,6 @@ DEP_CPP_TREEV=\
 
 DEP_CPP_TREEV=\
 	"..\..\Src\DirectoryScanner.h"\
-	"..\..\Src\File.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\MemoFolder.h"\
 	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoNote.h"\
@@ -3694,6 +3999,10 @@ DEP_CPP_TREEV=\
 	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
 	"..\..\Src\TreeViewItem.h"\
+	
+NODEP_CPP_TREEV=\
+	"..\..\Src\File.h"\
+	"..\..\Src\Logger.h"\
 	"..\..\Src\TString.h"\
 	"..\..\Src\Uniconv.h"\
 	
@@ -3702,8 +4011,6 @@ DEP_CPP_TREEV=\
 
 DEP_CPP_TREEV=\
 	"..\..\Src\DirectoryScanner.h"\
-	"..\..\Src\File.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\MemoFolder.h"\
 	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoNote.h"\
@@ -3712,6 +4019,10 @@ DEP_CPP_TREEV=\
 	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
 	"..\..\Src\TreeViewItem.h"\
+	
+NODEP_CPP_TREEV=\
+	"..\..\Src\File.h"\
+	"..\..\Src\Logger.h"\
 	"..\..\Src\TString.h"\
 	"..\..\Src\Uniconv.h"\
 	
@@ -3727,12 +4038,12 @@ SOURCE=..\..\Src\TSParser.cpp
 
 DEP_CPP_TSPAR=\
 	"..\..\expat\include\expat.h"\
-	"..\..\Src\File.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboLib\File.h"\
+	"..\..\Src\TomboLib\Logger.h"\
+	"..\..\Src\TomboLib\Uniconv.h"\
+	"..\..\Src\TomboLib\VarBuffer.h"\
 	"..\..\Src\TSParser.h"\
-	"..\..\Src\Uniconv.h"\
-	"..\..\Src\VarBuffer.h"\
 	"..\..\Src\VFManager.h"\
 	"..\..\Src\VFStream.h"\
 	
@@ -3740,183 +4051,98 @@ DEP_CPP_TSPAR=\
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
 
 DEP_CPP_TSPAR=\
-	"..\..\Src\File.h"\
 	"..\..\Src\MemoSelectView.h"\
 	"..\..\Src\TreeViewItem.h"\
 	"..\..\Src\TSParser.h"\
-	"..\..\Src\Uniconv.h"\
 	"..\..\Src\VFStream.h"\
 	
 NODEP_CPP_TSPAR=\
 	"..\..\Src\ctypeutil.h"\
+	"..\..\Src\File.h"\
+	"..\..\Src\Uniconv.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Release"
 
 DEP_CPP_TSPAR=\
-	"..\..\Src\File.h"\
 	"..\..\Src\MemoSelectView.h"\
 	"..\..\Src\TreeViewItem.h"\
 	"..\..\Src\TSParser.h"\
-	"..\..\Src\Uniconv.h"\
 	"..\..\Src\VFStream.h"\
 	
 NODEP_CPP_TSPAR=\
 	"..\..\Src\ctypeutil.h"\
+	"..\..\Src\File.h"\
+	"..\..\Src\Uniconv.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Debug"
 
 DEP_CPP_TSPAR=\
-	"..\..\Src\File.h"\
 	"..\..\Src\MemoSelectView.h"\
 	"..\..\Src\TreeViewItem.h"\
 	"..\..\Src\TSParser.h"\
-	"..\..\Src\Uniconv.h"\
 	"..\..\Src\VFStream.h"\
 	
 NODEP_CPP_TSPAR=\
 	"..\..\Src\ctypeutil.h"\
+	"..\..\Src\File.h"\
+	"..\..\Src\Uniconv.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Release"
 
 DEP_CPP_TSPAR=\
-	"..\..\Src\File.h"\
 	"..\..\Src\MemoSelectView.h"\
 	"..\..\Src\TreeViewItem.h"\
 	"..\..\Src\TSParser.h"\
-	"..\..\Src\Uniconv.h"\
 	"..\..\Src\VFStream.h"\
 	
 NODEP_CPP_TSPAR=\
 	"..\..\Src\ctypeutil.h"\
+	"..\..\Src\File.h"\
+	"..\..\Src\Uniconv.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Debug"
 
 DEP_CPP_TSPAR=\
-	"..\..\Src\File.h"\
 	"..\..\Src\MemoSelectView.h"\
 	"..\..\Src\TreeViewItem.h"\
 	"..\..\Src\TSParser.h"\
-	"..\..\Src\Uniconv.h"\
 	"..\..\Src\VFStream.h"\
 	
 NODEP_CPP_TSPAR=\
 	"..\..\Src\ctypeutil.h"\
+	"..\..\Src\File.h"\
+	"..\..\Src\Uniconv.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Release"
 
 DEP_CPP_TSPAR=\
-	"..\..\Src\File.h"\
 	"..\..\Src\MemoSelectView.h"\
 	"..\..\Src\TreeViewItem.h"\
 	"..\..\Src\TSParser.h"\
-	"..\..\Src\Uniconv.h"\
 	"..\..\Src\VFStream.h"\
 	
 NODEP_CPP_TSPAR=\
 	"..\..\Src\ctypeutil.h"\
+	"..\..\Src\File.h"\
+	"..\..\Src\Uniconv.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Debug"
 
 DEP_CPP_TSPAR=\
-	"..\..\Src\File.h"\
 	"..\..\Src\MemoSelectView.h"\
 	"..\..\Src\TreeViewItem.h"\
 	"..\..\Src\TSParser.h"\
-	"..\..\Src\Uniconv.h"\
 	"..\..\Src\VFStream.h"\
 	
 NODEP_CPP_TSPAR=\
 	"..\..\Src\ctypeutil.h"\
-	
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\TString.cpp
-
-!IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
-
-DEP_CPP_TSTRI=\
 	"..\..\Src\File.h"\
-	"..\..\Src\Logger.h"\
-	"..\..\Src\Property.h"\
-	"..\..\Src\Tombo.h"\
-	"..\..\Src\TString.h"\
-	"..\..\Src\Uniconv.h"\
-	
-
-!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
-
-DEP_CPP_TSTRI=\
-	"..\..\Src\File.h"\
-	"..\..\Src\Logger.h"\
-	"..\..\Src\Property.h"\
-	"..\..\Src\Tombo.h"\
-	"..\..\Src\TString.h"\
-	"..\..\Src\Uniconv.h"\
-	
-
-!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Release"
-
-DEP_CPP_TSTRI=\
-	"..\..\Src\Property.h"\
-	"..\..\Src\Tombo.h"\
-	"..\..\Src\TString.h"\
-	"..\..\Src\Uniconv.h"\
-	
-
-!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Debug"
-
-DEP_CPP_TSTRI=\
-	"..\..\Src\Property.h"\
-	"..\..\Src\Tombo.h"\
-	"..\..\Src\TString.h"\
-	"..\..\Src\Uniconv.h"\
-	
-
-!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Release"
-
-DEP_CPP_TSTRI=\
-	"..\..\Src\File.h"\
-	"..\..\Src\Logger.h"\
-	"..\..\Src\Property.h"\
-	"..\..\Src\Tombo.h"\
-	"..\..\Src\TString.h"\
-	"..\..\Src\Uniconv.h"\
-	
-
-!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Debug"
-
-DEP_CPP_TSTRI=\
-	"..\..\Src\Property.h"\
-	"..\..\Src\Tombo.h"\
-	"..\..\Src\TString.h"\
-	"..\..\Src\Uniconv.h"\
-	
-
-!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Release"
-
-DEP_CPP_TSTRI=\
-	"..\..\Src\Property.h"\
-	"..\..\Src\Tombo.h"\
-	"..\..\Src\TString.h"\
-	"..\..\Src\Uniconv.h"\
-	
-
-!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Debug"
-
-DEP_CPP_TSTRI=\
-	"..\..\Src\Property.h"\
-	"..\..\Src\Tombo.h"\
-	"..\..\Src\TString.h"\
 	"..\..\Src\Uniconv.h"\
 	
 
@@ -3925,76 +4151,181 @@ DEP_CPP_TSTRI=\
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\Src\Uniconv.cpp
+SOURCE=..\..\Src\TomboLib\TString.cpp
+
+!IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
+
+DEP_CPP_TSTRI=\
+	"..\..\Src\Property.h"\
+	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboLib\File.h"\
+	"..\..\Src\TomboLib\Logger.h"\
+	"..\..\Src\TomboLib\TString.h"\
+	"..\..\Src\TomboLib\Uniconv.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
+
+DEP_CPP_TSTRI=\
+	"..\..\Src\TomboLib\TString.h"\
+	"..\..\Src\TomboLib\Uniconv.h"\
+	
+NODEP_CPP_TSTRI=\
+	"..\..\Src\TomboLib\Property.h"\
+	"..\..\Src\TomboLib\Tombo.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Release"
+
+DEP_CPP_TSTRI=\
+	"..\..\Src\TomboLib\TString.h"\
+	"..\..\Src\TomboLib\Uniconv.h"\
+	
+NODEP_CPP_TSTRI=\
+	"..\..\Src\TomboLib\Property.h"\
+	"..\..\Src\TomboLib\Tombo.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Debug"
+
+DEP_CPP_TSTRI=\
+	"..\..\Src\TomboLib\TString.h"\
+	"..\..\Src\TomboLib\Uniconv.h"\
+	
+NODEP_CPP_TSTRI=\
+	"..\..\Src\TomboLib\Property.h"\
+	"..\..\Src\TomboLib\Tombo.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Release"
+
+DEP_CPP_TSTRI=\
+	"..\..\Src\TomboLib\TString.h"\
+	"..\..\Src\TomboLib\Uniconv.h"\
+	
+NODEP_CPP_TSTRI=\
+	"..\..\Src\TomboLib\Property.h"\
+	"..\..\Src\TomboLib\Tombo.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Debug"
+
+DEP_CPP_TSTRI=\
+	"..\..\Src\TomboLib\TString.h"\
+	"..\..\Src\TomboLib\Uniconv.h"\
+	
+NODEP_CPP_TSTRI=\
+	"..\..\Src\TomboLib\Property.h"\
+	"..\..\Src\TomboLib\Tombo.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Release"
+
+DEP_CPP_TSTRI=\
+	"..\..\Src\TomboLib\TString.h"\
+	"..\..\Src\TomboLib\Uniconv.h"\
+	
+NODEP_CPP_TSTRI=\
+	"..\..\Src\TomboLib\Property.h"\
+	"..\..\Src\TomboLib\Tombo.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Debug"
+
+DEP_CPP_TSTRI=\
+	"..\..\Src\TomboLib\TString.h"\
+	"..\..\Src\TomboLib\Uniconv.h"\
+	
+NODEP_CPP_TSTRI=\
+	"..\..\Src\TomboLib\Property.h"\
+	"..\..\Src\TomboLib\Tombo.h"\
+	
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\TomboLib\Uniconv.cpp
 
 !IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
 
 DEP_CPP_UNICO=\
-	"..\..\Src\File.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
-	"..\..\Src\Uniconv.h"\
+	"..\..\Src\TomboLib\File.h"\
+	"..\..\Src\TomboLib\Logger.h"\
+	"..\..\Src\TomboLib\Uniconv.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
 
 DEP_CPP_UNICO=\
-	"..\..\Src\Uniconv.h"\
+	"..\..\Src\TomboLib\Uniconv.h"\
+	
+NODEP_CPP_UNICO=\
+	"..\..\Src\TomboLib\Property.h"\
+	"..\..\Src\TomboLib\Tombo.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Release"
 
 DEP_CPP_UNICO=\
-	"..\..\Src\Uniconv.h"\
+	"..\..\Src\TomboLib\Uniconv.h"\
 	
 NODEP_CPP_UNICO=\
-	"..\..\kctrl\kctrl.h"\
+	"..\..\Src\TomboLib\Property.h"\
+	"..\..\Src\TomboLib\Tombo.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Debug"
 
 DEP_CPP_UNICO=\
-	"..\..\Src\Uniconv.h"\
+	"..\..\Src\TomboLib\Uniconv.h"\
 	
 NODEP_CPP_UNICO=\
-	"..\..\kctrl\kctrl.h"\
+	"..\..\Src\TomboLib\Property.h"\
+	"..\..\Src\TomboLib\Tombo.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Release"
 
 DEP_CPP_UNICO=\
-	"..\..\Src\Uniconv.h"\
+	"..\..\Src\TomboLib\Uniconv.h"\
 	
 NODEP_CPP_UNICO=\
-	"..\..\kctrl\kctrl.h"\
+	"..\..\Src\TomboLib\Property.h"\
+	"..\..\Src\TomboLib\Tombo.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Debug"
 
 DEP_CPP_UNICO=\
-	"..\..\Src\Uniconv.h"\
+	"..\..\Src\TomboLib\Uniconv.h"\
 	
 NODEP_CPP_UNICO=\
-	"..\..\kctrl\kctrl.h"\
+	"..\..\Src\TomboLib\Property.h"\
+	"..\..\Src\TomboLib\Tombo.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Release"
 
 DEP_CPP_UNICO=\
-	"..\..\Src\Uniconv.h"\
+	"..\..\Src\TomboLib\Uniconv.h"\
 	
 NODEP_CPP_UNICO=\
-	"..\..\kctrl\kctrl.h"\
+	"..\..\Src\TomboLib\Property.h"\
+	"..\..\Src\TomboLib\Tombo.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Debug"
 
 DEP_CPP_UNICO=\
-	"..\..\Src\Uniconv.h"\
+	"..\..\Src\TomboLib\Uniconv.h"\
 	
 NODEP_CPP_UNICO=\
-	"..\..\kctrl\kctrl.h"\
+	"..\..\Src\TomboLib\Property.h"\
+	"..\..\Src\TomboLib\Tombo.h"\
 	
 
 !ENDIF 
@@ -4057,54 +4388,54 @@ DEP_CPP_UTIL_=\
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\Src\VarBuffer.cpp
+SOURCE=..\..\Src\TomboLib\VarBuffer.cpp
 
 !IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
 
 DEP_CPP_VARBU=\
-	"..\..\Src\VarBuffer.h"\
+	"..\..\Src\TomboLib\VarBuffer.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
 
 DEP_CPP_VARBU=\
-	"..\..\Src\VarBuffer.h"\
+	"..\..\Src\TomboLib\VarBuffer.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Release"
 
 DEP_CPP_VARBU=\
-	"..\..\Src\VarBuffer.h"\
+	"..\..\Src\TomboLib\VarBuffer.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Debug"
 
 DEP_CPP_VARBU=\
-	"..\..\Src\VarBuffer.h"\
+	"..\..\Src\TomboLib\VarBuffer.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Release"
 
 DEP_CPP_VARBU=\
-	"..\..\Src\VarBuffer.h"\
+	"..\..\Src\TomboLib\VarBuffer.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Debug"
 
 DEP_CPP_VARBU=\
-	"..\..\Src\VarBuffer.h"\
+	"..\..\Src\TomboLib\VarBuffer.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Release"
 
 DEP_CPP_VARBU=\
-	"..\..\Src\VarBuffer.h"\
+	"..\..\Src\TomboLib\VarBuffer.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Debug"
 
 DEP_CPP_VARBU=\
-	"..\..\Src\VarBuffer.h"\
+	"..\..\Src\TomboLib\VarBuffer.h"\
 	
 
 !ENDIF 
@@ -4117,15 +4448,15 @@ SOURCE=..\..\Src\VFManager.cpp
 !IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
 
 DEP_CPP_VFMAN=\
-	"..\..\Src\File.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\Message.h"\
 	"..\..\Src\PasswordManager.h"\
 	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboLib\File.h"\
+	"..\..\Src\TomboLib\Logger.h"\
+	"..\..\Src\TomboLib\TString.h"\
+	"..\..\Src\TomboLib\Uniconv.h"\
+	"..\..\Src\TomboLib\VarBuffer.h"\
 	"..\..\Src\TSParser.h"\
-	"..\..\Src\TString.h"\
-	"..\..\Src\Uniconv.h"\
-	"..\..\Src\VarBuffer.h"\
 	"..\..\Src\VFManager.h"\
 	"..\..\Src\VFStream.h"\
 	
@@ -4133,113 +4464,127 @@ DEP_CPP_VFMAN=\
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
 
 DEP_CPP_VFMAN=\
-	"..\..\Src\File.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\Message.h"\
 	"..\..\Src\PasswordManager.h"\
 	"..\..\Src\Tombo.h"\
 	"..\..\Src\TSParser.h"\
+	"..\..\Src\VFManager.h"\
+	"..\..\Src\VFStream.h"\
+	
+NODEP_CPP_VFMAN=\
+	"..\..\Src\File.h"\
+	"..\..\Src\Logger.h"\
 	"..\..\Src\TString.h"\
 	"..\..\Src\Uniconv.h"\
 	"..\..\Src\VarBuffer.h"\
-	"..\..\Src\VFManager.h"\
-	"..\..\Src\VFStream.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Release"
 
 DEP_CPP_VFMAN=\
-	"..\..\Src\File.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\Message.h"\
 	"..\..\Src\PasswordManager.h"\
 	"..\..\Src\Tombo.h"\
 	"..\..\Src\TSParser.h"\
+	"..\..\Src\VFManager.h"\
+	"..\..\Src\VFStream.h"\
+	
+NODEP_CPP_VFMAN=\
+	"..\..\Src\File.h"\
+	"..\..\Src\Logger.h"\
 	"..\..\Src\TString.h"\
 	"..\..\Src\Uniconv.h"\
 	"..\..\Src\VarBuffer.h"\
-	"..\..\Src\VFManager.h"\
-	"..\..\Src\VFStream.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Debug"
 
 DEP_CPP_VFMAN=\
-	"..\..\Src\File.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\Message.h"\
 	"..\..\Src\PasswordManager.h"\
 	"..\..\Src\Tombo.h"\
 	"..\..\Src\TSParser.h"\
+	"..\..\Src\VFManager.h"\
+	"..\..\Src\VFStream.h"\
+	
+NODEP_CPP_VFMAN=\
+	"..\..\Src\File.h"\
+	"..\..\Src\Logger.h"\
 	"..\..\Src\TString.h"\
 	"..\..\Src\Uniconv.h"\
 	"..\..\Src\VarBuffer.h"\
-	"..\..\Src\VFManager.h"\
-	"..\..\Src\VFStream.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Release"
 
 DEP_CPP_VFMAN=\
-	"..\..\Src\File.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\Message.h"\
 	"..\..\Src\PasswordManager.h"\
 	"..\..\Src\Tombo.h"\
 	"..\..\Src\TSParser.h"\
+	"..\..\Src\VFManager.h"\
+	"..\..\Src\VFStream.h"\
+	
+NODEP_CPP_VFMAN=\
+	"..\..\Src\File.h"\
+	"..\..\Src\Logger.h"\
 	"..\..\Src\TString.h"\
 	"..\..\Src\Uniconv.h"\
 	"..\..\Src\VarBuffer.h"\
-	"..\..\Src\VFManager.h"\
-	"..\..\Src\VFStream.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Debug"
 
 DEP_CPP_VFMAN=\
-	"..\..\Src\File.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\Message.h"\
 	"..\..\Src\PasswordManager.h"\
 	"..\..\Src\Tombo.h"\
 	"..\..\Src\TSParser.h"\
+	"..\..\Src\VFManager.h"\
+	"..\..\Src\VFStream.h"\
+	
+NODEP_CPP_VFMAN=\
+	"..\..\Src\File.h"\
+	"..\..\Src\Logger.h"\
 	"..\..\Src\TString.h"\
 	"..\..\Src\Uniconv.h"\
 	"..\..\Src\VarBuffer.h"\
-	"..\..\Src\VFManager.h"\
-	"..\..\Src\VFStream.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Release"
 
 DEP_CPP_VFMAN=\
-	"..\..\Src\File.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\Message.h"\
 	"..\..\Src\PasswordManager.h"\
 	"..\..\Src\Tombo.h"\
 	"..\..\Src\TSParser.h"\
+	"..\..\Src\VFManager.h"\
+	"..\..\Src\VFStream.h"\
+	
+NODEP_CPP_VFMAN=\
+	"..\..\Src\File.h"\
+	"..\..\Src\Logger.h"\
 	"..\..\Src\TString.h"\
 	"..\..\Src\Uniconv.h"\
 	"..\..\Src\VarBuffer.h"\
-	"..\..\Src\VFManager.h"\
-	"..\..\Src\VFStream.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Debug"
 
 DEP_CPP_VFMAN=\
-	"..\..\Src\File.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\Message.h"\
 	"..\..\Src\PasswordManager.h"\
 	"..\..\Src\Tombo.h"\
 	"..\..\Src\TSParser.h"\
+	"..\..\Src\VFManager.h"\
+	"..\..\Src\VFStream.h"\
+	
+NODEP_CPP_VFMAN=\
+	"..\..\Src\File.h"\
+	"..\..\Src\Logger.h"\
 	"..\..\Src\TString.h"\
 	"..\..\Src\Uniconv.h"\
 	"..\..\Src\VarBuffer.h"\
-	"..\..\Src\VFManager.h"\
-	"..\..\Src\VFStream.h"\
 	
 
 !ENDIF 
@@ -4254,9 +4599,7 @@ SOURCE=..\..\Src\VFStream.cpp
 DEP_CPP_VFSTR=\
 	"..\..\Src\DialogTemplate.h"\
 	"..\..\Src\DirectoryScanner.h"\
-	"..\..\Src\File.h"\
 	"..\..\Src\FilterAddDlg.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoNote.h"\
 	"..\..\Src\MemoSelectView.h"\
@@ -4264,10 +4607,12 @@ DEP_CPP_VFSTR=\
 	"..\..\Src\Property.h"\
 	"..\..\Src\SearchEngine.h"\
 	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboLib\File.h"\
+	"..\..\Src\TomboLib\Logger.h"\
+	"..\..\Src\TomboLib\TString.h"\
+	"..\..\Src\TomboLib\Uniconv.h"\
+	"..\..\Src\TomboLib\VarBuffer.h"\
 	"..\..\Src\TreeViewItem.h"\
-	"..\..\Src\TString.h"\
-	"..\..\Src\Uniconv.h"\
-	"..\..\Src\VarBuffer.h"\
 	"..\..\Src\VFStream.h"\
 	
 
@@ -4275,105 +4620,119 @@ DEP_CPP_VFSTR=\
 
 DEP_CPP_VFSTR=\
 	"..\..\Src\DirectoryScanner.h"\
-	"..\..\Src\File.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\MemoNote.h"\
 	"..\..\Src\MemoSelectView.h"\
 	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
 	"..\..\Src\TreeViewItem.h"\
-	"..\..\Src\Uniconv.h"\
 	"..\..\Src\VFStream.h"\
+	
+NODEP_CPP_VFSTR=\
+	"..\..\Src\File.h"\
+	"..\..\Src\Logger.h"\
+	"..\..\Src\Uniconv.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Release"
 
 DEP_CPP_VFSTR=\
 	"..\..\Src\DirectoryScanner.h"\
-	"..\..\Src\File.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\MemoNote.h"\
 	"..\..\Src\MemoSelectView.h"\
 	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
 	"..\..\Src\TreeViewItem.h"\
-	"..\..\Src\Uniconv.h"\
 	"..\..\Src\VFStream.h"\
+	
+NODEP_CPP_VFSTR=\
+	"..\..\Src\File.h"\
+	"..\..\Src\Logger.h"\
+	"..\..\Src\Uniconv.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Debug"
 
 DEP_CPP_VFSTR=\
 	"..\..\Src\DirectoryScanner.h"\
-	"..\..\Src\File.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\MemoNote.h"\
 	"..\..\Src\MemoSelectView.h"\
 	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
 	"..\..\Src\TreeViewItem.h"\
-	"..\..\Src\Uniconv.h"\
 	"..\..\Src\VFStream.h"\
+	
+NODEP_CPP_VFSTR=\
+	"..\..\Src\File.h"\
+	"..\..\Src\Logger.h"\
+	"..\..\Src\Uniconv.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Release"
 
 DEP_CPP_VFSTR=\
 	"..\..\Src\DirectoryScanner.h"\
-	"..\..\Src\File.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\MemoNote.h"\
 	"..\..\Src\MemoSelectView.h"\
 	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
 	"..\..\Src\TreeViewItem.h"\
-	"..\..\Src\Uniconv.h"\
 	"..\..\Src\VFStream.h"\
+	
+NODEP_CPP_VFSTR=\
+	"..\..\Src\File.h"\
+	"..\..\Src\Logger.h"\
+	"..\..\Src\Uniconv.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Debug"
 
 DEP_CPP_VFSTR=\
 	"..\..\Src\DirectoryScanner.h"\
-	"..\..\Src\File.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\MemoNote.h"\
 	"..\..\Src\MemoSelectView.h"\
 	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
 	"..\..\Src\TreeViewItem.h"\
-	"..\..\Src\Uniconv.h"\
 	"..\..\Src\VFStream.h"\
+	
+NODEP_CPP_VFSTR=\
+	"..\..\Src\File.h"\
+	"..\..\Src\Logger.h"\
+	"..\..\Src\Uniconv.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Release"
 
 DEP_CPP_VFSTR=\
 	"..\..\Src\DirectoryScanner.h"\
-	"..\..\Src\File.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\MemoNote.h"\
 	"..\..\Src\MemoSelectView.h"\
 	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
 	"..\..\Src\TreeViewItem.h"\
-	"..\..\Src\Uniconv.h"\
 	"..\..\Src\VFStream.h"\
+	
+NODEP_CPP_VFSTR=\
+	"..\..\Src\File.h"\
+	"..\..\Src\Logger.h"\
+	"..\..\Src\Uniconv.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Debug"
 
 DEP_CPP_VFSTR=\
 	"..\..\Src\DirectoryScanner.h"\
-	"..\..\Src\File.h"\
-	"..\..\Src\Logger.h"\
 	"..\..\Src\MemoNote.h"\
 	"..\..\Src\MemoSelectView.h"\
 	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
 	"..\..\Src\TreeViewItem.h"\
-	"..\..\Src\Uniconv.h"\
 	"..\..\Src\VFStream.h"\
+	
+NODEP_CPP_VFSTR=\
+	"..\..\Src\File.h"\
+	"..\..\Src\Logger.h"\
+	"..\..\Src\Uniconv.h"\
 	
 
 !ENDIF 
@@ -4394,6 +4753,10 @@ SOURCE=..\..\Src\gnupg\bithelp.h
 # Begin Source File
 
 SOURCE=..\..\Src\Chipher.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\TomboLib\Clipboard.h
 # End Source File
 # Begin Source File
 
@@ -4421,7 +4784,11 @@ SOURCE=..\..\Src\DirList.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\Src\File.h
+SOURCE=..\..\Src\TomboLib\File.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\TomboLib\FileInputStream.h
 # End Source File
 # Begin Source File
 
@@ -4445,7 +4812,11 @@ SOURCE=..\..\Src\GrepDialog.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\Src\Logger.h
+SOURCE=..\..\Src\TomboLib\List.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\TomboLib\Logger.h
 # End Source File
 # Begin Source File
 
@@ -4517,7 +4888,7 @@ SOURCE=..\..\Src\SearchTree.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\Src\SipControl.h
+SOURCE=..\..\Src\TomboLib\SipControl.h
 # End Source File
 # Begin Source File
 
@@ -4533,15 +4904,15 @@ SOURCE=..\..\Src\TSParser.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\Src\TString.h
+SOURCE=..\..\Src\TomboLib\TString.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\Src\Uniconv.h
+SOURCE=..\..\Src\TomboLib\Uniconv.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\Src\VarBuffer.h
+SOURCE=..\..\Src\TomboLib\VarBuffer.h
 # End Source File
 # Begin Source File
 

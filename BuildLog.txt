@@ -446,3 +446,8 @@ Changes
 * FIX: Shift+Up selection(#4032, #4033)
 	This fix is enabled only when set PLATFORM_SIG3 macro in DetailsViewWndProc.cpp
 
+////////////////////////////////
+// B114
+////////////////////////////////
+
+* Move some common libraries to folder 'TomboLib'. You should "build all" when compiling.
