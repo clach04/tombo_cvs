@@ -39,6 +39,8 @@
 #define IMG_ARTICLE_ENC_MASKED 5
 #define IMG_FOLDER_MASKED 6
 #define IMG_FOLDER_SEL_MASKED 7
+#define IMG_VFOLDER 8
+#define IMG_VFOLDER_SEL 9
 
 extern HINSTANCE g_hInstance;
 
