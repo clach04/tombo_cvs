@@ -1,7 +1,7 @@
 #
 # TOMBO Build program for ActivePerl(Win32)
 
-$version = "Tombo1_8";
+$version = "Tombo1_9b1";
 
 ##########################################################################
 # Tool definition
@@ -224,8 +224,8 @@ $be300root = "R:\\work2\\BE300SDK_1012\\Installer\\English PC Tools";
 @archlist = (
 	[\@buildlistCEJP, "CE-JP", "_ce_all_jp"],
 	[\@buildlistCEEN, "CE-EN", "_ce_all_en"],
-	[\@buildlistWin32JP, "Win32-JP", "_win32_jp"],
-	[\@buildlistWin32EN, "Win32-EN", "_win32_en"],
+	[\@buildlistWin32JP, "Win32-JP", "_desktop_jp"],
+	[\@buildlistWin32EN, "Win32-EN", "_desktop_en"],
 #	[\@buildlist_HPC_JP, "HPC-JP", "_hpcpro_jp"],
 #	[\@buildlist_PKTPC_JP, "PKTPC-JP", "_pktpc_jp"],
 #	[\@buildlist_PSPC_JP, "PSPC-JP", "_pspc_jp"],

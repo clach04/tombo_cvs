@@ -654,3 +654,10 @@ Not fully tested on both platform, probably it will work.
 
 * FIX: when tapping edit view then tapping tree view, menu don't be changed.
 * FIX: window size is not correct when 2 pane view.
+
+////////////////////////////////
+// B141 (TOMBO 1.9 beta 1)
+////////////////////////////////
+// main trunk
+
+* modify menubar width on PocketPC(English).

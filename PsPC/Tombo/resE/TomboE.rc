@@ -359,7 +359,7 @@ END
 
 /////////////////////////////////////////////////////////////////////////////
 //
-// Menubar
+// Menu
 //
 
 IDR_MENU_MAIN MENU DISCARDABLE 
@@ -393,6 +393,7 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "Encrypt",                     IDM_ENCRYPT
         MENUITEM "Decrypt",                     IDM_DECRYPT
+        MENUITEM "Two pane",                    IDM_TOGGLEPANE
     END
     POPUP "BkMark"
     BEGIN
