@@ -1981,6 +1981,9 @@ void MainFrame::LoadWinSize(HWND hWnd)
 	if (!Property::GetWinSize(&rMainFrame, &nSelectViewWidth)) {
 		nSelectViewWidth = (rClientRect.right - rClientRect.left) / 3;	
 	} else {
+#if defined(PLATFORM_HPC)
+		rMainFrame = rClientRect;
+#endif
 		MoveWindow(hWnd, rMainFrame.left, rMainFrame.top, rMainFrame.right, rMainFrame.bottom, TRUE);
 	}
 
