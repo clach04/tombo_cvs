@@ -2296,6 +2296,14 @@ static HWND GetCommandBar(HWND hBand, UINT uBandID)
 	HWND hwnd = CommandBands_GetCommandBar(hBand, idx);
 	return hwnd;
 }
+HMENU MainFrame::GetMainMenu() 
+{ 
+	return CommandBar_GetMenu(GetCommandBar(hMSCmdBar, ID_CMDBAR_MAIN), 0); 
+}
+HWND MainFrame::GetMainToolBar() 
+{ 
+	return GetCommandBar(hMSCmdBar, ID_BUTTONBAND); 
+}
 #endif
 
 int MainFrame::MessageBox(LPCTSTR pText, LPCTSTR pCaption, UINT uType)

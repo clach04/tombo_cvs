@@ -65,8 +65,8 @@ protected:
 	HWND GetMainToolBar() { return hToolBar; }
 #endif
 #if defined(PLATFORM_HPC)
-	HMENU GetMainMenu() { return CommandBar_GetMenu(GetCommandBar(hMSCmdBar, ID_CMDBAR_MAIN), 0); }
-	HWND GetMainToolBar() { return GetCommandBar(hMSCmdBar, ID_BUTTONBAND); }
+	HMENU GetMainMenu();
+	HWND GetMainToolBar();
 #endif
 	void EnableMenu(UINT uId, BOOL bEnable);
 
