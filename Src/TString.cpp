@@ -300,11 +300,13 @@ LPCTSTR GetNextDirSeparator(LPCTSTR pStart)
 {
 	LPCTSTR p = pStart;
 	while(*p) {
+#if defined(PLATFORM_WIN32)
 		if (IsDBCSLeadByte((BYTE)*p)) {
 			p++;
 			if (*p) p++;
 			continue;
 		}
+#endif
 		if (*p == TEXT('\\')) return p;
 		p++;
 	}

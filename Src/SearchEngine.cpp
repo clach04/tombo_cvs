@@ -104,9 +104,11 @@ BOOL SearchEngineA::SearchForward(const char *pText, DWORD nStartPos, BOOL bShif
 	DWORD nPatLen = strlen(pPattern);
 
 	if (bShift) {
+#if defined(PLATFORM_WIN32)
 		if (IsDBCSLeadByte((BYTE)*p)) {
 			p++;
 		}
+#endif
 		if (*p) p++;
 	}
 
@@ -134,9 +136,11 @@ BOOL SearchEngineA::SearchBackward(const char *pText, DWORD nStartPos, BOOL bShi
 
 	if (bShift) {
 		p--;
+#if defined(PLATFORM_WIN32)
 		if ((p-1) > pText && IsDBCSLeadByte((BYTE)*(p-1))) {
 			p--;
 		}
+#endif
 	}
 
 	if (!pCompiledPattern) return TRUE;
