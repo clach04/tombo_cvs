@@ -530,3 +530,13 @@ Changes
 	caret positions
 	BS/DEL key handers
 	...
+
+////////////////////////////////
+// B125
+////////////////////////////////
+// 2.0 branch
+
+* FIX: YAE hangups when switch to other note and click the text.
+* FIX: Selected region shifts when resizing.
+* Support CE version.
+

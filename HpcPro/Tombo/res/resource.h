@@ -26,6 +26,8 @@
 #define IDD_PROPTAB_PASS_TIMEOUT        111
 #define ID_MENUBAND                     111
 #define ID_BUTTONBAND                   112
+#define IDC_TOMBOEDIT                   113
+#define IDT_SELSCROLL                   114
 #define IDB_TOOLBAR                     115
 #define IDB_TOOLBAR_DETAILS             116
 #define IDD_PROPTAB_FONT                117
@@ -200,6 +202,6 @@
 #define _APS_NEXT_RESOURCE_VALUE        135
 #define _APS_NEXT_COMMAND_VALUE         40063
 #define _APS_NEXT_CONTROL_VALUE         1043
-#define _APS_NEXT_SYMED_VALUE           113
+#define _APS_NEXT_SYMED_VALUE           115
 #endif
 #endif

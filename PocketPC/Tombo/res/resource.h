@@ -14,7 +14,9 @@
 #define IDD_PASSWORD                    105
 #define IDC_MEMODETAILSVIEW_NF          105
 #define IDD_PROPTAB_FOLDER              106
+#define IDC_TOMBOEDIT                   106
 #define IDD_FILESELECT                  107
+#define IDT_SELSCROLL                   107
 #define IDB_ARTICLEBOX                  108
 #define IDD_PROPTAB_PASSWORD            109
 #define IDD_NEWFOLDER                   110
@@ -210,6 +212,6 @@
 #define _APS_NEXT_RESOURCE_VALUE        129
 #define _APS_NEXT_COMMAND_VALUE         40078
 #define _APS_NEXT_CONTROL_VALUE         1045
-#define _APS_NEXT_SYMED_VALUE           106
+#define _APS_NEXT_SYMED_VALUE           108
 #endif
 #endif

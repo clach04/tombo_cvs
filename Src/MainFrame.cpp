@@ -1253,11 +1253,11 @@ void MainFrame::OnSIPResize(BOOL bImeOn, RECT *pSipRect)
 
 	if (bImeOn) {
 		msView.MoveWindow(rWinRect.left, rWinRect.top, rWinRect.right, nClientBottom - rx.top - nDelta);
-		mdView.MoveWindow(rWinRect.left, rWinRect.top, rWinRect.right, nClientBottom - rx.top - nDelta);
+		pDetailsView->MoveWindow(rWinRect.left, rWinRect.top, rWinRect.right, nClientBottom - rx.top - nDelta);
 	} else {
 		DWORD nBottom = rWinRect.bottom - (r.bottom - r.top); 
 		msView.MoveWindow(rWinRect.left, rWinRect.top, rWinRect.right, nBottom);
-		mdView.MoveWindow(rWinRect.left, rWinRect.top, rWinRect.right, nBottom);
+		pDetailsView->MoveWindow(rWinRect.left, rWinRect.top, rWinRect.right, nBottom);
 	}
 #endif
 #if defined(PLATFORM_PSPC) || defined(PLATFORM_BE500)
@@ -1274,13 +1274,13 @@ void MainFrame::OnSIPResize(BOOL bImeOn, RECT *pSipRect)
 		RECT rx;
 		GetWindowRect(hMainWnd, &rx);
 		msView.MoveWindow(0, nTop, 240, nClientBottom - rx.top - nTop);
-		mdView.MoveWindow(0, nTop, 240, nClientBottom - rx.top - nTop);
+		pDetailsView->MoveWindow(0, nTop, 240, nClientBottom - rx.top - nTop);
 		
 //		msView.MoveWindow(0, nTop, 240, nBottom - nSipHeight);
 //		mdView.MoveWindow(0, nTop, 240, nBottom - nSipHeight);
 	} else {
 		msView.MoveWindow(0, nTop, 240, nBottom);
-		mdView.MoveWindow(0, nTop, 240, nBottom);
+		pDetailsView->MoveWindow(0, nTop, 240, nBottom);
 	}
 #endif
 #endif

@@ -1,6 +1,8 @@
 #include <windows.h>
 #include <tchar.h>
+#if !defined(PLATFORM_PSPC)
 #include <imm.h>
+#endif
 #if defined(PLATFORM_WIN32)
 #include <zmouse.h>
 #endif
@@ -170,7 +172,7 @@ BOOL YAEdit::Create(HINSTANCE hInst, HWND hParent, DWORD nId, RECT &r, YAECallba
 	if (!pDoc->Init("", this, pDocCb)) return FALSE;
 
 	
-#if defined(PLATFORM_WIN32)
+#if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
 	pView->hViewWnd = CreateWindowEx(WS_EX_CLIENTEDGE, YAEDIT_CLASS_NAME, TEXT(""),
 						WS_CHILD | WS_VISIBLE | WS_VSCROLL | WS_HSCROLL,
 						r.left,

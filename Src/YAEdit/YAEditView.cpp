@@ -1,6 +1,8 @@
 #include <windows.h>
 #include <tchar.h>
+#if !defined(PLATFORM_PSPC)
 #include <imm.h>
+#endif
 #if defined(PLATFORM_WIN32)
 #include <zmouse.h>
 #endif
@@ -514,6 +516,7 @@ void YAEditView::SetCaretPos()
 			bShowCaret = TRUE;
 		}
 
+#if !defined(PLATFORM_PSPC)
 		HIMC hIMC = ImmGetContext(hViewWnd);
 		COMPOSITIONFORM cf;
 		cf.dwStyle = CFS_POINT;
@@ -521,6 +524,7 @@ void YAEditView::SetCaretPos()
 		cf.ptCurrentPos.y = (nCursorRow - nBaseLineNo) * nLineH;
 		ImmSetCompositionWindow(hIMC, &cf);
 		ImmReleaseContext(hViewWnd, hIMC);
+#endif
 
 		::SetCaretPos(nCursorColPos - nColOffset, (nCursorRow - nBaseLineNo)*nLineH);
 	} else {
