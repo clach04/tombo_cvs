@@ -599,6 +599,7 @@ SOURCE=..\..\Src\DetailsViewWndProc.cpp
 
 DEP_CPP_DETAI=\
 	"..\..\Src\MemoDetailsView.h"\
+	"..\..\Src\MemoManager.h"\
 	"..\..\Src\Property.h"\
 	
 
@@ -1037,6 +1038,7 @@ SOURCE=..\..\Src\MainFrame.cpp
 
 DEP_CPP_MAINF=\
 	"..\..\Src\AboutDialog.h"\
+	"..\..\Src\DirectoryScanner.h"\
 	"..\..\Src\File.h"\
 	"..\..\Src\Logger.h"\
 	"..\..\Src\MainFrame.h"\
@@ -1044,6 +1046,7 @@ DEP_CPP_MAINF=\
 	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoNote.h"\
 	"..\..\Src\MemoSelectView.h"\
+	"..\..\Src\Message.h"\
 	"..\..\Src\PasswordManager.h"\
 	"..\..\Src\Property.h"\
 	"..\..\Src\SearchDlg.h"\
@@ -1052,12 +1055,10 @@ DEP_CPP_MAINF=\
 	"..\..\Src\Tombo.h"\
 	"..\..\Src\TreeViewItem.h"\
 	"..\..\Src\Uniconv.h"\
-	
-NODEP_CPP_MAINF=\
-	".\SO.h"\
-	".\SOBar.h"\
-	".\SOButton.h"\
-	".\Wind.h"\
+	{$(INCLUDE)}"CSO.h"\
+	{$(INCLUDE)}"CSOBar.h"\
+	{$(INCLUDE)}"CSOButton.h"\
+	{$(INCLUDE)}"CWind.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
@@ -1253,6 +1254,7 @@ DEP_CPP_MEMOD=\
 	"..\..\Src\MemoDetailsView.h"\
 	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoSelectView.h"\
+	"..\..\Src\Message.h"\
 	"..\..\Src\PasswordManager.h"\
 	"..\..\Src\Property.h"\
 	"..\..\Src\SearchEngine.h"\
@@ -1350,6 +1352,7 @@ DEP_CPP_MEMOF=\
 	"..\..\Src\Logger.h"\
 	"..\..\Src\MemoFolder.h"\
 	"..\..\Src\MemoNote.h"\
+	"..\..\Src\Message.h"\
 	"..\..\Src\Tombo.h"\
 	"..\..\Src\TreeViewItem.h"\
 	"..\..\Src\TString.h"\
@@ -1547,6 +1550,7 @@ DEP_CPP_MEMOM=\
 	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoNote.h"\
 	"..\..\Src\MemoSelectView.h"\
+	"..\..\Src\Message.h"\
 	"..\..\Src\NewFolderDialog.h"\
 	"..\..\Src\PasswordManager.h"\
 	"..\..\Src\Property.h"\
@@ -1666,6 +1670,7 @@ DEP_CPP_MEMON=\
 	"..\..\Src\MemoInfo.h"\
 	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoNote.h"\
+	"..\..\Src\Message.h"\
 	"..\..\Src\PasswordManager.h"\
 	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
@@ -1784,8 +1789,10 @@ DEP_CPP_MEMOS=\
 	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoNote.h"\
 	"..\..\Src\MemoSelectView.h"\
+	"..\..\Src\Message.h"\
 	"..\..\Src\PasswordManager.h"\
 	"..\..\Src\Property.h"\
+	"..\..\Src\SearchEngine.h"\
 	"..\..\Src\Tombo.h"\
 	"..\..\Src\TreeViewItem.h"\
 	"..\..\Src\TString.h"\
@@ -1932,6 +1939,7 @@ DEP_CPP_PASSW=\
 	"..\..\Src\File.h"\
 	"..\..\Src\Logger.h"\
 	"..\..\Src\MemoNote.h"\
+	"..\..\Src\Message.h"\
 	"..\..\Src\PasswordDialog.h"\
 	"..\..\Src\SipControl.h"\
 	"..\..\Src\Tombo.h"\
@@ -2009,6 +2017,7 @@ DEP_CPP_PASSWO=\
 	"..\..\Src\CryptManager.h"\
 	"..\..\Src\File.h"\
 	"..\..\Src\Logger.h"\
+	"..\..\Src\Message.h"\
 	"..\..\Src\PasswordDialog.h"\
 	"..\..\Src\PasswordManager.h"\
 	"..\..\Src\Property.h"\
@@ -2088,15 +2097,14 @@ DEP_CPP_PROPE=\
 	"..\..\Src\FileSelector.h"\
 	"..\..\Src\Logger.h"\
 	"..\..\Src\MemoNote.h"\
+	"..\..\Src\Message.h"\
 	"..\..\Src\PasswordManager.h"\
 	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
 	"..\..\Src\TreeViewItem.h"\
 	"..\..\Src\Uniconv.h"\
-	
-NODEP_CPP_PROPE=\
-	".\etDisk.h"\
-	".\otify.h"\
+	{$(INCLUDE)}"GetDisk.h"\
+	{$(INCLUDE)}"notify.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
@@ -2174,6 +2182,7 @@ SOURCE=..\..\Src\regex\regex.c
 
 DEP_CPP_REGEX=\
 	"..\..\Src\regex\config.h"\
+	"..\..\Src\regex\ctypeutil.h"\
 	"..\..\Src\regex\regex.h"\
 	
 NODEP_CPP_REGEX=\
@@ -2385,6 +2394,7 @@ SOURCE=..\..\Src\SearchEngine.cpp
 
 DEP_CPP_SEARCH=\
 	"..\..\Src\SearchEngine.h"\
+	"..\..\Src\Uniconv.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
@@ -2511,10 +2521,8 @@ DEP_CPP_SIPCO=\
 	"..\..\Src\Logger.h"\
 	"..\..\Src\SipControl.h"\
 	"..\..\Src\Tombo.h"\
-	
-NODEP_CPP_SIPCO=\
-	".\ip.h"\
-	".\ipapi.h"\
+	{$(INCLUDE)}"sip.h"\
+	{$(INCLUDE)}"sipapi.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
@@ -2628,6 +2636,7 @@ DEP_CPP_TREEV=\
 	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoNote.h"\
 	"..\..\Src\MemoSelectView.h"\
+	"..\..\Src\Message.h"\
 	"..\..\Src\PasswordManager.h"\
 	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
@@ -3146,6 +3155,10 @@ SOURCE=.\res\draftimg.bmp
 # Begin Source File
 
 SOURCE=..\..\Src\image\draftimg.bmp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\image\find.bmp
 # End Source File
 # Begin Source File
 

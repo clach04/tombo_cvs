@@ -55,7 +55,7 @@ static LRESULT CALLBACK MainFrameWndProc(HWND, UINT, WPARAM, LPARAM);
 // Pocket PC
 
 #if defined(PLATFORM_PKTPC)
-#define NUM_TOOLBAR_BMP 9
+#define NUM_TOOLBAR_BMP 10
 
 #define NUM_MS_TOOLTIP 1
 LPTSTR pMSToolTip[] = {
@@ -78,7 +78,7 @@ LPTSTR pMDToolTip[] = {
 
 #if defined(PLATFORM_PSPC)
 #define NUM_CMDBAR_BUTTONS 6
-#define NUM_IMG_BUTTONS 9
+#define NUM_IMG_BUTTONS 10
 
 #define NUM_MD_CMDBAR_BUTTONS 7
 #define NUM_MD_IMG_BUTTONS 1
@@ -113,8 +113,8 @@ static void ControlToolbar(HWND hToolbar, BOOL bSelectViewActive);
 static HWND GetCommandBar(HWND hBand, UINT uBandID);
 
 #define NUM_MY_TOOLBAR_BMPS 0
-#define NUM_CMDBAR_BUTTONS 18
-#define NUM_IMG_BUTTONS 9
+#define NUM_CMDBAR_BUTTONS 19
+#define NUM_IMG_BUTTONS 10
 
 static TBBUTTON aCmdBarButtons[NUM_CMDBAR_BUTTONS] = {
 	{0,                                  0,              TBSTATE_ENABLED, TBSTYLE_SEP,    0, 0, 0, -1},
@@ -132,6 +132,7 @@ static TBBUTTON aCmdBarButtons[NUM_CMDBAR_BUTTONS] = {
 	{0,                                  0,              TBSTATE_ENABLED, TBSTYLE_SEP,    0, 0, 0, -1},
 	{21,                                 IDM_TOGGLEPANE, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0, 0, 0, -1},
 	{0,                                  0,              TBSTATE_ENABLED, TBSTYLE_SEP,    0, 0, 0, -1},
+	{24,                                 IDM_SEARCH,     TBSTATE_ENABLED, TBSTYLE_BUTTON, 0, 0, 0, -1},
 	{22,                                 IDM_SEARCH_PREV,              0, TBSTYLE_BUTTON, 0, 0, 0, -1},
 	{23,                                 IDM_SEARCH_NEXT,              0, TBSTYLE_BUTTON, 0, 0, 0, -1},
 	{0,                                  0,              TBSTATE_ENABLED, TBSTYLE_SEP,    0, 0, 0, -1},
@@ -152,8 +153,8 @@ static TBBUTTON aMDCmdBarButtons[NUM_MD_CMDBAR_BUTTONS] = {
 static void ControlMenu(HMENU hMenu, BOOL bSelectViewActive);
 static void ControlToolbar(HWND hToolbar, BOOL bSelectViewActive);
 
-#define NUM_MY_TOOLBAR_BMPS 9
-#define NUM_TOOLBAR_BUTTONS 16
+#define NUM_MY_TOOLBAR_BMPS 10
+#define NUM_TOOLBAR_BUTTONS 17
 
 static TBBUTTON aToolbarButtons[NUM_TOOLBAR_BUTTONS] = {
 	{STD_FILENEW + NUM_MY_TOOLBAR_BMPS,  IDM_NEWMEMO,    TBSTATE_ENABLED, TBSTYLE_BUTTON, 0, 0, 0, -1},
@@ -169,6 +170,7 @@ static TBBUTTON aToolbarButtons[NUM_TOOLBAR_BUTTONS] = {
 	{3,                                  IDM_INSDATE1,   TBSTATE_ENABLED, TBSTYLE_BUTTON, 0, 0, 0, -1},
 	{4,                                  IDM_INSDATE2,   TBSTATE_ENABLED, TBSTYLE_BUTTON, 0, 0, 0, -1},
 	{0,                                  0,              TBSTATE_ENABLED, TBSTYLE_SEP,    0, 0, 0, -1},
+	{9,                                  IDM_SEARCH,     TBSTATE_ENABLED, TBSTYLE_BUTTON, 0, 0, 0, -1},
 	{7,                                  IDM_SEARCH_PREV,              0, TBSTYLE_BUTTON, 0, 0, 0, -1},
 	{8,                                  IDM_SEARCH_NEXT,              0, TBSTYLE_BUTTON, 0, 0, 0, -1},
 	{0,                                  0,              TBSTATE_ENABLED, TBSTYLE_SEP,    0, 0, 0, -1},
@@ -182,16 +184,17 @@ static TBBUTTON aToolbarButtons[NUM_TOOLBAR_BUTTONS] = {
 #define NUM_IMG_BUTTONS 0
 #define NUM_MD_IMG_BUTTONS 0
 
-#define NUM_SV_CMDBAR_BUTTONS 7
+#define NUM_SV_CMDBAR_BUTTONS 8
 CSOBAR_BUTTONINFO	aSVCSOBarButtons[NUM_SV_CMDBAR_BUTTONS] = 
 {
-	IDM_SV_MENU_1, CSOBAR_BUTTON_SUBMENU_DOWN,  CSO_BUTTON_DISP, (-1),        NULL, MSG_MEMO, NULL,   CSOBAR_CODEPOS_CENTER, 1, (-1), (-1), (-1), (-1), 0, CLR_INVALID, CLR_INVALID, CLR_INVALID, FALSE, FALSE,
-	IDM_SV_MENU_2, CSOBAR_BUTTON_SUBMENU_DOWN,  CSO_BUTTON_DISP, (-1),        NULL, MSG_TOOL, NULL,   CSOBAR_CODEPOS_CENTER, 1, (-1), (-1), (-1), (-1), 0, CLR_INVALID, CLR_INVALID, CLR_INVALID, FALSE, FALSE,
-	0,             CSOBAR_SEP,                  CSO_BUTTON_DISP, (-1),        NULL, NULL,     NULL,   0,                     1, (-1), (-1), (-1), (-1), 0, CLR_INVALID, CLR_INVALID, CLR_INVALID, FALSE, FALSE,
-	IDM_NEWMEMO,   CSOBAR_BUTTON_NORM,          CSO_BUTTON_DISP, IDB_NEWMEMO, NULL, NULL,     NULL,   CSOBAR_CODEPOS_CENTER, 1, (-1), (-1), (-1), (-1), 0, CLR_INVALID, CLR_INVALID, CLR_INVALID, FALSE, FALSE,
-	0,             CSOBAR_SEP,                  CSO_BUTTON_DISP, (-1),        NULL, NULL,     NULL,   0,                     1, (-1), (-1), (-1), (-1), 0, CLR_INVALID, CLR_INVALID, CLR_INVALID, FALSE, FALSE,
-	IDM_SEARCH_PREV,CSOBAR_BUTTON_NORM,         CSO_BUTTON_DISP, IDB_FINDPREV,NULL, NULL,     NULL,   CSOBAR_CODEPOS_CENTER, 1, (-1), (-1), (-1), (-1), 0, CLR_INVALID, CLR_INVALID, CLR_INVALID, FALSE, FALSE,
-	IDM_SEARCH_NEXT,CSOBAR_BUTTON_NORM,         CSO_BUTTON_DISP, IDB_FINDNEXT,NULL, NULL,     NULL,   CSOBAR_CODEPOS_CENTER, 1, (-1), (-1), (-1), (-1), 0, CLR_INVALID, CLR_INVALID, CLR_INVALID, FALSE, FALSE,
+	IDM_SV_MENU_1,  CSOBAR_BUTTON_SUBMENU_DOWN,  CSO_BUTTON_DISP, (-1),        NULL, MSG_MEMO, NULL,   CSOBAR_CODEPOS_CENTER, 1, (-1), (-1), (-1), (-1), 0, CLR_INVALID, CLR_INVALID, CLR_INVALID, FALSE, FALSE,
+	IDM_SV_MENU_2,  CSOBAR_BUTTON_SUBMENU_DOWN,  CSO_BUTTON_DISP, (-1),        NULL, MSG_TOOL, NULL,   CSOBAR_CODEPOS_CENTER, 1, (-1), (-1), (-1), (-1), 0, CLR_INVALID, CLR_INVALID, CLR_INVALID, FALSE, FALSE,
+	0,              CSOBAR_SEP,                  CSO_BUTTON_DISP, (-1),        NULL, NULL,     NULL,   0,                     1, (-1), (-1), (-1), (-1), 0, CLR_INVALID, CLR_INVALID, CLR_INVALID, FALSE, FALSE,
+	IDM_NEWMEMO,    CSOBAR_BUTTON_NORM,          CSO_BUTTON_DISP, IDB_NEWMEMO, NULL, NULL,     NULL,   CSOBAR_CODEPOS_CENTER, 1, (-1), (-1), (-1), (-1), 0, CLR_INVALID, CLR_INVALID, CLR_INVALID, FALSE, FALSE,
+	0,              CSOBAR_SEP,                  CSO_BUTTON_DISP, (-1),        NULL, NULL,     NULL,   0,                     1, (-1), (-1), (-1), (-1), 0, CLR_INVALID, CLR_INVALID, CLR_INVALID, FALSE, FALSE,
+	IDM_SEARCH,     CSOBAR_BUTTON_NORM,         CSO_BUTTON_DISP, IDB_FIND,     NULL, NULL,     NULL,   CSOBAR_CODEPOS_CENTER, 1, (-1), (-1), (-1), (-1), 0, CLR_INVALID, CLR_INVALID, CLR_INVALID, FALSE, FALSE,
+	IDM_SEARCH_PREV,CSOBAR_BUTTON_NORM,         CSO_BUTTON_DISP, IDB_FINDPREV, NULL, NULL,     NULL,   CSOBAR_CODEPOS_CENTER, 1, (-1), (-1), (-1), (-1), 0, CLR_INVALID, CLR_INVALID, CLR_INVALID, FALSE, FALSE,
+	IDM_SEARCH_NEXT,CSOBAR_BUTTON_NORM,         CSO_BUTTON_DISP, IDB_FINDNEXT, NULL, NULL,     NULL,   CSOBAR_CODEPOS_CENTER, 1, (-1), (-1), (-1), (-1), 0, CLR_INVALID, CLR_INVALID, CLR_INVALID, FALSE, FALSE,
 };
 
 #define NUM_DV_CMDBAR_BUTTONS 12
@@ -786,25 +789,18 @@ void MainFrame::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	HMENU hMSMenu = LoadMenu(pcs->hInstance, MAKEINTRESOURCE(IDR_MENU_MAIN));
 	hMenuEncrypt = aSVCSOBarButtons[0].SubMenu	= GetSubMenu(hMSMenu, 0);
 	aSVCSOBarButtons[1].SubMenu	= GetSubMenu(hMSMenu, 1);
-	aSVCSOBarButtons[3].reshInst = pcs->hInstance; 
-	aSVCSOBarButtons[5].reshInst = pcs->hInstance; 	
-	aSVCSOBarButtons[6].reshInst = pcs->hInstance; 
-
+	for (int i = 0; i < NUM_SV_CMDBAR_BUTTONS; i++) {
+		aSVCSOBarButtons[i].reshInst = pcs->hInstance;
+	}
 	CSOBar_AddButtons(hMSCmdBar, pcs->hInstance, NUM_SV_CMDBAR_BUTTONS, &aSVCSOBarButtons[0]);
 
 	// Ú×ƒrƒ…[
 	hMDCmdBar = MakeCSOBar(pcs->hInstance, hWnd, ID_CMDBAR_DETAILS);
 	HMENU hMDMenu = LoadMenu(pcs->hInstance, MAKEINTRESOURCE(IDR_MENU_DETAILS));
 	hFoldMenu = aDVCSOBarButtons[2].SubMenu	= GetSubMenu(hMDMenu, 0);
-	aDVCSOBarButtons[4].reshInst = pcs->hInstance;
-	aDVCSOBarButtons[6].reshInst = pcs->hInstance;
-	aDVCSOBarButtons[7].reshInst = pcs->hInstance;
-	aDVCSOBarButtons[8].reshInst = pcs->hInstance;
-	aDVCSOBarButtons[10].reshInst = pcs->hInstance;
-	aDVCSOBarButtons[11].reshInst = pcs->hInstance;
-//	aDVCSOBarButtons[12].reshInst = pcs->hInstance;
-//	aDVCSOBarButtons[13].reshInst = pcs->hInstance;
-
+	for (i = 0; i < NUM_DV_CMDBAR_BUTTONS; i++) {
+		aDVCSOBarButtons[i].reshInst = pcs->hInstance;
+	}
 	CSOBar_AddButtons(hMDCmdBar, pcs->hInstance, NUM_DV_CMDBAR_BUTTONS, &aDVCSOBarButtons[0]);
 
     CSOBar_Show(hMSCmdBar, TRUE);

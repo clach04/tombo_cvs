@@ -37,6 +37,7 @@ IDB_COPY                BITMAP  DISCARDABLE     "../../../Src/image/copy.bmp"
 IDB_PASTE               BITMAP  DISCARDABLE     "../../../Src/image/paste.bmp"
 IDB_FINDNEXT            BITMAP  DISCARDABLE     "../../../Src/image/findnext.bmp"
 IDB_FINDPREV            BITMAP  DISCARDABLE     "../../../Src/image/findprev.bmp"
+IDB_FIND                BITMAP  DISCARDABLE     "../../../Src/image/find.bmp"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -52,7 +53,7 @@ IDI_TOMBO               ICON    DISCARDABLE     "../../../Src/image/Tombo.ICO"
 // Dialog
 //
 
-IDD_ABOUTBOX DIALOGEX 0, 0, 152, 159
+IDD_ABOUTBOX DIALOG DISCARDABLE  0, 0, 152, 159
 STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE 0x80000000L
 CAPTION "About TOMBO"
