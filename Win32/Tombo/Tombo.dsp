@@ -161,6 +161,10 @@ SOURCE=..\..\Src\FileSelector.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\Src\FilterCtlDlg.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\Src\GrepDialog.cpp
 # End Source File
 # Begin Source File
@@ -358,6 +362,10 @@ SOURCE=..\..\Src\FileInputStream.h
 # Begin Source File
 
 SOURCE=..\..\Src\FileSelector.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\FilterCtlDlg.h
 # End Source File
 # Begin Source File
 

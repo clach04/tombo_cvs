@@ -326,8 +326,6 @@ DEP_CPP_ABOUT=\
 	"..\..\Src\File.h"\
 	"..\..\Src\Logger.h"\
 	"..\..\Src\Tombo.h"\
-	{$(INCLUDE)}"aygshell.h"\
-	{$(INCLUDE)}"sipapi.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
@@ -603,8 +601,6 @@ DEP_CPP_DETAI=\
 	"..\..\Src\MemoDetailsView.h"\
 	"..\..\Src\MemoManager.h"\
 	"..\..\Src\Property.h"\
-	{$(INCLUDE)}"aygshell.h"\
-	{$(INCLUDE)}"sipapi.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
@@ -926,6 +922,130 @@ DEP_CPP_FILES=\
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\Src\FilterCtlDlg.cpp
+
+!IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
+
+DEP_CPP_FILTE=\
+	"..\..\Src\FilterCtlDlg.h"\
+	"..\..\Src\MemoManager.h"\
+	"..\..\Src\MemoSelectView.h"\
+	"..\..\Src\Message.h"\
+	"..\..\Src\TreeViewItem.h"\
+	"..\..\Src\TString.h"\
+	"..\..\Src\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
+
+DEP_CPP_FILTE=\
+	"..\..\Src\FilterCtlDlg.h"\
+	"..\..\Src\MemoManager.h"\
+	"..\..\Src\MemoSelectView.h"\
+	"..\..\Src\Message.h"\
+	"..\..\Src\TreeViewItem.h"\
+	"..\..\Src\TString.h"\
+	"..\..\Src\VarBuffer.h"\
+	
+NODEP_CPP_FILTE=\
+	"..\..\Src\resource.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Release"
+
+DEP_CPP_FILTE=\
+	"..\..\Src\FilterCtlDlg.h"\
+	"..\..\Src\MemoManager.h"\
+	"..\..\Src\MemoSelectView.h"\
+	"..\..\Src\Message.h"\
+	"..\..\Src\TreeViewItem.h"\
+	"..\..\Src\TString.h"\
+	"..\..\Src\VarBuffer.h"\
+	
+NODEP_CPP_FILTE=\
+	"..\..\Src\resource.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Debug"
+
+DEP_CPP_FILTE=\
+	"..\..\Src\FilterCtlDlg.h"\
+	"..\..\Src\MemoManager.h"\
+	"..\..\Src\MemoSelectView.h"\
+	"..\..\Src\Message.h"\
+	"..\..\Src\TreeViewItem.h"\
+	"..\..\Src\TString.h"\
+	"..\..\Src\VarBuffer.h"\
+	
+NODEP_CPP_FILTE=\
+	"..\..\Src\resource.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Release"
+
+DEP_CPP_FILTE=\
+	"..\..\Src\FilterCtlDlg.h"\
+	"..\..\Src\MemoManager.h"\
+	"..\..\Src\MemoSelectView.h"\
+	"..\..\Src\Message.h"\
+	"..\..\Src\TreeViewItem.h"\
+	"..\..\Src\TString.h"\
+	"..\..\Src\VarBuffer.h"\
+	
+NODEP_CPP_FILTE=\
+	"..\..\Src\resource.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Debug"
+
+DEP_CPP_FILTE=\
+	"..\..\Src\FilterCtlDlg.h"\
+	"..\..\Src\MemoManager.h"\
+	"..\..\Src\MemoSelectView.h"\
+	"..\..\Src\Message.h"\
+	"..\..\Src\TreeViewItem.h"\
+	"..\..\Src\TString.h"\
+	"..\..\Src\VarBuffer.h"\
+	
+NODEP_CPP_FILTE=\
+	"..\..\Src\resource.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Release"
+
+DEP_CPP_FILTE=\
+	"..\..\Src\FilterCtlDlg.h"\
+	"..\..\Src\MemoManager.h"\
+	"..\..\Src\MemoSelectView.h"\
+	"..\..\Src\Message.h"\
+	"..\..\Src\TreeViewItem.h"\
+	"..\..\Src\TString.h"\
+	"..\..\Src\VarBuffer.h"\
+	
+NODEP_CPP_FILTE=\
+	"..\..\Src\resource.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Debug"
+
+DEP_CPP_FILTE=\
+	"..\..\Src\FilterCtlDlg.h"\
+	"..\..\Src\MemoManager.h"\
+	"..\..\Src\MemoSelectView.h"\
+	"..\..\Src\Message.h"\
+	"..\..\Src\TreeViewItem.h"\
+	"..\..\Src\TString.h"\
+	"..\..\Src\VarBuffer.h"\
+	
+NODEP_CPP_FILTE=\
+	"..\..\Src\resource.h"\
+	
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\Src\GrepDialog.cpp
 
 !IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
@@ -1125,8 +1245,6 @@ DEP_CPP_MAIN_=\
 	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
 	"..\..\Src\Uniconv.h"\
-	{$(INCLUDE)}"aygshell.h"\
-	{$(INCLUDE)}"sipapi.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
@@ -1238,6 +1356,7 @@ SOURCE=..\..\Src\MainFrame.cpp
 DEP_CPP_MAINF=\
 	"..\..\Src\AboutDialog.h"\
 	"..\..\Src\File.h"\
+	"..\..\Src\FilterCtlDlg.h"\
 	"..\..\Src\GrepDialog.h"\
 	"..\..\Src\Logger.h"\
 	"..\..\Src\MainFrame.h"\
@@ -1257,8 +1376,10 @@ DEP_CPP_MAINF=\
 	"..\..\Src\TString.h"\
 	"..\..\Src\Uniconv.h"\
 	"..\..\Src\VarBuffer.h"\
-	{$(INCLUDE)}"aygshell.h"\
-	{$(INCLUDE)}"sipapi.h"\
+	{$(INCLUDE)}"CSO.h"\
+	{$(INCLUDE)}"CSOBar.h"\
+	{$(INCLUDE)}"CSOButton.h"\
+	{$(INCLUDE)}"CWind.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
@@ -1461,8 +1582,6 @@ DEP_CPP_MEMOD=\
 	"..\..\Src\Tombo.h"\
 	"..\..\Src\TString.h"\
 	"..\..\Src\Uniconv.h"\
-	{$(INCLUDE)}"aygshell.h"\
-	{$(INCLUDE)}"sipapi.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
@@ -2006,8 +2125,6 @@ DEP_CPP_MEMOS=\
 	"..\..\Src\TString.h"\
 	"..\..\Src\Uniconv.h"\
 	"..\..\Src\VarBuffer.h"\
-	{$(INCLUDE)}"aygshell.h"\
-	{$(INCLUDE)}"sipapi.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
@@ -2319,6 +2436,8 @@ DEP_CPP_PROPE=\
 	"..\..\Src\TreeViewItem.h"\
 	"..\..\Src\Uniconv.h"\
 	"..\..\Src\VarBuffer.h"\
+	{$(INCLUDE)}"GetDisk.h"\
+	{$(INCLUDE)}"notify.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
@@ -2872,8 +2991,6 @@ SOURCE=..\..\Src\SelectViewWndProc.cpp
 DEP_CPP_SELEC=\
 	"..\..\Src\MemoSelectView.h"\
 	"..\..\Src\Property.h"\
-	{$(INCLUDE)}"aygshell.h"\
-	{$(INCLUDE)}"sipapi.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
@@ -2944,7 +3061,6 @@ DEP_CPP_SIPCO=\
 	"..\..\Src\Logger.h"\
 	"..\..\Src\SipControl.h"\
 	"..\..\Src\Tombo.h"\
-	{$(INCLUDE)}"aygshell.h"\
 	{$(INCLUDE)}"sip.h"\
 	{$(INCLUDE)}"sipapi.h"\
 	
@@ -3613,6 +3729,7 @@ DEP_CPP_VFSTR=\
 	"..\..\Src\SearchEngine.h"\
 	"..\..\Src\Tombo.h"\
 	"..\..\Src\TreeViewItem.h"\
+	"..\..\Src\TString.h"\
 	"..\..\Src\Uniconv.h"\
 	"..\..\Src\VarBuffer.h"\
 	"..\..\Src\VFStream.h"\
@@ -3769,6 +3886,10 @@ SOURCE=..\..\Src\File.h
 # Begin Source File
 
 SOURCE=..\..\Src\FileSelector.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\FilterCtlDlg.h
 # End Source File
 # Begin Source File
 

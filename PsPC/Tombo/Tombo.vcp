@@ -1253,6 +1253,133 @@ DEP_CPP_FILES=\
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\Src\FilterCtlDlg.cpp
+
+!IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
+
+DEP_CPP_FILTE=\
+	"..\..\Src\FilterCtlDlg.h"\
+	"..\..\Src\MemoManager.h"\
+	"..\..\Src\MemoSelectView.h"\
+	"..\..\Src\Message.h"\
+	"..\..\Src\TreeViewItem.h"\
+	"..\..\Src\TString.h"\
+	"..\..\Src\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
+
+DEP_CPP_FILTE=\
+	"..\..\Src\FilterCtlDlg.h"\
+	"..\..\Src\MemoManager.h"\
+	"..\..\Src\MemoSelectView.h"\
+	"..\..\Src\Message.h"\
+	"..\..\Src\TreeViewItem.h"\
+	"..\..\Src\TString.h"\
+	"..\..\Src\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Release"
+
+DEP_CPP_FILTE=\
+	"..\..\Src\FilterCtlDlg.h"\
+	"..\..\Src\MemoManager.h"\
+	"..\..\Src\MemoSelectView.h"\
+	"..\..\Src\Message.h"\
+	"..\..\Src\TreeViewItem.h"\
+	"..\..\Src\TString.h"\
+	"..\..\Src\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Debug"
+
+DEP_CPP_FILTE=\
+	"..\..\Src\FilterCtlDlg.h"\
+	"..\..\Src\MemoManager.h"\
+	"..\..\Src\MemoSelectView.h"\
+	"..\..\Src\Message.h"\
+	"..\..\Src\TreeViewItem.h"\
+	"..\..\Src\TString.h"\
+	"..\..\Src\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Release"
+
+DEP_CPP_FILTE=\
+	"..\..\Src\FilterCtlDlg.h"\
+	"..\..\Src\MemoManager.h"\
+	"..\..\Src\MemoSelectView.h"\
+	"..\..\Src\Message.h"\
+	"..\..\Src\TreeViewItem.h"\
+	"..\..\Src\TString.h"\
+	"..\..\Src\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Debug"
+
+DEP_CPP_FILTE=\
+	"..\..\Src\FilterCtlDlg.h"\
+	"..\..\Src\MemoManager.h"\
+	"..\..\Src\MemoSelectView.h"\
+	"..\..\Src\Message.h"\
+	"..\..\Src\TreeViewItem.h"\
+	"..\..\Src\TString.h"\
+	"..\..\Src\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Release"
+
+DEP_CPP_FILTE=\
+	"..\..\Src\FilterCtlDlg.h"\
+	"..\..\Src\MemoManager.h"\
+	"..\..\Src\MemoSelectView.h"\
+	"..\..\Src\Message.h"\
+	"..\..\Src\TreeViewItem.h"\
+	"..\..\Src\TString.h"\
+	"..\..\Src\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Debug"
+
+DEP_CPP_FILTE=\
+	"..\..\Src\FilterCtlDlg.h"\
+	"..\..\Src\MemoManager.h"\
+	"..\..\Src\MemoSelectView.h"\
+	"..\..\Src\Message.h"\
+	"..\..\Src\TreeViewItem.h"\
+	"..\..\Src\TString.h"\
+	"..\..\Src\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) ReleaseE"
+
+DEP_CPP_FILTE=\
+	"..\..\Src\FilterCtlDlg.h"\
+	"..\..\Src\MemoManager.h"\
+	"..\..\Src\MemoSelectView.h"\
+	"..\..\Src\Message.h"\
+	"..\..\Src\TreeViewItem.h"\
+	"..\..\Src\TString.h"\
+	"..\..\Src\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) ReleaseE"
+
+DEP_CPP_FILTE=\
+	"..\..\Src\FilterCtlDlg.h"\
+	"..\..\Src\MemoManager.h"\
+	"..\..\Src\MemoSelectView.h"\
+	"..\..\Src\Message.h"\
+	"..\..\Src\TreeViewItem.h"\
+	"..\..\Src\TString.h"\
+	"..\..\Src\VarBuffer.h"\
+	
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\Src\GrepDialog.cpp
 
 !IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
@@ -1621,6 +1748,7 @@ SOURCE=..\..\Src\MainFrame.cpp
 DEP_CPP_MAINF=\
 	"..\..\Src\AboutDialog.h"\
 	"..\..\Src\File.h"\
+	"..\..\Src\FilterCtlDlg.h"\
 	"..\..\Src\GrepDialog.h"\
 	"..\..\Src\Logger.h"\
 	"..\..\Src\MainFrame.h"\
@@ -1751,6 +1879,7 @@ DEP_CPP_MAINF=\
 DEP_CPP_MAINF=\
 	"..\..\Src\AboutDialog.h"\
 	"..\..\Src\File.h"\
+	"..\..\Src\FilterCtlDlg.h"\
 	"..\..\Src\GrepDialog.h"\
 	"..\..\Src\Logger.h"\
 	"..\..\Src\MainFrame.h"\
@@ -4361,6 +4490,7 @@ DEP_CPP_TSPAR=\
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) ReleaseE"
 
 DEP_CPP_TSPAR=\
+	"..\..\expat\include\expat.h"\
 	"..\..\Src\File.h"\
 	"..\..\Src\Logger.h"\
 	"..\..\Src\MemoManager.h"\
@@ -4746,6 +4876,7 @@ DEP_CPP_VFSTR=\
 	"..\..\Src\SearchEngine.h"\
 	"..\..\Src\Tombo.h"\
 	"..\..\Src\TreeViewItem.h"\
+	"..\..\Src\TString.h"\
 	"..\..\Src\Uniconv.h"\
 	"..\..\Src\VarBuffer.h"\
 	"..\..\Src\VFStream.h"\
@@ -4870,6 +5001,7 @@ DEP_CPP_VFSTR=\
 	"..\..\Src\SearchEngine.h"\
 	"..\..\Src\Tombo.h"\
 	"..\..\Src\TreeViewItem.h"\
+	"..\..\Src\TString.h"\
 	"..\..\Src\Uniconv.h"\
 	"..\..\Src\VarBuffer.h"\
 	"..\..\Src\VFStream.h"\
@@ -4941,6 +5073,10 @@ SOURCE=..\..\Src\File.h
 # Begin Source File
 
 SOURCE=..\..\Src\FileSelector.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\FilterCtlDlg.h
 # End Source File
 # Begin Source File
 
