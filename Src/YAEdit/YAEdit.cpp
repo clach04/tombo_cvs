@@ -23,7 +23,7 @@
 // constatnt definitions
 /////////////////////////////////////////////////////////////////////////////
 
-#define TOMBOEDIT_CLASS_NAME TEXT("TomboEditCtl")
+#define YAEDIT_CLASS_NAME TEXT("YAEditCtl")
 
 #define CHARA_CTRL_C 3
 #define CHARA_CTRL_V 22
@@ -35,18 +35,18 @@
 // static funcs/vars declarations
 /////////////////////////////////////////////////////////////////////////////
 
-static LRESULT CALLBACK TomboEditWndProc(HWND hWnd, UINT nMessage, WPARAM wParam, LPARAM lParam);
+static LRESULT CALLBACK YAEditWndProc(HWND hWnd, UINT nMessage, WPARAM wParam, LPARAM lParam);
 
 /////////////////////////////////////////////////////////////////////////////
 // Regist window class
 /////////////////////////////////////////////////////////////////////////////
 
-BOOL TomboEdit::RegisterClass(HINSTANCE hInst)
+BOOL YAEdit::RegisterClass(HINSTANCE hInst)
 {
 	WNDCLASS wc;
 
 	wc.style = 0;
-	wc.lpfnWndProc = (WNDPROC)TomboEditWndProc;
+	wc.lpfnWndProc = (WNDPROC)YAEditWndProc;
 	wc.cbClsExtra = 0;
 	wc.cbWndExtra = sizeof(LONG);
 	wc.hInstance = hInst;
@@ -59,7 +59,7 @@ BOOL TomboEdit::RegisterClass(HINSTANCE hInst)
 	wc.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);
 #endif
 	wc.lpszMenuName = NULL;
-	wc.lpszClassName = TOMBOEDIT_CLASS_NAME;
+	wc.lpszClassName = YAEDIT_CLASS_NAME;
 	::RegisterClass(&wc);
 	return TRUE;
 }
@@ -68,11 +68,11 @@ BOOL TomboEdit::RegisterClass(HINSTANCE hInst)
 // ctor & dtor
 /////////////////////////////////////////////////////////////////////////////
 
-TomboEdit::TomboEdit() : pWrapper(NULL), bScrollTimerOn(FALSE), pView(NULL), bMouseDown(FALSE), pLineMgr(NULL), pHandler(NULL)
+YAEdit::YAEdit() : pWrapper(NULL), bScrollTimerOn(FALSE), pView(NULL), bMouseDown(FALSE), pLineMgr(NULL), pHandler(NULL)
 {
 }
 
-TomboEdit::~TomboEdit()
+YAEdit::~YAEdit()
 {
 	if (pView) {
 		if (pView->hViewWnd) DestroyWindow(pView->hViewWnd);
@@ -84,17 +84,17 @@ TomboEdit::~TomboEdit()
 // Event handler
 /////////////////////////////////////////////////////////////////////////////
 
-LRESULT CALLBACK TomboEditWndProc(HWND hWnd, UINT nMessage, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK YAEditWndProc(HWND hWnd, UINT nMessage, WPARAM wParam, LPARAM lParam)
 {
 	if (nMessage == WM_CREATE) {
 		LPCREATESTRUCT pCS = (LPCREATESTRUCT)lParam;
-		TomboEdit *frm = (TomboEdit*)pCS->lpCreateParams;
+		YAEdit *frm = (YAEdit*)pCS->lpCreateParams;
 		SetWindowLong(hWnd, 0, (LONG)frm);
 		frm->OnCreate(hWnd, wParam, lParam);
 		return 0;
 	}
 
-	TomboEdit *frm = (TomboEdit*)GetWindowLong(hWnd, 0);
+	YAEdit *frm = (YAEdit*)GetWindowLong(hWnd, 0);
 	if (frm == NULL) {
 		return DefWindowProc(hWnd, nMessage, wParam, lParam);
 	}
@@ -153,25 +153,25 @@ LRESULT CALLBACK TomboEditWndProc(HWND hWnd, UINT nMessage, WPARAM wParam, LPARA
 // Create window
 /////////////////////////////////////////////////////////////////////////////
 
-BOOL TomboEdit::Create(HINSTANCE hInst, HWND hParent, DWORD nId, RECT &r, YAECallbackHandler *pCb, YAEDocCallbackHandler *pDocCb)
+BOOL YAEdit::Create(HINSTANCE hInst, HWND hParent, DWORD nId, RECT &r, YAECallbackHandler *pCb, YAEDocCallbackHandler *pDocCb)
 {
 	pHandler = pCb;
 	hInstance = hInst;
 	pDoc = NULL;
 
-	pView = new TomboEditView(this);
+	pView = new YAEditView(this);
 	if (!pView->Init()) return FALSE;
 
 	FixedPixelLineWrapper *pWw = new FixedPixelLineWrapper();
 	if (pWw == NULL || !pWw->Init(this)) return FALSE;
 	pWrapper = pWw;
 
-	pDoc = new TomboEditDoc(); 
+	pDoc = new YAEditDoc(); 
 	if (!pDoc->Init("", this, pDocCb)) return FALSE;
 
 	
 #if defined(PLATFORM_WIN32)
-	pView->hViewWnd = CreateWindowEx(WS_EX_CLIENTEDGE, TOMBOEDIT_CLASS_NAME, TEXT(""),
+	pView->hViewWnd = CreateWindowEx(WS_EX_CLIENTEDGE, YAEDIT_CLASS_NAME, TEXT(""),
 						WS_CHILD | WS_VISIBLE | WS_VSCROLL | WS_HSCROLL,
 						r.left,
 						r.top,
@@ -182,7 +182,7 @@ BOOL TomboEdit::Create(HINSTANCE hInst, HWND hParent, DWORD nId, RECT &r, YAECal
 						hInst,
 						this);
 #else
-	pView->hViewWnd = CreateWindow(TOMBOEDIT_CLASS_NAME, TEXT(""),
+	pView->hViewWnd = CreateWindow(YAEDIT_CLASS_NAME, TEXT(""),
 						WS_CHILD | WS_VISIBLE | WS_VSCROLL | WS_HSCROLL,
 						r.left,
 						r.top,
@@ -212,12 +212,12 @@ BOOL TomboEdit::Create(HINSTANCE hInst, HWND hParent, DWORD nId, RECT &r, YAECal
 /////////////////////////////////////////////////////////////////////////////
 // In this function, hViewWnd are not initialized yet.
 
-void TomboEdit::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
+void YAEdit::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
 	pView->OnCreate(hWnd, wParam, lParam);
 	pWrapper->SetViewWidth(pView->rClientRect.right - pView->rClientRect.left - pView->nMaxCharWidth);
 
-//	pDoc = new TomboEditDoc(); 
+//	pDoc = new YAEditDoc(); 
 //	if (!pDoc->Init("", this)) return;
 
 	pLineMgr = new LineManager();
@@ -232,7 +232,7 @@ void TomboEdit::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 // WM_VSCROLL handler
 /////////////////////////////////////////////////////////////////////////////
 
-void TomboEdit::OnVScroll(HWND hWnd, WPARAM wParam, LPARAM lParam)
+void YAEdit::OnVScroll(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
 	int nScrollCode = LOWORD(wParam);
 	switch(nScrollCode) {
@@ -258,7 +258,7 @@ void TomboEdit::OnVScroll(HWND hWnd, WPARAM wParam, LPARAM lParam)
 // WM_HSCROLL handler
 /////////////////////////////////////////////////////////////////////////////
 
-void TomboEdit::OnHScroll(HWND hWnd, WPARAM wParam, LPARAM lParam)
+void YAEdit::OnHScroll(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
 	int nScrollCode = LOWORD(wParam);
 	switch(nScrollCode) {
@@ -287,7 +287,7 @@ void TomboEdit::OnHScroll(HWND hWnd, WPARAM wParam, LPARAM lParam)
 // WM_MOUSEWHEEL
 /////////////////////////////////////////////////////////////////////////////
 #if defined(PLATFORM_WIN32)
-void TomboEdit::OnMouseWheel(HWND hWnd, WPARAM wParam, LPARAM lParam)
+void YAEdit::OnMouseWheel(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
 	short delta = ((short) HIWORD(wParam))/WHEEL_DELTA;
 	pView->SetScrollVertByOffset(-delta * 2);
@@ -300,7 +300,7 @@ void TomboEdit::OnMouseWheel(HWND hWnd, WPARAM wParam, LPARAM lParam)
 //////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////
 
-void TomboEdit::OnPaint(HWND hWnd, WPARAM wParam, LPARAM lParam)
+void YAEdit::OnPaint(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
 	PAINTSTRUCT ps;
 	HDC hDC = BeginPaint(hWnd, &ps);
@@ -313,20 +313,20 @@ void TomboEdit::OnPaint(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	EndPaint(hWnd, &ps);
 }
 
-void TomboEdit::RequestRedraw(DWORD nLineNo, WORD nLeftPos, BOOL bToBottom) { pView->RequestRedraw(nLineNo, nLeftPos, bToBottom); }
-void TomboEdit::RequestRedrawRegion(const Region *pRegion) { pView->RequestRedrawRegion(pRegion); }
+void YAEdit::RequestRedraw(DWORD nLineNo, WORD nLeftPos, BOOL bToBottom) { pView->RequestRedraw(nLineNo, nLeftPos, bToBottom); }
+void YAEdit::RequestRedrawRegion(const Region *pRegion) { pView->RequestRedrawRegion(pRegion); }
 
 /////////////////////////////////////////////////////////////////////////////
 // FOCUS
 /////////////////////////////////////////////////////////////////////////////
 
-void TomboEdit::OnSetFocus()  { if (pView) pView->OnSetFocus();  }
-void TomboEdit::OnKillFocus() { if (pView) pView->OnKillFocus(); }
+void YAEdit::OnSetFocus()  { if (pView) pView->OnSetFocus();  }
+void YAEdit::OnKillFocus() { if (pView) pView->OnKillFocus(); }
 
 /////////////////////////////////////////////////////////////////////////////
 // WM_KEYDOWN
 /////////////////////////////////////////////////////////////////////////////
-BOOL TomboEdit::OnKeyDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
+BOOL YAEdit::OnKeyDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
 	int nVertKey = (int)wParam;
 	BOOL bShiftDown = (GetKeyState(VK_SHIFT) & 0x8000) != 0;
@@ -449,7 +449,7 @@ BOOL TomboEdit::OnKeyDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
 // WM_CHAR
 /////////////////////////////////////////////////////////////////////////////
 
-void TomboEdit::OnChar(HWND hWnd, WPARAM wParam, LPARAM lParam)
+void YAEdit::OnChar(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
 	TCHAR ch = (TCHAR)wParam;
 	if (ch == CHARA_BS) {
@@ -507,7 +507,7 @@ void TomboEdit::OnChar(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	InsertLine(kbuf);
 }
 
-void TomboEdit::KeyBS()
+void YAEdit::KeyBS()
 {
 	if (SelectedRegion().posStart != SelectedRegion().posEnd) {
 		// selection area exists
@@ -570,18 +570,18 @@ void TomboEdit::KeyBS()
 // move cursor
 /////////////////////////////////////////////////////////////////////////////
 
-void TomboEdit::MoveRight() { pView->MoveRight(); ClearRegion(); }
-void TomboEdit::MoveLeft()  { pView->MoveLeft();  ClearRegion(); }
-void TomboEdit::MoveUp()    { pView->MoveUp();    ClearRegion(); }
-void TomboEdit::MoveEOL()   { pView->MoveEOL();   ClearRegion(); }
-void TomboEdit::MoveTOL()   { pView->MoveTOL();   ClearRegion(); }
-void TomboEdit::MoveDown()  { pView->MoveDown();  ClearRegion(); }
+void YAEdit::MoveRight() { pView->MoveRight(); ClearRegion(); }
+void YAEdit::MoveLeft()  { pView->MoveLeft();  ClearRegion(); }
+void YAEdit::MoveUp()    { pView->MoveUp();    ClearRegion(); }
+void YAEdit::MoveEOL()   { pView->MoveEOL();   ClearRegion(); }
+void YAEdit::MoveTOL()   { pView->MoveTOL();   ClearRegion(); }
+void YAEdit::MoveDown()  { pView->MoveDown();  ClearRegion(); }
 
 /////////////////////////////////////////////////////////////////////////////
 // WM_LBUTTONDOWN
 /////////////////////////////////////////////////////////////////////////////
 
-void TomboEdit::OnLButtonDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
+void YAEdit::OnLButtonDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
 	WORD nMouseDrgStartX, nMouseDrgStartY;	// LButton down point by WM_LBUTTONDOWN
 
@@ -619,7 +619,7 @@ void TomboEdit::OnLButtonDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
 #define MAKEPOINTS(l)   (*((POINTS FAR *) & (l))) 
 #endif
 
-void TomboEdit::SetSelectionFromPoint(int xPos, int yPos)
+void YAEdit::SetSelectionFromPoint(int xPos, int yPos)
 {
 	// when SetCaptured, cursor pos may be negative.
 	if (xPos < 0) xPos = 0;
@@ -653,7 +653,7 @@ void TomboEdit::SetSelectionFromPoint(int xPos, int yPos)
 	}
 }
 
-void TomboEdit::OnMouseMove(HWND hWnd, WPARAM wParam, LPARAM lParam)
+void YAEdit::OnMouseMove(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
 	if (!bMouseDown) return;
 
@@ -682,7 +682,7 @@ void TomboEdit::OnMouseMove(HWND hWnd, WPARAM wParam, LPARAM lParam)
 // WM_LBUTTONUP
 /////////////////////////////////////////////////////////////////////////////
 
-void TomboEdit::OnLButtonUp(HWND hWnd, WPARAM wParam, LPARAM lParam)
+void YAEdit::OnLButtonUp(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
 	if (!bMouseDown) return;
 
@@ -701,7 +701,7 @@ void TomboEdit::OnLButtonUp(HWND hWnd, WPARAM wParam, LPARAM lParam)
 // WM_TIMER
 /////////////////////////////////////////////////////////////////////////////
 
-void TomboEdit::OnTimer(HWND hWnd, WPARAM wParam, LPARAM lParam)
+void YAEdit::OnTimer(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
 	switch(wParam) {
 	case IDT_SELSCROLL:
@@ -715,9 +715,9 @@ void TomboEdit::OnTimer(HWND hWnd, WPARAM wParam, LPARAM lParam)
 // Set new document
 /////////////////////////////////////////////////////////////////////////////
 
-TomboEditDoc *TomboEdit::SetDoc(TomboEditDoc *pNewDoc)
+YAEditDoc *YAEdit::SetDoc(YAEditDoc *pNewDoc)
 {
-	TomboEditDoc *pOldDoc = pDoc;
+	YAEditDoc *pOldDoc = pDoc;
 	pDoc = pNewDoc;
 
 	pView->Init();
@@ -743,13 +743,13 @@ TomboEditDoc *TomboEdit::SetDoc(TomboEditDoc *pNewDoc)
 // get max line width for decide hscroll range
 /////////////////////////////////////////////////////////////////////////////
 
-DWORD TomboEdit::GetLineWidth(DWORD nOffset, LPCTSTR pStr, DWORD nLen) { return pView->GetLineWidth(nOffset, pStr, nLen); }
+DWORD YAEdit::GetLineWidth(DWORD nOffset, LPCTSTR pStr, DWORD nLen) { return pView->GetLineWidth(nOffset, pStr, nLen); }
 
 /////////////////////////////////////////////////////////////////////////////
 // DEL key handler
 /////////////////////////////////////////////////////////////////////////////
 
-void TomboEdit::DeleteKeyDown()
+void YAEdit::DeleteKeyDown()
 {
 	LineChunk lc;
 	if (!pDoc->GetLineChunk(pView->nCursorRow, &lc)) return;
@@ -786,7 +786,7 @@ void TomboEdit::DeleteKeyDown()
 // Resize window
 /////////////////////////////////////////////////////////////////////////////
 
-void TomboEdit::ResizeWindow(int x, int y, int width, int height) 
+void YAEdit::ResizeWindow(int x, int y, int width, int height) 
 {
 	MoveWindow(pView->hViewWnd, x, y, width, height, FALSE);
 
@@ -824,7 +824,7 @@ void TomboEdit::ResizeWindow(int x, int y, int width, int height)
 /////////////////////////////////////////////////////////////////////////////
 // Region
 /////////////////////////////////////////////////////////////////////////////
-void TomboEdit::SetFocus()
+void YAEdit::SetFocus()
 {
 	::SetFocus(pView->hViewWnd);
 }
@@ -833,7 +833,7 @@ void TomboEdit::SetFocus()
 // Region
 /////////////////////////////////////////////////////////////////////////////
 
-BOOL TomboEdit::DeleteRegion()
+BOOL YAEdit::DeleteRegion()
 {
 	if (!IsRegionSelected()) return TRUE;
 
@@ -859,14 +859,14 @@ BOOL TomboEdit::DeleteRegion()
 	return TRUE;
 }
 
-void TomboEdit::ClearRegion()
+void YAEdit::ClearRegion()
 {
 	Region r = SelectedRegion();
 	RequestRedrawRegion(&r);
 	ClearSelectedRegion();
 }
 
-void TomboEdit::ClearSelectedRegion()
+void YAEdit::ClearSelectedRegion()
 {
 	rSelRegion.posEnd.Set(pView->nCursorCol, pView->nCursorRow); 
 	rSelRegion.posStart = rSelRegion.posEnd;
@@ -876,7 +876,7 @@ void TomboEdit::ClearSelectedRegion()
 // Clipboard
 /////////////////////////////////////////////////////////////////////////////
 
-BOOL TomboEdit::CopyToClipboard()
+BOOL YAEdit::CopyToClipboard()
 {
 	Tombo_Lib::Clipboard cb;
 
@@ -895,7 +895,7 @@ BOOL TomboEdit::CopyToClipboard()
 	return TRUE;
 }
 
-BOOL TomboEdit::InsertFromClipboard()
+BOOL YAEdit::InsertFromClipboard()
 {
 	// Get data from clipboard
 	Tombo_Lib::Clipboard cb;
@@ -916,7 +916,7 @@ BOOL TomboEdit::InsertFromClipboard()
 // Insert String considering cursor move
 /////////////////////////////////////////////////////////////////////////////
 
-BOOL TomboEdit::InsertLine(LPCTSTR pText)
+BOOL YAEdit::InsertLine(LPCTSTR pText)
 {
 	DWORD nLen = _tcslen(pText);
 
@@ -952,7 +952,7 @@ BOOL TomboEdit::InsertLine(LPCTSTR pText)
 // region
 /////////////////////////////////////////////////////////////////////////////
 
-DWORD TomboEdit::GetRegionSize()
+DWORD YAEdit::GetRegionSize()
 {
 	if (rSelRegion.posStart.row == rSelRegion.posEnd.row) {
 		return rSelRegion.posEnd.col - rSelRegion.posStart.col;
@@ -977,7 +977,7 @@ DWORD TomboEdit::GetRegionSize()
 	}
 }
 
-BOOL TomboEdit::GetRegionString(LPTSTR pBuf)
+BOOL YAEdit::GetRegionString(LPTSTR pBuf)
 {
 	if (rSelRegion.posStart.row == rSelRegion.posEnd.row) {
 		LineChunk lc;
@@ -1027,12 +1027,12 @@ BOOL TomboEdit::GetRegionString(LPTSTR pBuf)
 	}
 }
 
-void TomboEdit::SetMark(const Coordinate &nStart)
+void YAEdit::SetMark(const Coordinate &nStart)
 {
 	rSelRegion.posStart = rSelRegion.posEnd = nStart;
 }
 
-void TomboEdit::SelectRegion(const Coordinate &nCurrent, Coordinate *pPrev)
+void YAEdit::SelectRegion(const Coordinate &nCurrent, Coordinate *pPrev)
 {
 	if (rSelRegion.posStart == rSelRegion.posEnd) {
 		*pPrev = rSelRegion.posStart;
@@ -1075,42 +1075,42 @@ void TomboEdit::SelectRegion(const Coordinate &nCurrent, Coordinate *pPrev)
 // Convert logical pos -> physical pos
 /////////////////////////////////////////////////////////////////////////////
 
-void TomboEdit::LogicalCursorPosToPhysicalCursorPos(DWORD nLgLineNo, DWORD nLgCursorPosX, LPDWORD pPhLineNo, LPDWORD pPhCursorPos)
+void YAEdit::LogicalCursorPosToPhysicalCursorPos(DWORD nLgLineNo, DWORD nLgCursorPosX, LPDWORD pPhLineNo, LPDWORD pPhCursorPos)
 {
 	pLineMgr->LogicalCursorPosToPhysicalCursorPos(nLgLineNo, nLgCursorPosX, pPhLineNo, pPhCursorPos);
 }
 
-void TomboEdit::PhysicalCursorPosToLogicalCursorPos(DWORD nPhLineNo, DWORD nPhCursorPosX, LPDWORD pLgLineNo, LPDWORD pLgCursorPos)
+void YAEdit::PhysicalCursorPosToLogicalCursorPos(DWORD nPhLineNo, DWORD nPhCursorPosX, LPDWORD pLgLineNo, LPDWORD pLgCursorPos)
 {
 	pLineMgr->PhysicalCursorPosToLogicalCursorPos(nPhLineNo, nPhCursorPosX, pLgLineNo, pLgCursorPos);
 }
 
-void TomboEdit::LogicalPosToPhysicalPos(const Coordinate *pLgPos, Coordinate *pPhPos)
+void YAEdit::LogicalPosToPhysicalPos(const Coordinate *pLgPos, Coordinate *pPhPos)
 {
 	pLineMgr->LogicalPosToPhysicalPos(pLgPos, pPhPos);
 }
 
-void TomboEdit::PhysicalPosToLogicalPos(const Coordinate *pPhPos, Coordinate *pLgPos)
+void YAEdit::PhysicalPosToLogicalPos(const Coordinate *pPhPos, Coordinate *pLgPos)
 {
 	pLineMgr->PhysicalPosToLogicalPos(pPhPos, pLgPos);
 }
 
 // get end of 
-void TomboEdit::GetEndPhysicalPos(DWORD nLgLineNo, Coordinate *pPos)
+void YAEdit::GetEndPhysicalPos(DWORD nLgLineNo, Coordinate *pPos)
 {
 	pLineMgr->GetEndPhysicalPos(nLgLineNo, pPos);
 }
 
 /////////////////////////////////////////////////////////////////////////////
-// Update notify from TomboEditDoc
+// Update notify from YAEditDoc
 /////////////////////////////////////////////////////////////////////////////
 
-BOOL TomboEdit::UpdateNotify(PhysicalLineManager *pPhMgr, const Region *pRegion, DWORD nBefPhLines, DWORD nAftPhLines, DWORD nAffeLines)
+BOOL YAEdit::UpdateNotify(PhysicalLineManager *pPhMgr, const Region *pOldRegion, DWORD nBefPhLines, DWORD nAftPhLines, DWORD nAffeLines)
 {
 	DWORD nBefLgLines = pLineMgr->MaxLine();
 	Coordinate cLgAfStart;
 	DWORD nAffLgLines;
-	if (!pLineMgr->AdjustLgLines(pPhMgr, pWrapper, *pRegion, nBefPhLines, nAftPhLines, nAffeLines, &cLgAfStart, &nAffLgLines)) return FALSE;
+	if (!pLineMgr->AdjustLgLines(pPhMgr, pWrapper, *pOldRegion, nBefPhLines, nAftPhLines, nAffeLines, &cLgAfStart, &nAffLgLines)) return FALSE;
 	DWORD nAftLgLines = pLineMgr->MaxLine();
 
 	// update view
@@ -1125,7 +1125,7 @@ BOOL TomboEdit::UpdateNotify(PhysicalLineManager *pPhMgr, const Region *pRegion,
 // Join line
 /////////////////////////////////////////////////////////////////////////////
 
-BOOL TomboEdit::JoinLine(DWORD nLgLineNo)
+BOOL YAEdit::JoinLine(DWORD nLgLineNo)
 {
 	LineChunk lc;
 	if (!pDoc->GetLineChunk(nLgLineNo, &lc)) return FALSE;

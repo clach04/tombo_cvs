@@ -1,11 +1,11 @@
-#ifndef TOMBOEDIT_H
-#define TOMBOEDIT_H
+#ifndef YAEDIT_H
+#define YAEDIT_H
 
-class TomboEditDoc;
+class YAEditDoc;
 class FixedPixelLineWrapper;
 class LineChunk;
 class FontWidthCache;
-class TomboEditView;
+class YAEditView;
 class LineManager;
 class PhysicalLineManager;
 class YAECallbackHandler;
@@ -15,7 +15,7 @@ class YAEDocCallbackHandler;
 // Controller class for YAE
 //////////////////////////////////////////////////
 
-class TomboEdit {
+class YAEdit {
 protected:
 
 	///////////////////////////////////////
@@ -25,8 +25,8 @@ protected:
 
 	///////////////////////////////////////
 	// VMC related members
-	TomboEditDoc *pDoc;
-	TomboEditView *pView;
+	YAEditDoc *pDoc;
+	YAEditView *pView;
 
 	///////////////////////////////////////
 	// key related members
@@ -70,8 +70,8 @@ public:
 
 	///////////////////////////////////////
 	// ctor & initialize
-	TomboEdit();
-	~TomboEdit();
+	YAEdit();
+	~YAEdit();
 	BOOL Create(HINSTANCE hInst, HWND hWnd, DWORD nId, RECT &r, YAECallbackHandler *pViewCB, YAEDocCallbackHandler* pDocCB);
 	void SetFocus();
 
@@ -103,8 +103,8 @@ public:
 
 	/////////////////////////////////
 	// application funcs.
-	TomboEditDoc *SetDoc(TomboEditDoc *pNewDoc);
-	TomboEditDoc *GetDoc() { return pDoc; }
+	YAEditDoc *SetDoc(YAEditDoc *pNewDoc);
+	YAEditDoc *GetDoc() { return pDoc; }
 	LineManager *GetLineMgr() { return pLineMgr; }
 
 	///////////////////////////////////////
@@ -127,7 +127,7 @@ public:
 	void ResizeWindow(int x, int y, int width, int height);
 
 	/////////////////////////////////
-	// TomboEditDoc callback
+	// YAEditDoc callback
 
 	void RequestRedraw(DWORD nLineNo, WORD nLeftPos, BOOL bToBottom);
 	void RequestRedrawRegion(const Region *pRegion);

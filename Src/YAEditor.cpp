@@ -15,14 +15,14 @@ class TomboDocCallback : public YAEDocCallbackHandler {
 public:
 	TomboDocCallback(MemoManager *pMgr);
 
-	void OnModifyStatusChanged(TomboEditDoc *pDoc, BOOL bOld, BOOL bNew);
+	void OnModifyStatusChanged(YAEditDoc *pDoc, BOOL bOld, BOOL bNew);
 };
 
 TomboDocCallback::TomboDocCallback(MemoManager *p) : pMgr(p)
 {
 }
 
-void TomboDocCallback::OnModifyStatusChanged(TomboEditDoc *pDoc, BOOL bOld, BOOL bNew)
+void TomboDocCallback::OnModifyStatusChanged(YAEditDoc *pDoc, BOOL bOld, BOOL bNew)
 {
 	pMgr->GetMainFrame()->SetModifyStatus(pDoc->IsModify());
 }
@@ -40,7 +40,7 @@ YAEditor::~YAEditor()
 
 BOOL YAEditor::Create(LPCTSTR pName, RECT &r, HWND hParent, HINSTANCE hInst, HFONT hFont)
 {
-	pEdit = new TomboEdit();
+	pEdit = new YAEdit();
 	pEdit->Create(hInst, hParent, nID, r, NULL, new TomboDocCallback(pMemoMgr));
 //	pEdit->SetFocus();
 	return TRUE;
@@ -72,10 +72,10 @@ void YAEditor::MoveWindow(DWORD x, DWORD y, DWORD nWidth, DWORD nHeight)
 
 BOOL YAEditor::SetMemo(LPCTSTR pMemo, DWORD nPos, BOOL bReadOnly)
 {
-	TomboEditDoc *pDoc = new TomboEditDoc();
+	YAEditDoc *pDoc = new YAEditDoc();
 	if (!pDoc->Init(pMemo, pEdit, new TomboDocCallback(pMemoMgr))) return FALSE;
 
-	TomboEditDoc *pOldDoc = pEdit->SetDoc(pDoc);
+	YAEditDoc *pOldDoc = pEdit->SetDoc(pDoc);
 	delete pOldDoc;
 
 	return TRUE;

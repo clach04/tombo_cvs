@@ -5,11 +5,11 @@
 // wrapped by window width
 /////////////////////////////////////////////////////////////////////////////
 
-class TomboEdit;
+class YAEdit;
 
 class FixedPixelLineWrapper : public LineWrapper {
 protected:
-	TomboEdit *pView;
+	YAEdit *pView;
 	DWORD nViewWidth;
 public:
 
@@ -17,7 +17,7 @@ public:
 	FixedPixelLineWrapper() {}
 	virtual ~FixedPixelLineWrapper() {}
 
-	BOOL Init(TomboEdit *p) { pView = p; return TRUE; }
+	BOOL Init(YAEdit *p) { pView = p; return TRUE; }
 
 	WrapResult Wrap(DWORD nCurrentPos, LPCTSTR pBase, DWORD nLineLimit, LPDWORD pSepPos);
 

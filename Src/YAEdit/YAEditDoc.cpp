@@ -16,16 +16,16 @@
 // ctor & dtor
 /////////////////////////////////////////////////////////////////////////////
 
-TomboEditDoc::TomboEditDoc() : pView(NULL), pPhLineMgr(NULL), pHandler(NULL)
+YAEditDoc::YAEditDoc() : pView(NULL), pPhLineMgr(NULL), pHandler(NULL)
 {
 }
 
-TomboEditDoc::~TomboEditDoc()
+YAEditDoc::~YAEditDoc()
 {
 	if (pPhLineMgr) delete pPhLineMgr;
 }
 
-BOOL TomboEditDoc::Init(const char *pStr, TomboEdit *pV, YAEDocCallbackHandler *pCb)
+BOOL YAEditDoc::Init(const char *pStr, YAEdit *pV, YAEDocCallbackHandler *pCb)
 {
 	pHandler = pCb;
 	pView = pV;
@@ -37,7 +37,7 @@ BOOL TomboEditDoc::Init(const char *pStr, TomboEdit *pV, YAEDocCallbackHandler *
 // load document
 /////////////////////////////////////////////////////////////////////////////
 
-BOOL TomboEditDoc::LoadDoc(const char *pStr)
+BOOL YAEditDoc::LoadDoc(const char *pStr)
 {
 	ReleaseDoc();
 	LPTSTR pStrT;
@@ -61,7 +61,7 @@ BOOL TomboEditDoc::LoadDoc(const char *pStr)
 // save document
 /////////////////////////////////////////////////////////////////////////////
 
-char *TomboEditDoc::GetDocumentData(LPDWORD pLen)
+char *YAEditDoc::GetDocumentData(LPDWORD pLen)
 {
 	return pPhLineMgr->GetDocumentData(pLen);
 }
@@ -70,7 +70,7 @@ char *TomboEditDoc::GetDocumentData(LPDWORD pLen)
 // release document memory
 /////////////////////////////////////////////////////////////////////////////
 
-BOOL TomboEditDoc::ReleaseDoc()
+BOOL YAEditDoc::ReleaseDoc()
 {
 	// LineManager depends on MarkerAllocator, delete/new order is important.
 	if (pPhLineMgr) delete pPhLineMgr;
@@ -89,7 +89,7 @@ BOOL TomboEditDoc::ReleaseDoc()
 // get line data
 /////////////////////////////////////////////////////////////////////////////
 
-BOOL TomboEditDoc::GetLineChunk(DWORD nLineNo, LineChunk *pChunk) 
+BOOL YAEditDoc::GetLineChunk(DWORD nLineNo, LineChunk *pChunk) 
 {
 	// retrieve line data info.
 	if (!pView->GetLineMgr()->GetLineChunk(nLineNo, pChunk)) return FALSE;
@@ -103,7 +103,7 @@ BOOL TomboEditDoc::GetLineChunk(DWORD nLineNo, LineChunk *pChunk)
 // In DBCS char set, it is difficult to detmine previous char. It may be -1, or may be -2.
 // In Unicode(UCS-2), this is simply -1 letter(2 bytes).
 
-DWORD TomboEditDoc::GetPrevOffset(DWORD n, DWORD nPos)
+DWORD YAEditDoc::GetPrevOffset(DWORD n, DWORD nPos)
 {
 #if defined(PLATFORM_WIN32)
 	LineChunk lc;
@@ -132,7 +132,7 @@ DWORD TomboEditDoc::GetPrevOffset(DWORD n, DWORD nPos)
 // Replace string
 /////////////////////////////////////////////////////////////////////////////
 
-BOOL TomboEditDoc::ReplaceString(const Region *pDelRegion, LPCTSTR pString)
+BOOL YAEditDoc::ReplaceString(const Region *pDelRegion, LPCTSTR pString)
 {
 	Region r = *pDelRegion;
 
@@ -154,7 +154,7 @@ BOOL TomboEditDoc::ReplaceString(const Region *pDelRegion, LPCTSTR pString)
 // update modify status
 /////////////////////////////////////////////////////////////////////////////
 
-void TomboEditDoc::SetModify(BOOL b)
+void YAEditDoc::SetModify(BOOL b)
 {
 	if (bModified == b) return;
 	BOOL bOld = bModified;

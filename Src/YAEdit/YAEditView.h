@@ -1,11 +1,11 @@
-#ifndef TOMBOEDITVIEW_H
-#define TOMBOEDITVIEW_H
+#ifndef YAEDITVIEW_H
+#define YAEDITVIEW_H
 
-class TomboEdit;
-class TomboEditDoc;
+class YAEdit;
+class YAEditDoc;
 
-class TomboEditView {
-	TomboEdit *pCtrl;
+class YAEditView {
+	YAEdit *pCtrl;
 
 	///////////////////////////////////////
 	// cursor(caret) related members
@@ -14,7 +14,7 @@ class TomboEditView {
 
 protected:
 	///////////////////////////////////////
-	// proxy to TomboEdit
+	// proxy to YAEdit
 
 	DWORD GetMaxLine();
 
@@ -63,8 +63,8 @@ public:
 	///////////////////////////////////////
 	// initializing
 
-	TomboEditView(TomboEdit *p) : pCtrl(p), pFontCache(NULL) {}
-	~TomboEditView();
+	YAEditView(YAEdit *p) : pCtrl(p), pFontCache(NULL) {}
+	~YAEditView();
 
 	BOOL Init();
 

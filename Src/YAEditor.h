@@ -3,11 +3,11 @@
 
 #include "MemoDetailsView.h"
 
-class TomboEdit;
+class YAEdit;
 class MemoManager;
 
 class YAEditor : public MemoDetailsView {
-	TomboEdit *pEdit;
+	YAEdit *pEdit;
 	MemoManager *pMemoMgr;
 	DWORD nID;
 public:

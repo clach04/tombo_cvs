@@ -115,47 +115,6 @@ BOOL PhysicalLineManager::DeleteRegion(const Region *pRegion)
 	return ReplaceRegion(pRegion, TEXT(""), &nNewEnd);
 }
 
-#ifdef COMMENT
-BOOL PhysicalLineManager::DeleteRegion(const Region *pRegion)
-{
-	if (pRegion->posStart.row == pRegion->posEnd.row) {
-		MemBlock *pBlock = aliLine.GetUnit(pRegion->posStart.row)->pLine;
-		
-		LPTSTR pDst = pBlock->GetDataArea() + pRegion->posStart.col;
-		LPCTSTR pSrc = pBlock->GetDataArea() + pRegion->posEnd.col; 
-		DWORD i;
-		for (i = 0; i < (pBlock->nUsed - pRegion->posEnd.col); i++) {
-			*pDst++ = *pSrc++;
-		}
-		pBlock->nUsed = pRegion->posStart.col + (pBlock->nUsed - pRegion->posEnd.col);
-		return TRUE;
-	}
-
-	//////////////////////////
-	// multi line delete
-
-	// append last line rest block to first line
-	MemBlock *pFirstBlock = aliLine.GetUnit(pRegion->posStart.row)->pLine;
-	MemBlock *pLastBlock = aliLine.GetUnit(pRegion->posEnd.row)->pLine;
-	DWORD nSize = (pLastBlock->nUsed - pRegion->posEnd.col + pRegion->posStart.col) * sizeof(TCHAR);
-	pFirstBlock = aliLine.GetUnit(pRegion->posStart.row)->pLine = pMemMgr->Extend(pFirstBlock, pFirstBlock->nUsed, nSize);
-	if (pFirstBlock == NULL) return FALSE;
-	memcpy(pFirstBlock->GetDataArea() + pRegion->posStart.col,
-			pLastBlock->GetDataArea() + pRegion->posEnd.col,
-			(pLastBlock->nUsed - pRegion->posEnd.col) * sizeof(TCHAR));
-	pFirstBlock->nUsed = pRegion->posStart.col + (pLastBlock->nUsed - pRegion->posEnd.col);
-
-	// whole line deletion
-	DWORD i;
-	for (i = pRegion->posStart.row + 1; i <= pRegion->posEnd.row; i++) {
-		LineInfo *pInfo = aliLine.GetUnit(i);
-		pMemMgr->Free(pInfo->pLine);
-	}
-	if (!aliLine.Shorten(pRegion->posStart.row + 1, pRegion->posEnd.row - (pRegion->posStart.row + 1) + 1)) return FALSE;
-	return TRUE;
-}
-#endif
-
 /////////////////////////////////////////////////////////////////////////////
 // Insert string
 /////////////////////////////////////////////////////////////////////////////
@@ -293,19 +252,6 @@ BOOL PhysicalLineManager::ReplaceRegion(const Region *pRegion, LPCTSTR pString, 
 	// parse and split replase string
 	StringSplitter ss;
 	if (!ss.Init() || !ss.Parse(pString)) return FALSE;
-
-//	if (_tcslen(pString) == 0) {
-//		if ((pRegion->posStart.col == 0 && pRegion->posEnd.col == 0) ||
-//			(pRegion->posStart.col == aliLine.GetUnit(pRegion->posStart.row)->pLine->nUsed &&
-//			 pRegion->posEnd.col == aliLine.GetUnit(pRegion->posEnd.row)->pLine->nUsed)) {
-//			// whole line(s) are replaced to empty
-//			*pAffectedLines = 0;
-//		} else {
-//			*pAffectedLines = 1;
-//		}
-//	} else {
-//		*pAffectedLines = ss.MaxLine();
-//	}
 	*pAffectedLines = ss.MaxLine();
 
 	// keep first and last line of curent memblock;

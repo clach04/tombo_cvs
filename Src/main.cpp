@@ -92,7 +92,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPTSTR pCmdLine, int nCmdSh
 #endif
 
 	// register YAEdit class 
-	TomboEdit::RegisterClass(hInst);
+	YAEdit::RegisterClass(hInst);
 
 	// create MainFrame instance
 	MainFrame frmMain;

@@ -7,8 +7,8 @@ struct LineInfo;
 class MemBlock;
 class Coordinate;
 class Region;
-class TomboEditDoc;
-class TomboEdit;
+class YAEditDoc;
+class YAEdit;
 
 /////////////////////////////////////////////////////////////////////////////
 // Line chunk
@@ -74,7 +74,7 @@ class LgLineInfo {
 class LineManager {
 	TVector<LgLineInfo> aliLine; // logical line index
 
-	TomboEdit *pEdit;
+	YAEdit *pEdit;
 
 protected:
 
@@ -99,7 +99,7 @@ public:
 
 	LineManager();
 	~LineManager();
-	BOOL Init(TomboEdit *pEdit);
+	BOOL Init(YAEdit *pEdit);
 	BOOL Reset();
 
 	////////////////////////////////////////////////////

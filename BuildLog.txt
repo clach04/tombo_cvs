@@ -511,3 +511,10 @@ Changes
 * Initial version of TOMBO 2.0 alpha
 * You can build only win32 version. CE version is not yet.
 * Very very unstable. there are crush, hung up, and so on.
+
+////////////////////////////////
+// B123
+////////////////////////////////
+// 2.0 branch
+
+* Rename some classes

@@ -1,7 +1,7 @@
 #ifndef YAEDITDOC_H
 #define YAEDITDOC_H
 
-class TomboEdit;
+class YAEdit;
 class LineChunk;
 class Region;
 class PhysicalLineManager;
@@ -11,10 +11,10 @@ class YAEDocCallbackHandler;
 // Document container for YAE
 ////////////////////////////////////////////////////
 
-class TomboEditDoc {
+class YAEditDoc {
 protected:
 	PhysicalLineManager *pPhLineMgr;
-	TomboEdit *pView;
+	YAEdit *pView;
 
 	YAEDocCallbackHandler *pHandler;
 
@@ -26,10 +26,10 @@ public:
 	////////////////////////////////////////////////////
 	// ctor, dtor & initialize
 
-	TomboEditDoc();
-	~TomboEditDoc();
+	YAEditDoc();
+	~YAEditDoc();
 
-	BOOL Init(const char *pStr, TomboEdit *pView, YAEDocCallbackHandler *pCb);
+	BOOL Init(const char *pStr, YAEdit *pView, YAEDocCallbackHandler *pCb);
 
 	PhysicalLineManager *GetPhMgr() { return pPhLineMgr; }
 
@@ -57,7 +57,7 @@ public:
 
 class YAEDocCallbackHandler {
 public:
-	virtual void OnModifyStatusChanged(TomboEditDoc *pDoc, BOOL bOld, BOOL bNew) = 0;
+	virtual void OnModifyStatusChanged(YAEditDoc *pDoc, BOOL bOld, BOOL bNew) = 0;
 };
 
 #endif

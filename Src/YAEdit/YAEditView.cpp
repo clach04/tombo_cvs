@@ -33,12 +33,12 @@
 // initialize
 /////////////////////////////////////////////////////////////////////////////
 
-TomboEditView::~TomboEditView()
+YAEditView::~YAEditView()
 {
 	if (pFontCache) delete pFontCache;
 }
 
-BOOL TomboEditView::Init()
+BOOL YAEditView::Init()
 {
 	nCursorColPos = nCursorCol = 0;
 	nBaseLineNo = nCursorRow = 0;
@@ -46,13 +46,13 @@ BOOL TomboEditView::Init()
 	return TRUE;
 }
 
-void TomboEditView::ResetParam()
+void YAEditView::ResetParam()
 {
 	GetClientRect(hViewWnd, &rClientRect);
 	nPageHeight = (rClientRect.bottom - rClientRect.top) / nLineH;
 }
 
-BOOL TomboEditView::ResetScrollbar()
+BOOL YAEditView::ResetScrollbar()
 {
 	nHorizPageScrollDelta = (rClientRect.right - rClientRect.left) / 4;
 
@@ -182,7 +182,7 @@ static void DrawLEOL(HDC hDC, LPRECT pRect, COLORREF color)
 	SelectObject(hDC, hOld);
 }
 
-void TomboEditView::DrawEndLineMark(HDC hDC, DWORD wStartPos, DWORD nMaxLine, RECT *pRect, LineChunk *pChunk)
+void YAEditView::DrawEndLineMark(HDC hDC, DWORD wStartPos, DWORD nMaxLine, RECT *pRect, LineChunk *pChunk)
 {
 	DWORD nLineNo = pChunk->GetLineNo();
 
@@ -218,7 +218,7 @@ void TomboEditView::DrawEndLineMark(HDC hDC, DWORD wStartPos, DWORD nMaxLine, RE
 // Draw one line 
 /////////////////////////////////////////////////////////////////////////////
 
-BOOL TomboEditView::PaintLine(HDC hDC, LineChunk *pChunk, const LPRECT pRect, DWORD nSelStart, DWORD nSelEnd)
+BOOL YAEditView::PaintLine(HDC hDC, LineChunk *pChunk, const LPRECT pRect, DWORD nSelStart, DWORD nSelEnd)
 {
 	DWORD nLineNo = pChunk->GetLineNo();
 
@@ -313,7 +313,7 @@ BOOL TomboEditView::PaintLine(HDC hDC, LineChunk *pChunk, const LPRECT pRect, DW
 	return TRUE;
 }
 
-void TomboEditView::PaintRect(HDC hDC, const RECT &rPaintRect)
+void YAEditView::PaintRect(HDC hDC, const RECT &rPaintRect)
 {
 	RECT r = rClientRect;
 
@@ -343,7 +343,7 @@ void TomboEditView::PaintRect(HDC hDC, const RECT &rPaintRect)
 
 }
 
-BOOL TomboEditView::DirectPaintLine(DWORD nLineNo)
+BOOL YAEditView::DirectPaintLine(DWORD nLineNo)
 {
 	if (!IsLineDisplay(nLineNo)) return TRUE; // the line is not in window
 
@@ -373,7 +373,7 @@ BOOL TomboEditView::DirectPaintLine(DWORD nLineNo)
 	return TRUE;
 }
 
-void TomboEditView::RequestRedraw(DWORD nLineNo, WORD nLeftPos, BOOL bToBottom)
+void YAEditView::RequestRedraw(DWORD nLineNo, WORD nLeftPos, BOOL bToBottom)
 {
 	if (!IsLineDisplay(nLineNo)) return;
 
@@ -392,7 +392,7 @@ void TomboEditView::RequestRedraw(DWORD nLineNo, WORD nLeftPos, BOOL bToBottom)
 }
 
 // maybe this method is not used now
-void TomboEditView::RequestRedrawWithLine(DWORD nLineNo, DWORD nNumLine)
+void YAEditView::RequestRedrawWithLine(DWORD nLineNo, DWORD nNumLine)
 {
 	LineChunk lc;
 	pCtrl->GetDoc()->GetLineChunk(nLineNo + nNumLine, &lc);
@@ -404,7 +404,7 @@ void TomboEditView::RequestRedrawWithLine(DWORD nLineNo, DWORD nNumLine)
 	RequestRedrawRegion(&r);
 }
 
-void TomboEditView::RequestRedrawRegion(const Region *pRegion)
+void YAEditView::RequestRedrawRegion(const Region *pRegion)
 {
 	Region rgn = *pRegion;
 
@@ -465,7 +465,7 @@ void TomboEditView::RequestRedrawRegion(const Region *pRegion)
 	}
 }
 
-void TomboEditView::CalcInvalidateArea(DWORD nLine, DWORD nStart, DWORD nEnd)
+void YAEditView::CalcInvalidateArea(DWORD nLine, DWORD nStart, DWORD nEnd)
 {
 	RECT r;
 
@@ -487,12 +487,13 @@ void TomboEditView::CalcInvalidateArea(DWORD nLine, DWORD nStart, DWORD nEnd)
 
 	InvalidateRect(hViewWnd, &r, TRUE);
 }
+
 /////////////////////////////////////////////////////////////////////////////
 // get max line no
 /////////////////////////////////////////////////////////////////////////////
-// This method is the proxy of TomboEdit.
+// This method is the proxy of YAEdit.
 
-DWORD TomboEditView::GetMaxLine()
+DWORD YAEditView::GetMaxLine()
 {
 	if (pCtrl && pCtrl->GetDoc()) {
 		return pCtrl->GetLineMgr()->MaxLine();
@@ -505,7 +506,7 @@ DWORD TomboEditView::GetMaxLine()
 // set caret position
 /////////////////////////////////////////////////////////////////////////////
 
-void TomboEditView::SetCaretPos()
+void YAEditView::SetCaretPos()
 {
 	if (IsCursorInDisplay()) {
 		if (!bShowCaret) {
@@ -536,7 +537,7 @@ void TomboEditView::SetCaretPos()
 // Scroll view that cursor is in.
 //
 // ScrollCaret try to adjust to view cursor cetner of the view if it can.
-void TomboEditView::ScrollCaret()
+void YAEditView::ScrollCaret()
 {
 	if (IsCursorInDisplay()) return;
 
@@ -558,7 +559,7 @@ void TomboEditView::ScrollCaret()
 // Find text position
 /////////////////////////////////////////////////////////////////////////////
 
-void TomboEditView::SetNearCursorPos(WORD xPos, DWORD nYLines)
+void YAEditView::SetNearCursorPos(WORD xPos, DWORD nYLines)
 {
 	xPos += (WORD)nColOffset;
 	nCursorRow = nYLines;
@@ -591,7 +592,7 @@ void TomboEditView::SetNearCursorPos(WORD xPos, DWORD nYLines)
 	SetCaretPos();
 }
 
-void TomboEditView::SetCaretPosition(const Coordinate &pos)
+void YAEditView::SetCaretPosition(const Coordinate &pos)
 {
 	nCursorRow = pos.row;
 	nCursorCol = pos.col;
@@ -608,7 +609,7 @@ void TomboEditView::SetCaretPosition(const Coordinate &pos)
 // scroll view
 /////////////////////////////////////////////////////////////////////////////
 
-void TomboEditView::SetScrollVertPos(DWORD nPos, BOOL bFullRewrite)
+void YAEditView::SetScrollVertPos(DWORD nPos, BOOL bFullRewrite)
 {
 	if (nPos + nPageHeight > GetMaxLine()) {
 		nPos = GetMaxLine() - nPageHeight;
@@ -622,7 +623,7 @@ void TomboEditView::SetScrollVertPos(DWORD nPos, BOOL bFullRewrite)
 	SetCaretPos();
 }
 
-void TomboEditView::SetScrollVertByOffset(int nLineOffset)
+void YAEditView::SetScrollVertByOffset(int nLineOffset)
 {
 	if (nPageHeight > GetMaxLine()) return;
 
@@ -660,7 +661,7 @@ void TomboEditView::SetScrollVertByOffset(int nLineOffset)
 	SetScrollVertPos(nPos, TRUE);
 }
 
-void TomboEditView::SetScrollHorizPos(int nPos)
+void YAEditView::SetScrollHorizPos(int nPos)
 {
 	SCROLLINFO si;
 	si.cbSize = sizeof(si);
@@ -680,25 +681,25 @@ void TomboEditView::SetScrollHorizPos(int nPos)
 	SetCaretPos();
 }
 
-void TomboEditView::NextPage() { SetScrollVertByOffset((int)(nPageHeight - 2)); }
-void TomboEditView::PrevPage() { SetScrollVertByOffset(-(int)(nPageHeight - 2)); }
-void TomboEditView::Next1L() { SetScrollVertByOffset(1); }
-void TomboEditView::Prev1L() { SetScrollVertByOffset(-1); }
-void TomboEditView::ScrollRight1L() { SetScrollHorizPos(nColOffset + nAveCharWidth); }
-void TomboEditView::ScrollLeft1L() { SetScrollHorizPos(nColOffset - nAveCharWidth); }
-void TomboEditView::ScrollRight1P() { SetScrollHorizPos(nColOffset + nHorizPageScrollDelta); }
-void TomboEditView::ScrollLeft1P() { SetScrollHorizPos(nColOffset - nHorizPageScrollDelta); }
+void YAEditView::NextPage() { SetScrollVertByOffset((int)(nPageHeight - 2)); }
+void YAEditView::PrevPage() { SetScrollVertByOffset(-(int)(nPageHeight - 2)); }
+void YAEditView::Next1L() { SetScrollVertByOffset(1); }
+void YAEditView::Prev1L() { SetScrollVertByOffset(-1); }
+void YAEditView::ScrollRight1L() { SetScrollHorizPos(nColOffset + nAveCharWidth); }
+void YAEditView::ScrollLeft1L() { SetScrollHorizPos(nColOffset - nAveCharWidth); }
+void YAEditView::ScrollRight1P() { SetScrollHorizPos(nColOffset + nHorizPageScrollDelta); }
+void YAEditView::ScrollLeft1P() { SetScrollHorizPos(nColOffset - nHorizPageScrollDelta); }
 
 /////////////////////////////////////////////////////////////////////////////
 // cursor position check funcs
 /////////////////////////////////////////////////////////////////////////////
 
-BOOL TomboEditView::IsCursorInDocBottom() { return nCursorRow + 1 == GetMaxLine(); }
-BOOL TomboEditView::IsCursorInPageBottom() { return nCursorRow - nBaseLineNo == nPageHeight - 1; }
-BOOL TomboEditView::IsCursorInPageTop() { return nCursorRow - nBaseLineNo == 0; }
-BOOL TomboEditView::IsCursorInDocTop() { return nCursorRow == 0; }
+BOOL YAEditView::IsCursorInDocBottom() { return nCursorRow + 1 == GetMaxLine(); }
+BOOL YAEditView::IsCursorInPageBottom() { return nCursorRow - nBaseLineNo == nPageHeight - 1; }
+BOOL YAEditView::IsCursorInPageTop() { return nCursorRow - nBaseLineNo == 0; }
+BOOL YAEditView::IsCursorInDocTop() { return nCursorRow == 0; }
 
-BOOL TomboEditView::IsCursorInDisplay()
+BOOL YAEditView::IsCursorInDisplay()
 {
 	if (nCursorRow < nBaseLineNo ||
 		nCursorRow >= nBaseLineNo + nPageHeight ||
@@ -708,7 +709,7 @@ BOOL TomboEditView::IsCursorInDisplay()
 	return TRUE;
 }
 
-BOOL TomboEditView::IsLineDisplay(DWORD nLineNo)
+BOOL YAEditView::IsLineDisplay(DWORD nLineNo)
 {
 	return (nBaseLineNo <= nLineNo) && (nLineNo < nBaseLineNo + nPageHeight);
 }
@@ -716,15 +717,15 @@ BOOL TomboEditView::IsLineDisplay(DWORD nLineNo)
 //  Coordinate conversion
 /////////////////////////////////////////////////////////////////////////////
 
-DWORD TomboEditView::LgLineNoToDpLineNo(DWORD nLgLineNo) { return nLgLineNo - nBaseLineNo; }
-DWORD TomboEditView::DpLineNoToLgLineNo(DWORD nDpLineNo) { return nDpLineNo + nBaseLineNo; }
-DWORD TomboEditView::DpLineNoToDpLinePixel(DWORD nDpLineNo) { return rClientRect.top + nDpLineNo * nLineH; }
-DWORD TomboEditView::DpLinePixelToLgLineNo(DWORD nDpLinePixel) { return nDpLinePixel / nLineH + nBaseLineNo; }
+DWORD YAEditView::LgLineNoToDpLineNo(DWORD nLgLineNo) { return nLgLineNo - nBaseLineNo; }
+DWORD YAEditView::DpLineNoToLgLineNo(DWORD nDpLineNo) { return nDpLineNo + nBaseLineNo; }
+DWORD YAEditView::DpLineNoToDpLinePixel(DWORD nDpLineNo) { return rClientRect.top + nDpLineNo * nLineH; }
+DWORD YAEditView::DpLinePixelToLgLineNo(DWORD nDpLinePixel) { return nDpLinePixel / nLineH + nBaseLineNo; }
 
 /////////////////////////////////////////////////////////////////////////////
 // WM_CREATE
 /////////////////////////////////////////////////////////////////////////////
-void TomboEditView::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
+void YAEditView::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
 	GetClientRect(hWnd, &rClientRect);
 	hViewWnd = hWnd;
@@ -755,7 +756,7 @@ void TomboEditView::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 // Forcus window
 /////////////////////////////////////////////////////////////////////////////
 
-void TomboEditView::OnSetFocus()
+void YAEditView::OnSetFocus()
 {
 	DWORD nCaretWidth = GetSystemMetrics(SM_CXBORDER);
 	if (nCaretWidth < 2) nCaretWidth = 2;
@@ -765,7 +766,7 @@ void TomboEditView::OnSetFocus()
 	ShowCaret(NULL);
 }
 
-void TomboEditView::OnKillFocus()
+void YAEditView::OnKillFocus()
 {
 	HideCaret(hViewWnd);
 	bShowCaret = FALSE;
@@ -776,7 +777,7 @@ void TomboEditView::OnKillFocus()
 // cursor move
 /////////////////////////////////////////////////////////////////////////////
 
-void TomboEditView::MoveRight()
+void YAEditView::MoveRight()
 {
 	if (!pCtrl->GetDoc()) return;
 
@@ -810,7 +811,7 @@ void TomboEditView::MoveRight()
 	SetCaretPos();
 }
 
-void TomboEditView::MoveLeft()
+void YAEditView::MoveLeft()
 {
 	if (!pCtrl->GetDoc()) return;
 
@@ -836,7 +837,7 @@ void TomboEditView::MoveLeft()
 	SetCaretPos();
 }
 
-void TomboEditView::MoveUp()
+void YAEditView::MoveUp()
 {
 	if (IsCursorInPageTop()) {
 		if (nBaseLineNo == 0) return;
@@ -846,7 +847,7 @@ void TomboEditView::MoveUp()
 	SetNearCursorPos((WORD)nCursorColPos, nCursorRow - 1);
 }
 
-void TomboEditView::MoveEOL()
+void YAEditView::MoveEOL()
 {
 	LineChunk lc;
 	if (!pCtrl->GetDoc()->GetLineChunk(nCursorRow, &lc)) return;
@@ -868,7 +869,7 @@ void TomboEditView::MoveEOL()
 	SetCaretPos();
 }
 
-void TomboEditView::MoveTOL()
+void YAEditView::MoveTOL()
 {
 	nCursorCol = 0;
 	nCursorColPos = 0;
@@ -878,7 +879,7 @@ void TomboEditView::MoveTOL()
 	SetCaretPos();
 }
 
-void TomboEditView::MoveDown()
+void YAEditView::MoveDown()
 {
 	if (IsCursorInDocBottom()) return;
 	if (IsCursorInPageBottom()) Next1L();
@@ -886,7 +887,7 @@ void TomboEditView::MoveDown()
 	SetNearCursorPos((WORD)nCursorColPos, nCursorRow + 1);
 }
 
-DWORD TomboEditView::GetLineWidth(DWORD nOffset, LPCTSTR pStr, DWORD nLen)
+DWORD YAEditView::GetLineWidth(DWORD nOffset, LPCTSTR pStr, DWORD nLen)
 {
 	LPCTSTR pLimit = pStr + nLen;
 	DWORD w = 0;
@@ -916,7 +917,7 @@ DWORD TomboEditView::GetLineWidth(DWORD nOffset, LPCTSTR pStr, DWORD nLen)
 	return w;
 }
 
-void TomboEditView::GetMaxLineWidth()
+void YAEditView::GetMaxLineWidth()
 {
 	DWORD i, w;
 	DWORD n = pCtrl->GetLineMgr()->MaxLine();

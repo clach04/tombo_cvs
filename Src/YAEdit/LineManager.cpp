@@ -24,7 +24,7 @@ LineManager::~LineManager()
 {
 }
 
-BOOL LineManager::Init(TomboEdit *pEd)
+BOOL LineManager::Init(YAEdit *pEd)
 {
 	pEdit = pEd;
 	if (!aliLine.Init(INITIAL_ARRAY_SIZE, ARRAY_DELTA)) return FALSE;
@@ -307,7 +307,7 @@ BOOL LineManager::AdjustLgLines(PhysicalLineManager *pMgr, LineWrapper *pWrapper
 	// TODO1: merge vWork and vSep
 	// TODO2: wrap part of line especially when rPhDelete.posStart.col is not first logical line in the physical line, 
 
-	// get logical line range that LineManager must remove.
+	// get logical line range that LineManager should remove.
 	DWORD nLgAfStartLine, nLgAfEndLine;
 	Region r = rPhDelete;
 	r.posStart.col = 0;
