@@ -150,6 +150,15 @@ a note does not open correctly.
 * FIX: Can't use Ctrl-Z(Undo) (#959,#960)
 * FIX: Switch view-mode when B key pressed.(#993,#994)
 
+////////////////////////////////
+// B082 (Tombo 1.6)
+////////////////////////////////
+
+* NEW: Select show/hide status bar.(Win32, HPC)(#1033)
+* NEW: Disable opening notes when action button pressed.(PocketPC)(#976)
+* FIX: Status not updated when push delete key after selecting region.(#617,#684) 
+* NEW: Disable save icon when a note is not modified.(#1075) 
+
 /////////////////////////////////////////////////////////////////////////
 // TODO
 /////////////////////////////////////////////////////////////////////////
