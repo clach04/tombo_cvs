@@ -210,11 +210,11 @@ void MemoDetailsView::OnGetFocus()
 		pMf->EnableRename(FALSE);
 		pMf->EnableEncrypt(FALSE);
 		pMf->EnableDecrypt(FALSE);
+		pMf->EnableNewFolder(FALSE);
 
 		pMf->EnableCut(TRUE);
 		pMf->EnableCopy(TRUE);
 		pMf->EnablePaste(TRUE);
-
 	}
 	SetModifyStatus();
 }
