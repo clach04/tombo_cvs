@@ -50,12 +50,11 @@ public:
 	virtual LPTSTR GetMemoBody(PasswordManager *pMgr);
 	virtual char *GetMemoBodyA(PasswordManager *pMgr);
 
-//	BOOL XX(PasswordManager *pMgr, LPCTSTR pMemo, LPCTSTR aOrigFile, LPCTSTR aWriteFile);
-
 	// ÉÅÉÇì‡óeÇÃï€ë∂
 	BOOL Save(PasswordManager *pMgr, LPCTSTR pMemo, TString *pHeadLine);
 	virtual BOOL SaveData(PasswordManager *pMgr, const char *pMemo, LPCTSTR pWriteFile);
 
+	BOOL IsReadOnly(BOOL *pReadOnly);
 
 	//////////////////////////////////
 	// à√çÜâªä÷òA

@@ -17,6 +17,8 @@ class MemoDetailsView {
 
 	BOOL bShowStatus;	// DetailsViewの表示・非表示状態
 
+	BOOL bReadOnly;		// is read only mode?
+
 public:
 	///////////////////////
 	// 初期化関連
@@ -26,6 +28,9 @@ public:
 
 	void SetTabstop();				// タブストップ変更
 	BOOL SetFolding(BOOL bFold);	// 折り返し表示切替
+
+	void SetReadOnly(BOOL bReadOnly);
+	BOOL IsReadOnly() { return bReadOnly; }
 
 	////////////////////////
 	// Windowメッセージ関連
@@ -40,7 +45,7 @@ public:
 
 	////////////////////////////
 	// データアクセス関連
-	BOOL SetMemo(LPCTSTR pMemo, DWORD nPos);
+	BOOL SetMemo(LPCTSTR pMemo, DWORD nPos, BOOL bReadOnly);
 	LPTSTR GetMemo();
 	BOOL IsModify() { return SendMessage(hViewWnd, EM_GETMODIFY, 0, 0); }
 	void ResetModify() { SendMessage(hViewWnd, EM_SETMODIFY, (WPARAM)(UINT)FALSE, 0); }
@@ -51,7 +56,7 @@ public:
 	void SetModifyStatus();
 
 	////////////////////////////
-	// 検索
+	// search
 	BOOL Search(BOOL bFirstSearch, BOOL bForward, BOOL bNFMsg, BOOL bSearchFromTop);
 };
 

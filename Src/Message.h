@@ -18,6 +18,7 @@
 #define MSG_INITAPPBTN_FAIL		MSG("アプリケーションボタンの初期化に失敗しました", "Initialize APP button failed.")
 #define MSG_NEW					MSG("新規", "New")
 #define MSG_UPDATE				MSG("更新", "Update")
+#define MSG_RONLY				MSG("閲覧", "ROnly")
 #define MSG_DEFAULT_HEADLINE	MSG("無題", "memo")
 #define MSG_SAVE_FAILED			MSG("メモの保存に失敗しました(%d)", "Save memo failed(%d).")
 #define MSG_GETSIPSTAT_FAILED	MSG("SIPの状態取得に失敗しました", "Get SIP status failed.")

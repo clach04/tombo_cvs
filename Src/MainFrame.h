@@ -1,6 +1,7 @@
 #ifndef MAINFRAME_H
 #define MAINFRAME_H
 
+#include "Message.h"
 #include "MemoSelectView.h"
 #include "MemoDetailsView.h"
 #include "PasswordManager.h"
@@ -53,6 +54,8 @@ protected:
 
 	// ペイン配分の変更
 	void MovePane(WORD width);
+
+	void SetStatusIndicator(DWORD nPos, LPCTSTR pText, BOOL bDisp);
 
 public:
 	MainFrame(); // ctor
@@ -122,8 +125,9 @@ public:
 	void SaveWinSize();
 
 	// ステータス表示制御
-	void SetNewMemoStatus(BOOL bNew);
-	void SetModifyStatus(BOOL bModify);
+	void SetReadOnlyStatus(BOOL bReadOnly) { SetStatusIndicator(1, MSG_RONLY, bReadOnly); }
+	void SetNewMemoStatus(BOOL bNew) { SetStatusIndicator(2, MSG_NEW, bNew); }
+	void SetModifyStatus(BOOL bModify) { SetStatusIndicator(3, MSG_UPDATE, bModify); }
 
 	// タイトルの変更
 	void SetTitle(LPCTSTR pTitle);

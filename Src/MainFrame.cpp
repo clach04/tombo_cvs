@@ -815,7 +815,7 @@ void MainFrame::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		// マルチペインに伴うウィンドウの再レイアウト
 	}
 	LoadWinSize(hWnd);
-	mdView.SetMemo(TEXT(""), 0);
+	mdView.SetMemo(TEXT(""), 0, FALSE);
 
 	if (!EnableApplicationButton(hWnd)) {
 		TomboMessageBox(hMainWnd, MSG_INITAPPBTN_FAIL, TEXT("Warning"), MB_ICONEXCLAMATION | MB_OK);
@@ -873,6 +873,15 @@ void MainFrame::ResizeStatusBar()
 	DWORD nHeight = r.bottom - r.top;
 	DWORD nWidth = r.right - r.left;
 
+	int nSep[4];
+
+	DWORD nWndSize = nHeight * 2;
+	nSep[0] = nWidth - nWndSize*3 - nHeight;
+	nSep[1] = nSep[0] + nWndSize;
+	nSep[2] = nSep[1] + nWndSize;
+	nSep[3] = nSep[2] + nWndSize;
+	SendMessage(hStatusBar, SB_SETPARTS, (WPARAM)4, (LPARAM)nSep);
+#ifdef COMMENT
 	int nSep[3];
 
 	DWORD nWndSize = nHeight * 2;
@@ -880,40 +889,24 @@ void MainFrame::ResizeStatusBar()
 	nSep[1] = nSep[0] + nWndSize;
 	nSep[2] = nSep[1] + nWndSize;
 	SendMessage(hStatusBar, SB_SETPARTS, (WPARAM)3, (LPARAM)nSep);
+#endif
 }
 #endif
 
 ///////////////////////////////////////////////////
-// 新規メモステータス表示
+// set status indicator on statusbar
 ///////////////////////////////////////////////////
 
-void MainFrame::SetNewMemoStatus(BOOL bNew)
+void MainFrame::SetStatusIndicator(DWORD nPos, LPCTSTR pText, BOOL bDisp)
 {
 #if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
-	LPTSTR p;
-	if (bNew) {
-		p = MSG_NEW;
+	LPCTSTR p;
+	if (bDisp) {
+		p = pText;
 	} else {
 		p = TEXT("");
 	}
-	SendMessage(hStatusBar, SB_SETTEXT, 1, (LPARAM)p);
-#endif
-}
-
-///////////////////////////////////////////////////
-// メモ更新ステータス表示
-///////////////////////////////////////////////////
-
-void MainFrame::SetModifyStatus(BOOL bModify)
-{
-#if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
-	LPTSTR p;
-	if (bModify) {
-		p = MSG_UPDATE;
-	} else {
-		p = TEXT("");
-	}
-	SendMessage(hStatusBar, SB_SETTEXT, 2, (LPARAM)p);
+	SendMessage(hStatusBar, SB_SETTEXT, nPos, (LPARAM)p);
 #endif
 }
 
@@ -1652,7 +1645,7 @@ void MainFrame::OnProperty()
 	BOOL bPrev = bDisableHotKey;
 	bDisableHotKey = TRUE;
 
-	mmMemoManager.NewMemo(); // XXXX
+	mmMemoManager.NewMemo();
 
 	int nResult = g_Property.Popup(hInstance, hMainWnd);
 	bDisableHotKey = bPrev;

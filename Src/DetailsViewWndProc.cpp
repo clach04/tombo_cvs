@@ -17,6 +17,7 @@ static HWND hParentWnd;
 
 #define KEY_ESC 0x1B
 #define KEY_CTRL_A 1
+#define KEY_CTRL_B 2
 
 void SetWndProc(WNDPROC wp, HWND hParent, HINSTANCE h, MemoDetailsView *p, MemoManager *pMgr)
 {
@@ -39,9 +40,40 @@ void SetWndProc(WNDPROC wp, HWND hParent, HINSTANCE h, MemoDetailsView *p, MemoM
 LRESULT CALLBACK NewDetailsViewProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch(msg) {
+	case WM_CLEAR:
+		if (pView->IsReadOnly()) return 0;
+		break;
+	case WM_CUT:
+		if (pView->IsReadOnly()) return 0;
+		break;
+	case WM_PASTE:
+		if (pView->IsReadOnly()) return 0;
+		break;
+	case WM_KEYDOWN:
+		if (wParam == 'B' && GetKeyState(VK_CONTROL)) {
+			// toggle browsing mode
+			pView->SetReadOnly(!pView->IsReadOnly());
+			return 0;
+		}
+		if (pView->IsReadOnly()) {
+			if (wParam == VK_DELETE) return 0;
+			if (wParam == VK_BACK || wParam == VK_CONVERT || wParam == VK_LEFT) {
+				SendMessage(hwnd, WM_KEYDOWN, VK_PRIOR, lParam);
+				return 0;
+			}
+			if (wParam == VK_SPACE || wParam == VK_RIGHT) {
+				SendMessage(hwnd, WM_KEYDOWN, VK_NEXT, lParam); 
+				return 0;
+			}
+		}
+		break;
 	case WM_CHAR:
-		// 検索状態フラグクリア
-		pManager->SetMDSearchFlg(TRUE);
+		pManager->SetMDSearchFlg(TRUE); // clear search status flag
+
+		// if read only mode, ignore key events
+		if (pView->IsReadOnly()) return 0;
+		// disable Ctrl-B(BELL)
+		if (wParam == KEY_CTRL_B) return 0;
 		break;
 
 #if defined(PLATFORM_PKTPC)

@@ -81,7 +81,6 @@ BOOL MemoDetailsView::Create(LPCTSTR pName, RECT &r, HWND hParent, DWORD nID, DW
 		SetFont(hFont);
 	}
 	SetTabstop();
-
 	return TRUE;
 }
 
@@ -206,8 +205,10 @@ void MemoDetailsView::OnGetFocus()
 // ƒƒ‚‚ÌÝ’è
 ///////////////////////////////////////////
 
-BOOL MemoDetailsView::SetMemo(LPCTSTR pMemo, DWORD nPos)
+BOOL MemoDetailsView::SetMemo(LPCTSTR pMemo, DWORD nPos, BOOL bReadOnly)
 {
+	SetReadOnly(bReadOnly);
+
 	SetWindowText(hViewWnd, pMemo);
 	if (g_Property.KeepCaret()) {
 		SendMessage(hViewWnd, EM_SETSEL, nPos, nPos);
@@ -535,4 +536,15 @@ BOOL MemoDetailsView::Search(BOOL bFirstSearch, BOOL bForward, BOOL bNFMsg, BOOL
 
 	delete [] p;
 	return bMatch;
+}
+
+/////////////////////////////////////////
+// change read only mode
+/////////////////////////////////////////
+
+void MemoDetailsView::SetReadOnly(BOOL bro)
+{
+	bReadOnly = bro;
+//	SendMessage(hViewWnd, EM_SETREADONLY, (WPARAM)bReadOnly, 0);
+	if (pMemoMgr) pMemoMgr->GetMainFrame()->SetReadOnlyStatus(bReadOnly);
 }

@@ -407,7 +407,7 @@ BOOL CryptedMemoNote::SaveData(PasswordManager *pMgr, const char *pText, LPCTSTR
 		}
 	}
 	if (!cMgr.Init(pPassword)) {
-		MessageBox(NULL, TEXT("In CryptedMemoNote::SaveData,CryptManager::Init failed"), TEXT("DEBUG"), MB_OK); // XXXX_DEBUG
+		MessageBox(NULL, TEXT("In CryptedMemoNote::SaveData,CryptManager::Init failed"), TEXT("DEBUG"), MB_OK);
 		return FALSE;
 	}
 	return cMgr.EncryptAndStore((LPBYTE)pText, strlen(pText), pWriteFile);
@@ -419,7 +419,7 @@ BOOL CryptedMemoNote::SaveData(PasswordManager *pMgr, const char *pText, LPCTSTR
 
 MemoNote *MemoNote::Encrypt(PasswordManager *pMgr, TString *pHeadLine, BOOL *pIsModified)
 {
-	MessageBox(NULL, TEXT("MemoNote::Encrypt called"), TEXT("DEBUG"), MB_OK); // XXXX_DEBUG
+	MessageBox(NULL, TEXT("MemoNote::Encrypt called"), TEXT("DEBUG"), MB_OK);
 	return NULL;
 }
 
@@ -427,14 +427,14 @@ MemoNote *PlainMemoNote::Encrypt(PasswordManager *pMgr, TString *pHeadLine, BOOL
 {
 	TString sMemoDir;
 	if (!sMemoDir.GetDirectoryPath(pPath)) {
-		MessageBox(NULL, TEXT("GetDirectoryPath failed"), TEXT("DEBUG"), MB_OK); // XXXX_DEBUG
+		MessageBox(NULL, TEXT("GetDirectoryPath failed"), TEXT("DEBUG"), MB_OK);
 		return FALSE;
 	}
 
 	// メモ本文取得
 	LPTSTR pText = GetMemoBody(pMgr);
 	if (pText == NULL) {
-		MessageBox(NULL, TEXT("GetMemoBody failed"), TEXT("DEBUG"), MB_OK); // XXXX_DEBUG
+		MessageBox(NULL, TEXT("GetMemoBody failed"), TEXT("DEBUG"), MB_OK);
 		return FALSE;
 	}
 
@@ -448,20 +448,20 @@ MemoNote *PlainMemoNote::Encrypt(PasswordManager *pMgr, TString *pHeadLine, BOOL
 		// チェックOFF時
 		if (!GetHeadLineFromFilePath(pPath, &sHeadLine)) {
 			MemoNote::WipeOutAndDelete(pText);
-			MessageBox(NULL, TEXT("GetHeadLineFromFilePath failed"), TEXT("DEBUG"), MB_OK); // XXXX_DEBUG
+			MessageBox(NULL, TEXT("GetHeadLineFromFilePath failed"), TEXT("DEBUG"), MB_OK);
 			return FALSE;
 		}
 	} else {
 		if (!GetHeadLineFromMemoText(pText, &sHeadLine)) {
 			MemoNote::WipeOutAndDelete(pText);
-			MessageBox(NULL, TEXT("GetHeadLineFromMemoText failed"), TEXT("DEBUG"), MB_OK); // XXXX_DEBUG
+			MessageBox(NULL, TEXT("GetHeadLineFromMemoText failed"), TEXT("DEBUG"), MB_OK);
 			return FALSE;
 		}
 	}
 
 	// 新ファイル名を決定
 	if (!GetHeadLinePath(sMemoDir.Get(), sHeadLine.Get(), TEXT(".chi"), &sFullPath, &pNotePath, pHeadLine)) {
-		MessageBox(NULL, TEXT("GetHeadLinePath failed"), TEXT("DEBUG"), MB_OK); // XXXX_DEBUG
+		MessageBox(NULL, TEXT("GetHeadLinePath failed"), TEXT("DEBUG"), MB_OK);
 		MemoNote::WipeOutAndDelete(pText);
 		return FALSE;
 	}
@@ -471,21 +471,21 @@ MemoNote *PlainMemoNote::Encrypt(PasswordManager *pMgr, TString *pHeadLine, BOOL
 	if (!p->Init(pNotePath)) {
 		MemoManager::WipeOutAndDeleteFile(sFullPath.Get());
 		MemoNote::WipeOutAndDelete(pText);
-		MessageBox(NULL, TEXT("new CryptedMemoNote failed"), TEXT("DEBUG"), MB_OK); // XXXX_DEBUG
+		MessageBox(NULL, TEXT("new CryptedMemoNote failed"), TEXT("DEBUG"), MB_OK);
 		return FALSE;
 	}
 
 	char *pTextA = ConvUnicode2SJIS(pText);
 	MemoNote::WipeOutAndDelete(pText);
 	if (pTextA == NULL) {
-		MessageBox(NULL, TEXT("ConvUnicode2SJIS failed"), TEXT("DEBUG"), MB_OK); // XXXX_DEBUG
+		MessageBox(NULL, TEXT("ConvUnicode2SJIS failed"), TEXT("DEBUG"), MB_OK);
 		return FALSE;
 	}
 	// メモ保存
 	if (!p->SaveData(pMgr, pTextA, sFullPath.Get())) {
 		MemoNote::WipeOutAndDelete(pTextA);
 		delete p;
-		MessageBox(NULL, TEXT("SaveData failed"), TEXT("DEBUG"), MB_OK); // XXXX_DEBUG
+		MessageBox(NULL, TEXT("SaveData failed"), TEXT("DEBUG"), MB_OK);
 		return FALSE;
 	}
 	MemoNote::WipeOutAndDelete(pTextA);
@@ -847,6 +847,26 @@ BOOL MemoNote::Rename(LPCTSTR pNewName)
 	delete [] pPath;
 	pPath = pNewPath;
 
+	return TRUE;
+}
+
+/////////////////////////////////////////////
+// Check file is readonly
+/////////////////////////////////////////////
+
+BOOL MemoNote::IsReadOnly(BOOL *pReadOnly)
+{
+	if (!pReadOnly) return FALSE;
+
+	TString sFullPath;
+	if (!sFullPath.Join(g_Property.TopDir(), TEXT("\\"), pPath)) return FALSE;
+
+	WIN32_FIND_DATA wfd;
+	HANDLE h = FindFirstFile(sFullPath.Get(), &wfd);
+	if (h == INVALID_HANDLE_VALUE) return FALSE;
+	FindClose(h);
+
+	*pReadOnly = (wfd.dwFileAttributes & FILE_ATTRIBUTE_READONLY) == FILE_ATTRIBUTE_READONLY;
 	return TRUE;
 }
 

@@ -183,10 +183,10 @@ BOOL MemoManager::MakeNewFolder(HWND hWnd)
 }
 
 ////////////////////////////////////////////////////////
-// メモ内容のセーブ
+// Save notes
 ////////////////////////////////////////////////////////
-// 修正されていなければ保存しない
-// 修正されている場合には確認した後に保存
+// Notes is not save if not modified or read only.
+// Otherwise save notes after confirm.
 
 BOOL MemoManager::SaveIfModify(LPDWORD pYNC, BOOL bDupMode)
 {
@@ -194,8 +194,8 @@ BOOL MemoManager::SaveIfModify(LPDWORD pYNC, BOOL bDupMode)
 		*pYNC = IDOK;
 	}
 
-	// 修正されていなければセーブしない
-	if (!pMemoDetailsView->IsModify()) {
+	// skip saving if not modified or read only
+	if (!pMemoDetailsView->IsModify() || pMemoDetailsView->IsReadOnly()) {
 		StoreCursorPos();
 		return TRUE;
 	}
@@ -232,13 +232,6 @@ BOOL MemoManager::SaveIfModify(LPDWORD pYNC, BOOL bDupMode)
 		// この時点で新規メモではなくなるのでステータスを変える
 		pMainFrame->SetNewMemoStatus(FALSE);
 	}
-//	HTREEITEM hOrigItem = pMemoSelectView->GetTreeItemFromPath(pCurrentNote->MemoPath());
-
-	// DEBUG
-//	if (hOrigItem != hCurrentItem) {
-//		MessageBox(NULL, TEXT("hItem Mismatch"), TEXT("DEBUG"), MB_OK);
-//	}
-
 	// ヘッドライン文字列の取得
 	TString sHeadLine;
 
@@ -285,7 +278,7 @@ BOOL MemoManager::SetMemo(MemoLocator *pLoc)
 			if (nError == ERROR_INVALID_PASSWORD) {
 				bLoop = TRUE;
 			} else {
-				pMemoDetailsView->SetMemo(MSG_CANT_OPEN_MEMO, 0);
+				pMemoDetailsView->SetMemo(MSG_CANT_OPEN_MEMO, 0, TRUE);
 				return TRUE;
 			}
 		}
@@ -296,8 +289,10 @@ BOOL MemoManager::SetMemo(MemoLocator *pLoc)
 	if (pNote && pNote->MemoPath()) {
 		if (!mi.ReadInfo(pNote->MemoPath(), &nPos)) nPos = 0;
 	}
+	BOOL bReadOnly;
+	if (!pNote->IsReadOnly(&bReadOnly)) return FALSE;
 
-	pMemoDetailsView->SetMemo(p, nPos);
+	pMemoDetailsView->SetMemo(p, nPos, bReadOnly);
 	MemoNote::WipeOutAndDelete(p);
 	SetCurrentNote(pLoc);
 	return TRUE;
@@ -323,7 +318,7 @@ BOOL MemoManager::NewMemo()
 
 BOOL MemoManager::ClearMemo()
 {
-	pMemoDetailsView->SetMemo(TEXT(""), 0);
+	pMemoDetailsView->SetMemo(TEXT(""), 0, FALSE);
 	MemoLocator loc(NULL, NULL);
 	SetCurrentNote(&loc);
 	return TRUE;
