@@ -1626,8 +1626,19 @@ void MainFrame::EnableDecrypt(BOOL bEnable)
 
 void MainFrame::OnForgetPass()
 {
+	DWORD nYNC;
+	if (!mmMemoManager.SaveIfModify(&nYNC, FALSE)) {
+		TCHAR buf[1024];
+		wsprintf(buf, MSG_SAVE_FAILED, GetLastError());
+		TomboMessageBox(hMainWnd, buf, TEXT("ERROR"), MB_ICONSTOP | MB_OK);
+		ActivateView(FALSE);
+		return;
+	}
+	if (nYNC == IDCANCEL) return;
+
 	pmPasswordMgr.ForgetPassword();
 	TomboMessageBox(hMainWnd, MSG_ERASE_PW, MSG_ERASE_PW_TITLE, MB_ICONINFORMATION | MB_OK);
+	mmMemoManager.NewMemo();
 }
 
 ///////////////////////////////////////////////////
