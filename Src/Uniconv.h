@@ -11,7 +11,8 @@ char *ConvUnicode2SJIS(LPCTSTR p);
 
 LPTSTR ConvSJIS2UnicodeWithByte(const char *p, DWORD nByte);
 
-// strdupのUNICODE版。領域はnew [] で確保するため、delete[] で開放すること。
+// TCHAR version of strdup
+// allocation does new[], so use delete[] for free memoy. 
 LPTSTR StringDup(LPCTSTR pStr);
 
 #ifdef _WIN32_WCE
@@ -21,6 +22,8 @@ DWORD CountMBStrings(const char *pStr, DWORD nBytes);
 // count number of UNICODE bytes. return value are number of bytes when pStr converts to MBCS.
 DWORD CountWCBytes(LPCTSTR pStr, DWORD nChar);
 #endif
+
+LPWSTR ConvTCharToWChar(LPCTSTR p);
 
 //////////////////////////////////
 // JIS -> SJIS

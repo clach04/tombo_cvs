@@ -459,6 +459,24 @@ char *ConvUnicode2SJIS(LPCTSTR p)
 	return pS;
 }
 
+///////////////////////////////////////////////////////////
+// Convert TCHAR to WCHAR
+////////////////////////////////////////////////////////////
+
+LPWSTR ConvTCharToWChar(LPCTSTR p)
+{
+#if defined(PLATFORM_WIN32)
+	LPWSTR pW;
+	DWORD nLen = strlen(p);
+	pW = new WCHAR[nLen +1];
+	if (pW == NULL) return NULL;
+	MultiByteToWideChar(CP_ACP, 0, p, -1, pW, nLen + 1);
+	return pW;
+#else
+	return StringDup(p);
+#endif
+}
+
 ///////////////////////////////////////////////////
 // JIS -> SJIS•ÏŠ·ƒ‹[ƒ`ƒ“
 ///////////////////////////////////////////////////
