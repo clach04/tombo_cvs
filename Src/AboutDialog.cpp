@@ -12,7 +12,7 @@
 
 // version info
 
-#define TOMBO_VERSION_INFO TEXT("Tombo version 1.6 beta2")
+#define TOMBO_VERSION_INFO TEXT("Tombo version 1.6")
 
 // コピーライト表記
 
@@ -36,7 +36,7 @@ TEXT("--------\r\n")
 TEXT("TOMBO is free software; you can redistribute it and/or modify\r\n")
 TEXT("it under the terms of the GNU General Public License as published by\r\n")
 TEXT("the Free Software Foundation; either version 2 of the License, or\r\n")
-TEXT("(at your option) any later version.\r\n")
+TEXT(" any later version.\r\n")
 TEXT("\r\n")
 TEXT("TOMBO is distributed in the hope that it will be useful,\r\n")
 TEXT("but WITHOUT ANY WARRANTY; without even the implied warranty of\r\n")
