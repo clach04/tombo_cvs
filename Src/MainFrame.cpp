@@ -15,6 +15,7 @@
 #include "SipControl.h"
 #include "TreeViewItem.h"
 #include "GrepDialog.h"
+#include "FilterCtlDlg.h"
 
 #ifdef _WIN32_WCE
 #if defined(PLATFORM_PKTPC)
@@ -39,6 +40,7 @@ UINT WINAPI ImmGetVirtualKey(HWND);
 LPCTSTR MainFrame::pClassName = TOMBO_MAIN_FRAME_WINDOW_CLSS;
 
 static LRESULT CALLBACK MainFrameWndProc(HWND, UINT, WPARAM, LPARAM);
+static HIMAGELIST CreateSelectViewImageList(HINSTANCE hInst);
 
 #define SHGetMenu(hWndMB)  (HMENU)SendMessage((hWndMB), SHCMBM_GETMENU, (WPARAM)0, (LPARAM)0);
 #define SHGetSubMenu(hWndMB,ID_MENU) (HMENU)SendMessage((hWndMB), SHCMBM_GETSUBMENU, (WPARAM)0, (LPARAM)ID_MENU);
@@ -51,6 +53,13 @@ static LRESULT CALLBACK MainFrameWndProc(HWND, UINT, WPARAM, LPARAM);
 #if defined(PLATFORM_HPC)
 #define BORDER_WIDTH 5
 #endif
+
+// IDB_MEMOSELECT_IMAGESに格納されているイメージ1個のサイズ
+#define IMAGE_CX 16
+#define IMAGE_CY 16
+
+// IDB_MEMOSELECT_IMAGESに格納されているイメージ数
+#define NUM_MEMOSELECT_BITMAPS 10
 
 ///////////////////////////////////////
 // コマンドバー関連
@@ -823,15 +832,16 @@ void MainFrame::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	}
 #endif
 
-	// メモ詳細ビュー生成
+	// Create edit view
 	mdView.Create(TEXT("MemoDetails"), r, hWnd, IDC_MEMODETAILSVIEW, IDC_MEMODETAILSVIEW_NF, hInstance, g_Property.DetailsViewFont());
 
 	if (!g_Property.WrapText()) {
 		SetWrapText(g_Property.WrapText());
 	}
 
-	// メモ選択ビュー生成
-	msView.Create(TEXT("MemoSelect"), r, hWnd, IDC_MEMOSELECTVIEW, hInstance, g_Property.SelectViewFont());
+	// Create tree view
+	hSelectViewImgList = CreateSelectViewImageList(hInstance);
+	msView.Create(TEXT("MemoSelect"), r, hWnd, IDC_MEMOSELECTVIEW, hInstance, g_Property.SelectViewFont(), hSelectViewImgList);
 	msView.InitTree();
 
 	if (g_Property.IsUseTwoPane()) {
@@ -859,6 +869,21 @@ void MainFrame::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 	// Raize window for some PocketPC devices.
 	SetForegroundWindow(hMainWnd);
+}
+
+static HIMAGELIST CreateSelectViewImageList(HINSTANCE hInst)
+{
+	HIMAGELIST hImageList;
+	// Create Imagelist.
+	if ((hImageList = ImageList_Create(IMAGE_CX, IMAGE_CY, ILC_MASK, NUM_MEMOSELECT_BITMAPS, 0)) == NULL) return NULL;
+	HBITMAP hBmp = LoadBitmap(hInst, MAKEINTRESOURCE(IDB_MEMOSELECT_IMAGES));
+
+	// Transparent color is GREEN
+	COLORREF rgbTransparent = RGB(0,255,0);
+	ImageList_AddMasked(hImageList, hBmp, rgbTransparent);
+	DeleteObject(hBmp);
+
+	return hImageList;
 }
 
 #if defined(PLATFORM_WIN32)
@@ -1059,6 +1084,8 @@ void MainFrame::OnCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	case IDM_GREP:
 		OnGrep();
 		break;
+	case IDM_VFOLDER_DEF:
+		OnVFolderDef();
 	}
 	return;
 }
@@ -2414,4 +2441,16 @@ void MainFrame::SetTopMost()
 		SetWindowPos(hMainWnd, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
 	}
 #endif
+}
+
+///////////////////////////////////////////////////
+// stay topmost of the screen
+///////////////////////////////////////////////////
+
+void MainFrame::OnVFolderDef()
+{
+	FilterCtlDlg dlg;
+	if (!dlg.Init(&msView)) return;
+	
+	dlg.Popup(g_hInstance, hMainWnd, hSelectViewImgList);
 }

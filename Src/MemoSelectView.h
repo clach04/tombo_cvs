@@ -7,6 +7,7 @@ class TString;
 class TreeViewItem;
 class MemoLocator;
 class GrepDialog;
+class TreeViewVirtualFolderRoot;
 
 class MemoSelectView {
 
@@ -14,7 +15,6 @@ class MemoSelectView {
 	// Window related members
 
 	HWND hViewWnd;
-	HIMAGELIST hImageList;
 
 	// root node
 	HTREEITEM hMemoRoot;
@@ -54,10 +54,12 @@ public:
 
 	MemoSelectView() : hViewWnd(NULL), pMemoMgr(NULL), bAutoLoadMode(FALSE), bSingleClickMode(FALSE), hMemoRoot(NULL), hSearchRoot(NULL), nGrepCount(0) {}
 	BOOL Init(MemoManager *p) { pMemoMgr = p; bCut = FALSE; pClipItem = NULL; return TRUE; }
-	BOOL Create(LPCTSTR pName, RECT &r, HWND hParent, DWORD nID, HINSTANCE hInst, HFONT hFont);
+	BOOL Create(LPCTSTR pName, RECT &r, HWND hParent, DWORD nID, HINSTANCE hInst, HFONT hFont, HIMAGELIST hList);
 
 	/////////////////////////////
 	// ï\é¶ÅEâÊñ ä÷òA
+
+	HWND GetHWnd() { return hViewWnd; }
 
 	BOOL Show(int nCmdShow);
 	void SetFocus();
@@ -155,6 +157,7 @@ public:
 	/////////////////////////////
 	// Virtual folder
 	BOOL InsertVirtualFolder(GrepDialog *pGrepDlg);
+	TreeViewVirtualFolderRoot *GetVirtualFolderRoot();
 
 	/////////////////////////////
 	// Control menu

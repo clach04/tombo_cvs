@@ -19,13 +19,6 @@
 #include "Message.h"
 #include "GrepDialog.h"
 
-// IDB_MEMOSELECT_IMAGESに格納されているイメージ1個のサイズ
-#define IMAGE_CX 16
-#define IMAGE_CY 16
-
-// IDB_MEMOSELECT_IMAGESに格納されているイメージ数
-#define NUM_BITMAPS 10
-
 void SelectViewSetWndProc(WNDPROC wp, HWND hParent, HINSTANCE h, MemoSelectView *p);
 LRESULT CALLBACK NewSelectViewProc( HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam );
 
@@ -39,7 +32,7 @@ static void InsertDummyNode(HWND hTree, HTREEITEM hItem);
 // ウィンドウ生成
 /////////////////////////////////////////
 
-BOOL MemoSelectView::Create(LPCTSTR pName, RECT &r, HWND hParent, DWORD nID, HINSTANCE hInst, HFONT hFont)
+BOOL MemoSelectView::Create(LPCTSTR pName, RECT &r, HWND hParent, DWORD nID, HINSTANCE hInst, HFONT hFont, HIMAGELIST hImgList)
 {
 	DWORD nWndStyle;
 	nWndStyle = WS_CHILD | WS_VSCROLL | WS_HSCROLL | TVS_HASLINES | TVS_HASBUTTONS | TVS_SHOWSELALWAYS | TVS_EDITLABELS;
@@ -61,15 +54,7 @@ BOOL MemoSelectView::Create(LPCTSTR pName, RECT &r, HWND hParent, DWORD nID, HIN
 	SetWindowLong(hViewWnd, GWL_WNDPROC, (LONG)NewSelectViewProc);
 #endif
 
-	// Create Imagelist.
-	if ((hImageList = ImageList_Create(IMAGE_CX, IMAGE_CY, ILC_MASK, NUM_BITMAPS, 0)) == NULL) return FALSE;
-	HBITMAP hBmp = LoadBitmap(hInst, MAKEINTRESOURCE(IDB_MEMOSELECT_IMAGES));
-
-	// Transparent color is GREEN
-	COLORREF rgbTransparent = RGB(0,255,0);
-	ImageList_AddMasked(hImageList, hBmp, rgbTransparent);
-	DeleteObject(hBmp);
-	TreeView_SetImageList(hViewWnd, hImageList, TVSIL_NORMAL);
+	TreeView_SetImageList(hViewWnd, hImgList, TVSIL_NORMAL);
 
 	// フォント設定
 	if (hFont != NULL) {
@@ -1442,4 +1427,16 @@ BOOL MemoSelectView::InsertVirtualFolder(GrepDialog *pGrepDlg)
 
 	TreeViewVirtualFolderRoot *pVFRoot = (TreeViewVirtualFolderRoot*)GetTVItem(hSearchRoot);
 	return pVFRoot->AddSearchResult(this, &vfInfo);
+}
+
+/////////////////////////////////////////////
+// Get virtual folder root instance
+/////////////////////////////////////////////
+
+TreeViewVirtualFolderRoot *MemoSelectView::GetVirtualFolderRoot()
+{
+	if (!IsExpand(hSearchRoot)) {
+		TreeView_Expand(hViewWnd, hSearchRoot, TVE_EXPAND);
+	}
+	return (TreeViewVirtualFolderRoot*)GetTVItem(hSearchRoot);
 }

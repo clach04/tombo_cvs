@@ -23,6 +23,8 @@ class MainFrame {
 	HWND hMSCmdBar;			// コマンドバー
 	HWND hMDCmdBar;
 
+	HIMAGELIST hSelectViewImgList;
+
 #if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
 	HWND hRebar;
 	HWND hToolBar;
@@ -105,6 +107,7 @@ public:
 	BOOL OnHotKey(WPARAM wParam, LPARAM lParam);
 	void OnResize(WPARAM wParam, LPARAM lParam);
 	void OnTooltip(WPARAM wParam, LPARAM lParam);
+	void OnVFolderDef();
 
 	///////////////////
 	// Search/grep
