@@ -34,7 +34,6 @@ class DirList {
 	DWORD nOption;
 
 	LPCTSTR pURIBase;
-	DWORD nURIBaseLen;
 public:
 	TVector<DirListItem> vDirList;
 	StringBufferT sbDirList;

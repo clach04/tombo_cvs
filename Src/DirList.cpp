@@ -30,7 +30,6 @@ BOOL DirList::Init(DWORD nOption, LPCTSTR pUB)
 	bAllocHeadLine = nOption & DIRLIST_OPT_ALLOCHEADLINE;
 
 	pURIBase = pUB;
-	nURIBaseLen = _tcslen(pURIBase);
 
 	if (!vDirList.Init(50, 10)) return FALSE;
 	if (!sbDirList.Init(400, 20)) return FALSE;
@@ -65,7 +64,7 @@ BOOL DirList::GetList(LPCTSTR pPrefix, LPCTSTR pMatchPath)
 			}
 
 			if (bAllocURI) {
-				if (!sbDirList.Add(pURIBase, nURIBaseLen, &(di.nURIPos))) return FALSE;
+				if (!sbDirList.Add(pURIBase, _tcslen(pURIBase), &(di.nURIPos))) return FALSE;
 				DWORD d;
 				if (!sbDirList.Add(wfd.cFileName, l, &d)) return FALSE;
 				if (wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
