@@ -557,3 +557,12 @@ Changes
 
 * separate MemoDetailsView and its implimentation.
 * FIX: Crush when encrypting folder(#4286,#4287).
+
+////////////////////////////////
+// B128
+////////////////////////////////
+// main trunk
+
+* minor refactoring to MainFrame.cpp
+* remove MWM_OPEN_REQUEST and add MWM_SWITCH_VIEW
+* remove HTREEITEM from MemoManager for simplify the node management.

@@ -72,8 +72,6 @@ public:
 	virtual DWORD ItemOrder() = 0;
 	virtual DWORD GetIcon(MemoSelectView *pView, DWORD nStatus) = 0;
 
-	virtual MemoLocator ToLocator();
-
 	// Get path information
 	virtual BOOL GetFolderPath(MemoSelectView *pView, TString *pPath) = 0;
 	virtual BOOL GetLocationPath(MemoSelectView *pView, TString *pPath) = 0;
@@ -111,8 +109,6 @@ public:
 
 	DWORD GetIcon(MemoSelectView *pView, DWORD nStatus);
 	DWORD ItemOrder();
-
-	MemoLocator ToLocator();
 
 	BOOL GetFolderPath(MemoSelectView *pView, TString *pPath);
 	BOOL GetLocationPath(MemoSelectView *pView, TString *pPath);

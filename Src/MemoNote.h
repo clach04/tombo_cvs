@@ -75,6 +75,7 @@ public:
 	// path related functions
 
 	LPCTSTR MemoPath() { return pPath; }
+	BOOL GetURI(TString *pURI);
 
 	static BOOL GetHeadLineFromPath(LPCTSTR pPath, TString *pHeadLine);
 

@@ -15,7 +15,7 @@ public:
 	// ctor, dtor and initializer
 	TomboURI() {}
 	~TomboURI() { }
-	BOOL Init(LPCTSTR p);
+	BOOL Init(LPCTSTR pURI);
 
 	///////////////////////////////
 	// accessor
@@ -25,7 +25,6 @@ public:
 	LPCTSTR GetFull() { return sURI.Get(); }
 
 	DWORD GetMaxPathItem() { return nMaxPathItem; }
-
 
 	///////////////////////////////
 	// helper functions

@@ -13,7 +13,6 @@
 #include "MemoInfo.h"
 #include "Message.h"
 
-
 #define DEFAULT_HEADLINE MSG_DEFAULT_HEADLINE
 
 /////////////////////////////////////////////
@@ -92,22 +91,14 @@ MemoNote::MemoNote() : pPath(NULL)
 
 MemoNote::~MemoNote()
 {
-	if (pPath) {
-		delete [] pPath;
-	}
-	
+	delete [] pPath;
 }
 
 BOOL MemoNote::Init(LPCTSTR p)
 {
 	if (pPath) delete [] pPath;
-	pPath = new TCHAR[_tcslen(p) + 1];
-	if (pPath == NULL) {
-		SetLastError(ERROR_NOT_ENOUGH_MEMORY);
-		return FALSE;
-	}
-	_tcscpy(pPath, p);
-
+	pPath = StringDup(p);
+	if (pPath == NULL) return FALSE;
 	return TRUE;
 }
 
@@ -190,13 +181,45 @@ BOOL MemoNote::InitNewMemo(LPCTSTR pMemoPath, LPCTSTR pText, TString *pHeadLine)
 }
 
 /////////////////////////////////////////////
+// get note's URI
+/////////////////////////////////////////////
+
+BOOL MemoNote::GetURI(TString *pURI)
+{
+	LPCTSTR pPrefix = TEXT("tombo://default/");
+	if (!pURI->Alloc(_tcslen(pPrefix) + _tcslen(pPath) + 1)) return FALSE;
+
+	_tcscpy(pURI->Get(), pPrefix);
+	LPTSTR p = pURI->Get() + _tcslen(pPrefix);
+	LPCTSTR q = pPath;
+	if (*q == TEXT('\\')) q++;
+
+	while(*q) {
+		if (*q == TEXT('\\')) {
+			*p++ = TEXT('/');
+			q++;
+			continue;
+		}
+#if defined(PLATFORM_WIN32)
+		if (IsDBCSLeadByte(*q)) {
+			*p++ = *q++;
+		}
+#endif
+		*p++ = *q++;
+	}
+	*p = TEXT('\0');
+
+	return TRUE;
+}
+
+
+/////////////////////////////////////////////
 // ÉÅÉÇì‡óeÇÃéÊìæ(PlainMemoNote)
 /////////////////////////////////////////////
 
 char *PlainMemoNote::GetMemoBodyA(PasswordManager*)
 {
 	TString sFileName;
-//	if (!sFileName.AllocFullPath(pPath)) return NULL;
 	if (!sFileName.Join(g_Property.TopDir(), TEXT("\\"), pPath)) return NULL;
 
 	File inf;
@@ -233,7 +256,6 @@ LPBYTE CryptedMemoNote::GetMemoBodySub(PasswordManager *pMgr, LPDWORD pSize)
 	BOOL bRegistedPassword = TRUE;
 
 	TString sFileName;
-//	if (!sFileName.AllocFullPath(pPath)) return NULL;
 	if (!sFileName.Join(g_Property.TopDir(), TEXT("\\"), pPath)) return NULL;
 
 	BOOL bCancel;
@@ -293,7 +315,6 @@ LPTSTR CryptedMemoNote::GetMemoBody(PasswordManager *pMgr)
 BOOL MemoNote::Save(PasswordManager *pMgr, LPCTSTR pMemo, TString *pHeadLine)
 {
 	TString sOrigFile;
-//	if (!sOrigFile.AllocFullPath(pPath)) return FALSE;
 	if (!sOrigFile.Join(g_Property.TopDir(), TEXT("\\"), pPath)) return FALSE;
 
 	BOOL bResult;
@@ -590,7 +611,6 @@ MemoNote *CryptedMemoNote::Decrypt(PasswordManager *pMgr, TString *pHeadLine, BO
 BOOL MemoNote::DeleteMemoData()
 {
 	TString sFileName;
-//	if (!sFileName.AllocFullPath(pPath)) return FALSE;
 	if (!sFileName.Join(g_Property.TopDir(), TEXT("\\"), pPath)) return FALSE;
 
 	// ïtâ¡èÓïÒÇï€éùÇµÇƒÇ¢ÇΩèÍçáÇ…ÇÕÇªÇÃèÓïÒÇ‡çÌèú

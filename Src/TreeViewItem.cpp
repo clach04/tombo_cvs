@@ -46,11 +46,6 @@ void TreeViewItem::SetViewItem(HTREEITEM h)
 	hItem = h;
 }
 
-MemoLocator TreeViewItem::ToLocator()
-{
-	return MemoLocator(NULL, NULL);
-}
-
 BOOL TreeViewItem::IsOperationEnabled(MemoSelectView *pView, OpType op)
 {
 	DWORD nOpMatrix = OpNewMemo | OpNewFolder | OpCut | OpCopy | OpPaste;
@@ -251,11 +246,6 @@ DWORD TreeViewFileItem::GetIcon(MemoSelectView *, DWORD nStatus)
 DWORD TreeViewFileItem::ItemOrder()
 {
 	return ITEM_ORDER_FILE;
-}
-
-MemoLocator TreeViewFileItem::ToLocator()
-{
-	return MemoLocator(pNote, GetViewItem());
 }
 
 BOOL TreeViewFileItem::GetFolderPath(MemoSelectView *pView, TString *pPath)

@@ -44,6 +44,9 @@ class MemoSelectView {
 	///////////////////////////////////
 	LRESULT EditLabel(TVITEM *pItem);
 
+protected:
+	HTREEITEM GetRootItem(LPCTSTR pRep);
+
 public:
 	/////////////////////////////
 	// Initialize functions
@@ -118,7 +121,7 @@ public:
 	HTREEITEM NewMemoCreated(MemoNote *pNote, LPCTSTR pHeadLine, HTREEITEM hItem);
 
 	BOOL InsertFile(HTREEITEM hParent, LPCTSTR pPrefix, LPCTSTR pFile);
-	BOOL InsertFile(HTREEITEM hParent, MemoNote *pNote, LPCTSTR pTitle, BOOL bInsertLast, BOOL bLink);
+	HTREEITEM InsertFile(HTREEITEM hParent, MemoNote *pNote, LPCTSTR pTitle, BOOL bInsertLast, BOOL bLink);
 
 	// if bInsertLast is TRUE, Insert folder without sorting.
 	HTREEITEM InsertFolder(HTREEITEM hParent, LPCTSTR pName, TreeViewItem *tvi, BOOL bInsertLast);
@@ -138,8 +141,9 @@ public:
 	BOOL CreateNewFolder(HTREEITEM hItem, LPCTSTR pFolder);
 	BOOL GetHeadLine(MemoNote *pNote, LPTSTR pHeadLine, DWORD nLen);
 
-	// rewrite headline string
-	BOOL UpdateHeadLine(MemoLocator *pLoc, LPCTSTR pHeadLine);
+	// update headline string
+	BOOL UpdateHeadLine(LPCTSTR pOldURI, LPCTSTR pNewURI, MemoNote *pNewNote);
+	HTREEITEM GetItemFromURI(LPCTSTR pURI);
 
 	// 現在選択されているアイテムと関連付けられているTreeViewItemを返す。
 	// pItemが指定されている場合にはHTREEITEMも返す。

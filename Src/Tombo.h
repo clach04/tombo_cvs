@@ -10,7 +10,7 @@ class PasswordManager;
 // MWM_OPEN_REQUEST : メモのオープン要求
 // WPARAM : オプション
 // LPARAM : オープンされるべきノードへのポインタ
-#define MWM_OPEN_REQUEST (0x8000 + 1)
+// #define MWM_OPEN_REQUEST (0x8000 + 1)
 
 // MWM_OPEN_REQUEST オプション
 #define OPEN_REQUEST_MDVIEW_ACTIVE 0
@@ -20,6 +20,9 @@ class PasswordManager;
 // MWM_RAISE_MAINFRAME : トップレベルウィンドウをRaiseして再前面にもってくる
 // WPARAM, LPARAM: 0
 #define MWM_RAISE_MAINFRAME (0x8000 + 2)
+
+// MWM_SWITCH_VIEW : switch focus
+#define MWM_SWITCH_VIEW (0x8000 + 3)
 
 ///////////////////////////////////////
 // 共通定義

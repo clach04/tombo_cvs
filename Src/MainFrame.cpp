@@ -336,8 +336,12 @@ static LRESULT CALLBACK MainFrameWndProc(HWND hWnd, UINT nMessage, WPARAM wParam
 		bRes = frm->OnNotify(hWnd, wParam, lParam);
 		if (bRes != 0xFFFFFFFF) return bRes;
 		break;
-	case MWM_OPEN_REQUEST:
-		frm->RequestOpenMemo((MemoLocator*)lParam, (BOOL)wParam);
+	case MWM_SWITCH_VIEW:
+		if (lParam == OPEN_REQUEST_MDVIEW_ACTIVE) {
+			frm->ActivateView(FALSE);
+		} else if (lParam == OPEN_REQUEST_MSVIEW_ACTIVE) {
+			frm->ActivateView(TRUE);
+		}
 		return 0;
 	case WM_SETFOCUS:
 		frm->SetFocus();
@@ -1551,14 +1555,16 @@ void MainFrame::OnList(BOOL bAskSave)
 		// 2Paneの場合、暗号化されたメモのみクリアする
 		if (nYNC == IDNO) {
 			// メモを破棄し、旧メモをリロード
-			RequestOpenMemo(&(mmMemoManager.CurrentLoc()), OPEN_REQUEST_MDVIEW_ACTIVE);
+			MemoLocator loc(mmMemoManager.CurrentNote());
+			RequestOpenMemo(&loc, OPEN_REQUEST_MDVIEW_ACTIVE);
 		} else {
 			MemoNote *pCurrent = mmMemoManager.CurrentNote();
 			if (pCurrent && pCurrent->IsEncrypted()) {
 				mmMemoManager.NewMemo();
 			} else {
 #if defined(PLATFORM_HPC)
-				RequestOpenMemo(&(mmMemoManager.CurrentLoc()), OPEN_REQUEST_MDVIEW_ACTIVE);
+				MemoLocator loc(mmMemoManager.CurrentNote(), NULL);
+				RequestOpenMemo(&loc, OPEN_REQUEST_MDVIEW_ACTIVE);
 #endif
 			}
 		}
@@ -1595,13 +1601,11 @@ void MainFrame::RequestOpenMemo(MemoLocator *pLoc, DWORD nSwitchView)
 {
 	MemoNote *pNote = pLoc->GetNote();
 	if (pNote == NULL) {
-		if (pLoc->IsDeleteReceived()) delete pLoc;
 		return; // フォルダの場合
 	}
 	if (((nSwitchView & OPEN_REQUEST_MSVIEW_ACTIVE) == 0) && (pNote->IsEncrypted() && !pmPasswordMgr.IsRememberPassword())) {
 		// bSwitchViewがFALSEで、メモを開くためにパスワードを問い合わせる必要がある場合には
 		// メモは開かない
-		if (pLoc->IsDeleteReceived()) delete pLoc;
 		return;
 	}
 	mmMemoManager.SetMemo(pLoc);
@@ -1647,11 +1651,10 @@ void MainFrame::RequestOpenMemo(MemoLocator *pLoc, DWORD nSwitchView)
 			ActivateView(FALSE);
 		}
 	}
-	if (pLoc->IsDeleteReceived()) delete pLoc;
 }
 
 ///////////////////////////////////////////////////
-// ビューの切り替え処理
+// switch view
 ///////////////////////////////////////////////////
 
 void MainFrame::ActivateView(BOOL bList)
