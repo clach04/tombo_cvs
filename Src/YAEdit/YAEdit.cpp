@@ -637,6 +637,7 @@ YAEditDoc *YAEdit::SetDoc(YAEditDoc *pNewDoc)
 	pLineMgr->RecalcWrap(pWrapper);
 
 	pView->SetCaretPosition(Coordinate(0, 0));
+	ClearSelectedRegion();	
 
 	pView->ResetScrollbar();
 	pView->RedrawAllScreen();
@@ -665,6 +666,10 @@ void YAEdit::ResizeWindow(int x, int y, int width, int height)
 	Coordinate cPhCursorPos;
 	pLineMgr->LogicalPosToPhysicalPos(&(pView->GetCaretPosition()), &cPhCursorPos);
 
+	Region rPhRgn;
+	pLineMgr->LogicalPosToPhysicalPos(&(rSelRegion.posStart), &(rPhRgn.posStart));
+	pLineMgr->LogicalPosToPhysicalPos(&(rSelRegion.posEnd), &(rPhRgn.posEnd));
+
 	// Rewrapping. Logical line will be changed.
 	pLineMgr->RecalcWrap(pWrapper);
 	pView->ResetScrollbar();
@@ -673,6 +678,9 @@ void YAEdit::ResizeWindow(int x, int y, int width, int height)
 	Coordinate cLgCursorPos;
 	pLineMgr->PhysicalPosToLogicalPos(&cPhCursorPos, &cLgCursorPos);
 	pView->SetCaretPosition(cLgCursorPos);
+
+	pLineMgr->PhysicalPosToLogicalPos(&(rPhRgn.posStart), &(rSelRegion.posStart));
+	pLineMgr->PhysicalPosToLogicalPos(&(rPhRgn.posEnd), &(rSelRegion.posEnd));
 
 	// redraw screen
 	pView->RedrawAllScreen();
