@@ -2138,8 +2138,14 @@ void MainFrame::EnableSaveButton(BOOL bEnable)
 	SendMessage(GetCommandBar(hMSCmdBar, ID_BUTTONBAND), TB_ENABLEBUTTON, IDM_SAVE, MAKELONG(nStat, 0)); 
 #endif
 #if defined(PLATFORM_PKTPC) || defined(PLATFORM_PSPC)
-//	SendMessage(hMSCmdBar, TB_ENABLEBUTTON, IDM_SAVE, MAKELONG(nStat, 0)); 
 	SendMessage(hMDCmdBar, TB_ENABLEBUTTON, IDM_SAVE, MAKELONG(nStat, 0)); 
+#endif
+#if defined(PLATFORM_BE500)
+	if (bEnable) {
+		CSOBar_SetButtonState(hMDCmdBar, TRUE, IDM_SAVE, 1, CSO_BUTTON_DISP);
+	} else {
+		CSOBar_SetButtonState(hMDCmdBar, TRUE, IDM_SAVE, 1, CSO_BUTTON_GRAYED);
+	}
 #endif
 }
 
