@@ -1,13 +1,21 @@
 #
-
-$version = "Tombo1_7b1";
-
-use File::Glob ':glob';
-
 # TOMBO Build program for ActivePerl(Win32)
 
+$version = "Tombo1_7b2";
+
 ##########################################################################
-# Data definition
+# Tool definition
+##########################################################################
+
+use File::Glob ':glob';
+use File::Path;
+use File::Copy;
+#use File::DosGlob 'glob';
+
+$zippg = "\"C:\\Program Files\\mzp\\mzp.exe\"";
+
+##########################################################################
+# File definition
 ##########################################################################
 
 $buildroot = "R:\\work2\\SF\\TOMBO";
@@ -17,33 +25,7 @@ $builddir  = "R:\\temp\\Tombo-Rel";
 $be500root = "R:\\work2\\BE500SDK\\Installer\\Japanese PC Tools";
 $be300root = "R:\\work2\\BE300SDK_1012\\Installer\\English PC Tools";
 
-@buildlistCEJP = (
-	["Bin\\HPCPro\\ARM", "$buildroot\\HpcPro\\Tombo\\ARMRel\\Tombo.exe"],
-	["Bin\\HPCPro\\MIPS", "$buildroot\\HpcPro\\Tombo\\MIPSRel\\Tombo.exe"],
-	["Bin\\HPCPro\\SH3", "$buildroot\\HpcPro\\Tombo\\SH3Rel\\Tombo.exe"],
-	["Bin\\HPCPro\\SH4", "$buildroot\\HpcPro\\Tombo\\SH4Rel\\Tombo.exe"],
-
-	["Bin\\PocketPC\\ARM", "$buildroot\\PocketPC\\CabWiz\\Tombo.arm.CAB"],
-	["Bin\\PocketPC\\MIPS", "$buildroot\\PocketPC\\CabWiz\\Tombo.mips.CAB"],
-	["Bin\\PocketPC\\SH3", "$buildroot\\PocketPC\\CabWiz\\Tombo.sh3.CAB"],
-
-	["Bin\\PsPC\\MIPS", "$buildroot\\PsPC\\CabWiz\\Tombo.mips.CAB"],
-	["Bin\\PsPC\\SH3", "$buildroot\\PsPC\\CabWiz\\Tombo.sh3.CAB"],
-
-	["Bin\\BE500", "$be500root\\Setup.exe"],
-	["Bin\\BE500", "$be500root\\Setup.ini"],
-	["Bin\\BE500", "$be500root\\Tombo.cbea"],
-
-
-	["Bin\\PocketPC\\ARM", "$buildroot\\PocketPC\\Tombo\\ARMRel\\Tombo.exe"],
-	["Bin\\PocketPC\\MIPS", "$buildroot\\PocketPC\\Tombo\\MIPSRel\\Tombo.exe"],
-	["Bin\\PocketPC\\SH3", "$buildroot\\PocketPC\\Tombo\\SH3Rel\\Tombo.exe"],
-
-	["Bin\\PsPC\\SH3", "$buildroot\\PsPC\\Tombo\\SH3Rel\\Tombo.exe"],
-	["Bin\\PsPC\\MIPS", "$buildroot\\PsPC\\Tombo\\MIPSRel\\Tombo.exe"],
-	["Bin\\BE500", "$buildroot\\BE500\\Tombo\\MIPSRel\\Tombo.exe"],
-
-
+@docsJP = (
 	["", "$docroot\\Jp\\COPYING-2_0.txt"],
 	["", "$docroot\\Jp\\Readme.txt"],
 	["Docs", "$docroot\\Jp\\Docs\\*.html"],
@@ -53,234 +35,226 @@ $be300root = "R:\\work2\\BE300SDK_1012\\Installer\\English PC Tools";
 	["", "$buildroot\\etc\\TOMBO_vfolder.dtd"],
 );
 
-@buildlistWin32JP = (
+@docsEN = (
+	["", "$docroot\\En\\COPYING-2_0.txt"],
+	["", "$docroot\\En\\Readme.txt"],
+	["Docs", "$docroot\\En\\Docs\\*.html"],
+	["Docs\\image", "$docroot\\En\\Docs\\image\\*.bmp"],
+	["Docs\\image", "$docroot\\En\\Docs\\image\\*.png"],
+	["", "$buildroot\\etc\\vfolder.xml"],
+	["", "$buildroot\\etc\\TOMBO_vfolder.dtd"],
+);
+
+@bin_hpc_arm_jp = (
+	["Bin\\HPCPro\\ARM", "$buildroot\\HpcPro\\Tombo\\ARMRel\\Tombo.exe"],
+);
+
+@bin_hpc_mips_jp = (
+	["Bin\\HPCPro\\MIPS", "$buildroot\\HpcPro\\Tombo\\MIPSRel\\Tombo.exe"],
+);
+
+@bin_hpc_sh3_jp = (
+	["Bin\\HPCPro\\SH3", "$buildroot\\HpcPro\\Tombo\\SH3Rel\\Tombo.exe"],
+);
+
+@bin_hpc_sh4_jp =(
+	["Bin\\HPCPro\\SH4", "$buildroot\\HpcPro\\Tombo\\SH4Rel\\Tombo.exe"],
+);
+
+@bin_pktpc_arm_jp = (
+	["Bin\\PocketPC\\ARM", "$buildroot\\PocketPC\\CabWiz\\Tombo.arm.CAB"],
+	["Bin\\PocketPC\\ARM", "$buildroot\\PocketPC\\Tombo\\ARMRel\\Tombo.exe"],
+);
+
+@bin_pktpc_mips_jp =(
+	["Bin\\PocketPC\\MIPS", "$buildroot\\PocketPC\\CabWiz\\Tombo.mips.CAB"],
+	["Bin\\PocketPC\\MIPS", "$buildroot\\PocketPC\\Tombo\\MIPSRel\\Tombo.exe"],
+);
+
+@bin_pktpc_sh3_jp =(
+	["Bin\\PocketPC\\SH3", "$buildroot\\PocketPC\\CabWiz\\Tombo.sh3.CAB"],
+	["Bin\\PocketPC\\SH3", "$buildroot\\PocketPC\\Tombo\\SH3Rel\\Tombo.exe"],
+);
+
+@bin_pspc_mips_jp =(
+	["Bin\\PsPC\\MIPS", "$buildroot\\PsPC\\CabWiz\\Tombo.mips.CAB"],
+	["Bin\\PsPC\\MIPS", "$buildroot\\PsPC\\Tombo\\MIPSRel\\Tombo.exe"],
+);
+
+@bin_pspc_sh3_jp =(
+	["Bin\\PsPC\\SH3", "$buildroot\\PsPC\\CabWiz\\Tombo.sh3.CAB"],
+	["Bin\\PsPC\\SH3", "$buildroot\\PsPC\\Tombo\\SH3Rel\\Tombo.exe"],
+);
+
+@bin_be500 = (
+	["Bin\\BE500", "$be500root\\Setup.exe"],
+	["Bin\\BE500", "$be500root\\Setup.ini"],
+	["Bin\\BE500", "$be500root\\Tombo.cbea"],
+	["Bin\\BE500", "$buildroot\\BE500\\Tombo\\MIPSRel\\Tombo.exe"],
+);
+
+@bin_win32_jp = (
 	["", "$buildroot\\Win32\\Tombo\\Release\\Tombo.exe"],
-
-	["", "$docroot\\Jp\\COPYING-2_0.txt"],
-	["", "$docroot\\Jp\\Readme.txt"],
-	["Docs", "$docroot\\Jp\\Docs\\*.html"],
-	["Docs\\image", "$docroot\\Jp\\Docs\\image\\*.bmp"],
-	["Docs\\image", "$docroot\\Jp\\Docs\\image\\*.png"],
-	["", "$buildroot\\etc\\vfolder.xml"],
-	["", "$buildroot\\etc\\TOMBO_vfolder.dtd"],
 );
 
-@buildlist_HPC_JP = (
-	["Bin\\HPCPro\\ARM", "$buildroot\\HpcPro\\Tombo\\ARMRel\\Tombo.exe"],
-	["Bin\\HPCPro\\MIPS", "$buildroot\\HpcPro\\Tombo\\MIPSRel\\Tombo.exe"],
-	["Bin\\HPCPro\\SH3", "$buildroot\\HpcPro\\Tombo\\SH3Rel\\Tombo.exe"],
-	["Bin\\HPCPro\\SH4", "$buildroot\\HpcPro\\Tombo\\SH4Rel\\Tombo.exe"],
-
-	["", "$docroot\\Jp\\COPYING-2_0.txt"],
-	["", "$docroot\\Jp\\Readme.txt"],
-	["Docs", "$docroot\\Jp\\Docs\\*.html"],
-	["Docs\\image", "$docroot\\Jp\\Docs\\image\\*.bmp"],
-	["Docs\\image", "$docroot\\Jp\\Docs\\image\\*.png"],
-	["", "$buildroot\\etc\\vfolder.xml"],
-	["", "$buildroot\\etc\\TOMBO_vfolder.dtd"],
+@bin_hpc_arm_en = (
+	["Bin\\HPCPro\\ARM", "$buildroot\\HpcPro\\Tombo\\ARMReleaseE\\Tombo.exe"],
 );
 
-@buildlist_PKTPC_JP = (
-	["Bin\\PocketPC\\ARM", "$buildroot\\PocketPC\\CabWiz\\Tombo.arm.CAB"],
-	["Bin\\PocketPC\\ARM", "$buildroot\\PocketPC\\Tombo\\ARMRel\\Tombo.exe"],
-	["Bin\\PocketPC\\MIPS", "$buildroot\\PocketPC\\CabWiz\\Tombo.mips.CAB"],
-	["Bin\\PocketPC\\MIPS", "$buildroot\\PocketPC\\Tombo\\MIPSRel\\Tombo.exe"],
-	["Bin\\PocketPC\\SH3", "$buildroot\\PocketPC\\CabWiz\\Tombo.sh3.CAB"],
-	["Bin\\PocketPC\\SH3", "$buildroot\\PocketPC\\Tombo\\SH3Rel\\Tombo.exe"],
-
-	["", "$docroot\\Jp\\COPYING-2_0.txt"],
-	["", "$docroot\\Jp\\Readme.txt"],
-	["Docs", "$docroot\\Jp\\Docs\\*.html"],
-	["Docs\\image", "$docroot\\Jp\\Docs\\image\\*.bmp"],
-	["Docs\\image", "$docroot\\Jp\\Docs\\image\\*.png"],
-	["", "$buildroot\\etc\\vfolder.xml"],
-	["", "$buildroot\\etc\\TOMBO_vfolder.dtd"],
+@bin_hpc_mips_en = (
+	["Bin\\HPCPro\\MIPS", "$buildroot\\HpcPro\\Tombo\\MIPSReleaseE\\Tombo.exe"],
 );
 
-@buildlist_PSPC_JP = (
-	["Bin\\PsPC\\SH3", "$buildroot\\PsPC\\CabWiz\\Tombo.sh3.CAB"],
-	["Bin\\PsPC\\SH3", "$buildroot\\PsPC\\Tombo\\SH3Rel\\Tombo.exe"],
-	["Bin\\PsPC\\MIPS", "$buildroot\\PsPC\\CabWiz\\Tombo.mips.CAB"],
-	["Bin\\PsPC\\MIPS", "$buildroot\\PsPC\\Tombo\\MIPSRel\\Tombo.exe"],
-
-	["", "$docroot\\Jp\\COPYING-2_0.txt"],
-	["", "$docroot\\Jp\\Readme.txt"],
-	["Docs", "$docroot\\Jp\\Docs\\*.html"],
-	["Docs\\image", "$docroot\\Jp\\Docs\\image\\*.bmp"],
-	["Docs\\image", "$docroot\\Jp\\Docs\\image\\*.png"],
-	["", "$buildroot\\etc\\vfolder.xml"],
-	["", "$buildroot\\etc\\TOMBO_vfolder.dtd"],
+@bin_hpc_sh3_en = (
+	["Bin\\HPCPro\\SH3", "$buildroot\\HpcPro\\Tombo\\SH3ReleaseE\\Tombo.exe"],
 );
 
-@buildlist_BE500_JP = (
-	["Bin\\BE500", "$be500root\\Setup.exe"],
-	["Bin\\BE500", "$be500root\\Setup.ini"],
-	["Bin\\BE500", "$be500root\\Tombo.cbea"],
-	["Bin\\BE500", "$buildroot\\BE500\\Tombo\\MIPSRel\\Tombo.exe"],
-
-	["", "$docroot\\Jp\\COPYING-2_0.txt"],
-	["", "$docroot\\Jp\\Readme.txt"],
-	["Docs", "$docroot\\Jp\\Docs\\*.html"],
-	["Docs\\image", "$docroot\\Jp\\Docs\\image\\*.bmp"],
-	["Docs\\image", "$docroot\\Jp\\Docs\\image\\*.png"],
-	["", "$buildroot\\etc\\vfolder.xml"],
-	["", "$buildroot\\etc\\TOMBO_vfolder.dtd"],
+@bin_hpc_sh4_en = (
+	["Bin\\HPCPro\\SH4", "$buildroot\\HpcPro\\Tombo\\SH4ReleaseE\\Tombo.exe"],
 );
+@bin_pktpc_arm_en = (
+	["Bin\\PocketPC\\ARM", "$buildroot\\PocketPC\\CabWiz\\TomboE.arm.CAB"],
+	["Bin\\PocketPC\\ARM", "$buildroot\\PocketPC\\Tombo\\ARMReleaseE\\Tombo.exe"],
+);
+
+@bin_pktpc_mips_en = (
+	["Bin\\PocketPC\\MIPS", "$buildroot\\PocketPC\\CabWiz\\TomboE.mips.CAB"],
+	["Bin\\PocketPC\\MIPS", "$buildroot\\PocketPC\\Tombo\\MIPSReleaseE\\Tombo.exe"],
+);
+
+@bin_pktpc_sh3_en = (
+	["Bin\\PocketPC\\SH3", "$buildroot\\PocketPC\\CabWiz\\TomboE.sh3.CAB"],
+	["Bin\\PocketPC\\SH3", "$buildroot\\PocketPC\\Tombo\\SH3ReleaseE\\Tombo.exe"],
+);
+
+@bin_pspc_sh3_en = (
+	["Bin\\PsPC\\SH3", "$buildroot\\PsPC\\CabWiz\\TomboE.mips.CAB"],
+	["Bin\\PsPC\\SH3", "$buildroot\\PsPC\\Tombo\\SH3ReleaseE\\Tombo.exe"],
+);
+
+@bin_pspc_mips_en = (
+	["Bin\\PsPC\\MIPS", "$buildroot\\PsPC\\CabWiz\\TomboE.sh3.CAB"],
+	["Bin\\PsPC\\MIPS", "$buildroot\\PsPC\\Tombo\\MIPSReleaseE\\Tombo.exe"],
+);
+
+@bin_be300 = (
+	["Bin\\BE300", "$be300root\\Setup.exe"],
+	["Bin\\BE300", "$be300root\\Setup.ini"],
+	["Bin\\BE300", "$be300root\\Tombo.cbea"],
+	["Bin\\BE300", "$buildroot\\BE300\\Tombo\\MIPSRel\\Tombo.exe"],
+);
+
+@bin_win32_en = (
+	["", "$buildroot\\Win32\\Tombo\\ReleaseE\\Tombo.exe"],
+);
+
+##########################################################################
+# Archive file configuration
+##########################################################################
+
+@buildlistCEJP = (
+	@bin_hpc_arm_jp, @bin_hpc_mips_jp, @bin_hpc_sh3_jp, @bin_hpc_sh4_jp,
+	@bin_pktpc_arm_jp, @bin_pktpc_mips_jp, @bin_pktpc_sh3_jp,
+	@bin_pspc_mips_jp, @bin_pspc_sh3_jp,
+	@bin_be500,
+
+	@docsJP
+);
+
+@buildlistWin32JP = ( @bin_win32_jp,  @docsJP);
+@buildlist_HPC_JP = ( @bin_hpc_arm_jp, @bin_hpc_mips_jp, @bin_hpc_sh3_jp, @bin_hpc_sh4_jp,  @docsJP);
+@buildlist_PKTPC_JP = ( @bin_pktpc_arm_jp, @bin_pktpc_mips_jp, @bin_pktpc_sh3_jp,  @docsJP);
+@buildlist_PSPC_JP = ( @bin_pspc_mips_jp, @bin_pspc_sh3_jp,  @docsJP);
+@buildlist_BE500_JP = ( @bin_be500, @docsJP);
 
 @buildlistCEEN = (
-	["Bin\\HPCPro\\ARM", "$buildroot\\HpcPro\\Tombo\\ARMReleaseE\\Tombo.exe"],
-	["Bin\\HPCPro\\MIPS", "$buildroot\\HpcPro\\Tombo\\MIPSReleaseE\\Tombo.exe"],
-	["Bin\\HPCPro\\SH3", "$buildroot\\HpcPro\\Tombo\\SH3ReleaseE\\Tombo.exe"],
-	["Bin\\HPCPro\\SH4", "$buildroot\\HpcPro\\Tombo\\SH4ReleaseE\\Tombo.exe"],
+	@bin_hpc_arm_en, @bin_hpc_mips_en, @bin_hpc_sh3_en, @bin_hpc_sh4_en,
+	@bin_pktpc_arm_en, @bin_pktpc_mips_en, @bin_pktpc_sh3_en,
+	@bin_pspc_sh3_en, @bin_pspc_mips_en,
+	@bin_be300,
 
-	["Bin\\PocketPC\\ARM", "$buildroot\\PocketPC\\CabWiz\\TomboE.arm.CAB"],
-	["Bin\\PocketPC\\MIPS", "$buildroot\\PocketPC\\CabWiz\\TomboE.mips.CAB"],
-	["Bin\\PocketPC\\SH3", "$buildroot\\PocketPC\\CabWiz\\TomboE.sh3.CAB"],
-
-	["Bin\\PsPC\\SH3", "$buildroot\\PsPC\\CabWiz\\TomboE.mips.CAB"],
-	["Bin\\PsPC\\MIPS", "$buildroot\\PsPC\\CabWiz\\TomboE.sh3.CAB"],
-
-	["Bin\\BE300", "$be300root\\Setup.exe"],
-	["Bin\\BE300", "$be300root\\Setup.ini"],
-	["Bin\\BE300", "$be300root\\Tombo.cbea"],
-
-	["Bin\\PocketPC\\ARM", "$buildroot\\PocketPC\\Tombo\\ARMReleaseE\\Tombo.exe"],
-	["Bin\\PocketPC\\MIPS", "$buildroot\\PocketPC\\Tombo\\MIPSReleaseE\\Tombo.exe"],
-	["Bin\\PocketPC\\SH3", "$buildroot\\PocketPC\\Tombo\\SH3ReleaseE\\Tombo.exe"],
-
-	["Bin\\PsPC\\SH3", "$buildroot\\PsPC\\Tombo\\SH3ReleaseE\\Tombo.exe"],
-	["Bin\\PsPC\\MIPS", "$buildroot\\PsPC\\Tombo\\MIPSReleaseE\\Tombo.exe"],
-
-	["Bin\\BE300", "$buildroot\\BE300\\Tombo\\MIPSRel\\Tombo.exe"],
-
-	["", "$docroot\\En\\COPYING-2_0.txt"],
-	["", "$docroot\\En\\Readme.txt"],
-	["Docs", "$docroot\\En\\Docs\\*.html"],
-	["Docs\\image", "$docroot\\En\\Docs\\image\\*.bmp"],
-	["Docs\\image", "$docroot\\En\\Docs\\image\\*.png"],
-	["", "$buildroot\\etc\\vfolder.xml"],
-	["", "$buildroot\\etc\\TOMBO_vfolder.dtd"],
+	@docsEN
 );
 
-@buildlistWin32EN = (
-	["", "$buildroot\\Win32\\Tombo\\ReleaseE\\Tombo.exe"],
+@buildlistWin32EN = ( @bin_win32_en, @docsEN );
+@buildlist_HPC_EN = ( @bin_hpc_arm_en, @bin_hpc_mips_en, @bin_hpc_sh3_en, @bin_hpc_sh4_en, @docsEN );
+@buildlist_PKTPC_EN = ( @bin_pktpc_arm_en, @bin_pktpc_mips_en, @bin_pktpc_sh3_en, @docsEN );
+@buildlist_PSPC_EN = ( @bin_pspc_sh3_en, @bin_pspc_mips_en, @docsEN );
+@buildlist_BE300_EN = ( @bin_be300, @docsEN );
 
-	["", "$docroot\\En\\COPYING-2_0.txt"],
-	["", "$docroot\\En\\Readme.txt"],
-	["Docs", "$docroot\\En\\Docs\\*.html"],
-	["Docs\\image", "$docroot\\En\\Docs\\image\\*.bmp"],
-	["Docs\\image", "$docroot\\En\\Docs\\image\\*.png"],
-	["", "$buildroot\\etc\\vfolder.xml"],
-	["", "$buildroot\\etc\\TOMBO_vfolder.dtd"],
-);
 
-@buildlist_HPC_EN = (
-	["Bin\\HPCPro\\ARM", "$buildroot\\HpcPro\\Tombo\\ARMReleaseE\\Tombo.exe"],
-	["Bin\\HPCPro\\MIPS", "$buildroot\\HpcPro\\Tombo\\MIPSReleaseE\\Tombo.exe"],
-	["Bin\\HPCPro\\SH3", "$buildroot\\HpcPro\\Tombo\\SH3ReleaseE\\Tombo.exe"],
-	["Bin\\HPCPro\\SH4", "$buildroot\\HpcPro\\Tombo\\SH4ReleaseE\\Tombo.exe"],
+# for each platforms 
 
-	["", "$docroot\\En\\COPYING-2_0.txt"],
-	["", "$docroot\\En\\Readme.txt"],
-	["Docs", "$docroot\\En\\Docs\\*.html"],
-	["Docs\\image", "$docroot\\En\\Docs\\image\\*.bmp"],
-	["Docs\\image", "$docroot\\En\\Docs\\image\\*.png"],
-	["", "$buildroot\\etc\\vfolder.xml"],
-	["", "$buildroot\\etc\\TOMBO_vfolder.dtd"],
-);
+@bl_HPC_ARM_JP = (@bin_hpc_arm_jp, @docsJP);
+@bl_HPC_MIPS_JP = (@bin_hpc_mips_jp, @docsJP);
+@bl_HPC_SH3_JP = (@bin_hpc_sh3_jp, @docsJP);
+@bl_HPC_SH4_JP = (@bin_hpc_sh4_jp, @docsJP);
+@bl_PKTPC_ARM_JP = (@bin_pktpc_arm_jp, @docsJP);
+@bl_PKTPC_MIPS_JP = (@bin_pktpc_mips_jp, @docsJP);
+@bl_PKTPC_SH3_JP = (@bin_pktpc_sh3_jp, @docsJP);
+@bl_PSPC_MIPS_JP = (@bin_pspc_mips_jp, @docsJP);
+@bl_PSPC_SH3_JP = (@bin_pspc_sh3_jp, @docsJP);
 
-@buildlist_PKTPC_EN = (
-	["Bin\\PocketPC\\ARM", "$buildroot\\PocketPC\\CabWiz\\TomboE.arm.CAB"],
-	["Bin\\PocketPC\\ARM", "$buildroot\\PocketPC\\Tombo\\ARMReleaseE\\Tombo.exe"],
-	["Bin\\PocketPC\\MIPS", "$buildroot\\PocketPC\\CabWiz\\TomboE.mips.CAB"],
-	["Bin\\PocketPC\\MIPS", "$buildroot\\PocketPC\\Tombo\\MIPSReleaseE\\Tombo.exe"],
-	["Bin\\PocketPC\\SH3", "$buildroot\\PocketPC\\CabWiz\\TomboE.sh3.CAB"],
-	["Bin\\PocketPC\\SH3", "$buildroot\\PocketPC\\Tombo\\SH3ReleaseE\\Tombo.exe"],
-
-	["", "$docroot\\En\\COPYING-2_0.txt"],
-	["", "$docroot\\En\\Readme.txt"],
-	["Docs", "$docroot\\En\\Docs\\*.html"],
-	["Docs\\image", "$docroot\\En\\Docs\\image\\*.bmp"],
-	["Docs\\image", "$docroot\\En\\Docs\\image\\*.png"],
-	["", "$buildroot\\etc\\vfolder.xml"],
-	["", "$buildroot\\etc\\TOMBO_vfolder.dtd"],
-);
-
-@buildlist_PSPC_EN = (
-	["Bin\\PsPC\\MIPS", "$buildroot\\PsPC\\CabWiz\\TomboE.mips.CAB"],
-	["Bin\\PsPC\\MIPS", "$buildroot\\PsPC\\Tombo\\MIPSReleaseE\\Tombo.exe"],
-	["Bin\\PsPC\\SH3", "$buildroot\\PsPC\\CabWiz\\TomboE.sh3.CAB"],
-	["Bin\\PsPC\\SH3", "$buildroot\\PsPC\\Tombo\\SH3ReleaseE\\Tombo.exe"],
-
-	["", "$docroot\\En\\COPYING-2_0.txt"],
-	["", "$docroot\\En\\Readme.txt"],
-	["Docs", "$docroot\\En\\Docs\\*.html"],
-	["Docs\\image", "$docroot\\En\\Docs\\image\\*.bmp"],
-	["Docs\\image", "$docroot\\En\\Docs\\image\\*.png"],
-	["", "$buildroot\\etc\\vfolder.xml"],
-	["", "$buildroot\\etc\\TOMBO_vfolder.dtd"],
-);
-
-@buildlist_BE300_EN = (
-	["Bin\\BE300", "$be300root\\Setup.exe"],
-	["Bin\\BE300", "$be300root\\Setup.ini"],
-	["Bin\\BE300", "$be300root\\Tombo.cbea"],
-	["Bin\\BE300", "$buildroot\\BE300\\Tombo\\MIPSRel\\Tombo.exe"],
-
-	["", "$docroot\\En\\COPYING-2_0.txt"],
-	["", "$docroot\\En\\Readme.txt"],
-	["Docs", "$docroot\\En\\Docs\\*.html"],
-	["Docs\\image", "$docroot\\En\\Docs\\image\\*.bmp"],
-	["Docs\\image", "$docroot\\En\\Docs\\image\\*.png"],
-	["", "$buildroot\\etc\\vfolder.xml"],
-	["", "$buildroot\\etc\\TOMBO_vfolder.dtd"],
-);
+@bl_HPC_ARM_EN = (@bin_hpc_arm_en, @docsEN);
+@bl_HPC_MIPS_EN = (@bin_hpc_mips_en, @docsEN);
+@bl_HPC_SH3_EN = (@bin_hpc_sh3_en, @docsEN);
+@bl_HPC_SH4_EN = (@bin_hpc_sh4_en, @docsEN);
+@bl_PKTPC_ARM_EN = (@bin_pktpc_arm_en, @docsEN);
+@bl_PKTPC_MIPS_EN = (@bin_pktpc_mips_en, @docsEN);
+@bl_PKTPC_SH3_EN = (@bin_pktpc_sh3_en, @docsEN);
+@bl_PSPC_MIPS_EN = (@bin_pspc_mips_en, @docsEN);
+@bl_PSPC_SH3_EN = (@bin_pspc_sh3_en, @docsEN);
 
 ##########################################################################
-# Tool definition
+# Program section
 ##########################################################################
 
-$zippg = "\"C:\\Program Files\\mzp\\mzp.exe\"";
+@archlist = (
+	[\@buildlistCEJP, "CE-JP", "_ce_all_jp"],
+	[\@buildlistCEEN, "CE-EN", "_ce_all_en"],
+	[\@buildlistWin32JP, "Win32-JP", "_win32_jp"],
+	[\@buildlistWin32EN, "Win32-EN", "_win32_en"],
+	[\@buildlist_HPC_JP, "HPC-JP", "_hpcpro_jp"],
+	[\@buildlist_PKTPC_JP, "PKTPC-JP", "_pktpc_jp"],
+	[\@buildlist_PSPC_JP, "PSPC-JP", "_pspc_jp"],
+	[\@buildlist_BE500_JP, "BE500-JP", "_be500_jp"],
+	[\@buildlist_HPC_EN, "HPC-EN", "_hpcpro_en"],
+	[\@buildlist_PKTPC_EN, "PKTPC-EN", "_pktpc_en"],
+	[\@buildlist_PSPC_EN, "PSPC-EN", "_pspc_en"],
+	[\@buildlist_BE300_EN, "BE300-EN", "_be300_en"],
+
+	[\@bl_HPC_ARM_JP, "HPC-ARM-JP", "_hpcpro_arm_jp"],
+	[\@bl_HPC_MIPS_JP,"HPC-MIPS-JP", "_hpcpro_mips_jp"],
+	[\@bl_HPC_SH3_JP,"HPC-SH3-JP", "_hpcpro_sh3_jp"],
+	[\@bl_HPC_SH4_JP,"HPC-SH4-JP", "_hpcpro_sh4_jp"],
+	[\@bl_PKTPC_ARM_JP,"PKTPC-ARM-JP", "_pktpc_arm_jp"],
+	[\@bl_PKTPC_MIPS_JP,"PKTPC-MIPS-JP", "_pktpc_mips_jp"],
+	[\@bl_PKTPC_SH3_JP,"PKTPC-SH3-JP", "_pktpc_sh3_jp"],
+	[\@bl_PSPC_MIPS_JP,"PSPC-MIPS-JP", "_pspc_mips_jp"],
+	[\@bl_PSPC_SH3_JP,"PSPC-SH3-JP", "_pspc_sh3_jp"],
+
+	[\@bl_HPC_ARM_EN, "HPC-ARM-EN", "_hpcpro_arm_en"],
+	[\@bl_HPC_MIPS_EN,"HPC-MIPS-EN", "_hpcpro_mips_en"],
+	[\@bl_HPC_SH3_EN,"HPC-SH3-EN", "_hpcpro_sh3_en"],
+	[\@bl_HPC_SH4_EN,"HPC-SH4-EN", "_hpcpro_sh4_en"],
+	[\@bl_PKTPC_ARM_EN,"PKTPC-ARM-EN", "_pktpc_arm_en"],
+	[\@bl_PKTPC_MIPS_EN,"PKTPC-MIPS-EN", "_pktpc_mips_en"],
+	[\@bl_PKTPC_SH3_EN,"PKTPC-SH3-EN", "_pktpc_sh3_en"],
+	[\@bl_PSPC_MIPS_EN,"PSPC-MIPS-EN", "_pspc_mips_en"],
+	[\@bl_PSPC_SH3_EN,"PSPC-SH3-EN", "_pspc_sh3_en"],
+);
+
+foreach $arch (@archlist) {
+	my ($al, $dl, $suffix) = @{$arch};
+	&cpfile ("$builddir\\$version\\$dl\\$version", $al);
+	&zipfile("$builddir\\$version\\$dl", $suffix, $version);
+}
+
+exit 0;
 
 ##########################################################################
-# Program section.
+# Subroutines
 ##########################################################################
-
-use File::Path;
-use File::Copy;
-use File::DosGlob 'glob';
-
-&cpfile("$builddir\\$version\\CE-JP\\$version", \@buildlistCEJP);
-&cpfile("$builddir\\$version\\CE-EN\\$version", \@buildlistCEEN);
-&cpfile("$builddir\\$version\\Win32-JP\\$version", \@buildlistWin32JP);
-&cpfile("$builddir\\$version\\Win32-EN\\$version", \@buildlistWin32EN);
-
-&cpfile("$builddir\\$version\\HPC-JP\\$version",  \@buildlist_HPC_JP);
-&cpfile("$builddir\\$version\\PKTPC-JP\\$version",  \@buildlist_PKTPC_JP);
-&cpfile("$builddir\\$version\\PSPC-JP\\$version", \@buildlist_PSPC_JP);
-&cpfile("$builddir\\$version\\BE500-JP\\$version",  \@buildlist_BE500_JP);
-
-&cpfile("$builddir\\$version\\HPC-EN\\$version",  \@buildlist_HPC_EN);
-&cpfile("$builddir\\$version\\PKTPC-EN\\$version",  \@buildlist_PKTPC_EN);
-&cpfile("$builddir\\$version\\PSPC-EN\\$version", \@buildlist_PSPC_EN);
-&cpfile("$builddir\\$version\\BE300-EN\\$version",  \@buildlist_BE300_EN);
-
-# make zip file 
-
-&zipfile("$builddir\\$version\\CE-JP", "_ce_all_jp", $version);
-&zipfile("$builddir\\$version\\CE-EN", "_ce_all_en", $version);
-&zipfile("$builddir\\$version\\Win32-JP", "_win32_jp", $version);
-&zipfile("$builddir\\$version\\Win32-En", "_win32_en", $version);
-
-&zipfile("$builddir\\$version\\HPC-EN", "_hpcpro_en", $version);
-&zipfile("$builddir\\$version\\PKTPC-EN", "_pktpc_en", $version);
-&zipfile("$builddir\\$version\\PSPC-EN", "_pspc_en", $version);
-&zipfile("$builddir\\$version\\BE300-EN", "_be300_en", $version);
-
-&zipfile("$builddir\\$version\\HPC-JP", "_hpcpro_jp", $version);
-&zipfile("$builddir\\$version\\PKTPC-JP", "_pktpc_jp", $version);
-&zipfile("$builddir\\$version\\PSPC-JP", "_pspc_jp", $version);
-&zipfile("$builddir\\$version\\BE500-JP", "_be500_jp", $version);
 
 sub cpfile {
 	my ($buildto, $list) = @_;
