@@ -98,6 +98,12 @@ public:
 	// 新規メモ生成時処理
 	TreeViewFileItem *NewMemoCreated(MemoNote *pNote, LPCTSTR pHeadLine, HTREEITEM hItem);
 
+	BOOL InsertFile(HTREEITEM hParent, LPCTSTR pPrefix, LPCTSTR pFile);
+	BOOL InsertFileToLast(HTREEITEM hParent, MemoNote *pNote, LPCTSTR pTitle);
+
+	HTREEITEM InsertFolder(HTREEITEM hParent, LPCTSTR pName, TreeViewItem *tvi);
+	HTREEITEM InsertFolderToLast(HTREEITEM hParent, LPCTSTR pName, TreeViewItem *tvi);
+
 	// TreeViewItemの状態が変わったことによるビューへの変更依頼
 	BOOL UpdateItemStatus(TreeViewItem *pItem, LPCTSTR pNewHeadLine);
 
@@ -119,7 +125,6 @@ public:
 	// 現在選択されているアイテムと関連付けられているMemoNoteを返す。
 	// pItemが指定されている場合にはHTREEITEMも返す。
 	// 選択されていない場合には戻り値としてNULLを返す。
-	//MemoNote *GetCurrentItem(HTREEITEM *pItem = NULL);
 	TreeViewItem *GetCurrentItem(HTREEITEM *pItem = NULL);
 
 	TreeViewItem *GetTVItem(HTREEITEM h);
@@ -128,7 +133,7 @@ public:
 	LONG GetItem(TV_ITEM *p) { return TreeView_GetItem(hViewWnd, p); }
 	BOOL SetTVItem(HTREEITEM h, TreeViewItem *p);
 
-	LPTSTR GeneratePath(TreeViewItem *p, LPTSTR pBuf, DWORD nSiz);
+	LPTSTR GeneratePath(HTREEITEM hItem, LPTSTR pBuf, DWORD nSiz);
 
 	BOOL OnEditLabel();
 };
@@ -137,12 +142,16 @@ public:
 // メモの(アイコン)状態定義
 /////////////////////////////////////////
 
+// 初期化時
+#define MEMO_VIEW_STATE_INIT			1
+
 // クリップボードに入っている
-#define MEMO_VIEW_STATE_CLIPED_SET		(1)
-#define MEMO_VIEW_STATE_CLIPED_CLEAR	(1 << 1)
+#define MEMO_VIEW_STATE_CLIPED_SET		(1 << 1)
+#define MEMO_VIEW_STATE_CLIPED_CLEAR	(1 << 2)
+
 // 開かれている
-#define MEMO_VIEW_STATE_OPEN_SET		(1 << 2)
-#define MEMO_VIEW_STATE_OPEN_CLEAR		(1 << 3)
+#define MEMO_VIEW_STATE_OPEN_SET		(1 << 3)
+#define MEMO_VIEW_STATE_OPEN_CLEAR		(1 << 4)
 
 
 #endif
