@@ -1424,6 +1424,7 @@ BOOL MemoSelectView::SearchOneItem(HTREEITEM hItem, BOOL bSearchEncryptedMemo, B
 	return TRUE;
 
 }
+
 BOOL MemoSelectView::SearchItems(HTREEITEM hTreeItem, BOOL bSearchEncryptedMemo, BOOL bFileNameOnly, BOOL bForward)
 {
 	HTREEITEM h = hTreeItem;
@@ -1483,7 +1484,7 @@ static HTREEITEM FindItem(HWND hWnd, HTREEITEM hParent, LPCTSTR pStr)
 		ti.hItem = hItem;
 		TreeView_GetItem(hWnd, &ti);
 
-		if (_tcscmp(buf, pStr) == 0) return hItem;
+		if (_tcsicmp(buf, pStr) == 0) return hItem;
 
 		hItem = TreeView_GetNextSibling(hWnd, hItem);
 	}
@@ -1491,19 +1492,18 @@ static HTREEITEM FindItem(HWND hWnd, HTREEITEM hParent, LPCTSTR pStr)
 }
 
 // ex.
-//	msView.ShowItem(TEXT("\\temp\\В═Вы.txt"));
+//	msView.ShowItem(TEXT("temp\\В═Вы.txt"));
 
 BOOL MemoSelectView::ShowItem(LPCTSTR pPath)
 {
-
 	TString sPath;
 	HTREEITEM hTargetItem;
 
-	if (!sPath.Join(g_Property.TopDir(), pPath)) return FALSE;
+	if (!sPath.Join(g_Property.TopDir(), TEXT("\\"), pPath)) return FALSE;
 	LPTSTR p = sPath.Get();
 	p += _tcslen(g_Property.TopDir());
 
-	hTargetItem = TreeView_GetChild(hViewWnd, TVI_ROOT);
+	hTargetItem = TreeView_GetRoot(hViewWnd);
 
 	LPTSTR q, pPartPath;
 	BOOL bEndFlg = FALSE;
@@ -1539,7 +1539,9 @@ BOOL MemoSelectView::ShowItem(LPCTSTR pPath)
 
 		// Get Target Item
 		hTargetItem = FindItem(hViewWnd, hTargetItem, pPartPath);
-		if (hTargetItem == NULL) return FALSE;
+		if (hTargetItem == NULL) {
+			return FALSE;
+		}
 		TreeView_SelectItem(hViewWnd, hTargetItem);
 
 		// restore path
