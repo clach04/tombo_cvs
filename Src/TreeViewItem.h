@@ -80,7 +80,7 @@ public:
 	virtual BOOL GetURIItem(MemoSelectView *pView, TString *pItem) = 0;
 
 	virtual BOOL OpenMemo(MemoSelectView *pView, DWORD nOption);
-
+	virtual BOOL LoadMemo(MemoSelectView *pView, BOOL bAskPass);
 	virtual BOOL IsUseDetailsView();
 };
 
@@ -119,6 +119,7 @@ public:
 	BOOL GetURIItem(MemoSelectView *pView, TString *pItem);
 
 	BOOL OpenMemo(MemoSelectView *pView, DWORD nOption);
+	BOOL LoadMemo(MemoSelectView *pView, BOOL bAskPass);
 
 	BOOL IsUseDetailsView();
 };
@@ -173,6 +174,8 @@ public:
 	BOOL GetLocationPath(MemoSelectView *pView, TString *pPath);
 
 	BOOL OpenMemo(MemoSelectView *pView, DWORD nOption);
+	BOOL LoadMemo(MemoSelectView *pView, BOOL bAskPass);
+
 };
 
 /////////////////////////////////////////////

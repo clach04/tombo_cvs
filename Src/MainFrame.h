@@ -27,12 +27,25 @@ class StatusBar;
 ///////////////////////////////////////
 
 class MainFrame {
+public:
+	enum LayoutType {
+		LT_Unknown = 0,
+		LT_TwoPane,
+		LT_OnePaneSelectView,
+		LT_OnePaneDetailsView
+	};
+
+	enum ViewType {
+		VT_Unknown = 0,
+		VT_SelectView,
+		VT_DetailsView
+	};
+
+private:
 	static LPCTSTR pClassName;
 
 	HWND hMainWnd;
 	HINSTANCE hInstance;
-
-//	HIMAGELIST hSelectViewImgList;
 
 	PLATFORM_TYPE *pPlatform;
 
@@ -45,12 +58,15 @@ class MainFrame {
 
 	PasswordManager pmPasswordMgr;
 
-	BOOL bSelectViewActive;
+	ViewType vtFocusedView;
+	LayoutType lCurrentLayout;
 
 	RECT rWindowRect;	// window size with menu/title
 
 	// pane size is changing
 	BOOL bResizePane;
+
+	WORD nSplitterSize;
 
 	BOOL bSearchStartFromTreeView;
 
@@ -62,7 +78,10 @@ protected:
 	BOOL EnableApplicationButton(HWND hWnd);
 
 	// move pane splitter
-	void MovePane(WORD width);
+	void MovePane(WORD nSplit);
+
+	void ChangeLayout(LayoutType layout);
+	void SetWindowTitle(TomboURI *pURI);
 
 public:
 	MainFrame(); // ctor
@@ -108,8 +127,6 @@ public:
 	void OnMouseMove(WPARAM wParam, LPARAM lParam);
 	void OnLButtonUp(WPARAM wParam, LPARAM lParam);
 
-	void SetLayout(DWORD nSplit);
-
 	////////////////////
 	// menu handler
 
@@ -124,18 +141,22 @@ public:
 	//////////////////////////
 	// open notes
 
+	void LoadMemo(LPCTSTR pURI, BOOL bAskPass);
+
+	//////////////////////////
+	// view control
+
 	void OpenDetailsView(LPCTSTR pURI, DWORD nSwitchView);
 	void LeaveDetailsView(BOOL bAskSave);
 	void PostSwitchView(DWORD nView) { PostMessage(hMainWnd, MWM_SWITCH_VIEW, (WPARAM)nView, (LPARAM)0); }
 //	void PopupEditViewDlg();
 
+	void ActivateView(ViewType vt);	// change windows layout and focus
+	void SetFocus(ViewType vt = VT_Unknown);
+									// change focus only.
+	void SetLayout();
 
-	// Activate view
-	// tree view is activated when bList is TRUE, otherwise edit view is activated.
-	void ActivateView(BOOL bList);
-	BOOL SelectViewActive() { return bSelectViewActive; }
-
-	void SetFocus();
+	BOOL SelectViewActive() { return vtFocusedView == VT_SelectView; }
 
 	////////////////////////////////
 	// Control menus & toolbars

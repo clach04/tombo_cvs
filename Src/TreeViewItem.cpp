@@ -63,6 +63,11 @@ BOOL TreeViewItem::OpenMemo(MemoSelectView *pView, DWORD nOption)
 	return TRUE;
 }
 
+BOOL TreeViewItem::LoadMemo(MemoSelectView *pView, BOOL bAskPass)
+{
+	return TRUE;
+}
+
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 //  File
@@ -328,6 +333,13 @@ BOOL TreeViewFileItem::OpenMemo(MemoSelectView *pView, DWORD nOption)
 	return TRUE;
 }
 
+BOOL TreeViewFileItem::LoadMemo(MemoSelectView *pView, BOOL bAskPass)
+{
+	TString sURI;
+	if (!pView->GetURI(&sURI, GetViewItem())) return FALSE;
+	pView->GetManager()->GetMainFrame()->LoadMemo(sURI.Get(), bAskPass);
+	return TRUE;
+}
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 //  Folder
@@ -684,6 +696,14 @@ BOOL TreeViewFileLink::OpenMemo(MemoSelectView *pView, DWORD nOption)
 	TString sURI;
 	pNote->GetURI(&sURI);
 	pView->GetManager()->GetMainFrame()->OpenDetailsView(sURI.Get(), nOption);
+	return TRUE;
+}
+
+BOOL TreeViewFileLink::LoadMemo(MemoSelectView *pView, BOOL bAskPass)
+{
+	TString sURI;
+	pNote->GetURI(&sURI);
+	pView->GetManager()->GetMainFrame()->LoadMemo(sURI.Get(), bAskPass);
 	return TRUE;
 }
 

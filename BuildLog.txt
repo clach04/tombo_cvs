@@ -621,3 +621,12 @@ Changes
 	- modify MemoDetailsView for multi instance support.
 	- impliment MemoDetailsViewDlg for support morden PocketPC style but not used in this version.
 
+////////////////////////////////
+// B138
+////////////////////////////////
+// main trunk
+
+* more more refactoring.
+* move imagelist to MemoSelectView.
+* two pane mode support for PocketPC (yet fully implimented).
+

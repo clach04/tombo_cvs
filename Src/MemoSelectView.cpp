@@ -407,7 +407,7 @@ LRESULT MemoSelectView::OnNotify(HWND hWnd, WPARAM wParam, LPARAM lParam)
 			if (!tvi) break;
 
 			if (!tvi->HasMultiItem()) {
-				tvi->OpenMemo(this, OPEN_REQUEST_MSVIEW_ACTIVE);
+				tvi->LoadMemo(this, TRUE);
 				pMemoMgr->GetMainFrame()->PostSwitchView(OPEN_REQUEST_MDVIEW_ACTIVE);
 				return 0;
 			}
@@ -431,8 +431,8 @@ LRESULT MemoSelectView::OnNotify(HWND hWnd, WPARAM wParam, LPARAM lParam)
 				ToggleExpandFolder(hItem, it.state & TVIS_EXPANDED);
 			} else {
 				// switch to edit view
-				tvi->OpenMemo(this, OPEN_REQUEST_MSVIEW_ACTIVE);
-				pMemoMgr->GetMainFrame()->ActivateView(FALSE);
+				tvi->LoadMemo(this, TRUE);
+				pMemoMgr->GetMainFrame()->ActivateView(MainFrame::VT_DetailsView);
 			}
 		}
 		break;
@@ -483,7 +483,7 @@ LRESULT MemoSelectView::OnNotify(HWND hWnd, WPARAM wParam, LPARAM lParam)
 			if (g_Property.IsUseTwoPane() && (p->action == TVC_BYMOUSE || p->action == TVC_BYKEYBOARD)) {
 				// change notes if operated by user. Otherwise no switching occured.
 				pMemoMgr->SetMSSearchFlg(TRUE);
-				tvi->OpenMemo(this, OPEN_REQUEST_MDVIEW_ACTIVE);
+				tvi->LoadMemo(this, FALSE);
 			}
 		}
 		break;
@@ -1225,7 +1225,8 @@ void MemoSelectView::OnGetFocus()
 {
 	MainFrame *pMf = pMemoMgr->GetMainFrame();
 	if (pMf) {
-		pMf->ActivateView(TRUE);
+//		pMf->ActivateView(TRUE);
+		pMf->ActivateView(MainFrame::VT_SelectView);
 	}
 	ControlMenu();
 }

@@ -15,8 +15,6 @@ class PasswordManager;
 // MWM_OPEN_REQUEST オプション
 #define OPEN_REQUEST_MDVIEW_ACTIVE 0
 #define OPEN_REQUEST_MSVIEW_ACTIVE 1
-#define OPEN_REQUEST_NO_ACTIVATE_VIEW 2
-#define OPEN_REQUEST_MAXIMIZE 4
 
 // MWM_RAISE_MAINFRAME : トップレベルウィンドウをRaiseして再前面にもってくる
 // WPARAM, LPARAM: 0

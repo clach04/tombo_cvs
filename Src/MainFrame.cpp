@@ -65,7 +65,7 @@ static HIMAGELIST CreateSelectViewImageList(HINSTANCE hInst);
 #define SHGetSubMenu(hWndMB,ID_MENU) (HMENU)SendMessage((hWndMB), SHCMBM_GETSUBMENU, (WPARAM)0, (LPARAM)ID_MENU);
 #define SHSetSubMenu(hWndMB,ID_MENU) (HMENU)SendMessage((hWndMB), SHCMBM_SETSUBMENU, (WPARAM)0, (LPARAM)ID_MENU);
 
-// 左右ペイン間の柱の幅
+// splitter width
 #if defined(PLATFORM_WIN32)
 #define BORDER_WIDTH 2
 #endif
@@ -80,7 +80,9 @@ static HIMAGELIST CreateSelectViewImageList(HINSTANCE hInst);
 // ctor
 ///////////////////////////////////////
 
-MainFrame::MainFrame() : bResizePane(FALSE), bSelectViewActive(FALSE), pBookMark(NULL), pDetailsView(NULL), pPlatform(NULL)
+MainFrame::MainFrame() : bResizePane(FALSE), //bSelectViewActive(FALSE), 
+	vtFocusedView(VT_Unknown),
+	pBookMark(NULL), pDetailsView(NULL), pPlatform(NULL), lCurrentLayout(LT_Unknown)
 {
 }
 
@@ -95,9 +97,8 @@ MainFrame::~MainFrame()
 	delete pPlatform;
 }
 
-
 ///////////////////////////////////////
-// ウィンドウクラスの登録
+// Regist window class
 ///////////////////////////////////////
 
 BOOL MainFrame::RegisterClass(HINSTANCE hInst)
@@ -127,7 +128,6 @@ BOOL MainFrame::RegisterClass(HINSTANCE hInst)
 	::RegisterClass(&wc);
 	return TRUE;
 }
-
 
 ///////////////////////////////////////////////////
 // Event Handler
@@ -161,9 +161,9 @@ static LRESULT CALLBACK MainFrameWndProc(HWND hWnd, UINT nMessage, WPARAM wParam
 		break;
 	case MWM_SWITCH_VIEW:
 		if (wParam == OPEN_REQUEST_MDVIEW_ACTIVE) {
-			frm->ActivateView(FALSE);
+			frm->ActivateView(MainFrame::VT_DetailsView);
 		} else if (wParam == OPEN_REQUEST_MSVIEW_ACTIVE) {
-			frm->ActivateView(TRUE);
+			frm->ActivateView(MainFrame::VT_SelectView);
 		}
 		return 0;
 	case WM_SETFOCUS:
@@ -309,7 +309,7 @@ int MainFrame::MainLoop() {
 
 #endif
 		// 本来の処理
-		if (!TranslateAccelerator(hMainWnd, bSelectViewActive ? hAccelSv : hAccelDv, &msg)) {
+		if (!TranslateAccelerator(hMainWnd, SelectViewActive() ? hAccelSv : hAccelDv, &msg)) {
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 		}
@@ -340,8 +340,7 @@ void MFDetailsViewCallback::GetFocusCallback(MemoDetailsView *pView)
 
 	MainFrame *pMf = pMainFrame;
 	if (pMf) {
-		// switch view
-		pMf->ActivateView(FALSE);
+		pMf->SetFocus(MainFrame::VT_DetailsView);
 
 		// menu control
 		pMf->EnableDelete(FALSE);
@@ -411,8 +410,6 @@ BOOL MainFrame::Create(LPCTSTR pWndName, HINSTANCE hInst, int nCmdShow)
 
 	pBookMark = new BookMark();
 	if (!pBookMark || !pBookMark->Init(BOOKMARK_ID_BASE)) return FALSE;
-
-//	pStatusBar = new StatusBar();
 
 
 #ifdef _WIN32_WCE
@@ -537,15 +534,15 @@ void MainFrame::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	}
 
 	// Create tree view
-//	hSelectViewImgList = CreateSelectViewImageList(hInstance);
 	msView.Create(TEXT("MemoSelect"), r, hWnd, IDC_MEMOSELECTVIEW, hInstance, g_Property.SelectViewFont());
 	msView.InitTree(pVFManager);
 
+	// set auto switch mode
 	if (g_Property.IsUseTwoPane()) {
-		// set auto switch mode
 		msView.SetAutoLoadMode(g_Property.AutoSelectMemo());
 		msView.SetSingleClickMode(g_Property.SingleClickOpenMemo());
 	}
+
 	LoadWinSize(hWnd);
 	pDetailsView->SetMemo(TEXT(""), 0, FALSE);
 
@@ -554,13 +551,14 @@ void MainFrame::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	}
 
 	if (g_Property.IsUseTwoPane()) {
-		// 初期表示時の詳細ビューは新規メモと同様の扱いとする
+		// set new notes
 		mmMemoManager.NewMemo();
 	}
 #if defined(PLATFORM_WIN32)
 	SetTopMost();
 #endif
-	ActivateView(TRUE);
+//	ActivateView(TRUE);
+	ActivateView(VT_SelectView);
 
 	// init password manager
 	pmPasswordMgr.Init(hMainWnd, hInstance);
@@ -578,9 +576,6 @@ void MainFrame::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	if (_tcslen(g_Property.GetDefaultNote()) != 0) {
 		msView.ShowItemByURI(g_Property.GetDefaultNote());
 	}
-
-	// Raize window for some PocketPC devices.
-//	SetForegroundWindow(hMainWnd);
 }
 
 ///////////////////////////////////////////////////
@@ -614,7 +609,8 @@ BOOL MainFrame::OnExit()
 		TCHAR buf[1024];
 		wsprintf(buf, MSG_SAVE_FAILED, GetLastError());
 		TomboMessageBox(hMainWnd, buf, TEXT("ERROR"), MB_ICONSTOP | MB_OK);
-		ActivateView(FALSE);
+//		ActivateView(FALSE);
+		ActivateView(VT_DetailsView);
 		return FALSE;
 	}
 	if (nYNC == IDCANCEL) return FALSE;
@@ -654,10 +650,13 @@ BOOL MainFrame::OnExit()
 void MainFrame::OnCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
 	// First, current active view tries to handle WM_COMMAND
-	if (bSelectViewActive) {
+	switch(vtFocusedView) {
+	case VT_SelectView:
 		if (msView.OnCommand(hWnd, wParam, lParam)) return;
-	} else {
+		break;
+	case VT_DetailsView:
 		if (pDetailsView->OnCommand(hWnd, wParam, lParam)) return;
+		break;
 	}
 
 	// if active view can't handle, try to handle main window.
@@ -747,10 +746,10 @@ void MainFrame::OnCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 }
 
 ///////////////////////////////////////////////////
-// WM_NOTIFYの処理
+// WM_NOTIFY
 ///////////////////////////////////////////////////
-// 基本は各ViewにDispatchする。
-// Dispatchに失敗したらFALSEを返す。
+// basically dispatch to each view.
+// return false if dispatch is failed.
 
 BOOL MainFrame::OnNotify(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
@@ -772,9 +771,8 @@ BOOL MainFrame::OnNotify(HWND hWnd, WPARAM wParam, LPARAM lParam)
 }
 
 ///////////////////////////////////////////////////
-// システム設定の変更
+// WM_SETTINGCHANGE
 ///////////////////////////////////////////////////
-// 現在はIMEのON/OFFのチェックのみ
 
 void MainFrame::OnSettingChange(WPARAM wParam)
 {
@@ -805,9 +803,7 @@ void MainFrame::OnSIPResize(BOOL bImeOn, RECT *pSipRect)
 {
 
 #if defined(PLATFORM_PKTPC)
-	WORD nWidth, nHeight;
-	msView.GetSize(&nWidth, &nHeight);
-	SetLayout(nHeight);
+	SetLayout();
 #endif
 
 #if defined(PLATFORM_PSPC) || defined(PLATFORM_BE500)
@@ -834,64 +830,23 @@ void MainFrame::OnSIPResize(BOOL bImeOn, RECT *pSipRect)
 }
 
 ///////////////////////////////////////////////////
-// KeyUpイベントのハンドリング
+// hotkey events
 ///////////////////////////////////////////////////
 
 BOOL MainFrame::OnHotKey(WPARAM wParam, LPARAM lParam)
 {
 	if (::bDisableHotKey) return FALSE;
-	if (bSelectViewActive) {
+	switch (vtFocusedView) {
+	case VT_SelectView:
 		return msView.OnHotKey(hMainWnd, wParam);
-	} else {
+	case VT_DetailsView:
 		return pDetailsView->OnHotKey(hMainWnd, wParam);
 	}
+	return FALSE;
 }
 
 ///////////////////////////////////////////////////
-//  リサイズ
-///////////////////////////////////////////////////
-
-void MainFrame::OnResize(WPARAM wParam, LPARAM lParam)
-{
-	WORD fwSizeType = wParam;
-	WORD nWidth = LOWORD(lParam);
-	WORD nHeight = HIWORD(lParam);
-
-	WORD wLeftWidth, wHeight;
-	msView.GetSize(&wLeftWidth, &wHeight);
-	SetLayout(wLeftWidth);
-}
-
-void MainFrame::SetLayout(DWORD nSplit)
-{
-	pPlatform->ShowStatusBar(!g_Property.HideStatusBar());
-
-	// get tree/edit view area
-	RECT r, rc;
-	GetClientRect(hMainWnd, &r);
-	rc = r;
-	pPlatform->AdjustUserRect(&rc);
-
-	if (g_Property.IsUseTwoPane()) {
-#if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
-		// split vertical
-		msView.MoveWindow(rc.left, rc.top , nSplit, rc.bottom);
-		pDetailsView->MoveWindow(nSplit + BORDER_WIDTH, rc.top, rc.right - nSplit - BORDER_WIDTH, rc.bottom);
-#else
-		// split horizontal
-		msView.MoveWindow(rc.left, rc.top , rc.right, nSplit);
-		pDetailsView->MoveWindow(rc.left, nSplit + BORDER_WIDTH, rc.right, rc.bottom - nSplit - BORDER_WIDTH);
-#endif
-	} else {
-		msView.MoveWindow(rc.left, rc.top, rc.right, rc.bottom);
-		pDetailsView->MoveWindow(rc.left, rc.top, rc.right, rc.bottom);
-	}
-	// Staus bar & rebar
-	pPlatform->ResizeStatusBar(0, MAKELPARAM(r.right - r.left, r.bottom - r.top));
-}
-
-///////////////////////////////////////////////////
-//  ツールチップ
+//  Tooltips
 ///////////////////////////////////////////////////
 
 void MainFrame::OnTooltip(WPARAM wParam, LPARAM lParam)
@@ -899,10 +854,10 @@ void MainFrame::OnTooltip(WPARAM wParam, LPARAM lParam)
 }
 
 ///////////////////////////////////////////////////
-//  左ボタン押下
+//  Press left button
 ///////////////////////////////////////////////////
 //
-// ペイン配分の変更開始
+// start splitter moving
 
 void MainFrame::OnLButtonDown(WPARAM wParam, LPARAM lParam)
 {
@@ -917,41 +872,41 @@ void MainFrame::OnLButtonDown(WPARAM wParam, LPARAM lParam)
 }
 
 ///////////////////////////////////////////////////
-//  マウスドラッグ
+//  Dragging
 ///////////////////////////////////////////////////
-//
-// ペイン配分の変更中
 
 void MainFrame::OnMouseMove(WPARAM wParam, LPARAM lParam)
 {
-#if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
 	WORD fwKeys = wParam;
 	WORD xPos = LOWORD(lParam);
 
-	SHORT yPos = (SHORT)HIWORD(lParam);
+	if (!(fwKeys & MK_LBUTTON) && !bResizePane) return;
 
 	RECT rClient;
 	GetClientRect(hMainWnd, &rClient);
+
+#if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
+
+	SHORT yPos = (SHORT)HIWORD(lParam);
+
 	SHORT yLimit = (SHORT)rClient.bottom;
+#ifdef COMMENT
 	if (!g_Property.HideStatusBar()) {
 		RECT rStatBar;
 		pPlatform->GetStatusWindowRect(&rStatBar);
 		yLimit -= (SHORT)rStatBar.bottom;
-
 	}
-
+#endif
 	if (yPos < 0 || yPos > yLimit) return;
-
-	if (!(fwKeys & MK_LBUTTON) && !bResizePane) return;
 	MovePane(xPos);
 #endif
 }
 
 ///////////////////////////////////////////////////
-//  左ボタン開放
+//  Left button up
 ///////////////////////////////////////////////////
 //
-// ペイン配分の変更終了
+// end splitter move
 
 void MainFrame::OnLButtonUp(WPARAM wParam, LPARAM lParam)
 {
@@ -990,29 +945,40 @@ void MainFrame::OnLButtonUp(WPARAM wParam, LPARAM lParam)
 }
 
 ///////////////////////////////////////////////////
-//  ペイン配分の変更処理
+//  move pane spliter
 ///////////////////////////////////////////////////
-void MainFrame::MovePane(WORD width)
+
+void MainFrame::MovePane(WORD nSplit)
 {
 	if (!g_Property.IsUseTwoPane()) return;
-	SetLayout(width);
+	nSplitterSize = nSplit;
+	SetLayout();
 }
 
 ///////////////////////////////////////////////////
 // Focus window
 ///////////////////////////////////////////////////
 
-void MainFrame::SetFocus()
+void MainFrame::SetFocus(ViewType vt)
 {
-	if (bSelectViewActive) {
+	if (vt != VT_Unknown) {
+		vtFocusedView = vt;
+	}
+
+	switch(vtFocusedView) {
+	case VT_SelectView:
+		pPlatform->CloseDetailsView();
 		msView.SetFocus();
-	} else {
+		break;
+	case VT_DetailsView:
+		pPlatform->OpenDetailsView();
 		pDetailsView->SetFocus();
+		break;
 	}
 }
 
 ///////////////////////////////////////////////////
-// 新規メモ
+// Create new notes
 ///////////////////////////////////////////////////
 
 void MainFrame::NewMemo()
@@ -1022,18 +988,19 @@ void MainFrame::NewMemo()
 		TomboMessageBox(hMainWnd, MSG_GETSIPSTAT_FAILED, TEXT("ERROR"), MB_ICONSTOP | MB_OK);
 	}
 
-	// メモ編集中に新規メモを作成した場合、保存確認して新規メモに移る
+	// if modifying notes, confirm save.
 	if (g_Property.IsUseTwoPane()) {
 		LeaveDetailsView(TRUE);
 	}
 	SetNewMemoStatus(TRUE);
 	mmMemoManager.NewMemo();
 
-	ActivateView(FALSE);
+//	ActivateView(FALSE);
+	ActivateView(VT_DetailsView);
 }
 
 ///////////////////////////////////////////////////
-// 新規フォルダ
+// Create new folder
 ///////////////////////////////////////////////////
 
 void MainFrame::NewFolder(TreeViewItem *pItem)
@@ -1041,6 +1008,123 @@ void MainFrame::NewFolder(TreeViewItem *pItem)
 	if (!mmMemoManager.MakeNewFolder(hMainWnd, pItem)) {
 		TomboMessageBox(hMainWnd, MSG_CREATEFOLDER_FAILED, TEXT("ERROR"), MB_ICONSTOP | MB_OK);
 	}
+}
+
+///////////////////////////////////////////////////
+// version dialog
+///////////////////////////////////////////////////
+
+void MainFrame::About()
+{
+	AboutDialog dlg;
+	BOOL bPrev = bDisableHotKey;
+	bDisableHotKey = TRUE;
+	dlg.Popup(hInstance, hMainWnd);
+	bDisableHotKey = bPrev;
+}
+
+///////////////////////////////////////////////////
+// Set note's headline to window title
+///////////////////////////////////////////////////
+
+void MainFrame::SetWindowTitle(TomboURI *pURI)
+{
+#if defined(PLATFORM_WIN32) || defined(PLATFORM_PKTPC)
+	if (g_Property.SwitchWindowTitle()) {
+		// change window title
+		LPCTSTR pPrefix = TEXT("Tombo - ");
+		LPCTSTR pBase;
+		TString sHeadLine;
+		if (pURI->GetHeadLine(&sHeadLine)) {
+			pBase = sHeadLine.Get();
+		} else {
+			pBase = TEXT("");
+		}
+		LPCTSTR pWinTitle;
+#if defined(PLATFORM_PKTPC)
+		pWinTitle = pBase;
+#else
+		TString sWinTitle;
+		if (sWinTitle.Join(pPrefix, pBase)) {
+			pWinTitle = sWinTitle.Get();
+		} else {
+			pWinTitle = pPrefix;
+		}
+#endif
+		SetWindowText(hMainWnd, pWinTitle);
+	}
+#endif
+}
+
+///////////////////////////////////////////////////
+// popup edit dialog
+///////////////////////////////////////////////////
+
+#ifdef COMMENT
+void MainFrame::PopupEditViewDlg()
+{
+#if defined(PLATFORM_PKTPC)
+	LPTSTR p = pDetailsView->GetMemo(); // p is deleted by DetailsViewDlg
+
+	DetailsViewDlg dlg;
+	int result = dlg.Popup(g_hInstance, hMainWnd, &mmMemoManager, p);
+
+	if (result == IDYES) {
+	}
+
+#endif
+}
+#endif
+
+///////////////////////////////////////////////////
+// Request open the note
+///////////////////////////////////////////////////
+// switch edit view when bSwitchView is TRUE
+
+void MainFrame::OpenDetailsView(LPCTSTR pURI, DWORD nSwitchView)
+{
+	TomboURI uri;
+	if (!uri.Init(pURI)) return;
+
+	if (((nSwitchView & OPEN_REQUEST_MSVIEW_ACTIVE) == 0) && (uri.IsEncrypted() && !pmPasswordMgr.IsRememberPassword())) {
+		// bSwitchViewがFALSEで、メモを開くためにパスワードを問い合わせる必要がある場合には
+		// メモは開かない
+		return;
+	}
+	mmMemoManager.SetMemo(&uri);
+	SetNewMemoStatus(FALSE);
+
+	SetWindowTitle(&uri);
+
+	if (g_Property.IsUseTwoPane()) {
+		if (nSwitchView & OPEN_REQUEST_MSVIEW_ACTIVE) {
+			ActivateView(VT_DetailsView);
+		}
+	} else {
+		ActivateView(VT_DetailsView);
+	}
+}
+
+///////////////////////////////////////////////////
+// load notes
+///////////////////////////////////////////////////
+
+void MainFrame::LoadMemo(LPCTSTR pURI, BOOL bAskPass)
+{
+	TomboURI uri;
+	if (!uri.Init(pURI)) return;
+
+	if (uri.IsEncrypted() && 
+		!pmPasswordMgr.IsRememberPassword() &&
+		bAskPass == FALSE) {
+		// if TOMBO doesn't keep password even though it is need
+		// and caller don't want to ask password, nothing to do
+		return;
+	}
+	mmMemoManager.SetMemo(&uri);
+	SetNewMemoStatus(FALSE);
+
+	SetWindowTitle(&uri);
 }
 
 ///////////////////////////////////////////////////
@@ -1066,12 +1150,14 @@ void MainFrame::LeaveDetailsView(BOOL bAskSave)
 		TCHAR buf[1024];
 		wsprintf(buf, MSG_SAVE_FAILED, GetLastError());
 		TomboMessageBox(hMainWnd, buf, TEXT("ERROR"), MB_ICONSTOP | MB_OK);
-		ActivateView(FALSE);
+//		ActivateView(FALSE);
+		ActivateView(VT_DetailsView);
 		return;
 	}
 	if (nYNC == IDCANCEL) return;
 
-	ActivateView(TRUE);
+//	ActivateView(TRUE);
+	ActivateView(VT_SelectView);
 
 	if (g_Property.IsUseTwoPane()) {
 		// clear encrypted notes if two pane mode
@@ -1104,141 +1190,129 @@ void MainFrame::LeaveDetailsView(BOOL bAskSave)
 }
 
 ///////////////////////////////////////////////////
-// version dialog
-///////////////////////////////////////////////////
-
-void MainFrame::About()
-{
-	AboutDialog dlg;
-	BOOL bPrev = bDisableHotKey;
-	bDisableHotKey = TRUE;
-	dlg.Popup(hInstance, hMainWnd);
-	bDisableHotKey = bPrev;
-}
-
-///////////////////////////////////////////////////
-// Request open the note
-///////////////////////////////////////////////////
-// switch edit view when bSwitchView is TRUE
-
-void MainFrame::OpenDetailsView(LPCTSTR pURI, DWORD nSwitchView)
-{
-	TomboURI uri;
-	if (!uri.Init(pURI)) return;
-
-	if (((nSwitchView & OPEN_REQUEST_MSVIEW_ACTIVE) == 0) && (uri.IsEncrypted() && !pmPasswordMgr.IsRememberPassword())) {
-		// bSwitchViewがFALSEで、メモを開くためにパスワードを問い合わせる必要がある場合には
-		// メモは開かない
-		return;
-	}
-	mmMemoManager.SetMemo(&uri);
-	SetNewMemoStatus(FALSE);
-
-#if defined(PLATFORM_WIN32) || defined(PLATFORM_PKTPC)
-	if (g_Property.SwitchWindowTitle()) {
-		// change window title
-		LPCTSTR pPrefix = TEXT("Tombo - ");
-		LPCTSTR pBase;
-		TString sHeadLine;
-		if (uri.GetHeadLine(&sHeadLine)) {
-			pBase = sHeadLine.Get();
-		} else {
-			pBase = TEXT("");
-		}
-		LPCTSTR pWinTitle;
-#if defined(PLATFORM_PKTPC)
-		pWinTitle = pBase;
-#else
-		TString sWinTitle;
-		if (sWinTitle.Join(pPrefix, pBase)) {
-			pWinTitle = sWinTitle.Get();
-		} else {
-			pWinTitle = pPrefix;
-		}
-#endif
-		SetWindowText(hMainWnd, pWinTitle);
-	}
-#endif
-
-	if (!(nSwitchView & OPEN_REQUEST_NO_ACTIVATE_VIEW)) {
-		if (g_Property.IsUseTwoPane()) {
-#if defined(PLATFORM_PKTPC)
-			if (nSwitchView & OPEN_REQUEST_MSVIEW_ACTIVE) {
-				if (nSwitchView & OPEN_REQUEST_MAXIMIZE) {
-//					::MessageBox(NULL, TEXT("Maximize"), TEXT("DEBUG"), MB_OK);
-
-					ActivateView(FALSE);
-				} else {
-					ActivateView(FALSE);
-				}
-			}
-#else
-			if (nSwitchView & OPEN_REQUEST_MSVIEW_ACTIVE) {
-				ActivateView(FALSE);
-			}
-#endif
-		} else {
-			ActivateView(FALSE);
-		}
-	}
-}
-
-#ifdef COMMENT
-void MainFrame::PopupEditViewDlg()
-{
-#if defined(PLATFORM_PKTPC)
-	LPTSTR p = pDetailsView->GetMemo(); // p is deleted by DetailsViewDlg
-
-	DetailsViewDlg dlg;
-	int result = dlg.Popup(g_hInstance, hMainWnd, &mmMemoManager, p);
-
-	if (result == IDYES) {
-	}
-
-#endif
-}
-#endif
-
-///////////////////////////////////////////////////
 // switch view
 ///////////////////////////////////////////////////
-// if bList is TRUE, activate TreeView.
-// if FALSE, activate EditView
 
-void MainFrame::ActivateView(BOOL bList)
+void MainFrame::ActivateView(ViewType vt)
 {
-	if (bSelectViewActive == bList) {
+	if (vt == vtFocusedView) {
 		SetFocus();
 		return;
 	}
 
-	bSelectViewActive = bList;
+	vtFocusedView = vt;
+	SetLayout();
+	SetFocus();
+}
 
-	// menu/toolbar control
-#if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC) || defined(PLATFORM_PKTPC)
-	if (bList) {
-		pPlatform->CloseDetailsView();
-	} else {
-		pPlatform->OpenDetailsView();
-	}
-#endif
+///////////////////////////////////////////////////
+// change layout
+///////////////////////////////////////////////////
 
+void MainFrame::SetLayout()
+{
 	if (g_Property.IsUseTwoPane()) {
-		// show both pane if two pane mode.
-		pDetailsView->Show(SW_SHOW);
-		msView.Show(SW_SHOW);
+		ChangeLayout(LT_TwoPane);
 	} else {
-		if (bSelectViewActive) {
-			// tree view
-			pDetailsView->Show(SW_HIDE);
-			msView.Show(SW_SHOW);
-		} else {
-			// edit view
-			msView.Show(SW_HIDE);
-			pDetailsView->Show(SW_SHOW);
+		switch (vtFocusedView) {
+		case VT_SelectView:
+			ChangeLayout(LT_OnePaneSelectView);
+			break;
+		case VT_DetailsView:
+			ChangeLayout(LT_OnePaneDetailsView);
+			break;
 		}
 	}
-	SetFocus();
+}
+
+///////////////////////////////////////////////////
+// Switch pane mode
+///////////////////////////////////////////////////
+void MainFrame::TogglePane()
+{
+#if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC) || defined(PLATFORM_PKTPC)
+	pPlatform->CheckMenu(IDM_TOGGLEPANE, !g_Property.IsUseTwoPane());
+
+	if (g_Property.IsUseTwoPane()) {
+		SaveWinSize();
+	}
+
+	DWORD nPane = g_Property.IsUseTwoPane() ? MF_UNCHECKED : MF_CHECKED;
+	g_Property.SetUseTwoPane(nPane);
+
+	SetLayout();
+#endif
+}
+
+///////////////////////////////////////////////////
+// Switch pane
+///////////////////////////////////////////////////
+
+void MainFrame::ChangeLayout(LayoutType layout)
+{
+	pPlatform->ShowStatusBar(!g_Property.HideStatusBar());
+
+	// get tree/edit view area
+	RECT r, rc;
+	GetClientRect(hMainWnd, &r);
+	rc = r;
+	pPlatform->AdjustUserRect(&rc);
+
+	switch(layout) {
+	case LT_TwoPane:
+		{
+#if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
+			// split vertical
+			msView.MoveWindow(rc.left, rc.top , nSplitterSize, rc.bottom);
+			pDetailsView->MoveWindow(nSplitterSize + BORDER_WIDTH, rc.top, rc.right - nSplitterSize - BORDER_WIDTH, rc.bottom);
+#else
+			// split horizontal
+			msView.MoveWindow(rc.left, rc.top , rc.right, nSplitterSize);
+			pDetailsView->MoveWindow(rc.left, nSplitterSize + BORDER_WIDTH, rc.right, rc.bottom - nSplitterSize - BORDER_WIDTH);
+#endif
+
+			msView.Show(SW_SHOW);
+			pDetailsView->Show(SW_SHOW);
+		}
+		break;
+	case LT_OnePaneSelectView:
+		{
+			WORD wLeftWidth, wHeight;
+			msView.GetSize(&wLeftWidth, &wHeight);
+
+			msView.MoveWindow(rc.left, rc.top, rc.right, rc.bottom);
+			pDetailsView->MoveWindow(rc.left, rc.top, rc.right, rc.bottom);
+
+			pDetailsView->Show(SW_HIDE);
+			msView.Show(SW_SHOW);
+		}
+		break;
+	case LT_OnePaneDetailsView:
+		{
+			WORD wLeftWidth, wHeight;
+			msView.GetSize(&wLeftWidth, &wHeight);
+
+			msView.MoveWindow(rc.left, rc.top, rc.right, rc.bottom);
+			pDetailsView->MoveWindow(rc.left, rc.top, rc.right, rc.bottom);
+
+			pDetailsView->Show(SW_SHOW);
+			msView.Show(SW_HIDE);
+		}
+		break;
+	}
+	lCurrentLayout = layout;
+
+	// Staus bar & rebar
+	pPlatform->ResizeStatusBar(0, MAKELPARAM(r.right - r.left, r.bottom - r.top));
+}
+
+///////////////////////////////////////////////////
+//  Resize window
+///////////////////////////////////////////////////
+
+void MainFrame::OnResize(WPARAM wParam, LPARAM lParam)
+{
+	SetLayout();
 }
 
 ///////////////////////////////////////////////////
@@ -1267,7 +1341,8 @@ void MainFrame::OnForgetPass()
 		TCHAR buf[1024];
 		wsprintf(buf, MSG_SAVE_FAILED, GetLastError());
 		TomboMessageBox(hMainWnd, buf, TEXT("ERROR"), MB_ICONSTOP | MB_OK);
-		ActivateView(FALSE);
+//		ActivateView(FALSE);
+		ActivateView(VT_DetailsView);
 		return;
 	}
 	if (nYNC == IDCANCEL) return;
@@ -1321,7 +1396,7 @@ void MainFrame::OnProperty()
 void MainFrame::OnTimer(WPARAM nTimerID)
 {
 	if (nTimerID == 0) {
-		if (!bSelectViewActive) {
+		if (!SelectViewActive()) {
 			if (mmMemoManager.GetCurrentURI()) {
 				TomboURI uri;
 				if (!uri.Init(mmMemoManager.GetCurrentURI())) return;
@@ -1418,19 +1493,13 @@ void MainFrame::SaveWinSize()
 	showCmd = wpl.showCmd;
 #endif
 
-	WORD nWidth, nHeight;
 	WORD nPane;
 	if (g_Property.IsUseTwoPane()) {
-		msView.GetSize(&nWidth, &nHeight);
-#if defined(PLATFORM_PKTPC)
-		nPane = nHeight;
-#else
-		nPane = nWidth;
-#endif
+		nPane = nSplitterSize;
 	} else {
 		UINT u1, u2;
 		RECT r2;
-		if (!Property::GetWinSize(&u1, &u2, &r2, &nWidth)) {
+		if (!Property::GetWinSize(&u1, &u2, &r2, &nPane)) {
 #if defined(PLATFORM_PKTPC)
 			nPane = (r.bottom - r.top) / 3 * 2;
 #else
@@ -1450,29 +1519,28 @@ void MainFrame::LoadWinSize(HWND hWnd)
 {
 #if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC) || defined(PLATFORM_PKTPC)
 	RECT rMainFrame;
-	WORD nSelectViewWidth;
+//	WORD nSelectViewWidth;
 	RECT rClientRect;
 	GetClientRect(hWnd, &rClientRect);
 
 	UINT u1, u2;
-	if (!Property::GetWinSize(&u1, &u2, &rMainFrame, &nSelectViewWidth)) {
+	if (!Property::GetWinSize(&u1, &u2, &rMainFrame, &nSplitterSize)) {
 #if defined(PLATFORM_PKTPC)
-		nSelectViewWidth = (rClientRect.right - rClientRect.left) / 3 * 2;
+		nSplitterSize = (rClientRect.right - rClientRect.left) / 3 * 2;
 #else
-		nSelectViewWidth = (rClientRect.right - rClientRect.left) / 3;
+		nSplitterSize = (rClientRect.right - rClientRect.left) / 3;
 #endif
 	} else {
 #if defined(PLATFORM_PKTPC)
-		rMainFrame = rClientRect;
+//		rMainFrame = rClientRect;
 #endif
 #if defined(PLATFORM_HPC)
-		rMainFrame = rClientRect;
-		MoveWindow(hWnd, rMainFrame.left, rMainFrame.top, rMainFrame.right, rMainFrame.bottom, TRUE);
+//		rMainFrame = rClientRect;
+//		MoveWindow(hWnd, rMainFrame.left, rMainFrame.top, rMainFrame.right, rMainFrame.bottom, TRUE);
 #endif
 	}
 
-	msView.MoveWindow(0, 0, nSelectViewWidth, rClientRect.bottom);
-	// edit view size is determined by tree view size, it is not modified here
+//	nSplitterSize = nSelectViewWidth;
 #endif
 }
 
@@ -1502,58 +1570,6 @@ void MainFrame::SetWrapText(BOOL bWrap)
 }
 
 ///////////////////////////////////////////////////
-// Switch pane
-///////////////////////////////////////////////////
-// 2-Pane
-//		Menu                   : Do checked
-//		Toolbar                : Not pressed
-//		Property::IsUseTwoPane : TRUE
-// 1-Pane
-//		Menu                   : Do not checked
-//		Toolbar                : Pressed
-//		Property::IsUseTwoPane : FALSE
-
-void MainFrame::TogglePane()
-{
-#if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC) || defined(PLATFORM_PKTPC)
-	pPlatform->CheckMenu(IDM_TOGGLEPANE, !g_Property.IsUseTwoPane());
-
-	if (g_Property.IsUseTwoPane()) {
-		SaveWinSize();
-	}
-
-	DWORD nPane = g_Property.IsUseTwoPane() ? MF_UNCHECKED : MF_CHECKED;
-	g_Property.SetUseTwoPane(nPane);
-
-	RECT r;
-	GetClientRect(hMainWnd, &r);
-
-//	if (g_Property.IsUseTwoPane()) {
-	if (nPane) {
-		// 1->2Pane
-		UINT u1, u2;
-		RECT rr;
-		WORD nWidth;
-		g_Property.GetWinSize(&u1, &u2, &rr, &nWidth);
-		SetLayout(nWidth);
-
-		msView.Show(SW_SHOW);
-		pDetailsView->Show(SW_SHOW);
-	} else {
-		// 2->1Pane
-		OnResize(0, MAKELPARAM(r.right - r.left, r.bottom - r.top));
-		if (bSelectViewActive) {
-			pDetailsView->Show(SW_HIDE);
-			msView.Show(SW_SHOW);
-		} else {
-			pDetailsView->Show(SW_SHOW);
-			msView.Show(SW_HIDE);
-		}
-	}
-#endif
-}
-
-///////////////////////////////////////////////////
 // Change window title
 ///////////////////////////////////////////////////
 
@@ -1569,7 +1585,7 @@ void MainFrame::SetTitle(LPCTSTR pTitle) {
 void MainFrame::OnSearch()
 {
 	SearchDialog sd;
-	if (sd.Popup(g_hInstance, hMainWnd, bSelectViewActive) != IDOK) return;
+	if (sd.Popup(g_hInstance, hMainWnd, SelectViewActive()) != IDOK) return;
 
 	SearchEngineA *pSE = new SearchEngineA();
 	if(!pSE->Init(sd.IsSearchEncryptMemo(), sd.IsFileNameOnly(), &pmPasswordMgr)) {
@@ -1593,10 +1609,10 @@ void MainFrame::OnSearch()
 	// Enable FindNext/Prev button
 	pPlatform->EnableSearchNext();
 
-	bSearchStartFromTreeView = bSelectViewActive;
+	bSearchStartFromTreeView = SelectViewActive();
 
 	// execute searching
-	if (bSelectViewActive) {
+	if (SelectViewActive()) {
 		DoSearchTree(TRUE, !sd.IsSearchDirectionUp());
 		mmMemoManager.SetMSSearchFlg(FALSE);
 	} else {
@@ -1654,7 +1670,7 @@ void MainFrame::OnSearchNext(BOOL bForward)
 		return;
 	}
 
-	if (bSelectViewActive) {
+	if (SelectViewActive()) {
 		DoSearchTree(mmMemoManager.MSSearchFlg(), bForward);
 		mmMemoManager.SetMSSearchFlg(FALSE);
 	} else {
@@ -1663,7 +1679,8 @@ void MainFrame::OnSearchNext(BOOL bForward)
 		BOOL bMatched = pDetailsView->Search(mmMemoManager.MDSearchFlg(), bForward, !bSearchStartFromTreeView, FALSE);
 		mmMemoManager.SetMDSearchFlg(FALSE);
 		if (bSearchStartFromTreeView && !bMatched) {
-			ActivateView(TRUE);
+//			ActivateView(TRUE);
+			ActivateView(VT_SelectView);
 			DoSearchTree(mmMemoManager.MSSearchFlg(), bForward);
 			mmMemoManager.SetMSSearchFlg(FALSE);
 		}
@@ -1692,8 +1709,6 @@ void MainFrame::ToggleShowStatusBar()
 	OnResize(0, MAKELPARAM(r.right - r.left, r.bottom - r.top));
 }
 #endif
-
-
 
 ///////////////////////////////////////////////////
 // get command bar from command band by ID

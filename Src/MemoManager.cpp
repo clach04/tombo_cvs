@@ -382,11 +382,6 @@ BOOL MemoManager::StoreCursorPos()
 	return TRUE;
 }
 
-void MemoManager::ActivateView(BOOL bSVActive)
-{
-	pMainFrame->ActivateView(bSVActive);
-}
-
 ////////////////////////////////////////////////////////
 // ‘S‘I‘ð
 ////////////////////////////////////////////////////////
