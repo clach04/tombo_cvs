@@ -84,7 +84,7 @@ FONT 9, "ＭＳ Ｐゴシック"
 BEGIN
     LTEXT           "メモフォルダ：",IDC_STATIC,5,5,40,10
     PUSHBUTTON      "...",IDC_FOLDERSEL,110,20,15,10
-    LTEXT           "メモを保存するフォルダを設定します。",IDC_STATIC,10,40,
+    LTEXT           "メモを保存するフォルダを設定します。",IDC_STATIC,5,40,
                     110,10
     CONTROL         "メモファイル名とメモタイトルを連動",IDC_KEEPTITLE,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,55,120,8

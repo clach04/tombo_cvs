@@ -439,3 +439,10 @@ Changes
 * Re-fix : When exit with minimize, can't restore window(#2878,#2879)
 * FIX: Move pane splitter when window moves(#4056,#4057)
 
+////////////////////////////////
+// B113 (Tombo 1.8 beta 1)
+////////////////////////////////
+
+* FIX: Shift+Up selection(#4032, #4033)
+	This fix is enabled only when set PLATFORM_SIG3 macro in DetailsViewWndProc.cpp
+
