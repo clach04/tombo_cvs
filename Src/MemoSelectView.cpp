@@ -1322,7 +1322,7 @@ static HTREEITEM FindItem(HWND hWnd, HTREEITEM hParent, LPCTSTR pStr, BOOL bNote
 }
 
 // ex.
-//	msView.ShowItem(TEXT("temp\\В═Вы.txt"));
+//	msView.ShowItem(TEXT("temp\\Hello.txt"));
 
 HTREEITEM MemoSelectView::ShowItem(LPCTSTR pPath, BOOL bSelChange)
 {
