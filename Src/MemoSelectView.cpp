@@ -1464,3 +1464,99 @@ BOOL MemoSelectView::SearchItems(HTREEITEM hTreeItem, BOOL bSearchEncryptedMemo,
 	}
 	return bResult;
 }
+
+/////////////////////////////////////////////
+// Expand tree and show note
+/////////////////////////////////////////////
+
+static HTREEITEM FindItem(HWND hWnd, HTREEITEM hParent, LPCTSTR pStr)
+{
+	HTREEITEM hItem = TreeView_GetChild(hWnd, hParent);
+	TV_ITEM ti;
+
+	TCHAR buf[MAX_PATH + 1];
+	ti.mask = TVIF_TEXT | TVIF_PARAM;
+	ti.cchTextMax = MAX_PATH;
+	ti.pszText = buf;
+
+	while(hItem) {
+		ti.hItem = hItem;
+		TreeView_GetItem(hWnd, &ti);
+
+		if (_tcscmp(buf, pStr) == 0) return hItem;
+
+		hItem = TreeView_GetNextSibling(hWnd, hItem);
+	}
+	return NULL;
+}
+
+// ex.
+//	msView.ShowItem(TEXT("\\temp\\В═Вы.txt"));
+
+BOOL MemoSelectView::ShowItem(LPCTSTR pPath)
+{
+
+	TString sPath;
+	HTREEITEM hTargetItem;
+
+	if (!sPath.Join(g_Property.TopDir(), pPath)) return FALSE;
+	LPTSTR p = sPath.Get();
+	p += _tcslen(g_Property.TopDir());
+
+	hTargetItem = TreeView_GetChild(hViewWnd, TVI_ROOT);
+
+	LPTSTR q, pPartPath;
+	BOOL bEndFlg = FALSE;
+	BOOL bNote = FALSE;
+	do {
+		// get path item
+		q = p + 1;
+		pPartPath = q;
+		while(*q) {
+			if (IsDBCSLeadByte(*q)) {
+				q++;
+				if (*q) q++;
+				continue;
+			}
+			if (*q == TEXT('\\')) break;
+			q++;
+		}
+		if (*q == TEXT('\0')) {
+			bEndFlg = TRUE;
+		}
+		*p = TEXT('\0');
+		*q = TEXT('\0');
+
+		// if tree is not expanding, expand it.
+		if (!IsExpand(hViewWnd, hTargetItem)) {
+			TreeView_Expand(hViewWnd, hTargetItem, TVE_EXPAND);
+		}
+
+		if (bEndFlg && MemoNote::IsNote(pPartPath)) {
+			*(pPartPath + _tcslen(pPartPath) - 4) = TEXT('\0');
+			bNote = TRUE;
+		}
+
+		// Get Target Item
+		hTargetItem = FindItem(hViewWnd, hTargetItem, pPartPath);
+		if (hTargetItem == NULL) return FALSE;
+		TreeView_SelectItem(hViewWnd, hTargetItem);
+
+		// restore path
+		*p = TEXT('\\');
+		*q = TEXT('\\');
+		p = q;
+	} while(!bEndFlg);
+
+	// if selected item is note, open it.
+	if (bNote) {
+		TreeViewItem *ptv = GetTVItem(hTargetItem);
+		if (!ptv->HasMultiItem()) {
+			TreeViewFileItem *p = (TreeViewFileItem*)ptv;
+			MemoLocator loc(p->GetNote(), p->GetViewItem());
+			pMemoMgr->GetMainFrame()->SendRequestOpen(&loc, OPEN_REQUEST_MSVIEW_ACTIVE);
+		}
+	}
+
+	return TRUE;
+}
