@@ -69,6 +69,8 @@ static LRESULT CALLBACK AboutDlgProc(HWND hDlg, UINT message, WPARAM wParam, LPA
 		{
 			HWND hCopyright = GetDlgItem(hDlg, IDC_COPYRIGHT);
 			SetWindowText(hCopyright, pCopyright);
+			HWND hVersion = GetDlgItem(hDlg, IDC_VERSIONINFO);
+			SetWindowText(hVersion, TOMBO_VERSION_INFO);
 			return TRUE;
 		}
 	case WM_COMMAND:
