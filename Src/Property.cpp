@@ -1674,12 +1674,14 @@ static LPTSTR GetMultiSZFromReg(HKEY hKey, LPCTSTR pAttr, LPDWORD pSize)
 	*pSize = siz;
 
 	LPTSTR pBuf;
-	pBuf = new TCHAR[siz / sizeof(TCHAR)];
+	DWORD n = siz / sizeof(TCHAR) + 1;
+	pBuf = new TCHAR[n];
 	if (pBuf == NULL) {
 		RegCloseKey(hKey);
 		SetLastError(ERROR_NOT_ENOUGH_MEMORY);
 		return NULL;
 	}
+	memset(pBuf, 0, n * sizeof(TCHAR));
 	res = RegQueryValueEx(hKey, pAttr, NULL, &typ, (LPBYTE)pBuf, &siz);
 	if (res != ERROR_SUCCESS) {
 		delete[] pBuf;

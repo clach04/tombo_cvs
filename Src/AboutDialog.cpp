@@ -13,7 +13,7 @@
 // version info
 
 //#define TOMBO_VERSION_INFO TEXT("Tombo version 1.10")
-#define TOMBO_VERSION_INFO TEXT("Tombo SNAPSHOT 20040922")
+#define TOMBO_VERSION_INFO TEXT("Tombo SNAPSHOT 20040925")
 
 // copyrights and credits
 

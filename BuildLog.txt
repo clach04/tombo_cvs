@@ -745,3 +745,10 @@ Not fully tested on both platform, probably it will work.
 ////////////////////////////////
 
 * FIX:  Dialog isn't indicated right on Windows98SE(#5013,#5014)
+
+////////////////////////////////
+// B152 (SNAPSHOT20040925)
+////////////////////////////////
+
+* For unstable problem inspection
+
