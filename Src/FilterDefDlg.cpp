@@ -219,8 +219,9 @@ BOOL FilterDlgFilterTab::Command_UpDown(HWND hDlg, int iDelta)
 {
 	HWND hList = GetDlgItem(hDlg, IDC_FILTERDEF_FILTER_LIST);
 	int iSel = ListView_GetNextItem(hList, -1, LVNI_SELECTED);
+	int n = ListView_GetItemCount(hList);
 
-	if (iSel <= 0) return TRUE;
+	if (iSel + iDelta < 0 || iSel + iDelta >= n) return TRUE;
 
 	LVITEM li;
 	li.mask = LVIF_PARAM;
@@ -483,7 +484,8 @@ DWORD FilterDefDlg::Popup(HINSTANCE hInst, HWND hParent, VFInfo *pi, BOOL bNew)
 
 	pInfo = pi;
 
-	DWORD nStartPage = bNew ? 0 : 1;
+//	DWORD nStartPage = bNew ? 0 : 1;
+	DWORD nStartPage = 1;
 	PropertyPage pp;
 	DWORD res = pp.Popup(hInst, hParent, pages, NUM_TAB_FILTERCTL, MSG_FILTERDEFDLG_TTL, MAKEINTRESOURCE(IDI_TOMBO), nStartPage);
 	return res;

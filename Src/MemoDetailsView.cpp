@@ -678,7 +678,7 @@ BOOL MemoDetailsView::Search(BOOL bFirstSearch, BOOL bForward, BOOL bNFMsg, BOOL
 		SendMessage(hViewWnd, EM_SCROLLCARET, 0, 0);
 
 	} else {
-		if (bNFMsg) MessageBox(NULL, MSG_STRING_NOT_FOUND, TOMBO_APP_NAME, MB_OK | MB_ICONINFORMATION);
+		if (bNFMsg) MessageBox(hViewWnd, MSG_STRING_NOT_FOUND, TOMBO_APP_NAME, MB_OK | MB_ICONINFORMATION);
 	}
 
 	delete [] p;

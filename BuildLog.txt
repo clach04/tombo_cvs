@@ -496,10 +496,98 @@ Changes
 * Add edit bookmark dialog
 
 ////////////////////////////////
-// B121
+// B121 (Tombo_1_8)
 ////////////////////////////////
 
 * Change bookmark format path to URI.
 * Support virtual folder's bookmark/startpage.
 * Add '%I' to date format. (#4190, #4191)
+
+////////////////////////////////
+// B122
+////////////////////////////////
+// 2.0 branch
+
+* Initial version of TOMBO 2.0 alpha
+* You can build only win32 version. CE version is not yet.
+* Very very unstable. there are crush, hung up, and so on.
+
+////////////////////////////////
+// B123
+////////////////////////////////
+// 2.0 branch
+
+* Rename some classes
+* Add unit test modules
+
+////////////////////////////////
+// B124
+////////////////////////////////
+// 2.0 branch
+
+* FIX: when select whole lines and hit BS key, YAE hangups.
+* some refactorings.
+	caret positions
+	BS/DEL key handers
+	...
+
+////////////////////////////////
+// B125
+////////////////////////////////
+// 2.0 branch
+
+* FIX: YAE hangups when switch to other note and click the text.
+* FIX: Selected region shifts when resizing.
+* Support CE version.
+
+////////////////////////////////
+// B126
+////////////////////////////////
+// 2.0 branch
+
+* FIX: Crush when encrypting folder(#4286,#4287).
+* FIX: Ctrl-C,V,X is not worked on HPC.
+
+////////////////////////////////
+// B127
+////////////////////////////////
+// main trunk
+
+// merged from B126
+
+* separate MemoDetailsView and its implimentation.
+* FIX: Crush when encrypting folder(#4286,#4287).
+
+////////////////////////////////
+// B128
+////////////////////////////////
+// main trunk
+
+* minor refactoring to MainFrame.cpp
+* remove MWM_OPEN_REQUEST and add MWM_SWITCH_VIEW
+* remove HTREEITEM from MemoManager for simplify the node management.
+
+////////////////////////////////
+// B129
+////////////////////////////////
+// main trunk
+
+* remove MemoLocator
+* many refactoring
+
+////////////////////////////////
+// B130
+////////////////////////////////
+// main trunk
+
+* remove MemoManager::pCurrentNote
+
+////////////////////////////////
+// B131 (Tombo_1_8_1)
+////////////////////////////////
+// Tombo_1_8_1 branch
+
+* Crush when encrypting folder(#4286,#4287)
+* Crush when pressing "Search Next" button(#4308,#4309)
+* Down button ignored at filterdef dialog(#2771,#2772)
 

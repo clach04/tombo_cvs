@@ -568,17 +568,18 @@ void MemoSelectView::OnNotify_RClick()
 		break;
 	case IDM_ENCRYPT:
 		{
-			MemoNote *pNote = ((TreeViewFileItem*)pItem)->GetNote();
-			if (g_Property.IsUseTwoPane() && pMemoMgr->IsNoteDisplayed(pNote->MemoPath())) {
-				pMemoMgr->InactiveDetailsView();
+			if (!pItem->HasMultiItem()) {
+				MemoNote *pNote = ((TreeViewFileItem*)pItem)->GetNote();
+				if (g_Property.IsUseTwoPane() && pMemoMgr->IsNoteDisplayed(pNote->MemoPath())) {
+					pMemoMgr->InactiveDetailsView();
+				}
+				TV_HITTESTINFO hti;
+				hti.pt = pth;
+				TreeView_HitTest(hViewWnd, &hti);
+				if (hti.hItem == NULL) return;
+
+				pItem = GetTVItem(hti.hItem);
 			}
-			TV_HITTESTINFO hti;
-			hti.pt = pth;
-			TreeView_HitTest(hViewWnd, &hti);
-			if (hti.hItem == NULL) return;
-
-			TreeViewItem *pItem = GetTVItem(hti.hItem);
-
 			OnEncrypt(pItem);
 		}
 		break;
