@@ -380,6 +380,12 @@ BEGIN
         MENUITEM "日付1\tCtrl+1",               IDM_INSDATE1
         MENUITEM "日付2\tCtrl+2",               IDM_INSDATE2
     END
+    POPUP "お気に入り(&B)"
+    BEGIN
+        MENUITEM "お気に入りに追加(&A)",        IDM_BOOKMARK_ADD
+        MENUITEM "お気に入りの整理(&E)",        IDM_BOOKMARK_CONFIG
+        MENUITEM SEPARATOR
+    END
     POPUP "検索(&S)"
     BEGIN
         MENUITEM "検索(&F)\tCtrl+F",            IDM_SEARCH

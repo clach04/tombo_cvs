@@ -15,7 +15,7 @@ class TString;
 #define NOTE_TYPE_CRYPTED 2
 
 ////////////////////////////////////////
-// メモを抽象するクラス
+// represents notes
 ////////////////////////////////////////
 
 class MemoNote {
@@ -24,7 +24,7 @@ protected:
 public:
 
 	///////////////////////////////////////////
-	// 初期化関連
+	// initialize
 
 	MemoNote();
 	virtual ~MemoNote();
@@ -41,63 +41,55 @@ public:
 	BOOL Equal(MemoNote *pTarget);
 
 	//////////////////////////////////
-	// メモ内容操作関連
+	// memo data operation members
 
-	// 新規メモの生成
+	// create new memo
 	BOOL InitNewMemo(LPCTSTR pMemoPath, LPCTSTR pText, TString *pHeadLine);
 
-	// メモ内容の取得
+	// get memo data
 	virtual LPTSTR GetMemoBody(PasswordManager *pMgr);
 	virtual char *GetMemoBodyA(PasswordManager *pMgr);
 
-	// メモ内容の保存
+	// save memo
 	BOOL Save(PasswordManager *pMgr, LPCTSTR pMemo, TString *pHeadLine);
 	virtual BOOL SaveData(PasswordManager *pMgr, const char *pMemo, LPCTSTR pWriteFile);
 
-	BOOL IsReadOnly(BOOL *pReadOnly);
-
 	//////////////////////////////////
-	// 暗号化関連
+	// Encryption/Decryption : 
+	//     returns MemoNote instance after encryption/decryption.
+	//     set buffer to pHeadLine
+	//     if headline string is changed, *pIsModified is set to TURE and
+	//     new headline string is set to buffer.
 
-	virtual BOOL IsEncrypted() { return FALSE; }
-
-	// 暗号化: 暗号化後のMemoNoteインスタンスを返す。
-	// pHeadLineにはバッファを設定して呼び出す。
-	// ヘッドライン文字列に変更があった場合には　*pIsModifiedがTRUEとなり、
-	// 新しいヘッドライン文字列が設定される。
 	virtual MemoNote *Encrypt(PasswordManager *pMgr, TString *pHeadLine, BOOL *pIsModified);
-
-	// 復号化: 復号化後のMemoNoteインスタンスを返す。	
-	// pHeadLineにはバッファを設定して呼び出す。
-	// ヘッドライン文字列に変更があった場合には　*pIsModifiedがTRUEとなり、
-	// 新しいヘッドライン文字列が設定される。
 	virtual MemoNote *Decrypt(PasswordManager *pMgr, TString *pHeadLine, BOOL *pIsModified);
 
 	//////////////////////////////////
-	// ファイル操作
+	// File operation
 
-	// メモのデータをを削除する
 	virtual BOOL DeleteMemoData();
-
-	// ファイル名の変更
 	BOOL Rename(LPCTSTR pNewName);
-
 	static MemoNote *CopyMemo(MemoNote *pOrig, LPCTSTR pMemoPath, TString *pHeadLine);
 
 	//////////////////////////////////
-	// ビューとの関連情報
+	// path related functions
 
 	LPCTSTR MemoPath() { return pPath; }
 
+	static BOOL GetHeadLineFromPath(LPCTSTR pPath, TString *pHeadLine);
 
 	//////////////////////////////////
-	// Utility系
+	// notes attributes
 
+	BOOL IsReadOnly(BOOL *pReadOnly);
+	virtual BOOL IsEncrypted() { return FALSE; }
 
-	// GetMemoBody()によって取得したバッファの開放
-	// 開放時にバッファの内容をゼロクリアする。
-	// セキュリティ上からGetMemoBody()で確保した領域はdeleteではなくこの関数で
-	// 開放すること
+	//////////////////////////////////
+	// Release buffer
+
+	// Release buffer that is allocated by GetMemoBody()
+	// This function clears buffer to zero before release
+	// so we should use this func for security reasons.
 	static void WipeOutAndDelete(LPTSTR pMemo);
 #ifdef _WIN32_WCE
 	static void WipeOutAndDelete(char *pMemo);
@@ -112,10 +104,11 @@ public:
 	// if creation failed, return FALSE.
 	// if pFile is not memo, return TRUE and *ppNote sets to NULL.
 	static BOOL MemoNoteFactory(LPCTSTR pPrefix, LPCTSTR pFile, MemoNote **ppNote);
+
 };
 
 ////////////////////////////////////////
-// 暗号化されていない通常のメモ
+// Plain notes
 ////////////////////////////////////////
 
 class PlainMemoNote : public MemoNote {
@@ -133,7 +126,7 @@ public:
 };
 
 ////////////////////////////////////////
-// 暗号化されたメモ
+// Encrypted notes
 ////////////////////////////////////////
 
 class CryptedMemoNote : public MemoNote {

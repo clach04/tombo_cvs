@@ -381,6 +381,38 @@ BOOL MemoNote::Save(PasswordManager *pMgr, LPCTSTR pMemo, TString *pHeadLine)
 	return bResult;
 }
 
+////////////////////////////////////////////////////
+// get headline
+////////////////////////////////////////////////////
+BOOL MemoNote::GetHeadLineFromPath(LPCTSTR pPath, TString *pHeadLine)
+{
+	if (pPath == NULL) {
+		SetLastError(ERROR_INVALID_DATA);
+		return FALSE;
+	}
+
+	TString sTitle;
+	if (!sTitle.Set(pPath)) return FALSE;
+
+	LPTSTR p = _tcstok(sTitle.Get(), TEXT("\\"));
+	LPTSTR pTitle = p;
+	while(p) {
+		pTitle = p;
+		p = _tcstok(NULL, TEXT("\\"));
+	}
+	if (pTitle == NULL) {
+		return pHeadLine->Set(TEXT(""));
+	} else {
+		if (_tcslen(pTitle) > 4) {
+			if (_tcscmp(pTitle + _tcslen(pTitle) - 4, TEXT(".txt")) == 0 ||
+				_tcscmp(pTitle + _tcslen(pTitle) - 4, TEXT(".chi")) == 0) {
+				*(pTitle + _tcslen(pTitle) - 4) = TEXT('\0');
+			}
+		}
+		return pHeadLine->Set(pTitle);
+	}
+}
+
 /////////////////////////////////////////////
 // ƒƒ‚“à—e‚Ì•Û‘¶
 /////////////////////////////////////////////

@@ -6,6 +6,7 @@
 #include "MemoManager.h"
 #include "MemoDetailsView.h"
 #include "MemoSelectView.h"
+#include "VarBuffer.h"
 #include "MainFrame.h"
 #include "MemoNote.h"
 #include "UniConv.h"

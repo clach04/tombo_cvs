@@ -5,6 +5,10 @@
 
 #define MAX_DATEFORMAT_LEN 256
 
+////////////////////////////////////
+// Property data
+////////////////////////////////////
+
 class Property {
 	TCHAR aTopDir[MAX_PATH];
 
@@ -57,6 +61,7 @@ class Property {
 	BOOL bOpenReadOnly;
 
 	TCHAR aDefaultNote[MAX_PATH];
+	LPTSTR pBookMark;
 
 public:
 	Property();
@@ -91,11 +96,11 @@ public:
 	// whether keep caret position or not
 	BOOL KeepCaret() { return nKeepCaret; }
 
-	// 選択ビューの挙動
+	// act of treeview
 	BOOL AutoSelectMemo() { return nAutoSelectMemo; }
 	BOOL SingleClickOpenMemo() { return nSingleClick; }
 
-	// アプリケーションボタン
+	// application buttons
 	DWORD AppButton1() { return nAppButton1; }
 	DWORD AppButton2() { return nAppButton2; }
 	DWORD AppButton3() { return nAppButton3; }
@@ -106,23 +111,23 @@ public:
 	DWORD SipSizeDelta() { return nSIPSizeDelta; }
 #endif
 
-	// ウィンドウをメモ名に連動させるか?
+	// is sync window text to note's name?
 	BOOL SwitchWindowTitle() { return nSwitchWindowTitle; }
 
-	// プロパティダイアログの表示
+	// popup property dialog
 	DWORD Popup(HINSTANCE hInst, HWND hWnd, LPCTSTR pSelPath);
 
-	// プロパティ値のロード
+	// load properties
 	BOOL Load(BOOL *pStrict);
 
-	// プロパティ値のセーブ
+	// save properties
 	BOOL Save();
 
-	// 2Paneモードを使うかどうか
+	// is two pane mode?
 	BOOL IsUseTwoPane() { return nUseTwoPane; }
 	void SetUseTwoPane(BOOL bPane);
 
-	// ファイル名をメモのタイトルに連動させない
+	// keep file name even if headline has changed
 	BOOL KeepTitle() { return nKeepTitle; }
 
 	// Property folder path
@@ -151,7 +156,6 @@ public:
 
 	BOOL OpenReadOnly() { return bOpenReadOnly; }
 
-
 	// save restore main window size
 	static BOOL SaveWinSize(UINT flags, UINT showCmd, LPRECT pWinRect, WORD nSelectViewWidth);
 	static BOOL GetWinSize(UINT *pFlags, UINT *pShowCmd, LPRECT pWinRect, LPWORD pSelectViewWidth);
@@ -176,7 +180,7 @@ public:
 };
 
 ////////////////////////////////////
-// 検索履歴
+// Search history
 ////////////////////////////////////
 
 LPTSTR LoadStringHistory(LPCTSTR pAttrName);
@@ -185,7 +189,14 @@ BOOL RetrieveAndSaveHistory(HWND hCombo, LPCTSTR pAttrName, LPCTSTR pSelValue, D
 BOOL LoadHistory(HWND hCombo, LPCTSTR pAttrName);
 
 ////////////////////////////////////
-// コマンドバー位置情報保持
+// Bookmark
+////////////////////////////////////
+
+LPTSTR LoadBookMarkFromReg();
+BOOL StoreBookMarkToReg(LPCTSTR pBookMark);
+
+////////////////////////////////////
+// save commandbar position
 ////////////////////////////////////
 
 #if defined(PLATFORM_HPC)
@@ -194,12 +205,12 @@ BOOL GetCommandbarInfo(LPCOMMANDBANDSRESTOREINFO p, DWORD n);
 #endif
 
 ////////////////////////////////////
-// グローバル変数宣言
+// global var declaration
 ////////////////////////////////////
 extern Property g_Property;
 
 /////////////////////////////////////////////
-// 属性名定義(ファイル間をまたがるもののみ)
+// attribute name definitions
 /////////////////////////////////////////////
 
 #define TOMBO_SEARCHHIST_ATTR_NAME TEXT("SearchHistory")

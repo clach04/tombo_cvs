@@ -10,9 +10,11 @@
 class MemoNote;
 class TreeViewItem;
 class VFManager;
+class BookMark;
+struct BookMarkItem;
 
 ///////////////////////////////////////
-// メインフレームウィンドウ
+// Main frame window
 ///////////////////////////////////////
 
 class MainFrame {
@@ -21,7 +23,7 @@ class MainFrame {
 	HWND hMainWnd;
 	HINSTANCE hInstance;
 
-	HWND hMSCmdBar;			// コマンドバー
+	HWND hMSCmdBar;			// command bar handle
 	HWND hMDCmdBar;
 
 	HIMAGELIST hSelectViewImgList;
@@ -52,18 +54,21 @@ class MainFrame {
 
 	BOOL bSelectViewActive;
 
-	RECT rWindowRect;	// 画面サイズ
+	RECT rWindowRect;	// window size with menu/title
 
-	// ペインサイズ変更中フラグ
+	// pane size is changing
 	BOOL bResizePane;
 
 	BOOL bSearchStartFromTreeView;
 
+	// bookmarks
+	BookMark *pBookMark;
+
 protected:
-	// アプリケーションボタンをアプリからハンドリングできるようにする
+	// hook application button for handling from TOMBO
 	BOOL EnableApplicationButton(HWND hWnd);
 
-	// ペイン配分の変更
+	// move pane splitter
 	void MovePane(WORD width);
 
 	void SetStatusIndicator(DWORD nPos, LPCTSTR pText, BOOL bDisp);
@@ -79,6 +84,8 @@ protected:
 	HMENU GetMDToolMenu();
 	HMENU GetMSEditMenu();
 
+	HMENU GetMSBookMarkMenu();
+
 #if defined(PLATFORM_BE500)
 	HMENU GetMSToolMenu();
 #endif
@@ -87,15 +94,16 @@ protected:
 
 public:
 	MainFrame(); // ctor
+	~MainFrame(); // dtor
 
-	// ウィンドウクラスの登録
+	// register window class and create functions
 	static BOOL RegisterClass(HINSTANCE hInst);
 
 	BOOL Create(LPCTSTR pWndName, HINSTANCE hInst, int nCmdShow);
 
 	int MainLoop();
 
-	// イベントハンドラ
+	// Event handler
 	void OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam);
 	void OnPaint(HWND hWnd, WPARAM wParam, LPARAM lParam);
 	BOOL OnExit();
@@ -132,11 +140,11 @@ public:
 	////////////////////
 	// menu handler
 
-	void About();	// Aboutダイアログ
-	void NewMemo();	// 新規メモの作成
-	void NewFolder(TreeViewItem *pItem); // 新規フォルダの作成
-	void SetWrapText(BOOL bWrap); // 折り返し表示の切り替え
-	void TogglePane(); // ペインの切り替え
+	void About();	// About dialog
+	void NewMemo();	// create new notes
+	void NewFolder(TreeViewItem *pItem); // create new folder
+	void SetWrapText(BOOL bWrap); // Toggle wrapping on/off
+	void TogglePane(); // switch 1pange/2panes
 
 	void SetTopMost(); // keep top of the window
 
@@ -147,11 +155,10 @@ public:
 	void SendRequestOpen(MemoLocator *pLoc, DWORD nSwitchFlg) { SendMessage(hMainWnd, MWM_OPEN_REQUEST, (WPARAM)nSwitchFlg, (LPARAM)pLoc); }
 	void PostRequestOpen(MemoLocator *pLoc, DWORD nSwitchFlg) { PostMessage(hMainWnd, MWM_OPEN_REQUEST, (WPARAM)nSwitchFlg, (LPARAM)pLoc); }
 
-
 	void OnList(BOOL bAskSave);
 
-	// ビューのアクティブ化
-	// TRUEの場合一覧ビューが、FALSEの場合詳細ビューがアクティブ化される。
+	// Activate view
+	// tree view is activated when bList is TRUE, otherwise edit view is activated.
 	void ActivateView(BOOL bList);
 	BOOL SelectViewActive() { return bSelectViewActive; }
 
@@ -172,10 +179,9 @@ public:
 	void EnableNewFolder(BOOL bEnable);
 	void EnableGrep(BOOL bEnable);
 
-	// ウィンドウサイズの保存・復元
+	// Save/restore window size
 	void LoadWinSize(HWND hWnd);
 	void SaveWinSize();
-
 	
 	////////////////////////////////
 	// Control status indicator
@@ -188,8 +194,18 @@ public:
 	void ToggleShowStatusBar();
 #endif
 
-	// タイトルの変更
+	// change window title
 	void SetTitle(LPCTSTR pTitle);
+
+	////////////////////////////////
+	// bookmark related members
+	void OnBookMarkAdd(HWND hWnd, WPARAM wParam, LPARAM lParam);
+	void OnBookMarkConfig(HWND hWnd, WPARAM wParam, LPARAM lParam);
+
+	void OnBookMark(HWND hWnd, WPARAM wParam, LPARAM lParam);
+
+	void AppendBookMark(HMENU hMenu, const BookMarkItem *pItem);
+	void LoadBookMark(LPCTSTR pBookMarks);
 
 	////////////////////////////////
 	// misc funcs

@@ -7,6 +7,7 @@
 #endif
 
 #include "Tombo.h"
+#include "VarBuffer.h"
 #include "MainFrame.h"
 #include "resource.h"
 #include "Message.h"
@@ -17,6 +18,7 @@
 #include "GrepDialog.h"
 #include "FilterCtlDlg.h"
 #include "VFManager.h"
+#include "BookMark.h"
 
 #ifdef _WIN32_WCE
 #if defined(PLATFORM_PKTPC)
@@ -62,6 +64,11 @@ static HIMAGELIST CreateSelectViewImageList(HINSTANCE hInst);
 // Number of items in IDB_MEMOSELECT_IMAGES
 #define NUM_MEMOSELECT_BITMAPS 10
 
+// Bookmark menu ID base value
+#define BOOKMARK_ID_BASE 41000
+#define BOOKMARK_MENU_POS 2
+#define NUM_BOOKMARK_SUBMENU_DEFAULT 3
+
 ///////////////////////////////////////
 // defs about toolbar/commandbar
 ///////////////////////////////////////
@@ -69,7 +76,7 @@ static HIMAGELIST CreateSelectViewImageList(HINSTANCE hInst);
 // Pocket PC
 
 #if defined(PLATFORM_PKTPC)
-#define NUM_TOOLBAR_BMP 10
+#define NUM_TOOLBAR_BMP 12
 
 #define NUM_MS_TOOLTIP 1
 LPTSTR pMSToolTip[] = {
@@ -243,9 +250,19 @@ CSOBAR_BUTTONINFO	aDVCSOBarButtons[NUM_DV_CMDBAR_BUTTONS] =
 // ctor
 ///////////////////////////////////////
 
-MainFrame::MainFrame() : bResizePane(FALSE), bSelectViewActive(FALSE)
+MainFrame::MainFrame() : bResizePane(FALSE), bSelectViewActive(FALSE), pBookMark(NULL)
 {
 }
+
+///////////////////////////////////////
+// dtor
+///////////////////////////////////////
+
+MainFrame::~MainFrame()
+{
+	if (pBookMark) delete pBookMark;
+}
+
 
 ///////////////////////////////////////
 // ウィンドウクラスの登録
@@ -478,6 +495,12 @@ BOOL MainFrame::Create(LPCTSTR pWndName, HINSTANCE hInst, int nCmdShow)
 
 	pVFManager = new VFManager();
 	if (!pVFManager || !pVFManager->Init()) return FALSE;
+
+	pBookMark = new BookMark();
+	if (!pBookMark || !pBookMark->Init(BOOKMARK_ID_BASE)) return FALSE;
+
+//	nMaxBookMarkID = BOOKMARK_ID_BASE;
+//	if (!vBookMark.Init(5, 5)) return FALSE;
 
 #ifdef _WIN32_WCE
 	hMainWnd = CreateWindow(pClassName, pWndName,
@@ -898,6 +921,12 @@ void MainFrame::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	mmMemoManager.SetPasswordManager(&pmPasswordMgr);
 	g_pPasswordManager = &pmPasswordMgr;
 
+	// load bookmark
+	LPTSTR pBM = LoadBookMarkFromReg();
+	if (pBM) {
+		LoadBookMark(pBM);
+		delete [] pBM;
+	}
 
 	// open top page
 	if (_tcslen(g_Property.GetDefaultNote()) != 0) {
@@ -958,7 +987,7 @@ HWND CreateToolBar(HWND hParent, HINSTANCE hInst)
 
 #if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
 ///////////////////////////////////////////////////
-// ステータスバーのリサイズ
+// resize status bar
 ///////////////////////////////////////////////////
 void MainFrame::ResizeStatusBar()
 {
@@ -1002,7 +1031,7 @@ void MainFrame::SetModifyStatus(BOOL bModify)
 }
 
 ///////////////////////////////////////////////////
-// 終了
+// exiting
 ///////////////////////////////////////////////////
 
 BOOL MainFrame::OnExit()
@@ -1035,24 +1064,30 @@ BOOL MainFrame::OnExit()
 	CommandBands_GetRestoreInformation(hMSCmdBar, SendMessage(hMSCmdBar, RB_IDTOINDEX, ID_BUTTONBAND, 0), &cbri[1]);
 	SetCommandbarInfo(cbri, 2);
 #endif
+
+	// save bookmarks
+	LPTSTR pBM = pBookMark->ExportToMultiSZ();
+	StoreBookMarkToReg(pBM);
+	delete [] pBM;
+
 	PostQuitMessage(0);
 	return TRUE;
 }
 
 ///////////////////////////////////////////////////
-// WM_COMMANDの処理
+// WM_COMMAND handling
 ///////////////////////////////////////////////////
 
 void MainFrame::OnCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
-	// WM_COMMANDはまず現在アクティブになっているビューに処理させる
+	// First, current active view tries to handle WM_COMMAND
 	if (bSelectViewActive) {
 		if (msView.OnCommand(hWnd, wParam, lParam)) return;
 	} else {
 		if (mdView.OnCommand(hWnd, wParam, lParam)) return;
 	}
 
-	// 処理されなかったコマンドの場合、メインウィンドウでの処理を試みる
+	// if active view can't handle, try to handle main window.
 	switch(LOWORD(wParam)) {
 #if defined(PLATFORM_BE500)
 	case CSOBAR_ADORNMENTID_CLOSE:
@@ -1123,6 +1158,17 @@ void MainFrame::OnCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		break;
 	case IDM_VFOLDER_DEF:
 		OnVFolderDef();
+		break;
+	case IDM_BOOKMARK_ADD:
+		OnBookMarkAdd(hWnd, wParam, lParam);
+		break;
+	case IDM_BOOKMARK_CONFIG:
+		OnBookMarkConfig(hWnd, wParam, lParam);
+		break;
+	}
+
+	if (pBookMark->IsBookMarkID(LOWORD(wParam))) {
+		OnBookMark(hWnd, wParam, lParam);
 	}
 	return;
 }
@@ -1629,7 +1675,7 @@ void MainFrame::ActivateView(BOOL bList)
 		// フォーカスの切り替え
 
 		if (bSelectViewActive) {
-			// 一覧ビュー
+			// tree view
 			mdView.Show(SW_HIDE);
 			msView.Show(SW_SHOW);
 #if defined(PLATFORM_PKTPC)
@@ -1645,7 +1691,7 @@ void MainFrame::ActivateView(BOOL bList)
 			CSOBar_Show(hMSCmdBar, SW_SHOW);
 #endif
 		} else {
-			// 詳細ビュー
+			// edit view
 			msView.Show(SW_HIDE);
 			mdView.Show(SW_SHOW);
 
@@ -1667,7 +1713,7 @@ void MainFrame::ActivateView(BOOL bList)
 }
 
 ///////////////////////////////////////////////////
-// メニューのコントロール
+// menu control
 
 #if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
 static void ControlMenu(HMENU hMenu, BOOL bSelectViewActive)
@@ -1697,7 +1743,7 @@ static void ControlMenu(HMENU hMenu, BOOL bSelectViewActive)
 #endif
 
 ///////////////////////////////////////////////////
-// ツールバーのボタン状態の更新
+// update menus status on toolbar
 ///////////////////////////////////////////////////
 void MainFrame::EnableMenu(UINT uId, BOOL bEnable)
 {
@@ -1720,7 +1766,7 @@ void MainFrame::EnableMenu(UINT uId, BOOL bEnable)
 
 
 ///////////////////////////////////////////////////
-// ツールバーのボタン状態の更新
+// update button status on toolbar
 ///////////////////////////////////////////////////
 
 #if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
@@ -1907,7 +1953,7 @@ void MainFrame::EnableGrep(BOOL bEnable)
 }
 
 ///////////////////////////////////////////////////
-// パスワード消去
+// erase password information
 ///////////////////////////////////////////////////
 
 void MainFrame::OnForgetPass()
@@ -1965,7 +2011,7 @@ void MainFrame::OnProperty()
 }
 
 ///////////////////////////////////////////////////
-// タイマー
+// timer events
 ///////////////////////////////////////////////////
 
 void MainFrame::OnTimer(WPARAM nTimerID)
@@ -1984,7 +2030,7 @@ void MainFrame::OnTimer(WPARAM nTimerID)
 }
 
 ///////////////////////////////////////////////////
-// 二重起動
+// suppress mutual execution
 ///////////////////////////////////////////////////
 void MainFrame::OnMutualExecute()
 {
@@ -1997,7 +2043,7 @@ void MainFrame::OnMutualExecute()
 }
 
 ///////////////////////////////////////////////////
-// アプリケーションボタンの有効化
+// enable application button handling
 ///////////////////////////////////////////////////
 // http://www.pocketpcdn.com/qa/handle_hardware_keys.html
 
@@ -2044,7 +2090,7 @@ BOOL MainFrame::EnableApplicationButton(HWND hWnd)
 }
 
 ///////////////////////////////////////////////////
-// ウィンドウサイズの保存
+// Save window size
 ///////////////////////////////////////////////////
 
 void MainFrame::SaveWinSize()
@@ -2087,7 +2133,7 @@ void MainFrame::SaveWinSize()
 }
 
 ///////////////////////////////////////////////////
-// ウィンドウサイズの復元
+// Restore window size
 ///////////////////////////////////////////////////
 
 void MainFrame::LoadWinSize(HWND hWnd)
@@ -2109,7 +2155,7 @@ void MainFrame::LoadWinSize(HWND hWnd)
 	}
 
 	msView.MoveWindow(0, 0, nSelectViewWidth, rClientRect.bottom);
-	// 詳細ビューは一覧ビューのサイズを元に計算されるためここでは変更しない
+	// edit view size is determined by tree view size, it is not modified here
 #endif
 }
 
@@ -2134,7 +2180,6 @@ HMENU MainFrame::GetMDToolMenu()
 #if defined(PLATFORM_HPC)
 	return CommandBar_GetMenu(GetCommandBar(hMSCmdBar, ID_CMDBAR_MAIN), 0);
 #endif
-
 }
 
 HMENU MainFrame::GetMSEditMenu()
@@ -2156,6 +2201,25 @@ HMENU MainFrame::GetMSEditMenu()
 #endif
 }
 
+HMENU MainFrame::GetMSBookMarkMenu()
+{
+#if defined(PLATFORM_WIN32)
+	HMENU hMenu = GetMenu(hMainWnd);
+	return GetSubMenu(hMenu, BOOKMARK_MENU_POS);
+#endif
+#if defined(PLATFORM_HPC)
+	HMENU hMenu = GetMainMenu();
+	return GetSubMenu(hMenu, BOOKMARK_MENU_POS);
+#endif
+#if defined(PLATFORM_PKTPC)
+	HMENU h = SHGetSubMenu(hMSCmdBar, IDM_MS_BOOKMARK);
+	if (h == NULL) {
+		MessageBox(TEXT("GetMSBookMarkMenu fail"), TEXT("DEBUG"), MB_OK);
+	}
+	return h;
+#endif
+}
+
 #if defined(PLATFORM_BE500)
 HMENU MainFrame::GetMSToolMenu()
 {
@@ -2164,7 +2228,7 @@ HMENU MainFrame::GetMSToolMenu()
 #endif
 
 ///////////////////////////////////////////////////
-// 詳細ビューの折り返し表示の制御
+// set wrpping text or not
 ///////////////////////////////////////////////////
 
 void MainFrame::SetWrapText(BOOL bWrap)
@@ -2190,15 +2254,15 @@ void MainFrame::SetWrapText(BOOL bWrap)
 }
 
 ///////////////////////////////////////////////////
-// ペインの切り替え
+// Switch pane
 ///////////////////////////////////////////////////
 // 2-Pane
-//		メニュー               : チェックあり
-//		ツールバー             : 押されていない
+//		Menu                   : Do checked
+//		Toolbar                : Not pressed
 //		Property::IsUseTwoPane : TRUE
 // 1-Pane
-//		メニュー               : チェックなし
-//		ツールバー             : 押下状態
+//		Menu                   : Do not checked
+//		Toolbar                : Pressed
 //		Property::IsUseTwoPane : FALSE
 
 void MainFrame::TogglePane()
@@ -2219,9 +2283,9 @@ void MainFrame::TogglePane()
 	hMenu = CommandBar_GetMenu(GetCommandBar(hMSCmdBar, ID_CMDBAR_MAIN), 0);
 #endif
 
-	// メニュー状態の取得
+	// get menu status
 	if (!GetMenuItemInfo(hMenu, IDM_TOGGLEPANE, FALSE, &mii)) return;
-	// メニュー状態の反転
+	// invert menu status
 	if (mii.fState & MFS_CHECKED) {
 		bFolding = TRUE;
 		uCheckFlg = MF_UNCHECKED;
@@ -2229,10 +2293,10 @@ void MainFrame::TogglePane()
 		bFolding = FALSE;
 		uCheckFlg = MF_CHECKED;
 	}
-	// superseded な関数だが、CEだとSetMenuItemInfoは値の設定ができないのでCheckMenuItemを使用
+	// CheckMenuItem is superseeded funcs, but in CE, SetMenuItemInfo can't set values, so use it.
 	CheckMenuItem(hMenu, IDM_TOGGLEPANE, MF_BYCOMMAND | uCheckFlg);
 
-	// ツールバーの制御
+	// control toolbar
 #if defined(PLATFORM_WIN32)
 	SendMessage(hToolBar, TB_PRESSBUTTON, IDM_TOGGLEPANE, MAKELONG(!uCheckFlg, 0));
 #endif
@@ -2273,7 +2337,7 @@ void MainFrame::TogglePane()
 }
 
 ///////////////////////////////////////////////////
-// ウィンドウタイトルの切り替え
+// Change window title
 ///////////////////////////////////////////////////
 
 void MainFrame::SetTitle(LPCTSTR pTitle) {
@@ -2282,7 +2346,7 @@ void MainFrame::SetTitle(LPCTSTR pTitle) {
 }
 
 ///////////////////////////////////////////////////
-// 検索
+// Searching
 ///////////////////////////////////////////////////
 
 void MainFrame::OnSearch()
@@ -2327,7 +2391,7 @@ void MainFrame::OnSearch()
 
 	bSearchStartFromTreeView = bSelectViewActive;
 
-	// 検索実行
+	// execute searching
 	if (bSelectViewActive) {
 		DoSearchTree(TRUE, !sd.IsSearchDirectionUp());
 		mmMemoManager.SetMSSearchFlg(FALSE);
@@ -2382,7 +2446,7 @@ void MainFrame::DoSearchTree(BOOL bFirst, BOOL bForward)
 }
 
 ///////////////////////////////////////////////////
-// 次の一致項目を検索
+// Search next one
 ///////////////////////////////////////////////////
 
 void MainFrame::OnSearchNext(BOOL bForward)
@@ -2436,7 +2500,7 @@ void MainFrame::ToggleShowStatusBar()
 #endif
 
 ///////////////////////////////////////////////////
-// コマンドバンドからIDでコマンドバーを取得
+// enable/disable save button
 ///////////////////////////////////////////////////
 
 void MainFrame::EnableSaveButton(BOOL bEnable)
@@ -2465,8 +2529,9 @@ void MainFrame::EnableSaveButton(BOOL bEnable)
 }
 
 ///////////////////////////////////////////////////
-// コマンドバンドからIDでコマンドバーを取得
+// get command bar from command band by ID
 ///////////////////////////////////////////////////
+
 #if defined(PLATFORM_HPC)
 static HWND GetCommandBar(HWND hBand, UINT uBandID)
 {
@@ -2548,4 +2613,85 @@ void MainFrame::OnVFolderDef()
 	if (!dlg.Init(&msView, pVFManager)) return;
 	msView.CloseVFRoot();
 	dlg.Popup(g_hInstance, hMainWnd, hSelectViewImgList);
+}
+
+///////////////////////////////////////////////////
+// stay topmost of the screen
+///////////////////////////////////////////////////
+
+void MainFrame::OnBookMarkAdd(HWND hWnd, WPARAM wParam, LPARAM lParam)
+{
+	// get note's path
+	TString sPath;
+	if (!msView.GetCurrentItemPath(&sPath)) {
+		sPath.Set(TEXT(""));
+	}
+
+	// add to bookmark manager
+	const BookMarkItem *pItem = pBookMark->Assign(sPath.Get());
+	if (pItem == NULL) return;
+
+	AppendBookMark(GetMSBookMarkMenu(), pItem);
+}
+
+void MainFrame::OnBookMarkConfig(HWND hWnd, WPARAM wParam, LPARAM lParam)
+{
+	LPTSTR pBookMarks = pBookMark->ExportToMultiSZ();
+	LoadBookMark(pBookMarks);
+}
+
+void MainFrame::OnBookMark(HWND hWnd, WPARAM wParam, LPARAM lParam)
+{
+	const BookMarkItem *pItem = pBookMark->Find(LOWORD(wParam));
+	if (pItem) {
+		msView.ShowItem(pItem->pPath);
+	}
+}
+
+void MainFrame::AppendBookMark(HMENU hMenu, const BookMarkItem *pItem)
+{
+	// add to menu
+	MENUITEMINFO mii;
+
+	memset(&mii, 0, sizeof(mii));
+
+	mii.cbSize = sizeof(mii);
+	mii.fMask = MIIM_ID | MIIM_DATA | MIIM_STATE | MIIM_TYPE;
+	mii.fType = MFT_STRING;
+	mii.fState = MFS_ENABLED;
+
+	mii.wID = pItem->nID;
+	mii.dwTypeData = pItem->pName;
+	mii.cch = _tcslen(pItem->pName);
+
+#if defined(PLATFORM_WIN32)
+	if (!InsertMenuItem(hMenu, pItem->nID - pBookMark->GetBaseID() + NUM_BOOKMARK_SUBMENU_DEFAULT, TRUE, &mii)) return;
+#endif
+#if defined(PLATFORM_HPC) || defined(PLATFORM_PKTPC)
+	if (!AppendMenu(hMenu, MF_STRING, pItem->nID, pItem->pName)) return;
+#endif
+}
+
+void MainFrame::LoadBookMark(LPCTSTR pBookMarks)
+{
+	const BookMarkItem *p;
+
+	HMENU hBookMark = GetMSBookMarkMenu();
+
+	// release current bookmark
+	DWORD n = pBookMark->NumItems();
+	for (DWORD i = 0; i < n; i++) {
+		p = pBookMark->GetUnit(i);
+		DeleteMenu(hBookMark, p->nID, MF_BYCOMMAND);
+	}
+
+	// load bookmark list
+	pBookMark->ImportFromMultiSZ(pBookMarks);
+
+	// add to menu
+	n = pBookMark->NumItems();
+	for (i = 0; i < n; i++) {
+		p = pBookMark->GetUnit(i);
+		AppendBookMark(hBookMark, p);
+	}
 }

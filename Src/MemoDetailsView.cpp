@@ -6,6 +6,7 @@
 #endif
 #include "Tombo.h"
 #include "MemoManager.h"
+#include "VarBuffer.h"
 #include "MainFrame.h"
 #include "MemoDetailsView.h"
 #include "resource.h"

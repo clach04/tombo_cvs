@@ -11,6 +11,7 @@
 
 #include "UniConv.h"
 #include "MemoManager.h"
+#include "VarBuffer.h"
 #include "MainFrame.h"
 #include "MemoNote.h"
 #include "Property.h"

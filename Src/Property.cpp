@@ -62,6 +62,8 @@
 #define TOMBO_WINSIZE_ATTR_NAME2 TEXT("WinSize2")
 #define TOMBO_REBARHIST_ATTR_NAME TEXT("RebarPos")
 
+#define BOOKMARK_ATTR_NAME TEXT("BookMark")
+
 #if defined(PLATFORM_PKTPC) || (defined(PLATFORM_BE500) && defined(TOMBO_LANG_ENGLISH))
 #if defined(PLATFORM_PKTPC)
 #define PROPTAB_PAGES 8
@@ -137,7 +139,7 @@ LPCTSTR GetString(UINT nID)
 // ctor
 //////////////////////////////////////////
 
-Property::Property() : pDefaultTopDir(NULL)
+Property::Property() : pDefaultTopDir(NULL), pBookMark(NULL)
 {
 	_tcscpy(aTopDir, TEXT(""));
 	_tcscpy(aDefaultNote, TEXT(""));
@@ -146,6 +148,7 @@ Property::Property() : pDefaultTopDir(NULL)
 Property::~Property()
 {
 	delete [] pDefaultTopDir;
+	delete [] pBookMark;
 }
 
 //////////////////////////////////////////
@@ -1932,7 +1935,7 @@ BOOL Property::SaveWrapTextStat()
 }
 
 ///////////////////////////////////////////////////
-// Rebarà íuï€éù
+// Rebar
 ///////////////////////////////////////////////////
 #if defined(PLATFORM_HPC)
 
@@ -1985,4 +1988,40 @@ BOOL Property::SetDefaultTomboRoot(LPCTSTR p, DWORD nLen)
 	pDefaultTopDir[nLen] = TEXT('\0');
 	ChopFileSeparator(pDefaultTopDir);
 	return TRUE;
+}
+
+
+///////////////////////////////////////////////////
+// BookMark
+///////////////////////////////////////////////////
+
+
+LPTSTR LoadBookMarkFromReg()
+{
+	HKEY hTomboRoot = GetTomboRootKey();
+	if (!hTomboRoot) return NULL;
+	DWORD nSize;
+	LPTSTR p = GetMultiSZFromReg(hTomboRoot, BOOKMARK_ATTR_NAME, &nSize);
+	if (p) RegCloseKey(hTomboRoot);
+	return p;
+}
+
+BOOL StoreBookMarkToReg(LPCTSTR pBookMark)
+{
+	LPCTSTR p = pBookMark;
+	DWORD nSize = 0;
+	while (*p) {
+		nSize += (_tcslen(p) + 1) * sizeof(TCHAR);
+		p += _tcslen(p) + 1;
+	}
+	nSize++;
+
+	HKEY hTomboRoot = GetTomboRootKey();
+	if (!hTomboRoot) return FALSE;
+	if (SetMultiSZToReg(hTomboRoot, BOOKMARK_ATTR_NAME, pBookMark, nSize)) {
+		RegCloseKey(hTomboRoot);
+		return TRUE;
+	} else {
+		return FALSE;
+	}
 }

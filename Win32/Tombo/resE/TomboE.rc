@@ -56,6 +56,12 @@ BEGIN
         MENUITEM "Insert Date1\tCtrl+1",        IDM_INSDATE1, GRAYED
         MENUITEM "Insert Date2\tCtrl+2",        IDM_INSDATE2, GRAYED
     END
+    POPUP "&BookMark"
+    BEGIN
+        MENUITEM "&Add bookmark",               IDM_BOOKMARK_ADD
+        MENUITEM "&Edit bookmark",              IDM_BOOKMARK_CONFIG
+        MENUITEM SEPARATOR
+    END
     POPUP "&Tools"
     BEGIN
         MENUITEM "Wrap Text",                   IDM_DETAILS_HSCROLL

@@ -8,6 +8,7 @@
 #include "Tombo.h"
 #include "Message.h"
 #include "UniConv.h"
+#include "VarBuffer.h"
 #include "MainFrame.h"
 #include "Property.h"
 #include "Logger.h"

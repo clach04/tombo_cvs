@@ -162,13 +162,15 @@
 #define IDM_TOPMOST                     40032
 #define IDM_VFOLDER_DEF                 40033
 #define IDM_TRACELINK                   40034
+#define IDM_BOOKMARK_ADD                40035
+#define IDM_BOOKMARK_CONFIG             40036
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        138
-#define _APS_NEXT_COMMAND_VALUE         40035
+#define _APS_NEXT_COMMAND_VALUE         40037
 #define _APS_NEXT_CONTROL_VALUE         1042
 #define _APS_NEXT_SYMED_VALUE           108
 #endif

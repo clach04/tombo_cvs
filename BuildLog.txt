@@ -472,3 +472,12 @@ Changes
 
 * Add default note option.(part of #4022)
 * Move DialogTemplate, PropertyPage, DirectoryScanner to TomboLib.
+
+////////////////////////////////
+// B118
+////////////////////////////////
+
+* Fix: when encrypted note is set to default page, GPF occures.
+* Add bookmark(#2716).
+	Edit bookmark is not implimented yet.
+	PsPC, BE-[35]00 is not implimented yet.

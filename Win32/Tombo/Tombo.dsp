@@ -129,6 +129,10 @@ SOURCE=..\..\Src\gnupg\blowfish.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\Src\BookMark.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\Src\Crypt.cpp
 # End Source File
 # Begin Source File
@@ -338,6 +342,10 @@ SOURCE=..\..\Src\VFStream.cpp
 # Begin Source File
 
 SOURCE=..\..\Src\AboutDialog.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\BookMark.h
 # End Source File
 # Begin Source File
 
