@@ -11,6 +11,10 @@
 #include "TreeViewItem.h"
 #include "MemoSelectView.h"
 
+///////////////////////////////////////
+// UCS2 -> MBCS conversion libs.
+///////////////////////////////////////
+
 class ConvertWideToMultiByte {
 	char *p;
 public:
@@ -56,20 +60,23 @@ TSParser::~TSParser()
 #define TAGID_SRC		5
 #define TAGID_TIMESTAMP	6
 #define TAGID_LIMIT		7
+#define TAGID_ORDER		8
 
 static DWORD nAllowParent[] = {
 	0,						// TAGID_UNKONWN
 	0,						// TAGID_INITIAL
 	(1 << TAGID_INITIAL),	// TAGID_FOLDERS
 	(1 << TAGID_FOLDERS),	// TAGID_VFOLDER
-	(1 << TAGID_VFOLDER) | (1 << TAGID_GREP) | (1 << TAGID_TIMESTAMP) | (1 << TAGID_LIMIT),
+	(1 << TAGID_VFOLDER) | (1 << TAGID_GREP) | (1 << TAGID_TIMESTAMP) | (1 << TAGID_LIMIT) | (1 << TAGID_ORDER),
 							// TAGID_GREP
-	(1 << TAGID_VFOLDER) | (1 << TAGID_GREP) | (1 << TAGID_TIMESTAMP) | (1 << TAGID_LIMIT),
+	(1 << TAGID_VFOLDER) | (1 << TAGID_GREP) | (1 << TAGID_TIMESTAMP) | (1 << TAGID_LIMIT) | (1 << TAGID_ORDER),
 							// TAGID_SRC
-	(1 << TAGID_VFOLDER) | (1 << TAGID_GREP) | (1 << TAGID_TIMESTAMP) | (1 << TAGID_LIMIT),
+	(1 << TAGID_VFOLDER) | (1 << TAGID_GREP) | (1 << TAGID_TIMESTAMP) | (1 << TAGID_LIMIT) | (1 << TAGID_ORDER),
 							// TAGID_TIMESTAMP
-	(1 << TAGID_VFOLDER) | (1 << TAGID_GREP) | (1 << TAGID_TIMESTAMP) | (1 << TAGID_LIMIT),
+	(1 << TAGID_VFOLDER) | (1 << TAGID_GREP) | (1 << TAGID_TIMESTAMP) | (1 << TAGID_LIMIT) | (1 << TAGID_ORDER),
 							// TAGID_LIMIT
+	(1 << TAGID_VFOLDER) | (1 << TAGID_GREP) | (1 << TAGID_TIMESTAMP) | (1 << TAGID_LIMIT) | (1 << TAGID_ORDER),
+							// TAGID_ORDER
 };
 
 ///////////////////////////////////////
@@ -393,6 +400,54 @@ BOOL TSLimitTag::EndElement(ParseInfo *p)
 	return TRUE;
 }
 
+///////////////////////////////////////
+// "order" tag implimentation
+///////////////////////////////////////
+
+class TSOrderTag : public TSParseTagItem {
+	VFSortFilter::SortFuncType sfType;
+public:
+	TSOrderTag() : TSParseTagItem(TAGID_ORDER){}
+	~TSOrderTag() {}
+
+	BOOL StartElement(ParseInfo *p, const XML_Char **atts);
+	BOOL EndElement(ParseInfo *p);
+};
+
+BOOL TSOrderTag::StartElement(ParseInfo *p, const XML_Char **atts)
+{
+	DWORD i = 0;
+	while(atts[i] != NULL) {
+		if (wcsicmp(atts[i], L"func") == 0) {
+			if (wcsicmp(atts[i + 1], L"filename_asc") == 0) {
+				sfType = VFSortFilter::SortFunc_FileNameAsc;
+			} else if (wcsicmp(atts[i + 1], L"filename_dsc") == 0) {
+				sfType = VFSortFilter::SortFunc_FileNameDsc;
+			} else if (wcsicmp(atts[i + 1], L"lastupdate_asc") == 0) {
+				sfType = VFSortFilter::SortFunc_LastUpdateAsc;
+			} else if (wcsicmp(atts[i + 1], L"lastupdate_dsc") == 0) {
+				sfType = VFSortFilter::SortFunc_LastUpdateDsc;
+			} else {
+				return FALSE;
+			}
+		}
+		i += 2;
+	}
+	return TRUE;
+}
+
+BOOL TSOrderTag::EndElement(ParseInfo *p)
+{
+	if (pHead == NULL) return FALSE;
+
+	VFSortFilter *pFilter = new VFSortFilter();
+	if (pFilter == NULL || !pFilter->Init(sfType)) return FALSE;
+	TSParseTagItem *pParent = pNext;
+	pTail->SetNext(pFilter);
+	pParent->pHead = pHead;
+	pParent->pTail = pFilter;
+	return TRUE;
+}
 
 ///////////////////////////////////////
 // ParseInfo implimentation
@@ -433,6 +488,8 @@ DWORD ParseInfo::GetTagID(const WCHAR *pTagName)
 		return TAGID_TIMESTAMP;
 	} else if (wcsicmp(pTagName, L"limit") == 0) {
 		return TAGID_LIMIT;
+	} else if (wcsicmp(pTagName, L"sort") == 0) {
+		return TAGID_ORDER;
 	} else {
 		return TAGID_UNKNOWN;
 	}
@@ -453,6 +510,8 @@ TSParseTagItem *ParseInfo::GetTagObjectFactory(DWORD nTagID)
 		return new TSTimestampTag();
 	case TAGID_LIMIT:
 		return new TSLimitTag();
+	case TAGID_ORDER:
+		return new TSOrderTag();
 	default:
 		return NULL;
 	}

@@ -19,6 +19,7 @@ class PasswordManager;
 class VFNote {
 	MemoNote *pNote;
 	LPTSTR pFileName;
+	UINT64 uLastUpdate;
 public:
 	VFNote() : pNote(NULL), pFileName(NULL) {}
 	~VFNote();
@@ -31,6 +32,8 @@ public:
 	// In this case, deleting pNote is due to caller.
 	void ClearNote() { pNote = NULL; }
 	LPCTSTR GetFileName() { return pFileName; }
+
+	UINT64 GetLastUpdate() { return uLastUpdate; }
 };
 
 ////////////////////////////////////
@@ -188,9 +191,24 @@ public:
 
 class VFSortFilter : public VFStream {
 public:
+	enum SortFuncType {
+		SortFunc_Unknown,
+		SortFunc_FileNameAsc,
+		SortFunc_FileNameDsc,
+		SortFunc_LastUpdateAsc,
+		SortFunc_LastUpdateDsc
+	};
+protected:
+	SortFuncType sfType;
+	TVector<VFNote*> vNotes;
+public:
 	VFSortFilter();
 	~VFSortFilter();
-	BOOL Init();
+	BOOL Init(SortFuncType sf);
+
+	BOOL Prepare();
+	BOOL Store(VFNote *p);
+	BOOL PostActivate();
 };
 
 #endif

@@ -11,6 +11,7 @@
 #include "MemoNote.h"
 #include "VFStream.h"
 #include "SearchEngine.h"
+#include "VarBuffer.h"
 
 #define STORE_INIT_SIZE 100
 #define STORE_EXTEND_DELTA 50
@@ -22,15 +23,29 @@
 VFNote::~VFNote()
 {
 	delete [] pFileName;
-	delete pNote;
+//	delete pNote;
 }
 
 BOOL VFNote::Init(MemoNote *p, LPCTSTR pFile)
 {
 	pNote = p;
 	pFileName = StringDup(pFile);
+	if (pFileName == NULL) return FALSE;
 	*(pFileName + _tcslen(pFileName) - 4) = TEXT('\0');
-	return (pFileName != NULL);
+
+	// Get file update time
+	TString aFullPath;
+	if (!aFullPath.AllocFullPath(pNote->MemoPath())) return FALSE;
+
+	WIN32_FIND_DATA wfd;
+	HANDLE h = FindFirstFile(aFullPath.Get(), &wfd);
+	if (h != INVALID_HANDLE_VALUE) {
+		uLastUpdate = ((UINT64)wfd.ftLastWriteTime.dwHighDateTime << 32) | (UINT64)wfd.ftLastWriteTime.dwLowDateTime ;
+		FindClose(h);
+		return TRUE;
+	} else {
+		return FALSE;
+	}
 }
 
 ////////////////////////////////////
@@ -340,6 +355,13 @@ BOOL VFTimestampFilter::Init(DWORD nDelta, BOOL bNew)
 BOOL VFTimestampFilter::Store(VFNote *pNote)
 {
 	MemoNote *pMemo = pNote->GetNote();
+	if (bNewer && pNote->GetLastUpdate() > uBase || (!bNewer && pNote->GetLastUpdate() < uBase)) {
+		return pNext->Store(pNote);
+	} else {
+		delete pNote;
+		return TRUE;
+	}
+#ifdef COMMENT
 	TString sPath;
 	if (!sPath.AllocFullPath(pMemo->MemoPath())) return FALSE;
 
@@ -359,4 +381,101 @@ BOOL VFTimestampFilter::Store(VFNote *pNote)
 		delete pNote;
 		return TRUE;
 	}
+#endif
+}
+
+////////////////////////////////////
+//  VFSortFilter
+////////////////////////////////////
+
+VFSortFilter::VFSortFilter()
+{
+}
+
+VFSortFilter::~VFSortFilter()
+{
+}
+
+BOOL VFSortFilter::Init(SortFuncType sf)
+{
+	sfType = sf;
+	return vNotes.Init(STORE_INIT_SIZE, STORE_EXTEND_DELTA);
+}
+
+BOOL VFSortFilter::Prepare()
+{
+	vNotes.Clear(TRUE);
+	return VFStream::Prepare();
+}
+
+BOOL VFSortFilter::Store(VFNote *p)
+{
+	if (!vNotes.Add(&p)) return FALSE;
+	return TRUE;
+}
+
+extern "C" {
+typedef int SortFunc(const void *e1, const void *e2);
+};
+
+extern "C" static int SortNotes_FileNameAsc(const void *e1, const void *e2)
+{
+	VFNote *p1 = *(VFNote**)e1;
+	VFNote *p2 = *(VFNote**)e2;
+	return _tcsicmp(p1->GetFileName(), p2->GetFileName());
+}
+
+extern "C" static int SortNotes_FileNameDesc(const void *e1, const void *e2)
+{
+	VFNote *p1 = *(VFNote**)e1;
+	VFNote *p2 = *(VFNote**)e2;
+	return _tcsicmp(p2->GetFileName(), p1->GetFileName());
+}
+
+extern "C" static int SortNotes_LastUpdateOlder(const void *e1, const void *e2)
+{
+	VFNote *p1 = *(VFNote**)e1;
+	VFNote *p2 = *(VFNote**)e2;
+	if (p1->GetLastUpdate() == p2->GetLastUpdate()) return 0;
+	if (p1->GetLastUpdate() > p2->GetLastUpdate()) return 1;
+	else return -1;
+}
+
+extern "C" static int SortNotes_LastUpdateNewer(const void *e1, const void *e2)
+{
+	VFNote *p1 = *(VFNote**)e1;
+	VFNote *p2 = *(VFNote**)e2;
+	if (p2->GetLastUpdate() == p1->GetLastUpdate()) return 0;
+	if (p2->GetLastUpdate() > p1->GetLastUpdate()) return 1;
+	else return -1;
+}
+
+BOOL VFSortFilter::PostActivate()
+{
+	VFNote *p;
+	DWORD n = vNotes.NumItems();
+
+	SortFunc *pFunc;
+	switch(sfType) {
+	case SortFunc_FileNameAsc:
+		pFunc = SortNotes_FileNameAsc;
+		break;
+	case SortFunc_FileNameDsc:
+		pFunc = SortNotes_FileNameDesc;
+		break;
+	case SortFunc_LastUpdateAsc:
+		pFunc = SortNotes_LastUpdateOlder;
+		break;
+	case SortFunc_LastUpdateDsc:
+		pFunc = SortNotes_LastUpdateNewer;
+		break;
+	default:
+		return FALSE;
+	}
+	qsort((LPBYTE)vNotes.GetBuf(), n, sizeof(VFNote*), pFunc);
+	for (DWORD i = 0; i < n; i++) {
+		p = *vNotes.GetUnit(i);
+		if (!pNext->Store(p)) return FALSE;
+	}
+	return VFStream::PostActivate();
 }
