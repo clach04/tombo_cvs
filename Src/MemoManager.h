@@ -1,8 +1,6 @@
 #ifndef MEMOMANAGER_H
 #define MEMOMANAGER_H
 
-#include <commctrl.h>
-
 class MemoDetailsView;
 class MemoSelectView;
 class MainFrame;
@@ -11,21 +9,7 @@ class PasswordManager;
 class SearchEngineA;
 class TreeViewItem;
 class TString;
-
-/////////////////////////////////////
-// Memo location info
-/////////////////////////////////////
-//
-// This class is helper class. Object life-time is only in functions.
-// If you want to have these info, you should not keep pointer but copy member variables.
-
-class MemoLocator {
-	MemoNote *pNote;
-public:
-	MemoLocator(MemoNote *p) : pNote(p) {}
-
-	MemoNote *GetNote() { return pNote; }
-};
+class TomboURI;
 
 /////////////////////////////////////
 // Control other view
@@ -43,7 +27,7 @@ protected:
 	MemoNote *pCurrentNote;
 	LPTSTR pCurrentURI;
 
-	MemoLocator AllocNewMemo(LPCTSTR pText, MemoNote *pTemplate = NULL);
+	MemoNote *AllocNewMemo(LPCTSTR pText, MemoNote *pTemplate = NULL);
 
 	SearchEngineA *pSearchEngineA;
 
@@ -52,7 +36,7 @@ protected:
 
 	/////////////////////////////////////
 	// maintain pCurrentNote;
-	void SetCurrentNote(MemoLocator *pLoc);
+	void SetCurrentNote(MemoNote *Note);
 
 public:
 	/////////////////////////////////////
@@ -85,7 +69,7 @@ public:
 	BOOL SaveIfModify(LPDWORD pYNC, BOOL bDupMode);
 
 	// メモのロード
-	BOOL SetMemo(MemoLocator *pLoc);
+	BOOL SetMemo(MemoNote *pNote);
 
 	// メモのクリア
 	BOOL ClearMemo();

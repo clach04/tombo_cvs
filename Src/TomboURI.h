@@ -23,6 +23,7 @@ public:
 	BOOL GetHeadLine(TString *pHeadLine);
 
 	LPCTSTR GetFull() { return sURI.Get(); }
+	LPCTSTR GetPath();
 
 	DWORD GetMaxPathItem() { return nMaxPathItem; }
 

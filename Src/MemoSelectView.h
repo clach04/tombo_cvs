@@ -91,6 +91,8 @@ public:
 	/////////////////////////////
 	// accessor/mutator for flags
 
+	MemoManager *GetManager() { return pMemoMgr; }
+
 	// é©ìÆêÿä∑Ç¶ÉÇÅ[Éh
 	void SetAutoLoadMode(BOOL bMode) { bAutoLoadMode = bMode; }
 	BOOL IsAutoLoadMode() { return bAutoLoadMode; }
@@ -159,7 +161,7 @@ public:
 	LPTSTR GeneratePath(HTREEITEM hItem, LPTSTR pBuf, DWORD nSiz);
 	BOOL GetCurrentItemPath(TString *pPath);
 
-	BOOL GetCurrentURI(TString *pURI);
+	BOOL GetURI(TString *pURI, HTREEITEM hTarget = NULL);
 
 	BOOL GetURINodeName(HTREEITEM h, LPTSTR pBuf, DWORD nBufLen);
 

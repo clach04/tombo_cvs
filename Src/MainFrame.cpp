@@ -41,6 +41,7 @@ UINT WINAPI ImmGetVirtualKey(HWND);
 #include "SearchDlg.h"
 #include "SearchEngine.h"
 #include "SearchTree.h"
+#include "TomboURI.h"
 
 //#include "YAEditor.h"
 
@@ -1555,16 +1556,18 @@ void MainFrame::OnList(BOOL bAskSave)
 		// 2Paneの場合、暗号化されたメモのみクリアする
 		if (nYNC == IDNO) {
 			// メモを破棄し、旧メモをリロード
-			MemoLocator loc(mmMemoManager.CurrentNote());
-			RequestOpenMemo(&loc, OPEN_REQUEST_MDVIEW_ACTIVE);
+			TString sURI;
+			if (!mmMemoManager.CurrentNote()->GetURI(&sURI)) return;
+			RequestOpenMemo(sURI.Get(), OPEN_REQUEST_MDVIEW_ACTIVE);
 		} else {
 			MemoNote *pCurrent = mmMemoManager.CurrentNote();
 			if (pCurrent && pCurrent->IsEncrypted()) {
 				mmMemoManager.NewMemo();
 			} else {
 #if defined(PLATFORM_HPC)
-				MemoLocator loc(mmMemoManager.CurrentNote(), NULL);
-				RequestOpenMemo(&loc, OPEN_REQUEST_MDVIEW_ACTIVE);
+				TString sURI;
+				if (!mmMemoManager.CurrentNote()->GetURI(&sURI)) return;
+				RequestOpenMemo(sURI.Get(), OPEN_REQUEST_MDVIEW_ACTIVE);
 #endif
 			}
 		}
@@ -1593,55 +1596,52 @@ void MainFrame::About()
 }
 
 ///////////////////////////////////////////////////
-// メモオープン要求
+// Request open the note
 ///////////////////////////////////////////////////
 // bSwitchViewがTRUEの場合には詳細ビューに切り替える
 
-void MainFrame::RequestOpenMemo(MemoLocator *pLoc, DWORD nSwitchView)
+void MainFrame::RequestOpenMemo(LPCTSTR pURI, DWORD nSwitchView)
 {
-	MemoNote *pNote = pLoc->GetNote();
-	if (pNote == NULL) {
-		return; // フォルダの場合
-	}
+	TomboURI uri;
+	if (!uri.Init(pURI)) return;
+
+	MemoNote *pNote = MemoNote::MemoNoteFactory(&uri);
+	if (pNote == NULL) return;
+
 	if (((nSwitchView & OPEN_REQUEST_MSVIEW_ACTIVE) == 0) && (pNote->IsEncrypted() && !pmPasswordMgr.IsRememberPassword())) {
 		// bSwitchViewがFALSEで、メモを開くためにパスワードを問い合わせる必要がある場合には
 		// メモは開かない
 		return;
 	}
-	mmMemoManager.SetMemo(pLoc);
+	mmMemoManager.SetMemo(pNote);
+	SetNewMemoStatus(FALSE);
 
 #if defined(PLATFORM_WIN32) || defined(PLATFORM_PKTPC)
-	LPCTSTR pPath = pNote->MemoPath();
-	LPCTSTR pPrefix = TEXT("Tombo - ");
-	if (pPath) {
-		LPCTSTR pBase = _tcsrchr(pPath, TEXT('\\'));
-		if (pBase) {
-			pBase++;
+	if (g_Property.SwitchWindowTitle()) {
+		// change window title
+		LPCTSTR pPrefix = TEXT("Tombo - ");
+		LPCTSTR pBase;
+		TString sHeadLine;
+		if (uri.GetHeadLine(&sHeadLine)) {
+			pBase = sHeadLine.Get();
 		} else {
-			pBase = pPath;
+			pBase = TEXT("");
 		}
-		LPTSTR p = new TCHAR[_tcslen(pBase) + 1 + _tcslen(pPrefix)];
-		if (p) {
-			// PocketPCの場合画面が狭いのでアプリ名は表示させない
-#if defined(PLATFORM_WIN32)
-			wsprintf(p, TEXT("%s%s"), pPrefix, pBase);
-#endif
+		LPCTSTR pWinTitle;
 #if defined(PLATFORM_PKTPC)
-			wsprintf(p, TEXT("%s"), pBase);
-#endif
-			DWORD l = _tcslen(p);
-			if (l > 4) {
-				*(p + l - 4) = TEXT('\0');
-			}
-			if (g_Property.SwitchWindowTitle()) {
-				SetWindowText(hMainWnd, p);
-			}
-			delete [] p;
+		pWinTitle = pBase;
+#else
+		TString sWinTitle;
+		if (sWinTitle.Join(pPrefix, pBase)) {
+			pWinTitle = sWinTitle.Get();
+		} else {
+			pWinTitle = pPrefix;
 		}
-	}	
+#endif
+		SetWindowText(hMainWnd, pWinTitle);
+	}
 #endif
 
-	SetNewMemoStatus(FALSE);
 	if (!(nSwitchView & OPEN_REQUEST_NO_ACTIVATE_VIEW)) {
 		if (g_Property.IsUseTwoPane()) {
 			if (nSwitchView & OPEN_REQUEST_MSVIEW_ACTIVE) {
@@ -1656,6 +1656,8 @@ void MainFrame::RequestOpenMemo(MemoLocator *pLoc, DWORD nSwitchView)
 ///////////////////////////////////////////////////
 // switch view
 ///////////////////////////////////////////////////
+// if bList is TRUE, activate TreeView.
+// if FALSE, activate EditView
 
 void MainFrame::ActivateView(BOOL bList)
 {
@@ -1996,8 +1998,7 @@ void MainFrame::OnProperty()
 	mmMemoManager.NewMemo();
 
 	TString sPath;
-//	if (!msView.GetCurrentItemPath(&sPath)) {
-	if (!msView.GetCurrentURI(&sPath)) {
+	if (!msView.GetURI(&sPath)) {
 		sPath.Set(TEXT(""));
 	}
 
@@ -2636,7 +2637,7 @@ void MainFrame::OnBookMarkAdd(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
 	// get note's path
 	TString sURI;
-	if (!msView.GetCurrentURI(&sURI)) return;
+	if (!msView.GetURI(&sURI)) return;
 
 	// add to bookmark manager
 	const BookMarkItem *pItem = pBookMark->Assign(sURI.Get());

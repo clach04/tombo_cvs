@@ -3,6 +3,8 @@
 #include "TString.h"
 #include "TomboURI.h"
 
+static LPCTSTR pURIPrefix = TEXT("tombo://");
+
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 // URI implimentation
@@ -12,7 +14,7 @@
 BOOL TomboURI::Init(LPCTSTR pURI)
 {
 	// check header string
-	if (_tcsnicmp(pURI, TEXT("tombo://"), 8) != 0) {
+	if (_tcsnicmp(pURI, pURIPrefix, 8) != 0) {
 		SetLastError(ERROR_INVALID_DATA);
 		return FALSE;
 	}
@@ -67,7 +69,7 @@ BOOL TomboURI::GetRepository(TString *pRepo)
 }
 
 /////////////////////////////////////////////
-// 
+// get headline
 /////////////////////////////////////////////
 BOOL TomboURI::GetHeadLine(TString *pHeadLine)
 {
@@ -88,6 +90,19 @@ BOOL TomboURI::GetHeadLine(TString *pHeadLine)
 		}
 	}
 	return TRUE;
+}
+
+/////////////////////////////////////////////
+// get path part
+/////////////////////////////////////////////
+
+LPCTSTR TomboURI::GetPath()
+{
+	LPCTSTR p = sURI.Get() + _tcslen(pURIPrefix);
+
+	// skip repository part
+	p = _tcschr(p, TEXT('/'));
+	return p;
 }
 
 /////////////////////////////////////////////

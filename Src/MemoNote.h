@@ -3,6 +3,7 @@
 
 class PasswordManager;
 class TString;
+class TomboURI;
 
 #include "TreeViewItem.h"
 
@@ -105,7 +106,7 @@ public:
 	// if creation failed, return FALSE.
 	// if pFile is not memo, return TRUE and *ppNote sets to NULL.
 	static BOOL MemoNoteFactory(LPCTSTR pPrefix, LPCTSTR pFile, MemoNote **ppNote);
-
+	static MemoNote *MemoNoteFactory(TomboURI *pURI);
 };
 
 ////////////////////////////////////////

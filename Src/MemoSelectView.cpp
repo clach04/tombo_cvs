@@ -319,7 +319,6 @@ TreeViewItem* MemoSelectView::GetCurrentItem(HTREEITEM *pItem)
 	return NULL;
 }
 
-
 BOOL MemoSelectView::Show(int nCmdShow)
 {
 	ShowWindow(hViewWnd, nCmdShow);
@@ -392,12 +391,8 @@ LRESULT MemoSelectView::OnNotify(HWND hWnd, WPARAM wParam, LPARAM lParam)
 			TreeViewItem *tvi = (TreeViewItem*)it.lParam;
 			if (!tvi) break;
 
-			// Viewの切り替えだけではSelectViewにフォーカスがあたってしまう。なぜ？
 			if (!tvi->HasMultiItem()) {
-				TreeViewFileItem *ptvfi = (TreeViewFileItem*)tvi;
-				// If 3rd parameter is TRUE, object are deleted by MainFrame::RequestOpenMemo() 
-				MemoLocator loc(ptvfi->GetNote());
-				pMemoMgr->GetMainFrame()->RequestOpenMemo(&loc, OPEN_REQUEST_MSVIEW_ACTIVE);
+				tvi->OpenMemo(this, OPEN_REQUEST_MSVIEW_ACTIVE);
 				pMemoMgr->GetMainFrame()->PostSwitchView(OPEN_REQUEST_MSVIEW_ACTIVE);
 			}
 			// 暗黙でExpand/Collapseが発生
@@ -419,10 +414,9 @@ LRESULT MemoSelectView::OnNotify(HWND hWnd, WPARAM wParam, LPARAM lParam)
 			if (tvi->HasMultiItem()) {
 				ToggleExpandFolder(hItem, it.state & TVIS_EXPANDED);
 			} else {
-				// open request
-				TreeViewFileItem *ptvfi = (TreeViewFileItem*)tvi;
-				MemoLocator loc(ptvfi->GetNote()); 
-				pMemoMgr->GetMainFrame()->RequestOpenMemo(&loc, OPEN_REQUEST_MSVIEW_ACTIVE);
+				// switch to edit view
+				tvi->OpenMemo(this, OPEN_REQUEST_MSVIEW_ACTIVE);
+				pMemoMgr->GetMainFrame()->ActivateView(FALSE);
 			}
 		}
 		break;
@@ -473,11 +467,7 @@ LRESULT MemoSelectView::OnNotify(HWND hWnd, WPARAM wParam, LPARAM lParam)
 			if (g_Property.IsUseTwoPane() && (p->action == TVC_BYMOUSE || p->action == TVC_BYKEYBOARD)) {
 				// change notes if operated by user. Otherwise no switching occured.
 				pMemoMgr->SetMSSearchFlg(TRUE);
-				if (!tvi->HasMultiItem()) {
-					TreeViewFileItem *ptvfi = (TreeViewFileItem*)tvi;
-					MemoLocator loc(ptvfi->GetNote());
-					pMemoMgr->GetMainFrame()->RequestOpenMemo(&loc, OPEN_REQUEST_MDVIEW_ACTIVE);
-				}
+				tvi->OpenMemo(this, OPEN_REQUEST_MDVIEW_ACTIVE);
 			}
 		}
 		break;
@@ -551,23 +541,7 @@ void MemoSelectView::OnNotify_RClick()
 		OnPaste();
 		break;
 	case IDM_ENCRYPT:
-		{
-			if (pItem->IsUseDetailsView()) {
-				MemoNote *pNote = ((TreeViewFileItem*)pItem)->GetNote();
-				if (g_Property.IsUseTwoPane() && pMemoMgr->IsNoteDisplayed(pNote->MemoPath())) {
-					pMemoMgr->InactiveDetailsView();
-				}
-			}
-
-			TV_HITTESTINFO hti;
-			hti.pt = pth;
-			TreeView_HitTest(hViewWnd, &hti);
-			if (hti.hItem == NULL) return;
-
-			TreeViewItem *pItem = GetTVItem(hti.hItem);
-
-			OnEncrypt(pItem);
-		}
+		OnEncrypt(pItem);
 		break;
 	case IDM_DECRYPT:
 		OnDecrypt(pItem);
@@ -762,12 +736,19 @@ BOOL MemoSelectView::GetCurrentItemPath(TString *pPath)
 	return TRUE;
 }
 
-BOOL MemoSelectView::GetCurrentURI(TString *pURI)
+BOOL MemoSelectView::GetURI(TString *pURI, HTREEITEM hTarget)
 {
-	HTREEITEM h;
-	TreeViewItem *pItem = GetCurrentItem(&h);
-	if (pItem == NULL) return FALSE;
+	HTREEITEM hBase;
+	if (hTarget == NULL) {
+		TreeViewItem *pItem = GetCurrentItem(&hBase);
+		if (pItem == NULL) return FALSE;
+	} else {
+		hBase = hTarget;
+	}
 
+	HTREEITEM h;
+	// count length 
+	h = hBase;
 	TString s;
 	DWORD n = 0;
 	while(h) {
@@ -780,8 +761,9 @@ BOOL MemoSelectView::GetCurrentURI(TString *pURI)
 		h = TreeView_GetParent(hViewWnd, h);
 	}
 	if (!pURI->Alloc(n + 8 + 1)) return FALSE;
-	GetCurrentItem(&h);
 
+	// copy to buffer
+	h = hBase;
 	LPTSTR pTail = pURI->Get() + n + 8;
 	*pTail = TEXT('\0');
 	while(h) {
@@ -798,8 +780,6 @@ BOOL MemoSelectView::GetCurrentURI(TString *pURI)
 	}
 	pTail -= 8;
 	_tcsncpy(pTail, TEXT("tombo://"), 8);
-
-	DWORD x = _tcslen(pURI->Get());
 	return TRUE;
 }
 
@@ -940,10 +920,7 @@ void MemoSelectView::OnActionButton(HWND hWnd)
 	HTREEITEM hItem;
 	TreeViewItem *p = GetCurrentItem(&hItem);
 	if (p && !p->HasMultiItem()) {
-		// request open if it is a note.
-		TreeViewFileItem *ptvfi = (TreeViewFileItem*)p;
-		MemoLocator loc(ptvfi->GetNote());
-		pMemoMgr->GetMainFrame()->RequestOpenMemo(&loc, OPEN_REQUEST_MSVIEW_ACTIVE);
+		p->OpenMemo(this, OPEN_REQUEST_MSVIEW_ACTIVE);
 		return;
 	}
 	
@@ -968,10 +945,6 @@ HTREEITEM MemoSelectView::GetPathForNewItem(TString *pPath, TreeViewItem *pItem)
 	} else {
 		hItem = pItem->GetViewItem();
 	}
-	MemoNote *pNote = NULL;
-	if (pItem && !pItem->HasMultiItem()) {
-		pNote = ((TreeViewFileItem*)pItem)->GetNote();
-	}
 	if (hItem == NULL) {
 		if (!pPath->Alloc(1)) return NULL;
 		_tcscpy(pPath->Get(), TEXT(""));
@@ -979,7 +952,7 @@ HTREEITEM MemoSelectView::GetPathForNewItem(TString *pPath, TreeViewItem *pItem)
 		return TreeView_GetRoot(hViewWnd);
 	}
 
-	if (pNote != NULL) {
+	if (pItem && !pItem->HasMultiItem()) {
 		hItem = TreeView_GetParent(hViewWnd, hItem);
 	}
 
@@ -1418,16 +1391,9 @@ HTREEITEM MemoSelectView::ShowItem(LPCTSTR pPath, BOOL bSelChange, BOOL bOpenNot
 
 		// if selected item is note, open it.
 		if (bNote) {
+			DWORD nOption = bOpenNotes ? OPEN_REQUEST_MSVIEW_ACTIVE : OPEN_REQUEST_MDVIEW_ACTIVE;
 			TreeViewItem *ptv = GetTVItem(hTargetItem);
-			if (!ptv->HasMultiItem()) {
-				TreeViewFileItem *p = (TreeViewFileItem*)ptv;
-				MemoLocator loc(p->GetNote());
-				if (bOpenNotes) {
-					pMemoMgr->GetMainFrame()->RequestOpenMemo(&loc, OPEN_REQUEST_MSVIEW_ACTIVE);
-				} else {
-					pMemoMgr->GetMainFrame()->RequestOpenMemo(&loc, OPEN_REQUEST_MDVIEW_ACTIVE);
-				}
-			}
+			ptv->OpenMemo(this, nOption);
 		}
 	}
 	return hTargetItem;
@@ -1456,10 +1422,10 @@ static HTREEITEM FindItem2(HWND hWnd, HTREEITEM hParent, LPCTSTR pStr, DWORD nLe
 	return NULL;
 }
 
-HTREEITEM MemoSelectView::ShowItemByURI(LPCTSTR pPath, BOOL bSelChange, BOOL bOpenNotes)
+HTREEITEM MemoSelectView::ShowItemByURI(LPCTSTR pURI, BOOL bSelChange, BOOL bOpenNotes)
 {
 	TomboURI tURI;
-	if (!tURI.Init(pPath)) return NULL;
+	if (!tURI.Init(pURI)) return NULL;
 
 	HTREEITEM hCurrent;
 
@@ -1503,20 +1469,17 @@ HTREEITEM MemoSelectView::ShowItemByURI(LPCTSTR pPath, BOOL bSelChange, BOOL bOp
 			if (pItem->HasMultiItem() && !IsExpand(hCurrent)) {
 				TreeView_Expand(hViewWnd, hCurrent, TVE_EXPAND);
 			}
-			TreeView_SelectItem(hViewWnd, hCurrent);
 		}
 	}
 
-	if (pItem && !pItem->HasMultiItem()) {
-		TreeViewFileItem *p = (TreeViewFileItem*)pItem;
-		MemoLocator loc(p->GetNote());
-		if (bOpenNotes) {
-			pMemoMgr->GetMainFrame()->RequestOpenMemo(&loc, OPEN_REQUEST_MSVIEW_ACTIVE);
-		} else {
-			pMemoMgr->GetMainFrame()->RequestOpenMemo(&loc, OPEN_REQUEST_MDVIEW_ACTIVE);
-		}
+	if (hCurrent && bSelChange) {
+		TreeView_SelectItem(hViewWnd, hCurrent);
 	}
 
+	if (pItem) {
+		DWORD nOption = bOpenNotes ? OPEN_REQUEST_MSVIEW_ACTIVE : OPEN_REQUEST_MDVIEW_ACTIVE;
+		pItem->OpenMemo(this, nOption);
+	}
 	return hCurrent;
 }
 

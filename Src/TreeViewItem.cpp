@@ -9,6 +9,7 @@
 #include "UniConv.h"
 #include "Property.h"
 #include "MemoManager.h"
+#include "MainFrame.h"
 #include "PasswordManager.h"
 #include "MemoFolder.h"
 #include "DirectoryScanner.h"
@@ -57,6 +58,11 @@ BOOL TreeViewItem::IsUseDetailsView()
 	return FALSE;
 }
 
+BOOL TreeViewItem::OpenMemo(MemoSelectView *pView, DWORD nOption)
+{
+	return TRUE;
+}
+
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 //  File
@@ -70,6 +76,12 @@ TreeViewFileItem::TreeViewFileItem() : TreeViewItem(FALSE)
 TreeViewFileItem::~TreeViewFileItem()
 {
 	delete pNote;
+}
+
+void TreeViewFileItem::SetNote(MemoNote *p)
+{ 
+	pNote = p;
+	bIsEncrypted = pNote->IsEncrypted();
 }
 
 BOOL TreeViewFileItem::Move(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR *ppErr)
@@ -142,6 +154,7 @@ BOOL TreeViewFileItem::Encrypt(MemoManager *pMgr, MemoSelectView *pView)
 	// TreeViewItemの保持するMemoNoteを暗号化されたものに置き換える
 	delete pNote;
 	pNote = p;
+	bIsEncrypted = TRUE;
 
 	// 暗号化に伴いアイコン・ヘッドラインが変更になる可能性があるので更新依頼
 	if (!pView->UpdateItemStatusNotify(this, sHeadLine.Get())) {
@@ -176,6 +189,7 @@ BOOL TreeViewFileItem::Decrypt(MemoManager *pMgr, MemoSelectView *pView)
 	// TreeViewItemの保持するMemoNoteを復号化されたものに置き換える
 	delete pNote;
 	pNote = p;
+	bIsEncrypted = FALSE;
 
 	// 暗号化に伴いアイコン・ヘッドラインが変更になる可能性があるので更新依頼
 	if (!pView->UpdateItemStatusNotify(this, sHeadLine.Get())) {
@@ -187,13 +201,9 @@ BOOL TreeViewFileItem::Decrypt(MemoManager *pMgr, MemoSelectView *pView)
 BOOL TreeViewFileItem::IsOperationEnabled(MemoSelectView *pView, OpType op)
 {
 	if (op == OpEncrypt) {
-		MemoNote *p = GetNote();
-		if (p == NULL) return FALSE;
-		return !p->IsEncrypted();
+		return !bIsEncrypted;
 	} else if (op == OpDecrypt) {
-		MemoNote *p = GetNote();
-		if (p == NULL) return FALSE;
-		return p->IsEncrypted();
+		return bIsEncrypted;
 	} else {
 		DWORD nOpMatrix = OpDelete | OpRename | OpNewMemo | OpNewFolder | OpCut | OpCopy | OpPaste;
 		return (nOpMatrix & op) != 0;
@@ -297,6 +307,15 @@ TreeViewFileItem::IsUseDetailsView()
 {
 	return TRUE;
 }
+
+BOOL TreeViewFileItem::OpenMemo(MemoSelectView *pView, DWORD nOption)
+{
+	TString sURI;
+	if (!pView->GetURI(&sURI, GetViewItem())) return FALSE;
+	pView->GetManager()->GetMainFrame()->RequestOpenMemo(sURI.Get(), nOption);
+	return TRUE;
+}
+
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 //  Folder
@@ -646,6 +665,14 @@ BOOL TreeViewFileLink::GetFolderPath(MemoSelectView *pView, TString *pPath)
 BOOL TreeViewFileLink::GetLocationPath(MemoSelectView *pView, TString *pPath)
 {
 	return FALSE;
+}
+
+BOOL TreeViewFileLink::OpenMemo(MemoSelectView *pView, DWORD nOption)
+{
+	TString sURI;
+	pNote->GetURI(&sURI);
+	pView->GetManager()->GetMainFrame()->RequestOpenMemo(sURI.Get(), nOption);
+	return TRUE;
 }
 
 /////////////////////////////////////////////

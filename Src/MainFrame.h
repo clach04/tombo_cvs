@@ -152,8 +152,7 @@ public:
 	//////////////////////////
 	// open notes
 
-	void RequestOpenMemo(MemoLocator *pLoc, DWORD nSwitchView);
-
+	void RequestOpenMemo(LPCTSTR pURI, DWORD nSwitchView);
 	void PostSwitchView(DWORD nView) { PostMessage(hMainWnd, MWM_SWITCH_VIEW, (WPARAM)nView, (LPARAM)0); }
 
 	void OnList(BOOL bAskSave);

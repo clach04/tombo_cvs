@@ -12,6 +12,7 @@
 #include "TString.h"
 #include "MemoInfo.h"
 #include "Message.h"
+#include "TomboURI.h"
 
 #define DEFAULT_HEADLINE MSG_DEFAULT_HEADLINE
 
@@ -986,5 +987,25 @@ BOOL MemoNote::MemoNoteFactory(LPCTSTR pPrefix, LPCTSTR pFile, MemoNote **ppNote
 		return FALSE;
 	}
 	return TRUE;
+}
+
+MemoNote *MemoNote::MemoNoteFactory(TomboURI *pURI)
+{
+	LPCTSTR pURIPath = pURI->GetPath() + 1;
+	LPTSTR pBuf = StringDup(pURIPath);
+	if (pBuf == NULL) return NULL;
+
+	// replace '/' to '\'
+	LPTSTR p = pBuf;
+	while(p) {
+		p = _tcschr(p, TEXT('/'));
+		if (p) {
+			*p = TEXT('\\');
+		}
+	}
+	MemoNote *pNote = NULL;
+	MemoNote::MemoNoteFactory(TEXT(""), pBuf, &pNote);
+	delete [] pBuf;
+	return pNote;
 }
 
