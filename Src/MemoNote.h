@@ -13,7 +13,6 @@ class TString;
 class MemoNote {
 protected:
 	LPTSTR pPath;
-//	HTREEITEM hItem;
 public:
 
 	///////////////////////////////////////////
@@ -77,9 +76,6 @@ public:
 
 	//////////////////////////////////
 	// ÉrÉÖÅ[Ç∆ÇÃä÷òAèÓïÒ
-
-//	HTREEITEM GetViewItem() { return hItem; }
-//	void SetViewItem(HTREEITEM h) { hItem = h; }
 
 	LPCTSTR MemoPath() { return pPath; }
 
