@@ -252,6 +252,12 @@ PG: Change copyright dialog for expat.
 * Create new note to root node when on virtual folder nodes.
 * Create new note the same level of the virtual link note what is selected.
 
+////////////////////////////////
+// B094 (CURRENT)
+////////////////////////////////
+
+* FIX:Memo discarded when select other note(#1313,#1314)
+* Keep wrap text status.
 
 /////////////////////////////////////////////////////////////////////////
 // TODO
