@@ -14,13 +14,13 @@ CopyFiles = Files.SH3
 CopyFiles = Files.MIPS
 
 [SourceDisksNames]
-1 = ,"Common Files",,R:\work2\Tombo\PsPC\CabWiz
+1 = ,"Common Files",,R:\work2\SF\Tombo\PsPC\CabWiz
 
 [SourceDisksNames.SH3]
-2 = ,"SH3 files",,R:\work2\Tombo\PsPC\Tombo\SH3Rel
+2 = ,"SH3 files",,R:\work2\SF\Tombo\PsPC\Tombo\SH3Rel
 
 [SourceDisksNames.MIPS]
-2 = ,"MIPS files",,R:\work2\Tombo\PsPC\Tombo\MIPSRel
+2 = ,"MIPS files",,R:\work2\SF\Tombo\PsPC\Tombo\MIPSRel
 
 [SourceDisksFiles]
 

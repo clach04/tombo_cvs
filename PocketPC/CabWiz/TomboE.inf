@@ -17,16 +17,16 @@ CopyFiles = Files.MIPS
 CopyFiles = Files.ARM
 
 [SourceDisksNames]
-1 = ,"Common Files",,R:\work2\Tombo\PocketPC\CabWiz
+1 = ,"Common Files",,R:\work2\SF\Tombo\PocketPC\CabWiz
 
 [SourceDisksNames.SH3]
-2 = ,"SH3 files",,R:\work2\Tombo\PocketPC\Tombo\SH3ReleaseE
+2 = ,"SH3 files",,R:\work2\SF\Tombo\PocketPC\Tombo\SH3ReleaseE
 
 [SourceDisksNames.MIPS]
-2 = ,"MIPS files",,R:\work2\Tombo\PocketPC\Tombo\MIPSReleaseE
+2 = ,"MIPS files",,R:\work2\SF\Tombo\PocketPC\Tombo\MIPSReleaseE
 
 [SourceDisksNames.ARM]
-2 = ,"ARM files",,R:\work2\Tombo\PocketPC\Tombo\ARMReleaseE
+2 = ,"ARM files",,R:\work2\SF\Tombo\PocketPC\Tombo\ARMReleaseE
 
 [SourceDisksFiles]
 
