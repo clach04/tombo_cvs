@@ -119,6 +119,7 @@ public:
 #define VFINFO_FLG_CHECKCRYPTED		2
 #define VFINFO_FLG_FILENAMEONLY		4
 #define VFINFO_FLG_PERSISTENT		8
+#define VFINFO_FLG_NEGATE			16
 
 class VFInfo {
 public:

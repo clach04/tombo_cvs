@@ -1,0 +1,32 @@
+Place expat include & libs in this folder.
+
+Expat is distributed by MIT License, in other hand, TOMBO is distributed by GPL.
+So, expat's files are not included in this archive.
+
+You will get Expat at http://www.libexpat.org/ 
+I built CE version. It will be get at http://homepage2.nifty.com/thirami/indexe.html
+
+
+Folder image:
+
+[Tombo]
+	[BE300]
+	[BE500]
+	[etc]
+	[expat]
+		[include]
+			expat.h
+		[lib]
+			[ARM]
+				libexpatw.lib
+			[MIPS]
+				libexpatw.lib
+			[SH3]
+				libexpatw.lib
+			[SH4]
+				libexpatw.lib
+			[Win32]
+				libexpatw.lib
+	[HpcPro]
+	...
+

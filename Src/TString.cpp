@@ -276,3 +276,30 @@ LPCTSTR GetNextDirSeparator(LPCTSTR pStart)
 	}
 	return NULL;
 }
+
+////////////////////////////////////////////////////////////////////
+// Get file path
+////////////////////////////////////////////////////////////////////
+
+void GetFilePath(LPTSTR pFilePath, LPCTSTR pFileName)
+{
+	LPCTSTR p = pFileName;
+	LPCTSTR q = NULL;
+
+	// get last position of '\'
+	while(*p) {
+#ifdef PLATFORM_WIN32
+		if (IsDBCSLeadByte((BYTE)*p)) {
+			p+= 2;
+			continue;
+		}
+#endif
+		if (*p == TEXT('\\')) {
+			q = p;
+		}
+		p++;
+	}
+	if (q == NULL) return;
+	_tcsncpy(pFilePath, pFileName, q - pFileName + 1);
+	*(pFilePath + (q - pFileName + 1)) = TEXT('\0');
+}

@@ -128,4 +128,5 @@ public:
 
 void ChopFileSeparator(LPTSTR pBuf);
 
+
 #endif

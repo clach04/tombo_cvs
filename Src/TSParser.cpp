@@ -1,311 +1,456 @@
 #include <windows.h>
 #include <commctrl.h>
-#include "Uniconv.h"
-#include "MemoSelectView.h"
-#include "TreeViewItem.h"
-#include "File.h"
-#include "VFStream.h"
+#define XMLPARSEAPI(type) type __cdecl	// for expat
+#define XML_UNICODE_WCHAR_T
+#include <expat.h>
+#include "Tombo.h"
+#include "UniConv.h"
 #include "TSParser.h"
+#include "VFStream.h"
+#include "TreeViewItem.h"
+#include "MemoSelectView.h"
 
+class ConvertWideToMultiByte {
+	char *p;
+public:
+	ConvertWideToMultiByte() : p(NULL) {}
+	~ConvertWideToMultiByte() { delete []p; }
 
-#if defined(PLATFORM_HPC) || defined(PLATFORM_PSPC)
-extern "C" {
-#include "ctypeutil.h"
+	char *Convert(WCHAR *p);
+	char *Get() { return p; }
 };
-int _strnicmp(const char *p1, const char *p2, int n);
-#endif
 
-///////////////////////////////////////////////
-///////////////////////////////////////////////
-// functions
-///////////////////////////////////////////////
-///////////////////////////////////////////////
+char *ConvertWideToMultiByte::Convert(WCHAR *pSrc)
+{
+	if (pSrc == NULL) return NULL;
 
-///////////////////////////////////////////////
-// TSParser
-///////////////////////////////////////////////
+	DWORD n = (wcslen(pSrc) + 1) * 2;
+	p = new char[n];
+	if (p == NULL) return NULL;
+	WideCharToMultiByte(CP_ACP, 0, pSrc, -1, p, n, NULL, NULL);
+	return p;
+}
 
-TSParser::TSParser() : hParent(NULL), pView(NULL), pScriptStr(NULL)
+///////////////////////////////////////
+// TSParser ctor&dtor
+///////////////////////////////////////
+
+TSParser::TSParser()
 {
 }
 
 TSParser::~TSParser()
 {
-	delete [] pScriptStr;
 }
 
-BOOL TSParser::Init(LPCTSTR pFileName, MemoSelectView *p, HTREEITEM hItem)
+///////////////////////////////////////
+// XML tag info 
+///////////////////////////////////////
+
+#define TAGID_UNKNOWN	0
+#define TAGID_INITIAL	1
+#define TAGID_FOLDERS	2
+#define TAGID_VFOLDER	3
+#define TAGID_GREP		4
+#define TAGID_SRC		5
+
+static DWORD nAllowParent[] = {
+	0,						// TAGID_UNKONWN
+	0,						// TAGID_INITIAL
+	(1 << TAGID_INITIAL),	// TAGID_FOLDERS
+	(1 << TAGID_FOLDERS),	// TAGID_VFOLDER
+	(1 << TAGID_VFOLDER) | (1 << TAGID_GREP),
+							// TAGID_GREP
+	(1 << TAGID_VFOLDER) | (1 << TAGID_GREP),
+							// TAGID_SRC
+};
+
+///////////////////////////////////////
+// TAG data
+///////////////////////////////////////
+
+TSParseTagItem::~TSParseTagItem()
 {
-	hParent = hItem;
-	pView = p;
+}
 
-	File inf;
-	if (!inf.Open(pFileName, GENERIC_READ, FILE_SHARE_READ, OPEN_EXISTING)) return FALSE;
-	char *pText = new char[inf.FileSize() + 1];
-	if (pText == NULL) return FALSE;
-
-	DWORD nSize = inf.FileSize();
-	if (!inf.Read((LPBYTE)pText, &nSize)) {
-		delete [] pText;
-		return FALSE;
-	}
-	pText[nSize] = TEXT('\0');
-
-	pScriptStr = pText;
-
+BOOL TSParseTagItem::StartElement(ParseInfo *p, const XML_Char **atts)
+{
 	return TRUE;
 }
 
-BOOL TSParser::Compile()
+BOOL TSParseTagItem::EndElement(ParseInfo *p)
 {
-	token_ptr = pScriptStr;
-	prev_token = "";
-
-	gettoken();
-	// TODO:2 Error Handling
-	BOOL bRes = ExprList();
-	if (!bRes) {
-		MessageBox(NULL, TEXT("Compile error"), TEXT("DEBUG"), MB_OK);
-	}
-	return bRes;
+	return TRUE;
 }
 
-///////////////////////////////////////////////
-// lexer
-///////////////////////////////////////////////
+///////////////////////////////////////
+//  "src" tag implimentation
+///////////////////////////////////////
 
-void TSParser::gettoken()
+class TSSrcTag : public TSParseTagItem {
+	WCHAR *pSrc;
+	BOOL bCheckEncrypt;
+public:
+	TSSrcTag() : TSParseTagItem(TAGID_SRC), pSrc(NULL), bCheckEncrypt(FALSE) {}
+	~TSSrcTag();
+
+	BOOL StartElement(ParseInfo *p, const XML_Char **atts);
+	BOOL EndElement(ParseInfo *p);
+};
+
+TSSrcTag::~TSSrcTag()
 {
-	const char *in;
-	const char *prev;
+	if (pSrc) delete [] pSrc;
+}
 
-gettoken_func_top:
+BOOL TSSrcTag::StartElement(ParseInfo *p, const XML_Char **atts)
+{
+	bCheckEncrypt = FALSE;
 
-	// skip space
-	while(*token_ptr && (*token_ptr == ' ' || *token_ptr == '\t' ||
-			     *token_ptr == '\r' || *token_ptr == '\n')) {
-		token_ptr++;
-	}
-
-	// skip comment line
-	if (*token_ptr == '#') {
-		while(*token_ptr && *token_ptr != '\r' && *token_ptr != '\n') {
-			if (IsDBCSLeadByte(*token_ptr)) {
-				token_ptr++;
+	DWORD i = 0;
+	while(atts[i] != NULL) {
+		if (wcsicmp(atts[i], L"folder") == 0) {
+			pSrc = new WCHAR[wcslen(atts[i + 1]) + 1];
+			if (pSrc == NULL) {
+				SetLastError(ERROR_NOT_ENOUGH_MEMORY);
+				return FALSE;
 			}
-			token_ptr++;
+			wcscpy(pSrc, atts[i + 1]);
+		} else if (wcsicmp(atts[i], L"checkencrypt") == 0) {
+			bCheckEncrypt = TRUE;
 		}
-		goto gettoken_func_top;
+
+		i += 2;
 	}
 
-	prev = prev_token;
-	prev_token = in = token_ptr;
+	if (!pSrc) {
+		// necessary attribute is not found.
+		return FALSE;
+	}
+	return TRUE;
+}
 
-	if (_strnicmp(token_ptr, "vfolder", 7) == 0 && !isalnum(*(token_ptr+7))) {
-		token_ptr += 7;
-		nexttoken = TOKEN_KW_VFOLDER;
-	} else if (_strnicmp(token_ptr, "dir", 3) == 0 && !isalnum(*(token_ptr+3))) {
-		token_ptr += 3;
-		nexttoken = TOKEN_KW_DIR;
-	} else if (_strnicmp(token_ptr, "store", 5) == 0 && !isalnum(*(token_ptr+5))) {
-		token_ptr += 5;
-		nexttoken = TOKEN_KW_STORE;
-	} else if (_strnicmp(token_ptr, "TITLE", 5) == 0 && !isalnum(*(token_ptr+5))) {
-		token_ptr += 5;
-		nexttoken = TOKEN_KW_TITLE;
-	} else if (_strnicmp(token_ptr, "LAST_UPDATE", 11) == 0 && !isalnum(*(token_ptr+11))) {
-		token_ptr += 11;
-		nexttoken = TOKEN_KW_LAST_UPDATE;
+BOOL TSSrcTag::EndElement(ParseInfo *p)
+{
+	if (pHead != NULL) {
+		// "src" tag can't have sub items.
+		return FALSE;
+	}
 
-	} else if (*token_ptr == '"' || *token_ptr == '\'') {
-		char sep = *token_ptr++;
+	VFDirectoryGenerator *pGen = new VFDirectoryGenerator();
+	if (pGen == NULL) return FALSE;
+#ifdef _WIN32_WCE
+	LPTSTR pConved = StringDup(pSrc);
+#else
+	ConvertWideToMultiByte conv;
+	if (!conv.Convert(pSrc)) return FALSE;
+	LPTSTR pConved = StringDup(conv.Get());
+#endif
+	if (!pGen->Init(pConved, bCheckEncrypt)) return FALSE;
+	
+	// Pass create object to parent item
+	TSParseTagItem *pParent = pNext;
+	pParent->pHead = pParent->pTail = pGen;
+	return TRUE;
+}
 
-		val_start = token_ptr;
-		while(*token_ptr) {
-			if (sep == '"' && *token_ptr == '\\' && *(token_ptr+1) == '"') {
-				// escape '\x'
-				token_ptr += 2;
-				continue;
-			}
-			if (IsDBCSLeadByte(*token_ptr)) {
-				token_ptr++;
-				if (*token_ptr) {
-					token_ptr++;
-					continue;
-				} else {
-					break;
-				}
-			}
-			if (*token_ptr == sep) {
-				token_ptr++;
-				val_end = token_ptr;
+///////////////////////////////////////
+// "grep" tag implimentation
+///////////////////////////////////////
 
-				nexttoken = TOKEN_STR;
-				return;
-			}
-			token_ptr++;
+class TSGrepTag : public TSParseTagItem {
+	WCHAR *pPattern;
+	BOOL bCaseSensitive;
+	BOOL bFileNameOnly;
+	BOOL bNegate;
+public:
+	TSGrepTag() : TSParseTagItem(TAGID_GREP), pPattern(NULL) {}
+	~TSGrepTag();
+
+	BOOL StartElement(ParseInfo *p, const XML_Char **atts);
+	BOOL EndElement(ParseInfo *p);
+};
+
+TSGrepTag::~TSGrepTag()
+{
+	if (pPattern) delete [] pPattern;
+}
+
+BOOL TSGrepTag::StartElement(ParseInfo *p, const XML_Char **atts)
+{
+	bCaseSensitive = bFileNameOnly = bNegate = FALSE;
+	DWORD i = 0;
+	while(atts[i] != NULL) {
+		if (wcsicmp(atts[i], L"pattern") == 0) {
+			pPattern = new WCHAR[wcslen(atts[i + 1]) + 1];
+			if (pPattern == NULL) return FALSE;
+			wcscpy(pPattern, atts[i + 1]);
+		} else if (wcsicmp(atts[i], L"casesensitive") == 0) {
+			bCaseSensitive = TRUE;
+		} else if (wcsicmp(atts[i], L"filenameonly") == 0) {
+			bFileNameOnly = TRUE;
+		} else if (wcsicmp(atts[i], L"not") == 0) {
+			bNegate = TRUE;
 		}
-		prev_token = prev;
-		token_ptr = in;
-		nexttoken = TOKEN_OTHER;
-	} else if (*token_ptr == '\0') {
-		nexttoken = TOKEN_EOF;
-	} else if (*token_ptr == ';') {
-		token_ptr++;
-		nexttoken = TOKEN_SEMICOLON;
-	} else if (*token_ptr == '[') {
-		token_ptr++;
-		nexttoken = TOKEN_LBRA;
-	} else if (*token_ptr == '(') {
-		token_ptr++;
-		nexttoken = TOKEN_LPAR;
-	} else if (*token_ptr == ')') {
-		token_ptr++;
-		nexttoken = TOKEN_RPAR;
-	} else if (*token_ptr == ']') {
-		token_ptr++;
-		nexttoken = TOKEN_RBRA;
-	} else if (*token_ptr == '|') {
-		token_ptr++;
-		nexttoken = TOKEN_PIPE;
-	} else {
-		nexttoken = TOKEN_OTHER;
+		i += 2;
 	}
-}
-
-///////////////////////////////////////////////
-// parser body
-///////////////////////////////////////////////
-
-// ExprList -> {Expr} $
-BOOL TSParser::ExprList()
-{
-	while(nexttoken == TOKEN_KW_VFOLDER) {
-		if (!Expr()) return FALSE;
+	if (!pPattern) {
+		return FALSE;
 	}
-	if (nexttoken != TOKEN_EOF) return FALSE;
 	return TRUE;
 }
 
-// Expr -> "vfolder" STR '[' StreamDef ']' ';'
-BOOL TSParser::Expr()
+BOOL TSGrepTag::EndElement(ParseInfo *p)
 {
-	if (nexttoken != TOKEN_KW_VFOLDER) return FALSE;
-	gettoken();
-
-	if (nexttoken != TOKEN_STR) return FALSE;
-	LPTSTR pNodeName = ConvSJIS2UnicodeWithByte(val_start, val_end - val_start - 1);
-	gettoken();
-
-	TreeViewVirtualFolder *pVf = new TreeViewVirtualFolder();
-
-	if (nexttoken != TOKEN_LBRA) {
-		delete pVf;
+	if (pHead == NULL) {
+		// Grep tag should have child tag.
 		return FALSE;
 	}
-	gettoken();
+	VFRegexFilter *pFilter = new VFRegexFilter();
 
-	if (!StreamDef(pVf)) {
-		delete pVf;
-		return FALSE;
-	}
+#ifdef _WIN32_WCE
+	LPTSTR pConved = pPattern;
+#else
+	ConvertWideToMultiByte conv;
+	if (!conv.Convert(pPattern)) return FALSE;
+	LPTSTR pConved = conv.Get();
+#endif
+	if (!pFilter || !pFilter->Init(pConved, bCaseSensitive, TRUE, bFileNameOnly, bNegate, g_pPasswordManager)) return FALSE;
 
-	if (nexttoken != TOKEN_RBRA) {
-		delete pVf;
-		return FALSE;
-	}
-	gettoken();
-
-	if (nexttoken != TOKEN_SEMICOLON) {
-		delete pVf;
-		return FALSE;
-	}
-	gettoken();
-
-	// Insert virtual folder to MemoSelectView
-	pView->InsertFolder(hParent, pNodeName, pVf, TRUE);
-
-	delete [] pNodeName;
-
+	// Pass create object to parent item
+	TSParseTagItem *pParent = pNext;
+	pTail->SetNext(pFilter);
+	pParent->pHead = pHead;
+	pParent->pTail = pFilter;
 	return TRUE;
 }
 
-// StreamDef -> DirStreamItem '|' StoreStreamItem
-// TODO:2 Generalize expressions.
-BOOL TSParser::StreamDef(TreeViewVirtualFolder *pVf)
+///////////////////////////////////////
+// "vfolder" tag implimentation
+///////////////////////////////////////
+
+class TSVFolderTag : public TSParseTagItem {
+	WCHAR *pName;
+public:
+	TSVFolderTag() : TSParseTagItem(TAGID_VFOLDER), pName(NULL){}
+	~TSVFolderTag();
+
+	BOOL StartElement(ParseInfo *p, const XML_Char **atts);
+	BOOL EndElement(ParseInfo *p);
+};
+
+TSVFolderTag::~TSVFolderTag()
 {
-	if (!DirStreamItem(pVf)) return FALSE;
-
-	if (nexttoken != TOKEN_PIPE) return FALSE;
-	gettoken();
-
-	if (!StoreStreamItem(pVf)) return FALSE;
-	return TRUE;
+	if (pName) delete[] pName;
 }
 
-// StreamItem -> "dir" '(' DirList ')'
-BOOL TSParser::DirStreamItem(TreeViewVirtualFolder *pVf)
+BOOL TSVFolderTag::StartElement(ParseInfo *p, const XML_Char **atts)
 {
-	if (nexttoken != TOKEN_KW_DIR) return FALSE;
-	gettoken();
-
-	if (nexttoken != TOKEN_LPAR) return FALSE;
-	gettoken();
-
-	if (!DirList(pVf)) return FALSE;
-
-	if (nexttoken != TOKEN_RPAR) return FALSE;
-	gettoken();
-
-	return TRUE;
-}
-
-// DirList -> STR
-// TODO:2 accept multi STR's 
-BOOL TSParser::DirList(TreeViewVirtualFolder *pVf)
-{
-	if (nexttoken != TOKEN_STR) return FALSE;
-	LPTSTR pDirPath = ConvSJIS2UnicodeWithByte(val_start, val_end - val_start - 1);
-	gettoken();
-
-	VFDirectoryGenerator *pDirGen = new VFDirectoryGenerator();
-	if (pDirGen == NULL) {
-		delete [] pDirPath;
+	DWORD i = 0;
+	while(atts[i] != NULL) {
+		if (wcsicmp(atts[i], L"name") == 0) {
+			pName = new WCHAR[wcslen(atts[i + 1]) + 1];
+			if (pName == NULL) return FALSE;
+			wcscpy(pName, atts[i + 1]);
+		}
+		i += 2;
+	}
+	if (!pName) {
 		return FALSE;
 	}
-	if (!pDirGen->Init(pDirPath, FALSE)) {
-		delete pDirGen;
-		delete [] pDirPath;
-		return FALSE;
-	}
-
-	pVf->SetGenerator(pDirGen);
-
 	return TRUE;
 }
 
-// StoreSearchItem -> 'store' '(' ('TITLE' | 'LAST_UPDATE') ')'
-BOOL TSParser::StoreStreamItem(TreeViewVirtualFolder *pVf)
+BOOL TSVFolderTag::EndElement(ParseInfo *p)
 {
-	if (nexttoken != TOKEN_KW_STORE) return FALSE;
-	gettoken();
-	if (nexttoken != TOKEN_LPAR) return FALSE;
-	gettoken();
+	if (pHead == NULL || pTail == NULL) return FALSE;
 
-	if (nexttoken != TOKEN_KW_TITLE && nexttoken != TOKEN_KW_LAST_UPDATE) return FALSE;
-
-	VFStore *pStore = new VFStore((nexttoken == TOKEN_KW_TITLE) ? VFStore::ORDER_TITLE : VFStore::ORDER_LAST_UPD);
-	if (pStore == NULL) return FALSE;
-
-	gettoken();
-
-	if (nexttoken != TOKEN_RPAR) {
+	TreeViewVirtualFolder *pVF = new TreeViewVirtualFolder();
+	if (!pVF) return FALSE;
+	VFStore *pStore = new VFStore(VFStore::ORDER_TITLE);
+	if (!pStore || !pStore->Init()) {
+		delete pVF;
 		delete pStore;
 		return FALSE;
 	}
-	gettoken();
 
-	pVf->SetStore(pStore);
+	pTail->SetNext(pStore);
 
+	pVF->SetGenerator((VFDirectoryGenerator*)pHead);
+	pVF->SetStore(pStore);
+
+#ifdef _WIN32_WCE
+	LPTSTR pConved = pName;
+#else
+	ConvertWideToMultiByte conv;
+	if (!conv.Convert(pName)) return FALSE;
+	LPTSTR pConved = conv.Get();
+#endif
+
+	p->InsertTree(pConved, pVF);
+	return TRUE;
+}
+
+///////////////////////////////////////
+// ParseInfo implimentation
+///////////////////////////////////////
+
+ParseInfo::~ParseInfo()
+{
+	TSParseTagItem *p = pTop;
+	TSParseTagItem *q;
+	while(p) {
+		q = p;
+		p = p->GetNext();
+		delete q;
+	}
+}
+
+BOOL ParseInfo::Init(MemoSelectView *p, HTREEITEM h)
+{
+	pView =p;
+	hItem = h;
+	TSParseTagItem *pTag = new TSParseTagItem(TAGID_INITIAL);
+	if (pTag == NULL) return FALSE;
+	Push(pTag);
+	return TRUE;
+}
+
+DWORD ParseInfo::GetTagID(const WCHAR *pTagName)
+{
+	if (wcsicmp(pTagName, L"folders") == 0) {
+		return TAGID_FOLDERS;
+	} else if (wcsicmp(pTagName, L"vfolder") == 0) {
+		return TAGID_VFOLDER;
+	} else if (wcsicmp(pTagName, L"grep") == 0) {
+		return TAGID_GREP;
+	} else if (wcsicmp(pTagName, L"src") == 0) {
+		return TAGID_SRC;
+	} else {
+		return TAGID_UNKNOWN;
+	}
+}
+
+TSParseTagItem *ParseInfo::GetTagObjectFactory(DWORD nTagID)
+{
+	switch (nTagID) {
+	case TAGID_FOLDERS:
+		return new TSParseTagItem(TAGID_FOLDERS);
+	case TAGID_VFOLDER:
+		return new TSVFolderTag();
+	case TAGID_GREP:
+		return new TSGrepTag();
+	case TAGID_SRC:
+		return new TSSrcTag();
+	default:
+		return NULL;
+	}
+}
+
+void ParseInfo::Push(TSParseTagItem *p)
+{
+	p->SetNext(pTop); 
+	pTop = p;
+}
+
+void ParseInfo::Pop()
+{
+	TSParseTagItem *p = pTop;
+	pTop = p->GetNext();
+	delete p;
+}
+
+BOOL ParseInfo::IsValidParent(DWORD nTag)
+{
+	return ((nAllowParent[nTag] & (1 << pTop->GetTagID())) != 0);
+}
+
+BOOL ParseInfo::InsertTree(LPCTSTR pName, TreeViewVirtualFolder *pVF)
+{
+	return pView->InsertFolder(hItem, pName, pVF, TRUE) != NULL;
+}
+
+///////////////////////////////////////
+// expat callback funcs.
+///////////////////////////////////////
+
+static void StartElement(void *userData, const XML_Char *name, const XML_Char **atts)
+{
+	ParseInfo *pInfo = (ParseInfo*)userData;
+	if (pInfo->IsError()) return;
+
+	// Check tag
+	DWORD nCurTag = pInfo->GetTagID(name);
+	if (nCurTag == TAGID_UNKNOWN) {
+		pInfo->SetError();
+		return;
+	}
+	if (!pInfo->IsValidParent(nCurTag)) {
+		pInfo->SetError();
+		return;
+	}
+	TSParseTagItem *pTag = pInfo->GetTagObjectFactory(nCurTag);
+	pInfo->Push(pTag);
+	if (!pTag->StartElement(pInfo, atts)) {
+		pInfo->SetError();
+	}
+}
+
+static void EndElement(void *userData, const XML_Char *name)
+{
+	ParseInfo *pInfo = (ParseInfo*)userData;
+	if (pInfo->IsError()) {
+		pInfo->Pop();
+		return;
+	}
+	pInfo->Top()->EndElement(pInfo);
+	pInfo->Pop();
+}
+
+///////////////////////////////////////
+// parser main
+///////////////////////////////////////
+
+BOOL TSParser::Parse(LPCTSTR pFileName, MemoSelectView *pView, HTREEITEM hItem)
+{
+	XML_Parser pParser;
+	ParseInfo info;
+
+	if (!info.Init(pView, hItem)) return FALSE;
+
+	HANDLE hFile = CreateFile(pFileName, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	if (hFile == INVALID_HANDLE_VALUE) return FALSE;
+
+	DWORD nFileSize = GetFileSize(hFile, NULL);
+
+	pParser = XML_ParserCreate(NULL);
+	if (pParser == NULL) {
+		CloseHandle(hFile);
+		return FALSE;
+	}
+
+	XML_SetElementHandler(pParser, StartElement, EndElement);
+	XML_SetUserData(pParser, &info);
+
+	void *pBuf = XML_GetBuffer(pParser, nFileSize);
+	if (pBuf == NULL) {
+		CloseHandle(hFile);
+		return FALSE;
+	}
+	DWORD nRead;
+	if (!ReadFile(hFile, pBuf, nFileSize, &nRead, NULL)) {
+		CloseHandle(hFile);
+		return FALSE;
+	}
+
+	CloseHandle(hFile);
+
+	if (!XML_ParseBuffer(pParser, nFileSize, TRUE)) {
+		const WCHAR *p = XML_ErrorString(XML_GetErrorCode(pParser));
+		int ln = XML_GetCurrentLineNumber(pParser);
+		int col = XML_GetCurrentColumnNumber(pParser);
+		return FALSE;
+	}
+	XML_ParserFree(pParser);
 	return TRUE;
 }

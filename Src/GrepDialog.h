@@ -39,6 +39,7 @@ public:
 	BOOL IsCaseSensitive() { return bCaseSensitive; }
 	BOOL IsCheckCryptedMemo() { return bCheckCryptedMemo; }
 	BOOL IsCheckFileName() { return bCheckFileName; }
+	BOOL IsNegate() { return 0; }
 
 	///////////////////////////
 	// for property tabs

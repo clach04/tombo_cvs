@@ -12,7 +12,7 @@
 
 // version info
 
-#define TOMBO_VERSION_INFO TEXT("Tombo version 1.7 alpha1")
+#define TOMBO_VERSION_INFO TEXT("Tombo version 1.7 alpha3")
 
 // コピーライト表記
 
@@ -32,6 +32,11 @@ TEXT("\r\n")
 TEXT("Utility library:\r\n")
 TEXT("  Copyright (C) 1993-2000 Yukihiro Matsumoto\r\n")
 TEXT("\r\n")
+TEXT("The Expat XML Parser:\r\n")
+TEXT("  Copyright (c) 1998, 1999, 2000 Thai Open Source Software Center Ltd\r\n")
+TEXT("                               and Clark Cooper\r\n")
+TEXT("  Copyright (c) 2001, 2002 Expat maintainers.\r\n")
+TEXT("  ** Expat library is distributed under MIT License. ** \r\n")
 TEXT("--------\r\n")
 TEXT("TOMBO is free software; you can redistribute it and/or modify\r\n")
 TEXT("it under the terms of the GNU General Public License as published by\r\n")
@@ -52,6 +57,7 @@ TEXT("\r\n")
 TEXT("TOMBO\t: http://homepage2.nifty.com/thirami\r\n")
 TEXT("GnuPG\t: http://www.gnupg.org/\r\n")
 TEXT("Ruby\t: http://www.ruby-lang.org/\r\n")
+TEXT("Expat\t: http://www.libexpat.org/\r\n")
 TEXT("\r\n")
 TEXT("--------\r\n")
 TEXT("\r\n")

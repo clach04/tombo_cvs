@@ -134,10 +134,11 @@ public:
 
 class VFRegexFilter : public VFStream {
 	SearchEngineA *pRegex;
+	BOOL bNegate;
 public:
 	VFRegexFilter();
 	~VFRegexFilter();
-	BOOL Init(LPCTSTR pPattern, BOOL bCase, BOOL bEnc, BOOL bFileName, PasswordManager *pPassMgr);
+	BOOL Init(LPCTSTR pPattern, BOOL bCase, BOOL bEnc, BOOL bFileName, BOOL bNeg, PasswordManager *pPassMgr);
 
 	////////////////////////////
 	// VFStream implimentation

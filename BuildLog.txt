@@ -200,6 +200,21 @@ PG: Move search logic from SearchTree::SearchOneItem to SearchEngineA::Search
 PG: Merge SearchTree:SearchResult and SearchEngineA::SearchResult to global SearchResult(in Tombo.h)
 PG: Change VFRegexFilter::Store's matching logic to SearchEngineA::Search
 
+////////////////////////////////
+// B088
+////////////////////////////////
+
+* Re-impliment virtual folder. Data format changed sharply.
+* New data format is XML-based.
+* Support invert match (like grep -v).
+* Multi level grep (grep A | grep B | ...) is supported.
+* Grep result via dialog and XML file data is not synced yet.
+* Add sample file for vfolder.(<top>\etc\vfolder.xml)
+
+PG: Almost remake TSParser.*
+PG: link expat library for parse XML vfolder file at TSParser.
+PG: Change copyright dialog for expat.
+
 
 /////////////////////////////////////////////////////////////////////////
 // TODO

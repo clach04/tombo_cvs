@@ -67,7 +67,7 @@ extern PasswordManager *g_pPasswordManager;
 
 // Virtual folder definition file name
 // path is defind by user(Property).
-#define TOMBO_VFOLDER_DEF_FILE TEXT("#vfolder.txt")
+#define TOMBO_VFOLDER_DEF_FILE TEXT("vfolder.xml")
 
 // Number of preserving history about search string.
 #define NUM_SEARCH_HISTORY 10

@@ -582,18 +582,21 @@ DWORD TreeViewVirtualFolderRoot::GetIcon(MemoSelectView *pView, DWORD nStatus)
 
 BOOL TreeViewVirtualFolderRoot::Expand(MemoSelectView *pView)
 {
-#ifdef COMMENT
 	HTREEITEM hParent = GetViewItem();
+
+	////////
+	TCHAR buf[MAX_PATH + 1];
+	TCHAR buf2[MAX_PATH + 1];
+	GetModuleFileName(NULL, buf, MAX_PATH);
+	GetFilePath(buf2, buf);
 
 	TString sVFpath;
-	if (!sVFpath.Join(g_Property.PropertyDir(), TEXT("\\"), TOMBO_VFOLDER_DEF_FILE)) return FALSE;
+	if (!sVFpath.Join(buf2, TOMBO_VFOLDER_DEF_FILE)) return FALSE;
 
 	TSParser tp;
-	if (!tp.Init(sVFpath.Get(), pView, hParent)) return FALSE;
-	if (!tp.Compile()) return FALSE;
-#endif
+	if (!tp.Parse(sVFpath.Get(), pView, hParent)) return FALSE;
+	////////
 
-	HTREEITEM hParent = GetViewItem();
 
 	TreeViewVirtualFolder *pVf;
 	VFDirectoryGenerator *pGen;
@@ -618,7 +621,8 @@ BOOL TreeViewVirtualFolderRoot::StreamObjectsFactory(VFInfo *pInfo, TreeViewVirt
 	if (!pRegex->Init(pInfo->pRegex,
 					pInfo->nFlag & VFINFO_FLG_CASESENSITIVE,
 					pInfo->nFlag & VFINFO_FLG_CHECKCRYPTED,
-					pInfo->nFlag & VFINFO_FLG_FILENAMEONLY, 
+					pInfo->nFlag & VFINFO_FLG_FILENAMEONLY,
+					pInfo->nFlag & VFINFO_FLG_NEGATE,
 					g_pPasswordManager)) { // Password Manager
 		return FALSE;
 	}

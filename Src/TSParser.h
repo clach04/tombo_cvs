@@ -1,62 +1,107 @@
 #ifndef TSCOMPILER_H
 #define TSCOMPILER_H
 
-class VFDirectoryGenerator;
 class MemoSelectView;
-
-enum TokenType {
-	TOKEN_EOF,
-	TOKEN_OTHER,
-	TOKEN_STR,
-	TOKEN_SEMICOLON,
-	TOKEN_LBRA,
-	TOKEN_RBRA,
-	TOKEN_LPAR,
-	TOKEN_RPAR,
-	TOKEN_PIPE,
-	TOKEN_KW_VFOLDER,
-	TOKEN_KW_DIR,
-	TOKEN_KW_STORE,
-	TOKEN_KW_TITLE,
-	TOKEN_KW_LAST_UPDATE
-};
+class ParseInfo;
+class VFStream;
+class TreeViewVirtualFolder;
 
 ////////////////////////////////////
 // TOMBO script parser
 ////////////////////////////////////
 
 class TSParser {
-	char *pScriptStr;	// target script
-
-	// lexer working variable
-	const char *token_ptr;
-	const char *prev_token;
-	enum TokenType nexttoken;
-
-	// token value
-	const char *val_start;
-	const char *val_end;
-
-	HTREEITEM hParent;
-	MemoSelectView *pView;
-
-	// lexer
-	void gettoken();
-
-	// parse functions
-	BOOL ExprList();
-	BOOL Expr();
-	BOOL StreamDef(TreeViewVirtualFolder *p);
-	BOOL DirStreamItem(TreeViewVirtualFolder *p);
-	BOOL StoreStreamItem(TreeViewVirtualFolder *p);
-	BOOL DirList(TreeViewVirtualFolder *p);
 public:
 	TSParser();
 	~TSParser();
 
-	BOOL Init(LPCTSTR pFileName, MemoSelectView *pView, HTREEITEM hItem);
-
-	BOOL Compile();
+	BOOL Parse(LPCTSTR pFileName, MemoSelectView *pView, HTREEITEM hItem);
 };
+
+///////////////////////////////////////
+// XML TAG abstruction
+///////////////////////////////////////
+
+class TSParseTagItem {
+protected:
+	DWORD nTagID;
+	TSParseTagItem *pNext;
+
+public:
+	VFStream *pHead;
+	VFStream *pTail;
+
+	////////////////////////
+	// ctor & dtor
+
+	TSParseTagItem(DWORD nID) : nTagID(nID), pHead(NULL), pTail(NULL) {}
+	virtual ~TSParseTagItem(); 
+
+	////////////////////////
+	// accessor & mutator
+
+	DWORD GetTagID() { return nTagID; }
+
+	////////////////////////
+	// tag chain operation
+
+	void SetNext(TSParseTagItem *p) { pNext = p; }
+	TSParseTagItem *GetNext() { return pNext; }
+
+	////////////////////////
+	// Start element
+	virtual BOOL StartElement(ParseInfo *p, const unsigned short **atts);
+
+	////////////////////////
+	// End element
+	virtual BOOL EndElement(ParseInfo *p);
+};
+
+///////////////////////////////////////
+// XML Parser helper
+///////////////////////////////////////
+
+class ParseInfo {
+	MemoSelectView *pView;
+	HTREEITEM hItem;
+
+	BOOL bError;
+	TSParseTagItem *pTop;
+public:
+	////////////////////////
+	// ctor & dtor
+
+	ParseInfo() : bError(FALSE), pTop(NULL) {}
+	~ParseInfo();
+	BOOL Init(MemoSelectView *p, HTREEITEM h);
+
+	////////////////////////
+	// Error info
+
+	BOOL IsError() { return bError; }
+	void SetError() { bError = TRUE; }
+
+	////////////////////////
+	// check & get tag Object
+
+	DWORD GetTagID(const WCHAR *pTagName);
+	TSParseTagItem *GetTagObjectFactory(DWORD nTagID);
+
+	////////////////////////
+	// Tag info operation
+
+	void Push(TSParseTagItem *p);
+	TSParseTagItem *Top() { return pTop; }
+	void Pop();
+
+	////////////////////////
+	// Tag validation
+	BOOL IsValidParent(DWORD nTag);
+
+	////////////////////////
+	// insert tree
+	BOOL InsertTree(LPCTSTR pName, TreeViewVirtualFolder *pVF);
+};
+
 
 #endif

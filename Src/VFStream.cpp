@@ -239,8 +239,9 @@ VFRegexFilter::~VFRegexFilter()
 	delete pRegex;
 }
 
-BOOL VFRegexFilter::Init(LPCTSTR pPattern, BOOL bCase, BOOL bEnc, BOOL bFileName, PasswordManager *pPassMgr)
+BOOL VFRegexFilter::Init(LPCTSTR pPattern, BOOL bCase, BOOL bEnc, BOOL bFileName, BOOL bNeg, PasswordManager *pPassMgr)
 {
+	bNegate = bNeg;
 	pRegex = new SearchEngineA();
 	const char *pReason;
 	if (!pRegex || !pRegex->Init(bEnc, bFileName, pPassMgr)) return FALSE;
@@ -254,10 +255,19 @@ BOOL VFRegexFilter::Store(VFNote *p)
 	if (pNote == NULL) return FALSE;
 	switch(pRegex->Search(pNote)) {
 	case SR_NOTFOUND:
-		delete p; // when discarding, Store() must delete object p.
-		return TRUE;
+		if (bNegate) {
+			return pNext->Store(p);
+		} else {
+			delete p; // when discarding, Store() must delete object p.
+			return TRUE;
+		}
 	case SR_FOUND:
-		return pNext->Store(p);
+		if (bNegate) {
+			delete p; // when discarding, Store() must delete object p.
+			return TRUE;
+		} else {
+			return pNext->Store(p);
+		}
 	case SR_CANCELED:
 	case SR_FAILED:
 	default:
