@@ -552,7 +552,16 @@ PG: lParam changed on message MWM_OPEN_REQUEST: TreeViewFileItem to MemoLocator.
 PG: If message posted from MemoSelectView's NM_DBLCLK handler, MainFrame::RequestOpenMemo deletes MemoLocator object.
 PG: Debug logwrite code removed.
 
+¡ B072 2002/11/01
+
+* NEW:#610 Context menu on TreeView.
+* NEW:#696 Implimenting Greek code conversion library.
+* #576 can't use Ctrl-Z when IME are KANA mode.(Japanese NEC mobilegear only??)
+PG: fix application error when modify memo -> ESC key -> select "NO"
+
 TODO: 
+
+* Disable menu to rename/delete root node.
 
 == around virtual folder
 
