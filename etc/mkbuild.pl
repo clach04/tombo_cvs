@@ -1,7 +1,7 @@
 #
 # TOMBO Build program for ActivePerl(Win32)
 
-$version = "Tombo1_9";
+$version = "Tombo1_10";
 
 ##########################################################################
 # Tool definition
@@ -69,6 +69,11 @@ $be300root = "R:\\work2\\BE300SDK_1012\\Installer\\English PC Tools";
 @bin_hpc_sh4_jp =(
 	["Bin\\HPCPro\\SH4", "$buildroot\\HpcPro\\Tombo\\SH4Rel\\Tombo.exe"],
 	["Bin\\HPCPro\\SH4", "$buildroot\\Src\\MsgRes\\TomboMsg\\jp\\TomboMsg.txt"],
+);
+
+@bin_sig3 = (
+	["Bin\\HPCPro\\Sig3", "$buildroot\\HpcPro\\Tombo\\ARMSig3\\Tombo.exe"],
+	["Bin\\HPCPro\\Sig3", "$buildroot\\Src\\MsgRes\\TomboMsg\\jp\\TomboMsg.txt"],
 );
 
 @bin_pktpc_arm_jp = (
@@ -180,7 +185,7 @@ $be300root = "R:\\work2\\BE300SDK_1012\\Installer\\English PC Tools";
 	@bin_hpc_arm_jp, @bin_hpc_mips_jp, @bin_hpc_sh3_jp, @bin_hpc_sh4_jp,
 	@bin_pktpc_arm_jp, @bin_pktpc_mips_jp, @bin_pktpc_sh3_jp,
 	@bin_pspc_mips_jp, @bin_pspc_sh3_jp,
-	@bin_be500,
+	@bin_be500, @bin_sig3,
 
 	@docsJP
 );
@@ -190,6 +195,7 @@ $be300root = "R:\\work2\\BE300SDK_1012\\Installer\\English PC Tools";
 @buildlist_PKTPC_JP = ( @bin_pktpc_arm_jp, @bin_pktpc_mips_jp, @bin_pktpc_sh3_jp,  @docsJP);
 @buildlist_PSPC_JP = ( @bin_pspc_mips_jp, @bin_pspc_sh3_jp,  @docsJP);
 @buildlist_BE500_JP = ( @bin_be500, @docsJP);
+@buildlist_SIG3 = ( @bin_sig3, @docsJP);
 
 @buildlistCEEN = (
 	@bin_hpc_arm_en, @bin_hpc_mips_en, @bin_hpc_sh3_en, @bin_hpc_sh4_en,
@@ -218,6 +224,8 @@ $be300root = "R:\\work2\\BE300SDK_1012\\Installer\\English PC Tools";
 @bl_PKTPC_SH3_JP = (@bin_pktpc_sh3_jp, @docsJP);
 @bl_PSPC_MIPS_JP = (@bin_pspc_mips_jp, @docsJP);
 @bl_PSPC_SH3_JP = (@bin_pspc_sh3_jp, @docsJP);
+
+@bl_SIG3 = ( @bin_sig3, @docsJP);
 
 @bl_HPC_ARM_EN = (@bin_hpc_arm_en, @docsEN);
 @bl_HPC_MIPS_EN = (@bin_hpc_mips_en, @docsEN);
@@ -259,11 +267,13 @@ $be300root = "R:\\work2\\BE300SDK_1012\\Installer\\English PC Tools";
 #	[\@bl_HPC_MIPS_JP,"HPC-MIPS-JP", "_hpcpro_mips_jp"],
 #	[\@bl_HPC_SH3_JP,"HPC-SH3-JP", "_hpcpro_sh3_jp"],
 #	[\@bl_HPC_SH4_JP,"HPC-SH4-JP", "_hpcpro_sh4_jp"],
+	[\@bl_SIG3, "SIG3", "_sig3"],
 	[\@bl_PKTPC_ARM_JP,"PKTPC-ARM-JP", "_pktpc_arm_jp"],
 	[\@bl_PKTPC_MIPS_JP,"PKTPC-MIPS-JP", "_pktpc_mips_jp"],
 #	[\@bl_PKTPC_SH3_JP,"PKTPC-SH3-JP", "_pktpc_sh3_jp"],
 #	[\@bl_PSPC_MIPS_JP,"PSPC-MIPS-JP", "_pspc_mips_jp"],
 #	[\@bl_PSPC_SH3_JP,"PSPC-SH3-JP", "_pspc_sh3_jp"],
+	[\@bl_HPC_MIPS_JP,"HPC-MIPS-JP", "_hpcpro_mips_jp"],
 
 #	[\@bl_HPC_ARM_EN, "HPC-ARM-EN", "_hpcpro_arm_en"],
 #	[\@bl_HPC_MIPS_EN,"HPC-MIPS-EN", "_hpcpro_mips_en"],
