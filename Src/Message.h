@@ -94,6 +94,9 @@
 #define MSG_DECRYPT_FAILED		MSG("いくつかのファイルについて復号化に失敗しました", "Some files are not decrypted.")
 #define MSG_CHECKBF_FAILED		MSG("暗号化ライブラリのセルフテストに失敗しました(%s)。暗号化が正常に行われない可能性があります", "Self test of encryption libs failed(%s). Encryption are not work correctly.")
 #define MSG_CHECKBF_TTL			MSG("セルフテスト失敗", "Self test failed")
-
+#define MSG_SEARCH_CANCELING	MSG("キャンセルしています...", "Wait a moment...")
+#define MSG_SEARCH_FAILED		MSG("検索に失敗しました(%d)", "Search failed(%d).")
+#define MSG_STRING_SEARCH_CANCELED \
+								MSG("検索はキャンセルされました", "Search has been canceled.")
 #endif
 
