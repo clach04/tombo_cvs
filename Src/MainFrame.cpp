@@ -1985,48 +1985,55 @@ void MainFrame::OnSearch()
 
 	// ŒŸõŽÀs
 	if (bSelectViewActive) {
-		TString sPath, sFullPath;
-		// Get path of selecting on treeview.
-		TreeViewItem *pItem = msView.GetCurrentItem();
-		if (pItem->HasMultiItem()) {
-			// folder
-			if (!msView.GetPathForNewItem(&sPath)) return;
-		} else {
-			// file
-			if (!sPath.Set(((TreeViewFileItem *)pItem)->GetNote()->MemoPath())) return;
-		}
-		if (!sFullPath.Join(g_Property.TopDir(), TEXT("\\"), sPath.Get())) return;
-
-		// Create dialog and do search.
-		SearchTree st;
-		st.Init(pSE, sFullPath.Get(), _tcslen(g_Property.TopDir()), !sd.IsSearchDirectionUp(), FALSE);
-		st.Popup(g_hInstance, hMainWnd);
-
-		TCHAR buf[1024];
-
-		switch(st.GetResult()) {
-		case SearchTree::SR_FOUND:
-			msView.ShowItem(st.GetPartPath());
-			mmMemoManager.SearchDetailsView(TRUE, TRUE, TRUE, TRUE);
-			break;
-		case SearchTree::SR_NOTFOUND:
-			MessageBox(MSG_STRING_NOT_FOUND, TOMBO_APP_NAME, MB_OK | MB_ICONINFORMATION);
-			break;
-		case SearchTree::SR_CANCELED:
-			msView.ShowItem(st.GetPartPath());
-			MessageBox(MSG_STRING_SEARCH_CANCELED, TOMBO_APP_NAME, MB_OK | MB_ICONINFORMATION);
-			break;
-		case SearchTree::SR_FAILED:
-			wsprintf(buf, MSG_SEARCH_FAILED, GetLastError());
-			msView.ShowItem(st.GetPartPath());
-			MessageBox(buf, TOMBO_APP_NAME, MB_OK | MB_ICONERROR);
-			break;
-		}
-//		msView.Search(TRUE, !sd.IsSearchDirectionUp());
+		DoSearchTree(TRUE, !sd.IsSearchDirectionUp());
 		mmMemoManager.SetMSSearchFlg(FALSE);
 	} else {
 		mdView.Search(TRUE, TRUE, TRUE, FALSE);
 		mmMemoManager.SetMDSearchFlg(FALSE);
+	}
+}
+
+void MainFrame::DoSearchTree(BOOL bFirst, BOOL bForward)
+{
+
+	SearchEngineA *pSE = mmMemoManager.GetSearchEngine();
+
+	TString sPath, sFullPath;
+	// Get path of selecting on treeview.
+	TreeViewItem *pItem = msView.GetCurrentItem();
+	if (pItem->HasMultiItem()) {
+		// folder
+		if (!msView.GetPathForNewItem(&sPath)) return;
+	} else {
+		// file
+		if (!sPath.Set(((TreeViewFileItem *)pItem)->GetNote()->MemoPath())) return;
+	}
+	if (!sFullPath.Join(g_Property.TopDir(), TEXT("\\"), sPath.Get())) return;
+
+	// Create dialog and do search.
+	SearchTree st;
+	st.Init(pSE, sFullPath.Get(), _tcslen(g_Property.TopDir()), bForward, !bFirst);
+	st.Popup(g_hInstance, hMainWnd);
+
+	TCHAR buf[1024];
+
+	switch(st.GetResult()) {
+	case SearchTree::SR_FOUND:
+		msView.ShowItem(st.GetPartPath());
+		mmMemoManager.SearchDetailsView(TRUE, TRUE, TRUE, TRUE);
+		break;
+	case SearchTree::SR_NOTFOUND:
+		MessageBox(MSG_STRING_NOT_FOUND, TOMBO_APP_NAME, MB_OK | MB_ICONINFORMATION);
+		break;
+	case SearchTree::SR_CANCELED:
+		msView.ShowItem(st.GetPartPath());
+		MessageBox(MSG_STRING_SEARCH_CANCELED, TOMBO_APP_NAME, MB_OK | MB_ICONINFORMATION);
+		break;
+	case SearchTree::SR_FAILED:
+		wsprintf(buf, MSG_SEARCH_FAILED, GetLastError());
+		msView.ShowItem(st.GetPartPath());
+		MessageBox(buf, TOMBO_APP_NAME, MB_OK | MB_ICONERROR);
+		break;
 	}
 }
 
@@ -2036,8 +2043,10 @@ void MainFrame::OnSearch()
 
 void MainFrame::OnSearchNext(BOOL bForward)
 {
+	if (mmMemoManager.GetSearchEngine() == NULL) return;
+
 	if (bSelectViewActive) {
-		msView.Search(mmMemoManager.MSSearchFlg(), bForward);
+		DoSearchTree(mmMemoManager.MSSearchFlg(), bForward);
 		mmMemoManager.SetMSSearchFlg(FALSE);
 	} else {
 		mdView.Search(mmMemoManager.MDSearchFlg(), bForward, TRUE, FALSE);

@@ -84,6 +84,7 @@ public:
 	// 検索
 	void OnSearch();
 	void OnSearchNext(BOOL bForward);
+	void DoSearchTree(BOOL bFirst, BOOL bForward);
 
 	///////////////////
 	// ペイン配分変更
