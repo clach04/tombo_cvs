@@ -8,9 +8,6 @@
 // It is due to caller.
 
 class VarBufferImpl {
-#ifdef UNIT_TEST
-public:
-#endif
 	LPBYTE pBuf;
 	DWORD nInitBytes;
 	DWORD nDeltaBytes;
@@ -33,6 +30,8 @@ public:
 	DWORD CurrentUse() { return nCurrentUse; }
 
 	BOOL Clear(BOOL bReAlloc);
+
+	friend class VarBufferTest;
 };
 
 ////////////////////////////////////////////////////
