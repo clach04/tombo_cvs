@@ -754,7 +754,7 @@ Not fully tested on both platform, probably it will work.
 	-> Fixed at heap memory destruction.(#5029, #5030)
 
 ////////////////////////////////
-// B154(TOMBO 1.11)
+// B154
 ////////////////////////////////
 
 * Add save without dialog option(#4988)
@@ -762,4 +762,10 @@ Not fully tested on both platform, probably it will work.
 * Ctrl-C is disabled on read only mode(#5006,#5007)
 * A heap memory is destroyed.(#5029,#5030)
 * Different memo is chosen (#5031,#5032)
+
+////////////////////////////////
+// B155 (TOMBO 1.11)
+////////////////////////////////
+
+* FIX: Shift+ESC is not worked.
 

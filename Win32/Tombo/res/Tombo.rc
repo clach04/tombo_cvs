@@ -202,7 +202,7 @@ BEGIN
     LTEXT           "Show memo title to titlebar",
                     IDC_PROPTAB_KEEPCARET_HELP3,20,75,130,15
     CONTROL         "Disable save dialog",IDC_PROPTAB_DISABLESAVEDLG,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,5,95,73,10
+                    BS_AUTOCHECKBOX | WS_TABSTOP,5,95,145,10
 END
 
 IDD_PROPTAB_SELECTMEMO DIALOG DISCARDABLE  0, 0, 192, 131

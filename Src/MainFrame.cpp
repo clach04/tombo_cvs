@@ -1138,27 +1138,24 @@ void MainFrame::LeaveDetailsView(BOOL bAskSave)
 	DWORD nYNC;
 	BOOL bResult;
 	if (bAskSave) {
-		bResult = mmMemoManager.SaveIfModify(&nYNC, FALSE);
-	} else {
 		if (GetKeyState(VK_SHIFT) < 0) {
 			nYNC = IDNO;
 			bResult = TRUE;
 		} else {
-			nYNC = IDYES;
-			bResult = mmMemoManager.SaveIfModify(NULL, TRUE);
+			bResult = mmMemoManager.SaveIfModify(&nYNC, FALSE);
 		}
+	} else {
+		nYNC = IDYES;
+		bResult = mmMemoManager.SaveIfModify(NULL, TRUE);
 	}
 	if (!bResult) {
 		TCHAR buf[1024];
 		wsprintf(buf, MSG_SAVE_FAILED, GetLastError());
 		TomboMessageBox(hMainWnd, buf, TEXT("ERROR"), MB_ICONSTOP | MB_OK);
-//		ActivateView(FALSE);
 		ActivateView(VT_DetailsView);
 		return;
 	}
 	if (nYNC == IDCANCEL) return;
-
-//	ActivateView(TRUE);
 	ActivateView(VT_SelectView);
 
 	if (g_Property.IsUseTwoPane()) {
