@@ -432,12 +432,14 @@ BEGIN
     "8",            IDM_SEARCH_PREV,        VIRTKEY, CONTROL, NOINVERT
     "9",            IDM_SEARCH_NEXT,        VIRTKEY, CONTROL, NOINVERT
     "A",            IDM_SELALL,             VIRTKEY, CONTROL, NOINVERT
+    "B",            IDM_TOGGLEREADONLY,     VIRTKEY, CONTROL, NOINVERT
     "F",            IDM_SEARCH,             VIRTKEY, CONTROL, NOINVERT
     "N",            IDM_NEWMEMO,            VIRTKEY, CONTROL, NOINVERT
     "S",            IDM_SAVE,               VIRTKEY, CONTROL, NOINVERT
     VK_ESCAPE,      IDM_RETURNLIST,         VIRTKEY, NOINVERT
     VK_F3,          IDM_SEARCH_NEXT,        VIRTKEY, NOINVERT
     VK_F3,          IDM_SEARCH_PREV,        VIRTKEY, SHIFT, NOINVERT
+    "Z",            IDM_UNDO,               VIRTKEY, CONTROL, NOINVERT
 END
 
 

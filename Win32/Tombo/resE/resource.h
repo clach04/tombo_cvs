@@ -105,13 +105,15 @@
 #define IDM_SEARCH_NEXT                 40024
 #define IDM_SEARCH_PREV                 40025
 #define IDM_RENAME                      40026
+#define IDM_UNDO                        40028
+#define IDM_TOGGLEREADONLY              40029
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        135
-#define _APS_NEXT_COMMAND_VALUE         40027
+#define _APS_NEXT_COMMAND_VALUE         40030
 #define _APS_NEXT_CONTROL_VALUE         1031
 #define _APS_NEXT_SYMED_VALUE           108
 #endif

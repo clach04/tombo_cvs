@@ -132,6 +132,9 @@ BOOL MemoDetailsView::OnCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	case IDM_PASTE:
 		SendMessage(hViewWnd, WM_PASTE, 0, 0);
 		return TRUE;
+	case IDM_UNDO:
+		SendMessage(hViewWnd, WM_UNDO, 0, 0);
+		return TRUE;
 	case IDM_ACTIONBUTTON:
 		PostMessage(hWnd, WM_COMMAND, MAKEWPARAM(IDM_RETURNLIST, 0), 0);
 		return TRUE;
@@ -154,6 +157,11 @@ BOOL MemoDetailsView::OnCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 			}
 			SendMessage(hViewWnd, EM_REPLACESEL, 0, (LPARAM)sDate.Get());
 			return TRUE;
+		}
+	case IDM_TOGGLEREADONLY:
+		{
+			SetReadOnly(!IsReadOnly());
+			return FALSE;
 		}
 	}
 

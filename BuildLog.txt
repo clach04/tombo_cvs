@@ -143,6 +143,13 @@ a note does not open correctly.
 * NEW: Add search next/prev keyboard shortcut for function key-less devices.(Win32/HPC)(#851)
 * NEW: impliment viewer mode.(#832)
 
+////////////////////////////////
+// B081 (Tombo 1.6 beta 2)
+////////////////////////////////
+
+* FIX: Can't use Ctrl-Z(Undo) (#959,#960)
+* FIX: Switch view-mode when B key pressed.(#993,#994)
+
 /////////////////////////////////////////////////////////////////////////
 // TODO
 /////////////////////////////////////////////////////////////////////////

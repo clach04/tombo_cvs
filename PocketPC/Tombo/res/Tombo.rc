@@ -487,11 +487,13 @@ BEGIN
     "1",            IDM_INSDATE1,           VIRTKEY, CONTROL, NOINVERT
     "2",            IDM_INSDATE2,           VIRTKEY, CONTROL, NOINVERT
     "A",            IDM_SELALL,             VIRTKEY, CONTROL, NOINVERT
+    "B",            IDM_TOGGLEREADONLY,     VIRTKEY, CONTROL, NOINVERT
     "F",            IDM_SEARCH,             VIRTKEY, CONTROL, NOINVERT
     "S",            IDM_SAVE,               VIRTKEY, CONTROL, NOINVERT
     VK_ESCAPE,      IDM_RETURNLIST,         VIRTKEY, NOINVERT
     VK_F3,          IDM_SEARCH_NEXT,        VIRTKEY, NOINVERT
     VK_F3,          IDM_SEARCH_PREV,        VIRTKEY, SHIFT, NOINVERT
+    "Z",            IDM_UNDO,               VIRTKEY, CONTROL, NOINVERT
 END
 
 

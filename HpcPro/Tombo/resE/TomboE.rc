@@ -367,12 +367,17 @@ BEGIN
     "2",            IDM_INSDATE2,           VIRTKEY, CONTROL, NOINVERT
     "9",            IDM_SEARCH_PREV,        VIRTKEY, CONTROL, NOINVERT
     "A",            IDM_SELALL,             VIRTKEY, CONTROL, NOINVERT
+    "B",            IDM_TOGGLEREADONLY,     VIRTKEY, CONTROL, NOINVERT
+    "C",            IDM_COPY,               VIRTKEY, CONTROL, NOINVERT
     "F",            IDM_SEARCH,             VIRTKEY, CONTROL, NOINVERT
     "N",            IDM_NEWMEMO,            VIRTKEY, CONTROL, NOINVERT
     "S",            IDM_SAVE,               VIRTKEY, CONTROL, NOINVERT
+    "V",            IDM_PASTE,              VIRTKEY, CONTROL, NOINVERT
     VK_ESCAPE,      IDM_RETURNLIST,         VIRTKEY, NOINVERT
     VK_F3,          IDM_SEARCH_NEXT,        VIRTKEY, NOINVERT
     VK_F3,          IDM_SEARCH_PREV,        VIRTKEY, SHIFT, NOINVERT
+    "X",            IDM_CUT,                VIRTKEY, CONTROL, NOINVERT
+    "Z",            IDM_UNDO,               VIRTKEY, CONTROL, NOINVERT
 END
 
 

@@ -50,11 +50,11 @@ LRESULT CALLBACK NewDetailsViewProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM l
 		if (pView->IsReadOnly()) return 0;
 		break;
 	case WM_KEYDOWN:
-		if (wParam == 'B' && GetKeyState(VK_CONTROL)) {
-			// toggle browsing mode
-			pView->SetReadOnly(!pView->IsReadOnly());
-			return 0;
-		}
+//		if (wParam == 'B' && GetKeyState(VK_CONTROL)) {
+//			// toggle browsing mode
+//			pView->SetReadOnly(!pView->IsReadOnly());
+//			return 0;
+//		}
 		if (pView->IsReadOnly()) {
 			if (wParam == VK_DELETE) return 0;
 			if (wParam == VK_BACK || wParam == VK_CONVERT || wParam == VK_LEFT) {
