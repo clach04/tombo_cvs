@@ -1177,7 +1177,7 @@ void MemoSelectView::ControlMenu()
 		pMf->EnableDecrypt(pItem->CanDecrypt(this));
 
 		pMf->EnableNew(pItem->CanNewMemo(this));
-		pMf->EnableNewFolder(pItem->CanNewMemo(this));
+		pMf->EnableNewFolder(pItem->CanNewFolder(this));
 
 		pMf->EnableCut(pItem->CanCut(this));
 		pMf->EnableCopy(pItem->CanCopy(this));

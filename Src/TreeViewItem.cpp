@@ -73,6 +73,11 @@ BOOL TreeViewItem::CanNewMemo(MemoSelectView *pView)
 	return TRUE;
 }
 
+BOOL TreeViewItem::CanNewFolder(MemoSelectView *pView)
+{
+	return TRUE;
+}
+
 BOOL TreeViewItem::CanCut(MemoSelectView *pView)
 {
 	return TRUE;
@@ -235,6 +240,11 @@ BOOL TreeViewFileItem::CanDecrypt(MemoSelectView *pView)
 }
 
 BOOL TreeViewFileItem::CanNewMemo(MemoSelectView *pView)
+{
+	return TRUE;
+}
+
+BOOL TreeViewFileItem::CanNewFolder(MemoSelectView *pView)
 {
 	return TRUE;
 }
@@ -561,6 +571,11 @@ BOOL TreeViewFolderItem::CanNewMemo(MemoSelectView *pView)
 	return TRUE;
 }
 
+BOOL TreeViewFolderItem::CanNewFolder(MemoSelectView *pView)
+{
+	return TRUE;
+}
+
 BOOL TreeViewFolderItem::CanGrep(MemoSelectView *pView)
 {
 	return TRUE;
@@ -704,6 +719,11 @@ BOOL TreeViewFileLink::CanEncrypt(MemoSelectView *pView)
 BOOL TreeViewFileLink::CanNewMemo(MemoSelectView *pView)
 {
 	return TRUE;
+}
+
+BOOL TreeViewFileLink::CanNewFolder(MemoSelectView *pView)
+{
+	return FALSE;
 }
 
 BOOL TreeViewFileLink::CanCut(MemoSelectView *pView)
@@ -912,6 +932,11 @@ BOOL TreeViewVirtualFolderRoot::CanNewMemo(MemoSelectView *pView)
 	return TRUE;
 }
 
+BOOL TreeViewVirtualFolderRoot::CanNewFolder(MemoSelectView *pView)
+{
+	return FALSE;
+}
+
 BOOL TreeViewVirtualFolderRoot::CanCut(MemoSelectView *pView)
 {
 	return FALSE;
@@ -1045,6 +1070,11 @@ BOOL TreeViewVirtualFolder::CanEncrypt(MemoSelectView *pView)
 BOOL TreeViewVirtualFolder::CanNewMemo(MemoSelectView *pView)
 {
 	return TRUE;
+}
+
+BOOL TreeViewVirtualFolder::CanNewFolder(MemoSelectView *pView)
+{
+	return FALSE;
 }
 
 BOOL TreeViewVirtualFolder::CanCut(MemoSelectView *pView)

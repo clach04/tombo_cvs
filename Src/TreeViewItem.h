@@ -55,6 +55,7 @@ public:
 	virtual BOOL CanEncrypt(MemoSelectView *pView);
 	virtual BOOL CanDecrypt(MemoSelectView *pView);
 	virtual BOOL CanNewMemo(MemoSelectView *pView);
+	virtual BOOL CanNewFolder(MemoSelectView *pView);
 	virtual BOOL CanCut(MemoSelectView *pView);
 	virtual BOOL CanCopy(MemoSelectView *pView);
 	virtual BOOL CanPaste(MemoSelectView *pView);
@@ -103,6 +104,7 @@ public:
 	virtual BOOL CanEncrypt(MemoSelectView *pView);
 	virtual BOOL CanDecrypt(MemoSelectView *pView);
 	virtual BOOL CanNewMemo(MemoSelectView *pView);
+	virtual BOOL CanNewFolder(MemoSelectView *pView);
 	virtual BOOL CanCut(MemoSelectView *pView);
 	virtual BOOL CanCopy(MemoSelectView *pView);
 	virtual BOOL CanPaste(MemoSelectView *pView);
@@ -138,6 +140,7 @@ public:
 	virtual BOOL CanEncrypt(MemoSelectView *pView);
 	virtual BOOL CanDecrypt(MemoSelectView *pView);
 	virtual BOOL CanNewMemo(MemoSelectView *pView);
+	virtual BOOL CanNewFolder(MemoSelectView *pView);
 	virtual BOOL CanCut(MemoSelectView *pView);
 	virtual BOOL CanCopy(MemoSelectView *pView);
 	virtual BOOL CanPaste(MemoSelectView *pView);
@@ -183,6 +186,7 @@ public:
 	virtual BOOL CanEncrypt(MemoSelectView *pView);
 	virtual BOOL CanDecrypt(MemoSelectView *pView);
 	virtual BOOL CanNewMemo(MemoSelectView *pView);
+	virtual BOOL CanNewFolder(MemoSelectView *pView);
 	virtual BOOL CanCut(MemoSelectView *pView);
 	virtual BOOL CanCopy(MemoSelectView *pView);
 	virtual BOOL CanPaste(MemoSelectView *pView);
@@ -216,6 +220,7 @@ public:
 	virtual BOOL CanEncrypt(MemoSelectView *pView);
 	virtual BOOL CanDecrypt(MemoSelectView *pView);
 	virtual BOOL CanNewMemo(MemoSelectView *pView);
+	virtual BOOL CanNewFolder(MemoSelectView *pView);
 	virtual BOOL CanCut(MemoSelectView *pView);
 	virtual BOOL CanCopy(MemoSelectView *pView);
 	virtual BOOL CanPaste(MemoSelectView *pView);
@@ -244,6 +249,7 @@ public:
 	virtual BOOL CanEncrypt(MemoSelectView *pView);
 	virtual BOOL CanDecrypt(MemoSelectView *pView);
 	virtual BOOL CanNewMemo(MemoSelectView *pView);
+	virtual BOOL CanNewFolder(MemoSelectView *pView);
 	virtual BOOL CanCut(MemoSelectView *pView);
 	virtual BOOL CanCopy(MemoSelectView *pView);
 	virtual BOOL CanPaste(MemoSelectView *pView);
