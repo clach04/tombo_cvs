@@ -28,6 +28,7 @@
 #define YAEDIT_CLASS_NAME TEXT("YAEditCtl")
 
 #define CHARA_CTRL_C 3
+#define CHARA_CTRL_S 19
 #define CHARA_CTRL_V 22
 #define CHARA_CTRL_X 24
 #define CHARA_BS 8
@@ -439,6 +440,11 @@ void YAEdit::OnChar(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		}
 		return;
 	}
+	if (ch == CHARA_CTRL_S) {
+		// nop
+		return;
+	}
+
 #if defined(PLATFORM_WIN32)
 	// if char is DBCS lead byte, buffering.
 	if (aKeyBuffer[0] != '\0') {
@@ -489,12 +495,12 @@ void YAEdit::DeleteKeyDown()
 // move cursor
 /////////////////////////////////////////////////////////////////////////////
 
-void YAEdit::MoveRight() { pView->MoveRight(); ClearRegion(); }
-void YAEdit::MoveLeft()  { pView->MoveLeft();  ClearRegion(); }
-void YAEdit::MoveUp()    { pView->MoveUp();    ClearRegion(); }
-void YAEdit::MoveEOL()   { pView->MoveEOL();   ClearRegion(); }
-void YAEdit::MoveTOL()   { pView->MoveTOL();   ClearRegion(); }
-void YAEdit::MoveDown()  { pView->MoveDown();  ClearRegion(); }
+void YAEdit::MoveRight() { pView->ScrollCaret(); pView->MoveRight(); ClearRegion(); }
+void YAEdit::MoveLeft()  { pView->ScrollCaret(); pView->MoveLeft();  ClearRegion(); }
+void YAEdit::MoveUp()    { pView->ScrollCaret(); pView->MoveUp();    ClearRegion(); }
+void YAEdit::MoveEOL()   { pView->ScrollCaret(); pView->MoveEOL();   ClearRegion(); }
+void YAEdit::MoveTOL()   { pView->ScrollCaret(); pView->MoveTOL();   ClearRegion(); }
+void YAEdit::MoveDown()  { pView->ScrollCaret(); pView->MoveDown();  ClearRegion(); }
 
 /////////////////////////////////////////////////////////////////////////////
 // WM_LBUTTONDOWN
@@ -905,6 +911,8 @@ BOOL YAEdit::UpdateNotify(PhysicalLineManager *pPhMgr, const Region *pOldRegion,
 	// update view
 	// what a inefficient logic!!
 	RequestRedraw(cLgAfStart.row, 0, TRUE);
+
+	pView->ScrollCaret();
 
 	return TRUE;
 }
