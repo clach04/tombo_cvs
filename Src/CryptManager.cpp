@@ -147,7 +147,7 @@ BOOL CryptManager::EncryptAndStore(const LPBYTE pData, int nSize, LPCTSTR pFileN
 	// ƒtƒ@ƒCƒ‹‚Ö‚Ì•Û‘¶
 	File outf;
 
-	if (!outf.Open(pFileName, GENERIC_WRITE, 0, CREATE_ALWAYS)) {
+	if (!outf.Open(pFileName, GENERIC_WRITE, 0, OPEN_ALWAYS)) {
 		for (i = 0; i < len; i++) pBuf[i] = 0;
 		WipeOutAndDelete((char*)pBuf, len);
 
@@ -163,6 +163,7 @@ BOOL CryptManager::EncryptAndStore(const LPBYTE pData, int nSize, LPCTSTR pFileN
 		wsprintf(buf, TEXT("CryptManager::EncryptAndStore write failed %d"), GetLastError());
 		MessageBox(NULL, buf, TEXT("DEBUG"), MB_OK); // XXXX_DEBUG
 	}
+	if (!outf.SetEOF()) return FALSE;
 	outf.Close();
 
 	WipeOutAndDelete((char*)pBuf, len);

@@ -282,28 +282,6 @@ LPTSTR CryptedMemoNote::GetMemoBody(PasswordManager *pMgr)
 	return pMemo;
 }
 
-/////////////////////////////////////////////
-// メモ内容の保存
-/////////////////////////////////////////////
-BOOL MemoNote::XX(PasswordManager *pMgr, LPCTSTR pMemo, LPCTSTR aOrigFile, LPCTSTR aWriteFile)
-{
-	// 書き込むメモ内容の生成
-	char *pText = ConvUnicode2SJIS(pMemo);
-	if (pText == NULL) return FALSE;
-	SecureBufferA sText(pText);
-
-	BOOL bResult = SaveData(pMgr, pText, aWriteFile);
-
-	if (_tcscmp(aOrigFile, aWriteFile) != 0) {
-		if (bResult) {
-			MemoManager::WipeOutAndDeleteFile(aOrigFile);
-		} else {
-			MemoManager::WipeOutAndDeleteFile(aWriteFile);
-		}
-	}
-	return bResult;
-}
-
 // パスファイル名からベース名(パスと拡張子を除いたもの)を取得
 // ...\..\AA.txt -> AA
 static BOOL GetBaseName(TString *pBase, LPCTSTR pFull)
@@ -332,6 +310,12 @@ static BOOL GetBaseName(TString *pBase, LPCTSTR pFull)
 	return TRUE;
 }
 
+////////////////////////////////////////////////////
+// Save memo data and return new headline string
+////////////////////////////////////////////////////
+//
+// IN : pMgr, pMemo
+// OUT: pHeadLine
 BOOL MemoNote::Save(PasswordManager *pMgr, LPCTSTR pMemo, TString *pHeadLine)
 {
 	TString sOrigFile;
@@ -340,55 +324,81 @@ BOOL MemoNote::Save(PasswordManager *pMgr, LPCTSTR pMemo, TString *pHeadLine)
 	BOOL bResult;
 	TString sHeadLine;
 
-	// 旧ヘッドラインをパスから取得
+	// get old headline from path
 	if (!GetBaseName(pHeadLine, pPath)) return FALSE;
 
 	if (g_Property.KeepTitle()) {
+		// clone original headline
 		sHeadLine.Set(pHeadLine->Get());
 	} else {
-		// 新ヘッドラインをメモから取得
+		// Get new headline from memo text
 		if (!GetHeadLineFromMemoText(pMemo, &sHeadLine)) return FALSE;
 	}
+
+	// Prepare write file.
+	char *pText = ConvUnicode2SJIS(pMemo);
+	if (pText == NULL) return FALSE;
+	SecureBufferA sText(pText);
+
 
 	DWORD nH = ChopFileNumberLen(pHeadLine->Get());
 	DWORD nH2 = ChopFileNumberLen(sHeadLine.Get());
 
-	TString sWriteFile;
 	LPTSTR pNotePath = pPath;
 
+	// check headline has changed.
 	if (nH == nH2 && _tcsncmp(pHeadLine->Get(), sHeadLine.Get(), nH) == 0) {
-
-		if (!sWriteFile.Alloc(_tcslen(sOrigFile.Get()) + _tcslen(TEXT(".tmp")) + 1)) return FALSE;
-		wsprintf(sWriteFile.Get(), TEXT("%s.tmp"), sOrigFile.Get());
-
-		bResult = XX(pMgr, pMemo, sOrigFile.Get(), sWriteFile.Get());
-		if (bResult) {
-			MoveFile(sWriteFile.Get(), sOrigFile.Get());
+		// not changed.
+		// Generate backup file name
+		TString sBackupFile;
+		if (!sBackupFile.Join(sOrigFile.Get(), TEXT(".tmp"))) return FALSE;
+		// Backup(copy) original file
+		//
+		// Because ActiveSync can't treat Move&Write, backup operation uses not move but copy
+		if (!CopyFile(sOrigFile.Get(), sBackupFile.Get(), FALSE)) {
+			// if new file, copy are failed but it is OK.
+			if (GetLastError() != ERROR_FILE_NOT_FOUND) return FALSE;
 		}
-	} else {
-		TString sMemoDir;
-
-		if (!sMemoDir.GetDirectoryPath(pPath)) return FALSE;
-		// ヘッドラインが変更された
-		if (!GetHeadLinePath(sMemoDir.Get(), sHeadLine.Get(), GetExtension() , &sWriteFile, &pNotePath, pHeadLine)) {
+		// Save to file
+		if (!SaveData(pMgr, pText, sOrigFile.Get())) {
+			// When save failed, try to rollback original file.
+			DeleteFile(sOrigFile.Get());
+			MoveFile(sBackupFile.Get(), sOrigFile.Get());
 			return FALSE;
 		}
+		// remove backup file
+		DeleteFile(sBackupFile.Get());
+		bResult = TRUE;
+	} else {
+		// changed.
+		TString sMemoDir;
+		TString sNewFile;
 
-		bResult = XX(pMgr, pMemo, sOrigFile.Get(), sWriteFile.Get());
+		if (!sMemoDir.GetDirectoryPath(pPath)) return FALSE;
+		if (!GetHeadLinePath(sMemoDir.Get(), sHeadLine.Get(), GetExtension() , &sNewFile, &pNotePath, pHeadLine)) return FALSE;
 
+		bResult = SaveData(pMgr, pText, sNewFile.Get());
+		if (bResult) {
+			// delete original file
+			DeleteFile(sOrigFile.Get());
+
+			// Update note's file path information. 
+			LPTSTR pNewPath = StringDup(pNotePath);
+			if (pNewPath == NULL) return FALSE;
+			delete [] pPath;
+			pPath = pNewPath;
+
+		} else {
+			// delete writing file
+			DeleteFile(sNewFile.Get());
+		}
+
+		// Additionally, rename memo info(*.tdt) file.
 		if (g_Property.KeepCaret()) {
 			MemoInfo mi;
-			mi.RenameInfo(sOrigFile.Get(), sWriteFile.Get());
+			mi.RenameInfo(sOrigFile.Get(), sNewFile.Get());
 		}
 	}
-
-	if (bResult && pNotePath != pPath) {
-		LPTSTR pNewPath = StringDup(pNotePath);
-		if (pNewPath == NULL) return FALSE;
-		delete [] pPath;
-		pPath = pNewPath;
-	}
-
 	return bResult;
 }
 
@@ -405,6 +415,7 @@ BOOL PlainMemoNote::SaveData(PasswordManager *pMgr, const char *pText, LPCTSTR p
 	File outf;
 	if (!outf.Open(pWriteFile, GENERIC_WRITE, 0, OPEN_ALWAYS)) return FALSE;
 	if (!outf.Write((LPBYTE)pText, strlen(pText))) return FALSE;
+	if (!outf.SetEOF()) return FALSE;
 	outf.Close();
 	return TRUE;
 }
