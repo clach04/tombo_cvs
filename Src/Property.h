@@ -38,6 +38,8 @@ class Property {
 
 	DWORD nKeepTitle;
 
+	TCHAR aPropDir[MAX_PATH];
+
 public:
 	Property();
 
@@ -90,6 +92,9 @@ public:
 
 	// ファイル名をメモのタイトルに連動させない
 	BOOL KeepTitle() { return nKeepTitle; }
+
+	// Property folder path
+	LPCTSTR PropertyDir() { return aPropDir; }
 
 	// ウィンドウサイズ関連の保存・復元
 	static BOOL SaveWinSize(LPRECT pWinRect, WORD nSelectViewWidth);

@@ -44,6 +44,7 @@
 #define USE_TWO_PANE_ATTR_NAME TEXT("UseTwoPane")
 #define SWITCH_WINDOW_TITLE_ATTR_NAME TEXT("SwitchWindowTitle")
 #define KEEP_TITLE_ATTR_NAME TEXT("KeepTitle")
+#define PROP_FOLDER_ATTR_NAME TEXT("PropertyDir")
 
 #define TOMBO_WINSIZE_ATTR_NAME TEXT("WinSize")
 #define TOMBO_REBARHIST_ATTR_NAME TEXT("RebarPos")
@@ -1178,6 +1179,13 @@ BOOL Property::Load(BOOL *pStrict)
 		nKeepTitle = FALSE;
 	}
 
+	// Property folder
+	siz = sizeof(aPropDir);
+	res = RegQueryValueEx(hTomboRoot, PROP_FOLDER_ATTR_NAME, NULL, &typ, (LPBYTE)aPropDir, &siz);
+	if (res != ERROR_SUCCESS) {
+		aPropDir[0] = TEXT('\0');
+	}
+
 	RegCloseKey(hTomboRoot);
 	return TRUE;
 }
@@ -1253,6 +1261,11 @@ BOOL Property::Save()
 #endif
 
 	if (!SetDWORDToReg(hTomboRoot, KEEP_TITLE_ATTR_NAME, nKeepTitle)) return FALSE;
+
+	// Property dir
+	if (_tcslen(aPropDir) > 0) {
+		if (!SetSZToReg(hTomboRoot, PROP_FOLDER_ATTR_NAME, aPropDir)) return FALSE;
+	}
 
 #if defined(PLATFORM_BE500)
 	CGDFlushRegistry();
