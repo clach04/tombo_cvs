@@ -1,6 +1,6 @@
 #
 
-$version = "Tombo1_6b1";
+$version = "Tombo1_6b2";
 
 use File::Glob ':glob';
 
@@ -27,8 +27,8 @@ $be300root = "R:\\work2\\BE300SDK_1012\\Installer\\English PC Tools";
 	["Bin\\PocketPC\\MIPS", "$buildroot\\PocketPC\\CabWiz\\Tombo.mips.CAB"],
 	["Bin\\PocketPC\\SH3", "$buildroot\\PocketPC\\CabWiz\\Tombo.sh3.CAB"],
 
-	["Bin\\PsPC\\SH3", "$buildroot\\PsPC\\CabWiz\\Tombo.mips.CAB"],
-	["Bin\\PsPC\\MIPS", "$buildroot\\PsPC\\CabWiz\\Tombo.sh3.CAB"],
+	["Bin\\PsPC\\MIPS", "$buildroot\\PsPC\\CabWiz\\Tombo.mips.CAB"],
+	["Bin\\PsPC\\SH3", "$buildroot\\PsPC\\CabWiz\\Tombo.sh3.CAB"],
 
 	["Bin\\BE500", "$be500root\\Setup.exe"],
 	["Bin\\BE500", "$be500root\\Setup.ini"],
