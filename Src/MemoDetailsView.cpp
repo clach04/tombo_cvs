@@ -16,7 +16,7 @@
 #include "Message.h"
 
 
-static BOOL GetDateText(TString *pInsStr, LPCTSTR pFormat);
+static BOOL GetDateText(TString *pInsStr, LPCTSTR pFormat, TString *pPath);
 
 void SetWndProc(SUPER_WND_PROC wp, HWND hParent, HINSTANCE h, MemoDetailsView *p, MemoManager *pMgr);
 LRESULT CALLBACK NewDetailsViewProc( HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam );
@@ -269,7 +269,7 @@ void MemoDetailsView::SetFont(HFONT hFont)
 }
 
 /////////////////////////////////////////
-// カーソル位置の取得
+// get cursor position
 /////////////////////////////////////////
 
 DWORD MemoDetailsView::GetCursorPos()
@@ -280,13 +280,72 @@ DWORD MemoDetailsView::GetCursorPos()
 }
 
 /////////////////////////////////////////
-// 日付文字列の取得
+// get partial path
 /////////////////////////////////////////
 
-static BOOL GetDateText(TString *pInsStr, LPCTSTR pFormat)
+static BOOL GetPartialPathFW(TString *pChoped, TString *pOrig, DWORD nLevel)
+{
+	if (!pChoped->Join(TEXT("\\"), pOrig->Get())) return FALSE;
+	if (nLevel == 0) return TRUE;
+
+	LPTSTR p = pChoped->Get() + 1;
+	DWORD i = 0;
+	while (*p) {
+		if (*p == TEXT('\\')) {
+			i++;
+			if (i >= nLevel) {
+				*p = TEXT('\0');
+				return TRUE;
+			}
+		}
+
+		p = CharNext(p);
+	}
+	return TRUE;
+}
+
+static LPCTSTR GetPartialPathBW(TString *pChoped, TString *pOrig, DWORD nLevel)
+{
+	if (!pChoped->Join(TEXT("\\"), pOrig->Get())) return NULL;
+	if (nLevel == 0) return pChoped->Get();
+
+	LPTSTR p = pChoped->Get() + 1;
+	DWORD n = 0;
+	while(*p) {
+		if (*p == TEXT('\\')) {
+			n++;
+		}
+		p = CharNext(p);
+	}
+
+	if (nLevel > n) {
+		nLevel = n;
+	}
+	DWORD k = n - nLevel;
+
+	p = pChoped->Get() + 1;
+	DWORD i = 0;
+	while(*p) {
+		if (*p == TEXT('\\')) {
+			i++;
+			if (i > k) break;
+		}
+		p = CharNext(p);
+	}
+	return p;
+}
+/////////////////////////////////////////
+// format date string
+/////////////////////////////////////////
+
+static BOOL GetDateText(TString *pInsStr, LPCTSTR pFormat, TString *pPath)
 {
 	SYSTEMTIME st;
 	GetLocalTime(&st);
+
+	TString sPartPath;
+	LPCTSTR pTop;
+	DWORD nLv;
 
 	// 文字バッファサイズのカウント
 	DWORD nLen = 0;
@@ -311,6 +370,27 @@ static BOOL GetDateText(TString *pInsStr, LPCTSTR pFormat)
 			case TEXT('w'):
 			case TEXT('W'):
 				nLen += 3;
+				break;
+			case TEXT('f'):
+				if (_istdigit(*(p+1))) {
+					nLv = *(p+1) - TEXT('0');
+					p++;
+				} else {
+					nLv = 0;
+				}
+				if (!GetPartialPathFW(&sPartPath, pPath, nLv)) return FALSE;
+				nLen += _tcslen(sPartPath.Get());
+				break;
+			case TEXT('F'):
+				if (_istdigit(*(p+1))) {
+					nLv = *(p+1) - TEXT('0');
+					p++;
+				} else {
+					nLv = 0;
+				}
+				pTop = GetPartialPathBW(&sPartPath, pPath, nLv);
+				if (!pTop) return FALSE;
+				nLen += _tcslen(pTop);
 				break;
 			default:
 				nLen += 2;
@@ -400,6 +480,29 @@ static BOOL GetDateText(TString *pInsStr, LPCTSTR pFormat)
 			case TEXT('n'):
 				wsprintf(q, TEXT("\r\n"));
 				q += 2;
+				break;
+			case TEXT('f'):
+				if (_istdigit(*(p+1))) {
+					nLv = *(p+1) - TEXT('0');
+					p++;
+				} else {
+					nLv = 0;
+				}
+				if (!GetPartialPathFW(&sPartPath, pPath, nLv)) return FALSE;
+				_tcscpy(q, sPartPath.Get());
+				q += _tcslen(sPartPath.Get());
+				break;
+			case TEXT('F'):
+				if (_istdigit(*(p+1))) {
+					nLv = *(p+1) - TEXT('0');
+					p++;
+				} else {
+					nLv = 0;
+				}
+				pTop = GetPartialPathBW(&sPartPath, pPath, nLv);
+				if (!pTop) return FALSE;
+				_tcscpy(q, pTop);
+				q += _tcslen(pTop);
 				break;
 			default:
 				*q++ = TEXT('%');
@@ -591,7 +694,11 @@ void MemoDetailsView::SetReadOnly(BOOL bro)
 void MemoDetailsView::InsertDate1()
 {
 	TString sDate;
-	if (!GetDateText(&sDate, g_Property.DateFormat1())) {
+
+	TString sPathStr;
+	pMemoMgr->GetCurrentSelectedPath(&sPathStr);
+
+	if (!GetDateText(&sDate, g_Property.DateFormat1(), &sPathStr)) {
 		TomboMessageBox(NULL, MSG_GET_DATE_FAILED, TEXT("ERROR"), MB_ICONERROR | MB_OK);
 		return;
 	}
@@ -601,7 +708,11 @@ void MemoDetailsView::InsertDate1()
 void MemoDetailsView::InsertDate2()
 {
 	TString sDate;
-	if (!GetDateText(&sDate, g_Property.DateFormat2())) {
+
+	TString sPathStr;
+	pMemoMgr->GetCurrentSelectedPath(&sPathStr);
+
+	if (!GetDateText(&sDate, g_Property.DateFormat2(), &sPathStr)) {
 		TomboMessageBox(NULL, MSG_GET_DATE_FAILED, TEXT("ERROR"), MB_ICONERROR | MB_OK);
 		return;
 	}

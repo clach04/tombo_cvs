@@ -10,6 +10,7 @@ class MemoNote;
 class PasswordManager;
 class SearchEngineA;
 class TreeViewItem;
+class TString;
 
 /////////////////////////////////////
 // Memo location info
@@ -126,6 +127,8 @@ public:
 	MemoNote *CurrentNote() { return pCurrentNote; }
 	MainFrame *GetMainFrame() { return pMainFrame; }
 	MemoLocator CurrentLoc();
+
+	BOOL GetCurrentSelectedPath(TString *pPath);
 
 	/////////////////////////////////////
 	// Notify from MemoSelectView

@@ -128,6 +128,26 @@ MemoLocator MemoManager::AllocNewMemo(LPCTSTR pText, MemoNote *pTemplate)
 }
 
 /////////////////////////////////////////////
+// get current selected path
+/////////////////////////////////////////////
+
+BOOL MemoManager::GetCurrentSelectedPath(TString *pPath)
+{
+	if (pCurrentNote) {
+		TString sMemoPath;
+		if (!sMemoPath.Set(pCurrentNote->MemoPath())) return FALSE;
+		if (!pPath->GetDirectoryPath(sMemoPath.Get())) return FALSE;
+		ChopFileSeparator(pPath->Get());
+		return TRUE;
+	}
+
+	TreeViewItem *pItem = pMemoSelectView->GetCurrentItem();
+	if (!pItem->GetFolderPath(pMemoSelectView, pPath)) return FALSE;
+	ChopFileSeparator(pPath->Get());
+	return TRUE;
+}
+
+/////////////////////////////////////////////
 // ƒtƒ@ƒCƒ‹‚ÌWipeOut‚Æíœ
 /////////////////////////////////////////////
 
