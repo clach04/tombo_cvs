@@ -490,7 +490,23 @@ TOMBO 1.2 beta 1
 
 ☆ TOMBO 1.3
 
-■
+■ B065 2002/10/05
+
+・CVSへの移行を睨んでビットマップ・アイコンをSrc/imageの下に移動。
+・H/PC版についてCut/Copy/Pasteをキーボードアクセラレータに追加
+	通常EDITBOXコントロールが自前で処理するのだが、モバイルギアでカナ入力モードの際には
+	正しく処理されないらしい。
+
+== ソース管理をローカルのVSSからSFのCVSに移行 ==
+
+■ B066 2002/10/06
+
+* BE300版を作成。BE500版をBE300用SDK+TOMBO_LANG_ENGLISHつきでビルドしたもの
+* #577,#620 FileSelectorについてSHBrowseForFolderを使うように修正(Win32版)
+* #587 フォルダ名の変更ができないバグをFIX
+* #586 Set Icons to transparent.(Win32/HPC)
+* #648 Add "Find" Button on toolbar(Win32/HPC/BE300/BE500/PocketPC)
+  Because there are no space, BE-[35]00/PocketPC are place select view only.
 
 TODO: 
 MemoInfoについてMemoManager管理からMemoNote管理になるように修正する
