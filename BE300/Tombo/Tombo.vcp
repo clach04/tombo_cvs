@@ -471,6 +471,123 @@ NODEP_CPP_BLOWF=\
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\Src\BookMark.cpp
+
+!IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
+
+DEP_CPP_BOOKM=\
+	"..\..\Src\BookMark.h"\
+	"..\..\Src\MemoManager.h"\
+	"..\..\Src\MemoNote.h"\
+	"..\..\Src\TomboLib\TString.h"\
+	"..\..\Src\TomboLib\Uniconv.h"\
+	"..\..\Src\TomboLib\VarBuffer.h"\
+	"..\..\Src\TreeViewItem.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
+
+DEP_CPP_BOOKM=\
+	"..\..\Src\BookMark.h"\
+	"..\..\Src\MemoManager.h"\
+	"..\..\Src\MemoNote.h"\
+	"..\..\Src\TreeViewItem.h"\
+	
+NODEP_CPP_BOOKM=\
+	"..\..\Src\TString.h"\
+	"..\..\Src\Uniconv.h"\
+	"..\..\Src\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Release"
+
+DEP_CPP_BOOKM=\
+	"..\..\Src\BookMark.h"\
+	"..\..\Src\MemoManager.h"\
+	"..\..\Src\MemoNote.h"\
+	"..\..\Src\TreeViewItem.h"\
+	
+NODEP_CPP_BOOKM=\
+	"..\..\Src\TString.h"\
+	"..\..\Src\Uniconv.h"\
+	"..\..\Src\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Debug"
+
+DEP_CPP_BOOKM=\
+	"..\..\Src\BookMark.h"\
+	"..\..\Src\MemoManager.h"\
+	"..\..\Src\MemoNote.h"\
+	"..\..\Src\TreeViewItem.h"\
+	
+NODEP_CPP_BOOKM=\
+	"..\..\Src\TString.h"\
+	"..\..\Src\Uniconv.h"\
+	"..\..\Src\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Release"
+
+DEP_CPP_BOOKM=\
+	"..\..\Src\BookMark.h"\
+	"..\..\Src\MemoManager.h"\
+	"..\..\Src\MemoNote.h"\
+	"..\..\Src\TreeViewItem.h"\
+	
+NODEP_CPP_BOOKM=\
+	"..\..\Src\TString.h"\
+	"..\..\Src\Uniconv.h"\
+	"..\..\Src\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Debug"
+
+DEP_CPP_BOOKM=\
+	"..\..\Src\BookMark.h"\
+	"..\..\Src\MemoManager.h"\
+	"..\..\Src\MemoNote.h"\
+	"..\..\Src\TreeViewItem.h"\
+	
+NODEP_CPP_BOOKM=\
+	"..\..\Src\TString.h"\
+	"..\..\Src\Uniconv.h"\
+	"..\..\Src\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Release"
+
+DEP_CPP_BOOKM=\
+	"..\..\Src\BookMark.h"\
+	"..\..\Src\MemoManager.h"\
+	"..\..\Src\MemoNote.h"\
+	"..\..\Src\TreeViewItem.h"\
+	
+NODEP_CPP_BOOKM=\
+	"..\..\Src\TString.h"\
+	"..\..\Src\Uniconv.h"\
+	"..\..\Src\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Debug"
+
+DEP_CPP_BOOKM=\
+	"..\..\Src\BookMark.h"\
+	"..\..\Src\MemoManager.h"\
+	"..\..\Src\MemoNote.h"\
+	"..\..\Src\TreeViewItem.h"\
+	
+NODEP_CPP_BOOKM=\
+	"..\..\Src\TString.h"\
+	"..\..\Src\Uniconv.h"\
+	"..\..\Src\VarBuffer.h"\
+	
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\Src\TomboLib\Clipboard.cpp
 
 !IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
@@ -1134,14 +1251,12 @@ DEP_CPP_FILTE=\
 	"..\..\Src\Message.h"\
 	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboLib\DialogTemplate.h"\
 	"..\..\Src\TomboLib\File.h"\
 	"..\..\Src\TomboLib\Logger.h"\
 	"..\..\Src\TomboLib\TString.h"\
 	"..\..\Src\TomboLib\VarBuffer.h"\
 	"..\..\Src\VFStream.h"\
-	
-NODEP_CPP_FILTE=\
-	"..\..\Src\DialogTemplate.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
@@ -1413,16 +1528,14 @@ DEP_CPP_FILTERD=\
 	"..\..\Src\FilterDefDlg.h"\
 	"..\..\Src\Message.h"\
 	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboLib\DialogTemplate.h"\
 	"..\..\Src\TomboLib\File.h"\
 	"..\..\Src\TomboLib\Logger.h"\
+	"..\..\Src\TomboLib\PropertyPage.h"\
 	"..\..\Src\TomboLib\TString.h"\
 	"..\..\Src\TomboLib\VarBuffer.h"\
 	"..\..\Src\VFManager.h"\
 	"..\..\Src\VFStream.h"\
-	
-NODEP_CPP_FILTERD=\
-	"..\..\Src\DialogTemplate.h"\
-	"..\..\Src\PropertyPage.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
@@ -1580,10 +1693,8 @@ DEP_CPP_GREPD=\
 	"..\..\Src\Tombo.h"\
 	"..\..\Src\TomboLib\File.h"\
 	"..\..\Src\TomboLib\Logger.h"\
+	"..\..\Src\TomboLib\PropertyPage.h"\
 	"..\..\Src\TomboLib\TString.h"\
-	
-NODEP_CPP_GREPD=\
-	"..\..\Src\PropertyPage.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
@@ -1702,10 +1813,8 @@ SOURCE=..\..\Src\TomboLib\Logger.cpp
 !IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
 
 DEP_CPP_LOGGE=\
-	"..\..\Src\Tombo.h"\
 	"..\..\Src\TomboLib\File.h"\
 	"..\..\Src\TomboLib\Logger.h"\
-	"..\..\Src\TomboLib\Uniconv.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
@@ -1806,6 +1915,7 @@ DEP_CPP_MAIN_=\
 	"..\..\Src\TomboLib\File.h"\
 	"..\..\Src\TomboLib\Logger.h"\
 	"..\..\Src\TomboLib\Uniconv.h"\
+	"..\..\Src\TomboLib\VarBuffer.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
@@ -1917,6 +2027,7 @@ SOURCE=..\..\Src\MainFrame.cpp
 
 DEP_CPP_MAINF=\
 	"..\..\Src\AboutDialog.h"\
+	"..\..\Src\BookMark.h"\
 	"..\..\Src\FilterCtlDlg.h"\
 	"..\..\Src\GrepDialog.h"\
 	"..\..\Src\MainFrame.h"\
@@ -1939,12 +2050,10 @@ DEP_CPP_MAINF=\
 	"..\..\Src\TomboLib\VarBuffer.h"\
 	"..\..\Src\TreeViewItem.h"\
 	"..\..\Src\VFManager.h"\
-	
-NODEP_CPP_MAINF=\
-	".\SO.h"\
-	".\SOBar.h"\
-	".\SOButton.h"\
-	".\Wind.h"\
+	{$(INCLUDE)}"CSO.h"\
+	{$(INCLUDE)}"CSOBar.h"\
+	{$(INCLUDE)}"CSOButton.h"\
+	{$(INCLUDE)}"CWind.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
@@ -2157,6 +2266,7 @@ DEP_CPP_MEMOD=\
 	"..\..\Src\TomboLib\Logger.h"\
 	"..\..\Src\TomboLib\TString.h"\
 	"..\..\Src\TomboLib\Uniconv.h"\
+	"..\..\Src\TomboLib\VarBuffer.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
@@ -2256,15 +2366,13 @@ DEP_CPP_MEMOF=\
 	"..\..\Src\PasswordManager.h"\
 	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboLib\DirectoryScanner.h"\
 	"..\..\Src\TomboLib\File.h"\
 	"..\..\Src\TomboLib\Logger.h"\
 	"..\..\Src\TomboLib\TString.h"\
 	"..\..\Src\TomboLib\Uniconv.h"\
 	"..\..\Src\TomboLib\VarBuffer.h"\
 	"..\..\Src\TreeViewItem.h"\
-	
-NODEP_CPP_MEMOF=\
-	"..\..\Src\DirectoryScanner.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
@@ -3123,14 +3231,12 @@ DEP_CPP_PROPE=\
 	"..\..\Src\Tombo.h"\
 	"..\..\Src\TomboLib\File.h"\
 	"..\..\Src\TomboLib\Logger.h"\
+	"..\..\Src\TomboLib\PropertyPage.h"\
 	"..\..\Src\TomboLib\Uniconv.h"\
 	"..\..\Src\TomboLib\VarBuffer.h"\
 	"..\..\Src\TreeViewItem.h"\
-	
-NODEP_CPP_PROPE=\
-	"..\..\Src\PropertyPage.h"\
-	".\etDisk.h"\
-	".\otify.h"\
+	{$(INCLUDE)}"GetDisk.h"\
+	{$(INCLUDE)}"notify.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
@@ -3763,10 +3869,8 @@ DEP_CPP_SIPCO=\
 	"..\..\Src\TomboLib\File.h"\
 	"..\..\Src\TomboLib\Logger.h"\
 	"..\..\Src\TomboLib\SipControl.h"\
-	
-NODEP_CPP_SIPCO=\
-	".\ip.h"\
-	".\ipapi.h"\
+	{$(INCLUDE)}"sip.h"\
+	{$(INCLUDE)}"sipapi.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
@@ -3876,6 +3980,7 @@ DEP_CPP_TREEV=\
 	"..\..\Src\PasswordManager.h"\
 	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboLib\DirectoryScanner.h"\
 	"..\..\Src\TomboLib\File.h"\
 	"..\..\Src\TomboLib\Logger.h"\
 	"..\..\Src\TomboLib\TString.h"\
@@ -3885,9 +3990,6 @@ DEP_CPP_TREEV=\
 	"..\..\Src\TSParser.h"\
 	"..\..\Src\VFManager.h"\
 	"..\..\Src\VFStream.h"\
-	
-NODEP_CPP_TREEV=\
-	"..\..\Src\DirectoryScanner.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
@@ -4160,10 +4262,6 @@ SOURCE=..\..\Src\TomboLib\TString.cpp
 !IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
 
 DEP_CPP_TSTRI=\
-	"..\..\Src\Property.h"\
-	"..\..\Src\Tombo.h"\
-	"..\..\Src\TomboLib\File.h"\
-	"..\..\Src\TomboLib\Logger.h"\
 	"..\..\Src\TomboLib\TString.h"\
 	"..\..\Src\TomboLib\Uniconv.h"\
 	
@@ -4609,6 +4707,8 @@ DEP_CPP_VFSTR=\
 	"..\..\Src\Property.h"\
 	"..\..\Src\SearchEngine.h"\
 	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboLib\DialogTemplate.h"\
+	"..\..\Src\TomboLib\DirectoryScanner.h"\
 	"..\..\Src\TomboLib\File.h"\
 	"..\..\Src\TomboLib\Logger.h"\
 	"..\..\Src\TomboLib\TString.h"\
@@ -4616,10 +4716,6 @@ DEP_CPP_VFSTR=\
 	"..\..\Src\TomboLib\VarBuffer.h"\
 	"..\..\Src\TreeViewItem.h"\
 	"..\..\Src\VFStream.h"\
-	
-NODEP_CPP_VFSTR=\
-	"..\..\Src\DialogTemplate.h"\
-	"..\..\Src\DirectoryScanner.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
@@ -4755,6 +4851,10 @@ SOURCE=..\..\Src\AboutDialog.h
 # Begin Source File
 
 SOURCE=..\..\Src\gnupg\bithelp.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\BookMark.h
 # End Source File
 # Begin Source File
 
@@ -4942,6 +5042,10 @@ SOURCE=..\..\Src\bitmap1.bmp
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\Src\image\bookmark.bmp
+# End Source File
+# Begin Source File
+
 SOURCE=.\res\copy.bmp
 # End Source File
 # Begin Source File
@@ -5043,6 +5147,10 @@ SOURCE=.\Tombo.ICO
 # Begin Source File
 
 SOURCE=..\..\Src\image\Tombo.ico
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\image\tool.bmp
 # End Source File
 # Begin Source File
 

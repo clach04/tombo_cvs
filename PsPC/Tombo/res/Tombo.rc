@@ -386,6 +386,12 @@ BEGIN
         MENUITEM "ˆÃ†‰»",                      IDM_ENCRYPT
         MENUITEM "•œ†‰»",                      IDM_DECRYPT
     END
+    POPUP "‚µ‚¨‚è"
+    BEGIN
+        MENUITEM "‚¨‹C‚É“ü‚è‚É’Ç‰Á",            IDM_BOOKMARK_ADD
+        MENUITEM "‚¨‹C‚É“ü‚è‚Ì®—",            IDM_BOOKMARK_CONFIG
+        MENUITEM SEPARATOR
+    END
 END
 
 IDR_MENU_DETAILS MENU DISCARDABLE 

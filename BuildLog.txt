@@ -481,3 +481,10 @@ Changes
 * Add bookmark(#2716).
 	Edit bookmark is not implimented yet.
 	PsPC, BE-[35]00 is not implimented yet.
+
+////////////////////////////////
+// B119
+////////////////////////////////
+
+* Add bookmark:
+   Support PsPC, BE-[35]00

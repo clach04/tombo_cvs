@@ -39,6 +39,8 @@ IDB_FINDNEXT            BITMAP  DISCARDABLE     "../../../Src/image/findnext.bmp
 IDB_FINDPREV            BITMAP  DISCARDABLE     "../../../Src/image/findprev.bmp"
 IDB_FIND                BITMAP  DISCARDABLE     "../../../Src/image/find.bmp"
 IDB_DELETE              BITMAP  DISCARDABLE     "../../../Src/image/delete.bmp"
+IDB_BOOKMARK            BITMAP  DISCARDABLE     "../../../src/image/bookmark.bmp"
+IDB_TOOL                BITMAP  DISCARDABLE     "../../../src/image/tool.bmp"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -394,6 +396,12 @@ BEGIN
         MENUITEM "Virtual folder",              IDM_VFOLDER_DEF
         MENUITEM "Erase password",              IDM_FORGETPASS
         MENUITEM "About",                       IDM_ABOUT
+    END
+    POPUP "Bookmark"
+    BEGIN
+        MENUITEM "Add bookmark",                IDM_BOOKMARK_ADD
+        MENUITEM "Edit bookmark",               IDM_BOOKMARK_CONFIG
+        MENUITEM SEPARATOR
     END
 END
 

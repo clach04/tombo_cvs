@@ -40,6 +40,7 @@ class MainFrame {
 #if defined(PLATFORM_BE500)
 	HMENU hMSMemoMenu;
 	HMENU hMSToolMenu;
+	HMENU hMSBookMarkMenu;
 	HMENU hMDEditMenu;
 #endif
 

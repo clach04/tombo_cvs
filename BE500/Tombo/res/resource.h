@@ -25,6 +25,7 @@
 #define IDM_DV_MENU_1                   110
 #define IDD_PROPTAB_PASS_TIMEOUT        111
 #define IDM_DV_MENU_2                   111
+#define IDM_SV_MENU_3                   112
 #define IDB_TOOLBAR                     115
 #define IDB_TOOLBAR_DETAILS             116
 #define IDD_PROPTAB_FONT                117
@@ -51,7 +52,9 @@
 #define IDD_FILTERDEF_SRC               138
 #define IDB_DELETE                      138
 #define IDD_FILTERDEF_FILTER            139
+#define IDB_BOOKMARK                    139
 #define IDD_FILTERDEF_ADD_REGEX         140
+#define IDB_TOOL                        140
 #define IDD_FILTERDEF_ADD_LIMIT         141
 #define IDD_FILTERDEF_ADD_TIMESTAMP     142
 #define IDD_FILTERDEF_ADD_SORT          143
@@ -188,14 +191,16 @@
 #define IDM_TOGGLEREADONLY              40055
 #define IDM_GREP                        40056
 #define IDM_VFOLDER_DEF                 40057
+#define IDM_BOOKMARK_ADD                40058
+#define IDM_BOOKMARK_CONFIG             40059
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        139
-#define _APS_NEXT_COMMAND_VALUE         40058
+#define _APS_NEXT_RESOURCE_VALUE        141
+#define _APS_NEXT_COMMAND_VALUE         40060
 #define _APS_NEXT_CONTROL_VALUE         1041
-#define _APS_NEXT_SYMED_VALUE           112
+#define _APS_NEXT_SYMED_VALUE           113
 #endif
 #endif

@@ -39,6 +39,8 @@ IDB_FINDNEXT            BITMAP  DISCARDABLE     "../../../Src/image/findnext.bmp
 IDB_FINDPREV            BITMAP  DISCARDABLE     "../../../Src/image/findprev.bmp"
 IDB_FIND                BITMAP  DISCARDABLE     "../../../Src/image/find.bmp"
 IDB_DELETE              BITMAP  DISCARDABLE     "../../../src/image/delete.bmp"
+IDB_BOOKMARK            BITMAP  DISCARDABLE     "../../../src/image/bookmark.bmp"
+IDB_TOOL                BITMAP  DISCARDABLE     "../../../src/image/tool.bmp"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -392,6 +394,12 @@ BEGIN
         MENUITEM "仮想フォルダ",                IDM_VFOLDER_DEF
         MENUITEM "パスワード消去",              IDM_FORGETPASS
         MENUITEM "バージョン情報",              IDM_ABOUT
+    END
+    POPUP "お気に入り"
+    BEGIN
+        MENUITEM "お気に入りに追加",            IDM_BOOKMARK_ADD
+        MENUITEM "お気に入りの整理",            IDM_BOOKMARK_CONFIG
+        MENUITEM SEPARATOR
     END
 END
 
