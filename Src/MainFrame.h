@@ -96,7 +96,7 @@ public:
 	BOOL OnExit();
 	BOOL OnNotify(HWND hWnd, WPARAM wParam, LPARAM lParam);
 	void OnSettingChange(WPARAM wParam);
-	void OnSIPResize(BOOL bImeOn, DWORD nSipHeight);
+	void OnSIPResize(BOOL bImeOn, DWORD nClientBottom);
 	void OnCommand(HWND hWnd, WPARAM wParam, LPARAM lParam);
 	void OnProperty();
 	void OnForgetPass();

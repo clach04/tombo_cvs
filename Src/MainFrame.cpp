@@ -1102,7 +1102,7 @@ void MainFrame::OnSettingChange(WPARAM wParam)
 	if (!sc.GetSipStat(&bStat)) return;
 
 	RECT r = sc.GetRect();
-	OnSIPResize(bStat, r.bottom - r.top);
+	OnSIPResize(bStat, r.top);
 #endif
 #if defined(PLATFORM_HPC) || defined(PLATFORM_PSPC)
 	if (wParam == SPI_SETWORKAREA) {
@@ -1118,22 +1118,23 @@ void MainFrame::OnSettingChange(WPARAM wParam)
 // IMÇÃON/OFFÇ…î∫Ç§ÉäÉTÉCÉY
 ///////////////////////////////////////////////////
 
-void MainFrame::OnSIPResize(BOOL bImeOn, DWORD nSipHeight)
+void MainFrame::OnSIPResize(BOOL bImeOn, DWORD nClientBottom)
 {
 #ifdef _WIN32_WCE
-#ifdef PLATFORM_PKTPC
-	DWORD nBottom;
+#if defined(PLATFORM_PKTPC)
 	RECT r, rWinRect;
 
 	GetClientRect(hMainWnd, &rWinRect);
 	GetWindowRect(hMSCmdBar, &r);
-	
-	nBottom = rWinRect.bottom - (r.bottom - r.top); 
 
 	if (bImeOn) {
-		msView.MoveWindow(rWinRect.left, rWinRect.top, rWinRect.right, nBottom - nSipHeight);
-		mdView.MoveWindow(rWinRect.left, rWinRect.top, rWinRect.right, nBottom - nSipHeight);
+		RECT rx;
+		GetWindowRect(hMainWnd, &rx);
+
+		msView.MoveWindow(rWinRect.left, rWinRect.top, rWinRect.right, nClientBottom - rx.top);
+		mdView.MoveWindow(rWinRect.left, rWinRect.top, rWinRect.right, nClientBottom - rx.top);
 	} else {
+		DWORD nBottom = rWinRect.bottom - (r.bottom - r.top); 
 		msView.MoveWindow(rWinRect.left, rWinRect.top, rWinRect.right, nBottom);
 		mdView.MoveWindow(rWinRect.left, rWinRect.top, rWinRect.right, nBottom);
 	}
@@ -1149,8 +1150,13 @@ void MainFrame::OnSIPResize(BOOL bImeOn, DWORD nSipHeight)
 	nTop = nHOffset;
 	nBottom = 320 - nHOffset * 2;
 	if (bImeOn) {
-		msView.MoveWindow(0, nTop, 240, nBottom - nSipHeight);
-		mdView.MoveWindow(0, nTop, 240, nBottom - nSipHeight);
+		RECT rx;
+		GetWindowRect(hMainWnd, &rx);
+		msView.MoveWindow(0, nTop, 240, nClientBottom - rx.top - nTop);
+		mdView.MoveWindow(0, nTop, 240, nClientBottom - rx.top - nTop);
+		
+//		msView.MoveWindow(0, nTop, 240, nBottom - nSipHeight);
+//		mdView.MoveWindow(0, nTop, 240, nBottom - nSipHeight);
 	} else {
 		msView.MoveWindow(0, nTop, 240, nBottom);
 		mdView.MoveWindow(0, nTop, 240, nBottom);

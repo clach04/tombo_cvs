@@ -23,6 +23,7 @@ BOOL SipControl::GetSipStat(BOOL *pStatus)
 #endif
 	*pStatus = (sip.fdwFlags & SIPF_ON) != 0;
 	rSipRect = sip.rcSipRect;
+	rVisibleDesktop = sip.rcVisibleDesktop;
 #endif
 	return TRUE;
 }
