@@ -848,14 +848,14 @@ BOOL MemoSelectView::UpdateItemStatusNotify(TreeViewItem *pItem, LPCTSTR pNewHea
 	// Notify to memomanager
 	pMemoMgr->ReleaseItemNotify(&(pItem->ToLocator()));
 
-	// Delete from Tree. (TreeViewItem is not deleted.)
+	// Delete from Tree. (TreeViewItem is not deleted because it will deleted at caller.)
 	TreeView_DeleteItem(hViewWnd, hOrigNode);
 
 	// Insert to tree.
 	TV_INSERTSTRUCT ti;
 	ti.hParent = hParent;
 	ti.item.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE | TVIF_PARAM;
-	ti.item.iImage = ti.item.iSelectedImage = pItem->GetIcon(this, 0); // 現状のアイコンを取得
+	ti.item.iImage = ti.item.iSelectedImage = pItem->GetIcon(this, 0); // Get current icon
 	ti.item.pszText = (LPTSTR)pNewHeadLine;
 	ti.item.lParam = (LPARAM)pItem;
 	HTREEITEM hItem = ::InsertNode(hViewWnd, &ti);
@@ -1029,9 +1029,6 @@ BOOL MemoSelectView::UpdateHeadLine(MemoLocator *pLoc, LPCTSTR pHeadLine)
 	// Get parent item
 	HTREEITEM hParent = TreeView_GetParent(hViewWnd, hItem);
 
-	// Delete current item
-	TreeView_DeleteItem(hViewWnd, hItem);
-
 	// 新しいノードの挿入・MemoNoteとの関連付け
 	TV_INSERTSTRUCT ti;
 	ti.hParent = hParent;
@@ -1041,14 +1038,26 @@ BOOL MemoSelectView::UpdateHeadLine(MemoLocator *pLoc, LPCTSTR pHeadLine)
 
 	TreeViewFileItem *tvi = new TreeViewFileItem();
 	MemoNote *pNewNote = pNote->Clone();
+
+	// Delete current item
+	DeleteOneItem(hItem);
+
 	if (pNewNote == NULL) return FALSE;
 	tvi->SetNote(pNewNote);
 	ti.item.lParam = (LPARAM)tvi;
 
+	// TODO:
+	// 親がcloseされているときにはhCurrentItemの関連が切り離されているので
+	// そもそもUpdateHeadLineが呼び出されることはない
 	if (IsExpand(hViewWnd, hParent)) {
 		HTREEITEM hItem = ::InsertNode(hViewWnd, &ti);
 		tvi->SetViewItem(hItem);
 		TreeView_SelectItem(hViewWnd, hItem);
+
+		// Notify to MemoManager
+		MemoLocator loc(pNewNote, hItem);
+		pMemoMgr->InsertItemNotify(&loc);
+
 	} else {
 #if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
 		if (g_Property.IsUseTwoPane()) {
