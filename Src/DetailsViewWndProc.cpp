@@ -118,7 +118,7 @@ LRESULT CALLBACK NewDetailsViewProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM l
 	}
 
 	LRESULT lResult = CallWindowProc((WNDPROC)gSuperProc, hwnd, msg, wParam, lParam);
-	if (msg == WM_CHAR && pView) {
+	if (pView && (msg == WM_CHAR || msg == WM_KEYDOWN && wParam == VK_DELETE)) {
 		pView->SetModifyStatus();
 	}
     return lResult;
