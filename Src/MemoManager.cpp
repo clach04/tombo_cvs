@@ -150,9 +150,8 @@ void MemoManager::SelectNote(MemoNote *pNote)
 // フォルダの新規作成
 ////////////////////////////////////////////////////////
 
-BOOL MemoManager::MakeNewFolder(HWND hWnd)
+BOOL MemoManager::MakeNewFolder(HWND hWnd, TreeViewItem *pItem)
 {
-
 	NewFolderDialog dlg;
 	BOOL bPrev = bDisableHotKey;
 	bDisableHotKey = TRUE;
@@ -165,7 +164,8 @@ BOOL MemoManager::MakeNewFolder(HWND hWnd)
 		TString sPartPath;
 		TString sPath;
 
-		HTREEITEM hItem = pMemoSelectView->GetPathForNewItem(&sPartPath);
+		HTREEITEM hItem;
+		hItem = pMemoSelectView->GetPathForNewItem(&sPartPath, pItem);
 		if (hItem == NULL) return FALSE;
 
 		if (!sPath.AllocFullPath(sPartPath.Get())) return FALSE;

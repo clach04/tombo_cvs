@@ -9,6 +9,7 @@ class MainFrame;
 class MemoNote;
 class PasswordManager;
 class SearchEngineA;
+class TreeViewItem;
 
 /////////////////////////////////////
 // Memo location info
@@ -94,7 +95,7 @@ public:
 
 	void SelectNote(MemoNote *pNote);
 
-	BOOL MakeNewFolder(HWND hWnd);	// フォルダの新規作成
+	BOOL MakeNewFolder(HWND hWnd, TreeViewItem *pItem);	// フォルダの新規作成
 
 	BOOL StoreCursorPos();
 

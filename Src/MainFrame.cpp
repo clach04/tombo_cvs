@@ -13,6 +13,7 @@
 #include "Property.h"
 #include "TString.h"
 #include "SipControl.h"
+#include "TreeViewItem.h"
 
 #ifdef _WIN32_WCE
 #if defined(PLATFORM_PKTPC)
@@ -1000,7 +1001,7 @@ void MainFrame::OnCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		NewMemo();
 		break;
 	case IDM_NEWFOLDER:
-		NewFolder();
+		NewFolder(NULL);
 		break;
 	case IDM_ABOUT:
 		About();
@@ -1348,9 +1349,9 @@ void MainFrame::NewMemo()
 // 新規フォルダ
 ///////////////////////////////////////////////////
 
-void MainFrame::NewFolder()
+void MainFrame::NewFolder(TreeViewItem *pItem)
 {
-	if (!mmMemoManager.MakeNewFolder(hMainWnd)) {
+	if (!mmMemoManager.MakeNewFolder(hMainWnd, pItem)) {
 		TomboMessageBox(hMainWnd, MSG_CREATEFOLDER_FAILED, TEXT("ERROR"), MB_ICONSTOP | MB_OK);
 	}
 }
@@ -2005,7 +2006,7 @@ void MainFrame::OnSearch()
 	}
 	mmMemoManager.SetSearchEngine(pSE);
 
-	// 検索ボタンの有効化
+	// Enable FindNext/Prev button
 #if defined(PLATFORM_WIN32)
 	SendMessage(hToolBar, TB_SETSTATE, IDM_SEARCH_PREV, MAKELONG(TBSTATE_ENABLED, 0)); 
 	SendMessage(hToolBar, TB_SETSTATE, IDM_SEARCH_NEXT, MAKELONG(TBSTATE_ENABLED, 0)); 
@@ -2020,6 +2021,8 @@ void MainFrame::OnSearch()
 	SendMessage(hMDCmdBar, TB_SETSTATE, IDM_SEARCH_PREV, MAKELONG(TBSTATE_ENABLED, 0)); 
 	SendMessage(hMDCmdBar, TB_SETSTATE, IDM_SEARCH_NEXT, MAKELONG(TBSTATE_ENABLED, 0)); 
 #endif
+
+	bSearchStartFromTreeView = bSelectViewActive;
 
 	// 検索実行
 	if (bSelectViewActive) {
@@ -2087,8 +2090,15 @@ void MainFrame::OnSearchNext(BOOL bForward)
 		DoSearchTree(mmMemoManager.MSSearchFlg(), bForward);
 		mmMemoManager.SetMSSearchFlg(FALSE);
 	} else {
-		mdView.Search(mmMemoManager.MDSearchFlg(), bForward, TRUE, FALSE);
+		// if search starts at edit view, show message when match failed.
+		// if starts at tree view, search next item.
+		BOOL bMatched = mdView.Search(mmMemoManager.MDSearchFlg(), bForward, !bSearchStartFromTreeView, FALSE);
 		mmMemoManager.SetMDSearchFlg(FALSE);
+		if (bSearchStartFromTreeView && !bMatched) {
+			ActivateView(TRUE);
+			DoSearchTree(mmMemoManager.MSSearchFlg(), bForward);
+			mmMemoManager.SetMSSearchFlg(FALSE);
+		}
 	}
 }
 

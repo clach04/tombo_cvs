@@ -469,9 +469,13 @@ void MemoDetailsView::SetTabstop() {
 // 検索
 /////////////////////////////////////////
 //
+// RESULT: return TRUE if matched.
+//
 // bFirstSearch : 検索開始位置: TRUE = メモ先頭 FALSE = 現在のカーソル位置 + 1
 // bForward : 検索の向き: TRUE = 順方向 FALSE = 逆方向
 // bNFMsg: 見つからなかった場合にメッセージを出すか
+// pFound: if string is found, set TRUE otherwise set FALSE.
+
 
 BOOL MemoDetailsView::Search(BOOL bFirstSearch, BOOL bForward, BOOL bNFMsg, BOOL bSearchFromTop)
 {

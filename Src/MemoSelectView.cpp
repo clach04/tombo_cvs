@@ -589,6 +589,9 @@ LRESULT MemoSelectView::OnNotify(HWND hWnd, WPARAM wParam, LPARAM lParam)
 			case IDM_DELETEITEM:
 				OnDelete(hti.hItem, pItem);
 				break;
+			case IDM_NEWFOLDER:
+				pMemoMgr->GetMainFrame()->NewFolder(pItem);
+				break;
 			}
 			break;
 		}
@@ -901,12 +904,16 @@ void MemoSelectView::OnActionButton(HWND hWnd)
 // 選択しているアイテムのパスの取得
 ///////////////////////////////////////////
 
-HTREEITEM MemoSelectView::GetPathForNewItem(TString *pPath)
+HTREEITEM MemoSelectView::GetPathForNewItem(TString *pPath, TreeViewItem *pItem)
 {
 	TCHAR buf[MAX_PATH];
 	HTREEITEM hItem = NULL;
 
-	TreeViewItem *pItem = GetCurrentItem(&hItem);
+	if (pItem == NULL) {
+		pItem = GetCurrentItem(&hItem);
+	} else {
+		hItem = pItem->GetViewItem();
+	}
 	MemoNote *pNote = NULL;
 	if (pItem && !pItem->HasMultiItem()) {
 		pNote = ((TreeViewFileItem*)pItem)->GetNote();

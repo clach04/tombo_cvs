@@ -110,7 +110,7 @@ public:
 
 	// 現在選択しているアイテムのパスを取得する。
 	// 選択しているアイテムがフォルダの場合、自身までのパスを含む
-	HTREEITEM GetPathForNewItem(TString *pPath);
+	HTREEITEM GetPathForNewItem(TString *pPath, TreeViewItem *pItem = NULL);
 
 	HTREEITEM GetTreeItemFromPath(LPCTSTR pPath);
 

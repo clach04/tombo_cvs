@@ -8,6 +8,7 @@
 #include "MemoManager.h"
 
 class MemoNote;
+class TreeViewItem;
 
 ///////////////////////////////////////
 // メインフレームウィンドウ
@@ -47,6 +48,8 @@ class MainFrame {
 
 	// ペインサイズ変更中フラグ
 	BOOL bResizePane;
+
+	BOOL bSearchStartFromTreeView;
 
 protected:
 	// アプリケーションボタンをアプリからハンドリングできるようにする
@@ -101,7 +104,7 @@ public:
 
 	void About();	// Aboutダイアログ
 	void NewMemo();	// 新規メモの作成
-	void NewFolder(); // 新規フォルダの作成
+	void NewFolder(TreeViewItem *pItem); // 新規フォルダの作成
 	void ToggleFolding(); // 折り返し表示の切り替え
 	void TogglePane(); // ペインの切り替え
 
