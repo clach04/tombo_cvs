@@ -102,12 +102,12 @@ BOOL GrepPersistTab::OnCommand(HWND hDlg, WPARAM wParam, LPARAM lParam)
 
 DWORD GrepDialog::Popup(HINSTANCE hInst, HWND hParent)
 {
-	PropertyTab *pages[2];
+	PropertyTab *pages[1];
 	GrepMainTab pgMain(this);
 	GrepPersistTab pgPersist;
 
 	pages[0] = &pgMain;
-	pages[1] = &pgPersist;
+//	pages[1] = &pgPersist;
 
 	PropertyPage pp;
 
