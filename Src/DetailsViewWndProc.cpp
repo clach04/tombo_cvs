@@ -11,14 +11,18 @@
 
 static MemoManager *pManager; 
 static MemoDetailsView *pView;
-//static WNDPROC gSuperProc;
 static HINSTANCE hInst;
 static HWND hParentWnd;
 static SUPER_WND_PROC gSuperProc;
 
+static BOOL bCtrlKeyDown = FALSE;
+
 #define KEY_ESC 0x1B
 #define KEY_CTRL_A 1
 #define KEY_CTRL_B 2
+
+#define KEY_COLON       0xBB
+#define KEY_SEMICOLON   0xBA
 
 void SetWndProc(SUPER_WND_PROC wp, HWND hParent, HINSTANCE h, MemoDetailsView *p, MemoManager *pMgr)
 {
@@ -30,14 +34,9 @@ void SetWndProc(SUPER_WND_PROC wp, HWND hParent, HINSTANCE h, MemoDetailsView *p
 }
 
 /////////////////////////////////////////
-// サブクラス化用Window Procedure
+// Window procedure for sub classing editview
 /////////////////////////////////////////
-//
-// タップ&ホールド/ESCによる一覧ビューへのリターンに対応するため、
-// エディットコントロールに対して
-// ウィンドウプロシージャの乗っ取りを行っている。
 
-//#if !defined(PLATFORM_PSPC) && !defined(PLATFORM_BE500)
 LRESULT CALLBACK NewDetailsViewProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch(msg) {
@@ -61,6 +60,21 @@ LRESULT CALLBACK NewDetailsViewProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM l
 				SendMessage(hwnd, WM_KEYDOWN, VK_NEXT, lParam); 
 				return 0;
 			}
+		} else {
+			if (wParam == KEY_COLON && bCtrlKeyDown) {	// :
+				if (pView) pView->InsertDate1();
+			}
+			if (wParam == KEY_SEMICOLON && bCtrlKeyDown) {	// ;
+				if (pView) pView->InsertDate2();
+			}
+			if (wParam == VK_CONTROL) {
+				bCtrlKeyDown = TRUE;
+			}
+		}
+		break;
+	case WM_KEYUP:
+		if (wParam == VK_CONTROL) {
+			bCtrlKeyDown = FALSE;
 		}
 		break;
 	case WM_CHAR:
@@ -75,10 +89,10 @@ LRESULT CALLBACK NewDetailsViewProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM l
 #if defined(PLATFORM_PKTPC)
 	case WM_LBUTTONDOWN:
 		{
-			// 検索状態フラグクリア
+			// clear search status
 			pManager->SetMDSearchFlg(TRUE);
 
-			// タップ&ホールド処理
+			// Tap&hold
 			SHRGINFO rgi;
 			rgi.cbSize = sizeof(SHRGINFO);
 			rgi.hwndClient = hwnd;
@@ -100,7 +114,7 @@ LRESULT CALLBACK NewDetailsViewProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM l
 		}
 #else
 	case WM_LBUTTONDOWN:
-		// 検索状態フラグクリア
+		// clear search status
 		pManager->SetMDSearchFlg(TRUE);
 		break;
 #endif
@@ -117,4 +131,3 @@ LRESULT CALLBACK NewDetailsViewProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM l
 	}
     return lResult;
 }
-//#endif

@@ -11,38 +11,47 @@ typedef FARPROC SUPER_WND_PROC;
 
 
 //////////////////////////////////////////
-// メモ内容表示ビュー
+// Edit view
 //////////////////////////////////////////
 
 class MemoDetailsView {
-	HWND hViewWnd;		// 現在使用されているウィンドウ(hViewWnd_fd or hViewWnd_nf)
-	HWND hViewWnd_fd;	// 折り返しを行うウィンドウ
-	HWND hViewWnd_nf;	// 折り返しを行わないウィンドウ
+	HWND hViewWnd;		// The window handle used now(hViewWnd_fd or hViewWnd_nf)
+	HWND hViewWnd_fd;	// The window created by wrapping options
+	HWND hViewWnd_nf;	// The window created by no wrapping options
 
 	MemoManager *pMemoMgr;
 	DWORD nLeftOffset;
 
-	BOOL bShowStatus;	// DetailsViewの表示・非表示状態
+	BOOL bShowStatus;	// Is view displayed?
 
 	BOOL bReadOnly;		// is read only mode?
 
 	DWORD nInitialPos;	// cursor position when open this note.
 
 public:
+
 	///////////////////////
-	// 初期化関連
+	// Initialize
+
 	MemoDetailsView() : hViewWnd(NULL) {}
 	BOOL Init(MemoManager *p) { pMemoMgr = p; return TRUE; }
 	BOOL Create(LPCTSTR pName, RECT &r, HWND hParent, DWORD nID, DWORD nID_nf, HINSTANCE hInst, HFONT hFont);
 
-	void SetTabstop();				// タブストップ変更
-	BOOL SetFolding(BOOL bFold);	// 折り返し表示切替
+
+	///////////////////////
+	// Properties
+
+	void SetTabstop();				// Tab stop
+	BOOL SetFolding(BOOL bFold);	// Change wrapping
 
 	void SetReadOnly(BOOL bReadOnly);
 	BOOL IsReadOnly() { return bReadOnly; }
 
+	void SetModifyStatus();
+
 	////////////////////////
-	// Windowメッセージ関連
+	// Message handler
+
 	BOOL Show(int nCmdShow);
 	void SetFocus() { ::SetFocus(hViewWnd); }
 	void SetFont(HFONT hFont);
@@ -53,7 +62,8 @@ public:
 	void OnGetFocus();
 
 	////////////////////////////
-	// データアクセス関連
+	// Data access
+
 	BOOL SetMemo(LPCTSTR pMemo, DWORD nPos, BOOL bReadOnly);
 	LPTSTR GetMemo();
 	BOOL IsModify() { if (hViewWnd) return SendMessage(hViewWnd, EM_GETMODIFY, 0, 0); else return FALSE; }
@@ -62,11 +72,14 @@ public:
 	DWORD GetCursorPos();
 	DWORD GetInitialPos() { return nInitialPos; }
 
-	void SelectAll();		// 全選択
-	void SetModifyStatus();
+	void SelectAll();
+
+	void InsertDate1();
+	void InsertDate2();
 
 	////////////////////////////
 	// search
+
 	BOOL Search(BOOL bFirstSearch, BOOL bForward, BOOL bNFMsg, BOOL bSearchFromTop);
 };
 

@@ -141,22 +141,24 @@ BOOL MemoDetailsView::OnCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		return TRUE;
 	case IDM_INSDATE1:
 		{
-			TString sDate;
-			if (!GetDateText(&sDate, g_Property.DateFormat1())) {
-				TomboMessageBox(NULL, MSG_GET_DATE_FAILED, TEXT("ERROR"), MB_ICONERROR | MB_OK);
-				return TRUE;
-			}
-			SendMessage(hViewWnd, EM_REPLACESEL, 0, (LPARAM)sDate.Get());
+//			TString sDate;
+//			if (!GetDateText(&sDate, g_Property.DateFormat1())) {
+//				TomboMessageBox(NULL, MSG_GET_DATE_FAILED, TEXT("ERROR"), MB_ICONERROR | MB_OK);
+//				return TRUE;
+//			}
+//			SendMessage(hViewWnd, EM_REPLACESEL, 0, (LPARAM)sDate.Get());
+			InsertDate1();
 			return TRUE;
 		}
 	case IDM_INSDATE2:
 		{
-			TString sDate;
-			if (!GetDateText(&sDate, g_Property.DateFormat2())) {
-				TomboMessageBox(NULL, MSG_GET_DATE_FAILED, TEXT("ERROR"), MB_ICONERROR | MB_OK);
-				return TRUE;
-			}
-			SendMessage(hViewWnd, EM_REPLACESEL, 0, (LPARAM)sDate.Get());
+//			TString sDate;
+//			if (!GetDateText(&sDate, g_Property.DateFormat2())) {
+//				TomboMessageBox(NULL, MSG_GET_DATE_FAILED, TEXT("ERROR"), MB_ICONERROR | MB_OK);
+//				return TRUE;
+//			}
+//			SendMessage(hViewWnd, EM_REPLACESEL, 0, (LPARAM)sDate.Get());
+			InsertDate2();
 			return TRUE;
 		}
 	case IDM_TOGGLEREADONLY:
@@ -572,4 +574,28 @@ void MemoDetailsView::SetReadOnly(BOOL bro)
 	bReadOnly = bro;
 //	SendMessage(hViewWnd, EM_SETREADONLY, (WPARAM)bReadOnly, 0);
 	if (pMemoMgr) pMemoMgr->GetMainFrame()->SetReadOnlyStatus(bReadOnly);
+}
+
+/////////////////////////////////////////
+// Insert date
+/////////////////////////////////////////
+
+void MemoDetailsView::InsertDate1()
+{
+	TString sDate;
+	if (!GetDateText(&sDate, g_Property.DateFormat1())) {
+		TomboMessageBox(NULL, MSG_GET_DATE_FAILED, TEXT("ERROR"), MB_ICONERROR | MB_OK);
+		return;
+	}
+	SendMessage(hViewWnd, EM_REPLACESEL, 0, (LPARAM)sDate.Get());
+}
+
+void MemoDetailsView::InsertDate2()
+{
+	TString sDate;
+	if (!GetDateText(&sDate, g_Property.DateFormat2())) {
+		TomboMessageBox(NULL, MSG_GET_DATE_FAILED, TEXT("ERROR"), MB_ICONERROR | MB_OK);
+		return;
+	}
+	SendMessage(hViewWnd, EM_REPLACESEL, 0, (LPARAM)sDate.Get());
 }
