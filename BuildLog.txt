@@ -82,6 +82,19 @@ TOMBO 1.5
 2002/12/01
 * Add errorno with save error message.
 
+////////////////////////////////
+// B076 CURRENT
+////////////////////////////////
+
+2002/12/07
+* Clear edit view when choose "Forget password"(#852).
+
+2002/12/12
+PG: add Variable buffer(plus vector)
+PG: Separate function that the file is notes or not.
+PG: Add sub function for searching.
+PG: Change inserting algorithmn.
+
 /////////////////////////////////////////////////////////////////////////
 // TODO
 /////////////////////////////////////////////////////////////////////////
