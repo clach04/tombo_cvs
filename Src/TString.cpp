@@ -221,7 +221,7 @@ BOOL WString::Set(TString *pSrc)
 	if (pSrc->Get() == NULL) return FALSE;
 #ifdef _WIN32_WCE
 	// TString has WCHAR strings. So copy it.
-	if (!Alloc(wcslen(pSrc->Get()) + 1) return FALSE;
+	if (!Alloc(wcslen(pSrc->Get()) + 1)) return FALSE;
 	wcscpy(pString, pSrc->Get());
 #else
 	// TString has char strings. Convert WBCS to Unicode.
