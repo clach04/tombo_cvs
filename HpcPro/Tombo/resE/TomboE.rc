@@ -187,9 +187,9 @@ BEGIN
                     BS_AUTOCHECKBOX | WS_TABSTOP,10,55,95,10
     CONTROL         "Find to file name",IDC_FILENAMEONLY,"Button",
                     BS_AUTOCHECKBOX | WS_TABSTOP,10,70,95,10
-    CONTROL         "Up",IDC_SEARCH_STRING_UP,"Button",BS_AUTORADIOBUTTON,
+    CONTROL         "Up",IDC_SEARCH_DIRECTION_UP,"Button",BS_AUTORADIOBUTTON,
                     115,50,25,10
-    CONTROL         "Down",IDC_SEARCH_STRING_DOWN,"Button",
+    CONTROL         "Down",IDC_SEARCH_DIRECTION_DOWN,"Button",
                     BS_AUTORADIOBUTTON,115,60,34,10
     GROUPBOX        "Direction",IDC_STATIC,110,40,45,35
 END

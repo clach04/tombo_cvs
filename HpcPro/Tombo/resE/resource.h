@@ -74,7 +74,9 @@
 #define IDC_FILENAMEONLY                1026
 #define IDC_VERSIONINFO                 1028
 #define IDC_SEARCH_STRING_UP            1029
+#define IDC_SEARCH_DIRECTION_UP         1029
 #define IDC_SEARCH_STRING_DOWN          1030
+#define IDC_SEARCH_DIRECTION_DOWN       1030
 #define IDM_ACTIONBUTTON                30001
 #define IDM_FILE_EXIT                   40002
 #define IDM_HELP_ABOUT                  40003
