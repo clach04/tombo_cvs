@@ -92,6 +92,7 @@ public:
 	void OnSearchNext(BOOL bForward);
 	void DoSearchTree(BOOL bFirst, BOOL bForward);
 
+	void OnGrep();
 	///////////////////
 	// ペイン配分変更
 	void OnLButtonDown(WPARAM wParam, LPARAM lParam);

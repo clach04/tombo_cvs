@@ -30,6 +30,8 @@
 #define IDD_PROPTAB_KEEPCARET           121
 #define IDD_SEARCH                      122
 #define IDD_SEARCHING                   123
+#define IDD_GREPTAB_MAIN                124
+#define IDD_GREPTAB_PERSIST             125
 #define IDM_MAIN_MENUITEM1              401
 #define IDM_MAIN_MENUITEM2              402
 #define IDS_MAIN_MENUITEM1              410
@@ -69,6 +71,11 @@
 #define IDC_SEARCH_DIRECTION_UP         1032
 #define IDC_SEARCH_DIRECTION_DOWN       1033
 #define IDC_SEARCHMSG                   1034
+#define IDC_GREPTAB_MAIN_SEARCHSTRING   1035
+#define IDC_GREPTAB_MAIN_CASESENSITIVE  1036
+#define IDC_GREPTAB_MAIN_ENCRYPTNOTE    1037
+#define IDC_GREPTAB_MAIN_FILENAME       1038
+#define IDC_GREPTAB_MAIN_STARTDIR       1039
 #define IDM_ACTIONBUTTON                30001
 #define IDM_FILE_EXIT                   40002
 #define IDM_HELP_ABOUT                  40003
@@ -110,7 +117,9 @@
 #define IDS_PROPTAB_DATE                40042
 #define IDM_CUT                         40043
 #define IDS_PROPTAB_KEEPCARET           40043
+#define IDS_GREPTAB_MAIN                40044
 #define IDM_SAVE                        40045
+#define IDS_GREPTAB_PERSIST             40045
 #define IDM_INSDATE1                    40046
 #define IDM_INSDATE2                    40047
 #define IDM_SELALL                      40048
@@ -121,14 +130,15 @@
 #define IDM_RENAME                      40053
 #define IDM_TOGGLEREADONLY              40054
 #define IDM_UNDO                        40055
+#define IDM_GREP                        40056
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        124
-#define _APS_NEXT_COMMAND_VALUE         40056
-#define _APS_NEXT_CONTROL_VALUE         1035
+#define _APS_NEXT_RESOURCE_VALUE        126
+#define _APS_NEXT_COMMAND_VALUE         40057
+#define _APS_NEXT_CONTROL_VALUE         1040
 #define _APS_NEXT_SYMED_VALUE           108
 #endif
 #endif

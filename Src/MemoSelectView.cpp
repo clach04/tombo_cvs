@@ -19,6 +19,7 @@
 #include "PasswordManager.h"
 #include "SearchEngine.h"
 #include "Message.h"
+#include "GrepDialog.h"
 
 // IDB_MEMOSELECT_IMAGESに格納されているイメージ1個のサイズ
 #define IMAGE_CX 16
@@ -35,7 +36,6 @@ LRESULT CALLBACK NewSelectViewProc( HWND hwnd, UINT msg, WPARAM wParam, LPARAM l
 /////////////////////////////////////////
 
 static void InsertDummyNode(HWND hTree, HTREEITEM hItem);
-static BOOL IsExpand(HWND hTree, HTREEITEM hItem);
 
 /////////////////////////////////////////
 // ウィンドウ生成
@@ -226,9 +226,10 @@ BOOL MemoSelectView::InitTree()
 
 	// Insert main tree
 	TreeViewFolderItem *pItem = new TreeViewFolderItem();
-	HTREEITEM hRoot = InsertFolder(TVI_ROOT, MSG_MEMO, pItem, TRUE);
-	TreeView_Expand(hViewWnd, hRoot, TVE_EXPAND);
+	hMemoRoot = InsertFolder(TVI_ROOT, MSG_MEMO, pItem, TRUE);
+	TreeView_Expand(hViewWnd, hMemoRoot, TVE_EXPAND);
 
+#ifdef COMMENT
 	// check vfolder def file
 	if (_tcslen(g_Property.PropertyDir()) == 0) return TRUE;
 	TString sVFpath;
@@ -236,10 +237,12 @@ BOOL MemoSelectView::InitTree()
 	File f;
 	if (!f.Open(sVFpath.Get(), GENERIC_READ, FILE_SHARE_READ, OPEN_EXISTING)) return FALSE;
 	f.Close();
+#endif
 
 	// Insert virtual tree
 	TreeViewVirtualFolderRoot *pVFRoot = new TreeViewVirtualFolderRoot();
-	InsertFolder(TVI_ROOT, MSG_VIRTUAL_FOLDER, pVFRoot, TRUE);
+	if (!pVFRoot || !pVFRoot->Init()) return FALSE;
+	hSearchRoot = InsertFolder(TVI_ROOT, MSG_VIRTUAL_FOLDER, pVFRoot, TRUE);
 
 	return TRUE;
 }
@@ -317,17 +320,17 @@ BOOL MemoSelectView::DeleteAllItem()
 }
 
 /////////////////////////////////////////
-// ツリーを開いているかどうか？
+// Is the item expending?
 /////////////////////////////////////////
 
-static BOOL IsExpand(HWND hTree, HTREEITEM hItem)
+BOOL MemoSelectView::IsExpand(HTREEITEM hItem)
 {
 	TV_ITEM ti;
 	ti.hItem = hItem;
 	ti.mask = TVIF_STATE;
 	ti.state = TVIS_EXPANDED;
 	ti.stateMask = TVIS_EXPANDED;
-	TreeView_GetItem(hTree, &ti);
+	TreeView_GetItem(hViewWnd, &ti);
 	return ti.state & TVIS_EXPANDED;
 }
 
@@ -941,7 +944,7 @@ HTREEITEM MemoSelectView::GetPathForNewItem(TString *pPath, TreeViewItem *pItem)
 BOOL MemoSelectView::CreateNewFolder(HTREEITEM hItem, LPCTSTR pFolder)
 {
 	// ツリーが閉じている場合には開く
-	if (!IsExpand(hViewWnd, hItem) && (TreeView_GetChild(hViewWnd, hItem) != NULL)) {
+	if (!IsExpand(hItem) && (TreeView_GetChild(hViewWnd, hItem) != NULL)) {
 		// 開くことで作成したフォルダは自動的に読み込まれる
 		TreeView_Expand(hViewWnd, hItem, TVE_EXPAND);
 	} else {
@@ -1063,7 +1066,7 @@ BOOL MemoSelectView::UpdateHeadLine(MemoLocator *pLoc, LPCTSTR pHeadLine)
 	// TODO:
 	// 親がcloseされているときにはhCurrentItemの関連が切り離されているので
 	// そもそもUpdateHeadLineが呼び出されることはない
-	if (IsExpand(hViewWnd, hParent)) {
+	if (IsExpand(hParent)) {
 		HTREEITEM hItem = ::InsertNode(hViewWnd, &ti);
 		tvi->SetViewItem(hItem);
 		TreeView_SelectItem(hViewWnd, hItem);
@@ -1318,7 +1321,7 @@ BOOL MemoSelectView::ShowItem(LPCTSTR pPath)
 		*q = TEXT('\0');
 
 		// if tree is not expanding, expand it.
-		if (!IsExpand(hViewWnd, hTargetItem)) {
+		if (!IsExpand(hTargetItem)) {
 			TreeView_Expand(hViewWnd, hTargetItem, TVE_EXPAND);
 		}
 
@@ -1351,4 +1354,40 @@ BOOL MemoSelectView::ShowItem(LPCTSTR pPath)
 	}
 
 	return TRUE;
+}
+
+/////////////////////////////////////////////
+// Insert grep result
+/////////////////////////////////////////////
+
+BOOL MemoSelectView::InsertVirtualFolder(GrepDialog *pGrepDlg)
+{
+	VFInfo vfInfo;
+
+	DWORD nFlg = 0;
+	if (pGrepDlg->IsCaseSensitive()) { nFlg |= VFINFO_FLG_CASESENSITIVE; }
+	if (pGrepDlg->IsCheckCryptedMemo()) { nFlg |= VFINFO_FLG_CHECKCRYPTED; }
+	if (pGrepDlg->IsCheckFileName()) { nFlg |= VFINFO_FLG_FILENAMEONLY; }
+
+	if (pGrepDlg->GetPath()) {
+		vfInfo.pPath = new TCHAR[_tcslen(pGrepDlg->GetPath()) + 2];
+		if (vfInfo.pPath == NULL) return FALSE;
+		*(vfInfo.pPath) = TEXT('\\');
+		_tcscpy(vfInfo.pPath + 1, pGrepDlg->GetPath());
+	} else {
+		return FALSE;
+	}
+	if (pGrepDlg->GetMatchString()) {
+		vfInfo.pRegex = StringDup(pGrepDlg->GetMatchString());
+	}
+	if (pGrepDlg->GetName()) {
+		vfInfo.pName = StringDup(pGrepDlg->GetName());
+	} else {
+		vfInfo.pName = new TCHAR[_tcslen(MSG_GREP_NONAME_LABEL) + 10];
+		if (vfInfo.pName == NULL) return FALSE;
+		wsprintf(vfInfo.pName, TEXT("%s%03d"), MSG_GREP_NONAME_LABEL, ++nGrepCount);
+	}
+
+	TreeViewVirtualFolderRoot *pVFRoot = (TreeViewVirtualFolderRoot*)GetTVItem(hSearchRoot);
+	return pVFRoot->AddSearchResult(this, &vfInfo);
 }

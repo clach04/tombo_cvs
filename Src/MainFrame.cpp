@@ -14,6 +14,7 @@
 #include "TString.h"
 #include "SipControl.h"
 #include "TreeViewItem.h"
+#include "GrepDialog.h"
 
 #ifdef _WIN32_WCE
 #if defined(PLATFORM_PKTPC)
@@ -1047,6 +1048,9 @@ void MainFrame::OnCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		ToggleShowStatusBar();
 		break;
 #endif
+	case IDM_GREP:
+		OnGrep();
+		break;
 	}
 	return;
 }
@@ -2177,3 +2181,21 @@ int MainFrame::MessageBox(LPCTSTR pText, LPCTSTR pCaption, UINT uType)
 	return TomboMessageBox(hMainWnd, pText, pCaption, uType);
 }
 
+///////////////////////////////////////////////////
+// Grep
+///////////////////////////////////////////////////
+
+void MainFrame::OnGrep()
+{
+	HTREEITEM hItem;
+	TString sPath;
+	hItem = msView.GetPathForNewItem(&sPath);
+	if (hItem == NULL) return;
+
+	GrepDialog gd;
+	if (!gd.Init(sPath.Get())) return;
+	gd.Popup(hInstance, hMainWnd);
+	if (!msView.InsertVirtualFolder(&gd)) {
+		MessageBox(MSG_INSERTVFOLDER_FAIL, TOMBO_APP_NAME, MB_OK | MB_ICONERROR);
+	}
+}

@@ -10,6 +10,7 @@ class VFStream;
 class MemoLoctor;
 
 #include "MemoManager.h"
+#include "VarBuffer.h"
 
 /////////////////////////////////////////////
 //  TreeViewÇÃÉAÉCÉeÉÄÇÃíäè€âª
@@ -68,8 +69,6 @@ public:
 class TreeViewFileItem : public TreeViewItem {
 protected:
 	MemoNote *pNote;
-
-//	BOOL DeleteWithoutAsk(MemoManager *pMgr, MemoSelectView *pView);
 public:
 	TreeViewFileItem();
 	~TreeViewFileItem();
@@ -113,17 +112,44 @@ public:
 };
 
 /////////////////////////////////////////////
+//  Virtual folder definition
+/////////////////////////////////////////////
+#define VFINFO_FLG_CASESENSITIVE	1
+#define VFINFO_FLG_CHECKCRYPTED		2
+#define VFINFO_FLG_FILENAMEONLY		4
+#define VFINFO_FLG_PERSISTENT		8
+
+class VFInfo {
+public:
+	VFInfo() : pName(NULL), pPath(NULL), pRegex(NULL) {}
+
+	void Release() { delete[] pName; delete[] pPath; delete[] pRegex; }
+
+	LPTSTR pName;
+	LPTSTR pPath;
+	LPTSTR pRegex;
+	DWORD nFlag;
+};
+
+/////////////////////////////////////////////
 //  Virtual Folder (Root)
 /////////////////////////////////////////////
 
 class TreeViewVirtualFolderRoot : public TreeViewFolderItem {
+	TVector<VFInfo> vbInfo;
 public:
 	TreeViewVirtualFolderRoot();
 	~TreeViewVirtualFolderRoot();
+	BOOL Init();
 
 	DWORD GetIcon(MemoSelectView *pView, DWORD nStatus);
 
 	BOOL Expand(MemoSelectView *pView);
+
+	////////////////////////////
+	// Virtual folder operator 
+	BOOL AddSearchResult(MemoSelectView *pView, VFInfo *p);
+
 };
 
 /////////////////////////////////////////////

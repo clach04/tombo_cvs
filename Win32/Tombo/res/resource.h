@@ -13,6 +13,8 @@
 #define IDS_TIPS_NEWMEMO                9
 #define IDS_TIPS_SAVE                   10
 #define IDS_PROPTAB_SELECTMEMO          11
+#define IDS_GREPTAB_MAIN                12
+#define IDS_GREPTAB_PERSIST             13
 #define ID_MENU_MAIN                    101
 #define ID_CMDBAR_MAIN                  101
 #define IDR_MENU_MAIN                   101
@@ -50,6 +52,8 @@
 #define IDD_SEARCH                      132
 #define IDR_CONTEXTMENU                 133
 #define IDD_SEARCHING                   134
+#define IDD_GREPTAB_MAIN                135
+#define IDD_GREPTAB_PERSIST             136
 #define IDC_PASS                        1000
 #define IDC_PROP_PASSWORD_DESC          1001
 #define IDC_PASS_TIMEOUT                1002
@@ -78,6 +82,13 @@
 #define IDC_SEARCH_DIRECTION_UP         1027
 #define IDC_SEARCH_DIRECTION_DOWN       1028
 #define IDC_SEARCHMSG                   1029
+#define IDC_GREPTAB_MAIN_STARTDIR       1030
+#define IDC_GREPTAB_MAIN_SEARCHSTRING   1031
+#define IDC_GREPTAB_MAIN_CASESENSITIVE  1032
+#define IDC_GREPTAB_MAIN_ENCRYPTNOTE    1033
+#define IDC_GREPTAB_MAIN_FILENAME       1034
+#define IDC_GREPTAB_PERSIST_NAME        1035
+#define IDC_PROPTAB_PERSIST_SELECTPERSIST 1036
 #define IDM_EXIT                        40001
 #define IDM_NEWMEMO                     40002
 #define IDM_RETURNLIST                  40003
@@ -108,14 +119,15 @@
 #define IDM_TOGGLEREADONLY              40028
 #define IDM_UNDO                        40029
 #define IDM_SHOWSTATUSBAR               40030
+#define IDM_GREP                        40031
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        135
-#define _APS_NEXT_COMMAND_VALUE         40031
-#define _APS_NEXT_CONTROL_VALUE         1030
+#define _APS_NEXT_RESOURCE_VALUE        137
+#define _APS_NEXT_COMMAND_VALUE         40032
+#define _APS_NEXT_CONTROL_VALUE         1037
 #define _APS_NEXT_SYMED_VALUE           108
 #endif
 #endif

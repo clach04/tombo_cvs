@@ -6,15 +6,29 @@ class MemoNote;
 class TString;
 class TreeViewItem;
 class MemoLocator;
+class GrepDialog;
 
 class MemoSelectView {
+
+	/////////////////////////////
+	// Window related members
+
 	HWND hViewWnd;
 	HIMAGELIST hImageList;
 
+	// root node
+	HTREEITEM hMemoRoot;
+	HTREEITEM hSearchRoot;
+
 	MemoManager *pMemoMgr;
 
-	// Cut/Copy/Paste用
-	TreeViewItem *pClipItem; // Cut/Copy元Dispatcher
+	/////////////////////////////
+	// Grep related members
+	DWORD nGrepCount;
+
+	/////////////////////////////
+	// for Cut/Copy/Paste
+	TreeViewItem *pClipItem;
 	BOOL bCut;
 
 	// 自動切換えモードフラグ
@@ -25,9 +39,6 @@ class MemoSelectView {
 
 	void DeleteOneItem(HTREEITEM hItem);
 	void DeleteItemsRec(HTREEITEM hFirst);
-
-	// ツリーの開閉
-	void ToggleExpandFolder(HTREEITEM hItem, UINT stat);
 
 	///////////////////////////////////
 
@@ -41,7 +52,7 @@ public:
 	/////////////////////////////
 	// Initialize functions
 
-	MemoSelectView() : hViewWnd(NULL), pMemoMgr(NULL), bAutoLoadMode(FALSE), bSingleClickMode(FALSE) {}
+	MemoSelectView() : hViewWnd(NULL), pMemoMgr(NULL), bAutoLoadMode(FALSE), bSingleClickMode(FALSE), hMemoRoot(NULL), hSearchRoot(NULL), nGrepCount(0) {}
 	BOOL Init(MemoManager *p) { pMemoMgr = p; bCut = FALSE; pClipItem = NULL; return TRUE; }
 	BOOL Create(LPCTSTR pName, RECT &r, HWND hParent, DWORD nID, HINSTANCE hInst, HFONT hFont);
 
@@ -84,17 +95,17 @@ public:
 	BOOL IsSingleClickMode() { return bSingleClickMode; }
 
 	/////////////////////////////
-	// 検索
-//	BOOL Search(BOOL bFirstSearch, BOOL bForward);
-
-	/////////////////////////////
 	// ビューアイテム操作関連
 
 	BOOL InitTree();
 	BOOL DeleteAllItem();
 
+	/////////////////////////////
+	// Expand/collapse tree
+	void ToggleExpandFolder(HTREEITEM hItem, UINT stat);
 	void TreeExpand(HTREEITEM hItem);
 	void TreeCollapse(HTREEITEM hItem);
+	BOOL IsExpand(HTREEITEM hItem);
 
 	// 新規メモ生成時処理
 	HTREEITEM NewMemoCreated(MemoNote *pNote, LPCTSTR pHeadLine, HTREEITEM hItem);
@@ -123,7 +134,7 @@ public:
 	// ヘッドライン文字列の書き換え
 	BOOL UpdateHeadLine(MemoLocator *pLoc, LPCTSTR pHeadLine);
 
-	// 現在選択されているアイテムと関連付けられているMemoNoteを返す。
+	// 現在選択されているアイテムと関連付けられているTreeViewItemを返す。
 	// pItemが指定されている場合にはHTREEITEMも返す。
 	// 選択されていない場合には戻り値としてNULLを返す。
 	TreeViewItem *GetCurrentItem(HTREEITEM *pItem = NULL);
@@ -139,6 +150,9 @@ public:
 	// Choose specified notes. if tree is collapsed, expand one.
 	BOOL ShowItem(LPCTSTR pPath);
 
+	/////////////////////////////
+	// Virtual folder
+	BOOL InsertVirtualFolder(GrepDialog *pGrepDlg);
 };
 
 /////////////////////////////////////////

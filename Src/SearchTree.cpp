@@ -82,7 +82,6 @@ extern "C" static DWORD WINAPI SearchThreadFunc(LPVOID p)
 
 void SearchTree::Popup(HINSTANCE hInst, HWND hParent)
 {
-	// TODO: layout at the center of the main window.
 	DialogBoxParam(hInst, MAKEINTRESOURCE(IDD_SEARCHING), hParent, (DLGPROC)SearchTreeDlgProc, (LONG)this);
 }
 

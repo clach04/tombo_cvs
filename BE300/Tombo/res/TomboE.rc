@@ -218,6 +218,29 @@ BEGIN
     CTEXT           "Searching...",IDC_SEARCHMSG,5,16,65,8
 END
 
+IDD_GREPTAB_MAIN DIALOG DISCARDABLE  0, 0, 131, 136
+STYLE WS_CHILD | WS_BORDER
+FONT 9, "System"
+BEGIN
+    LTEXT           "Target dir:",IDC_STATIC,5,5,34,8
+    LTEXT           "Static",IDC_GREPTAB_MAIN_STARTDIR,45,5,80,8
+    LTEXT           "Search str:",IDC_STATIC,5,20,35,8
+    COMBOBOX        IDC_GREPTAB_MAIN_SEARCHSTRING,40,20,90,115,CBS_DROPDOWN | 
+                    WS_VSCROLL | WS_TABSTOP
+    CONTROL         "Case sensitive",IDC_GREPTAB_MAIN_CASESENSITIVE,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,10,45,59,10
+    CONTROL         "Include encrypted memo",IDC_GREPTAB_MAIN_ENCRYPTNOTE,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,60,95,10
+    CONTROL         "Find to file name",IDC_GREPTAB_MAIN_FILENAME,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,10,75,68,10
+END
+
+IDD_GREPTAB_PERSIST DIALOG DISCARDABLE  0, 0, 131, 136
+STYLE WS_CHILD | WS_BORDER
+FONT 9, "System"
+BEGIN
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -239,6 +262,8 @@ BEGIN
         MENUITEM "Find",                        IDM_SEARCH
         MENUITEM "Find next",                   IDM_SEARCH_NEXT
         MENUITEM "Find prev",                   IDM_SEARCH_PREV
+        MENUITEM SEPARATOR
+        MENUITEM "Grep",                        IDM_GREP
         MENUITEM SEPARATOR
         MENUITEM "Encrypt",                     IDM_ENCRYPT
         MENUITEM "Decrypt",                     IDM_DECRYPT
@@ -340,6 +365,22 @@ BEGIN
         TOPMARGIN, 7
         BOTTOMMARGIN, 47
     END
+
+    IDD_GREPTAB_MAIN, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 124
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 129
+    END
+
+    IDD_GREPTAB_PERSIST, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 124
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 129
+    END
 END
 #endif    // APSTUDIO_INVOKED
 
@@ -408,6 +449,8 @@ BEGIN
     IDS_PROPTAB_DATE        "Date"
     IDS_PROPTAB_KEEPCARET   "Cursor"
     IDS_PROPTAB_CODEPAGE    "Codepage"
+    IDS_GREPTAB_MAIN        "Main"
+    IDS_GREPTAB_PERSIST     "Save"
 END
 
 #endif    // Japanese resources

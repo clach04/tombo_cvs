@@ -537,8 +537,19 @@ TreeViewVirtualFolderRoot::TreeViewVirtualFolderRoot()
 
 TreeViewVirtualFolderRoot::~TreeViewVirtualFolderRoot()
 {
+	// delete vbInfo's items memory
+	DWORD n = vbInfo.NumItems();
+	VFInfo *p;
+	for (DWORD i = 0; i < n; i++) {
+		p = vbInfo.GetUnit(i);
+		p->Release();
+	}
 }
 
+BOOL TreeViewVirtualFolderRoot::Init()
+{
+	return vbInfo.Init(5, 5);
+}
 
 DWORD TreeViewVirtualFolderRoot::GetIcon(MemoSelectView *pView, DWORD nStatus)
 {
@@ -571,6 +582,7 @@ DWORD TreeViewVirtualFolderRoot::GetIcon(MemoSelectView *pView, DWORD nStatus)
 
 BOOL TreeViewVirtualFolderRoot::Expand(MemoSelectView *pView)
 {
+#ifdef COMMENT
 	HTREEITEM hParent = GetViewItem();
 
 	TString sVFpath;
@@ -579,6 +591,52 @@ BOOL TreeViewVirtualFolderRoot::Expand(MemoSelectView *pView)
 	TSParser tp;
 	if (!tp.Init(sVFpath.Get(), pView, hParent)) return FALSE;
 	if (!tp.Compile()) return FALSE;
+#endif
+	HTREEITEM hParent = GetViewItem();
+
+	TreeViewVirtualFolder *pVf;
+	VFInfo *pInfo;
+	DWORD n = vbInfo.NumItems();
+	for (DWORD i = 0; i < n; i++) {
+		pInfo = vbInfo.GetUnit(i);
+
+		pVf = new TreeViewVirtualFolder();
+		VFDirectoryGenerator *pGen = new VFDirectoryGenerator();
+		if (pGen == NULL || !pGen->Init(StringDup(pInfo->pPath))) return FALSE;
+		VFStore *pStore = new VFStore(VFStore::ORDER_TITLE);
+		pGen->SetNext(pStore);
+		pVf->SetGenerator(pGen);
+		pVf->SetStore(pStore);
+
+		if (pVf == NULL) return FALSE;
+		pView->InsertFolder(hParent, pInfo->pName, pVf, TRUE);
+
+	}
+
+	return TRUE;
+}
+
+BOOL TreeViewVirtualFolderRoot::AddSearchResult(MemoSelectView *pView, VFInfo *pInfo)
+{
+
+	HTREEITEM hParent = GetViewItem();
+	if (!vbInfo.Add(pInfo)) return FALSE;
+
+	if (!pView->IsExpand(hParent)) {
+		pView->ToggleExpandFolder(hParent, 0);
+	} else {
+		// insert tree manually
+		TreeViewVirtualFolder *pVf = new TreeViewVirtualFolder();
+		VFDirectoryGenerator *pGen = new VFDirectoryGenerator();
+		if (pGen == NULL || !pGen->Init(StringDup(pInfo->pPath))) return FALSE;
+		VFStore *pStore = new VFStore(VFStore::ORDER_TITLE);
+		pGen->SetNext(pStore);
+		pVf->SetGenerator(pGen);
+		pVf->SetStore(pStore);
+
+		if (!pVf) return FALSE;
+		if (!pView->InsertFolder(hParent, pInfo->pName, pVf, TRUE)) return FALSE;
+	}
 
 	return TRUE;
 }
@@ -652,16 +710,11 @@ BOOL TreeViewVirtualFolder::Expand(MemoSelectView *pView)
 {
 	HTREEITEM hItem = GetViewItem();
 
-	// set waiting cursor
-	HCURSOR hOrigCursor = SetCursor(LoadCursor(NULL, IDC_WAIT));
-
 	// scanning.
 	if (!pGenerator || !pStore || 
 		!pGenerator->Prepare() || 
 		!pGenerator->Activate() ||
 		!pGenerator->PostActivate()) {
-
-		SetCursor(hOrigCursor);
 		return FALSE;
 	}
 
@@ -675,7 +728,5 @@ BOOL TreeViewVirtualFolder::Expand(MemoSelectView *pView)
 	}
 	pStore->FreeArray(); ppNotes = NULL;
 
-	// set normal cursor
-	SetCursor(hOrigCursor);
 	return TRUE;
 }

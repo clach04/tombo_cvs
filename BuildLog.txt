@@ -172,6 +172,14 @@ a note does not open correctly.
 * NEW: Add New folder by selecting right menu(#1170).
 * MOD: Disable "Not match" dialog when search starts with treeview(#940).
 
+////////////////////////////////
+// B085
+////////////////////////////////
+
+* Separate propertysheet basic implimentation from Property.* 
+* Add grep dialog and menu.
+* Implimenting virtual folder.
+	(In this build, all notes are displayed, filtering is not implimented yet.)
 
 /////////////////////////////////////////////////////////////////////////
 // TODO
@@ -181,10 +189,10 @@ a note does not open correctly.
 
 Disable menu to rename/delete root node.
 Check and refine menu item's enable/disable
-MemoInfo‚É‚Â‚¢‚ÄMemoManagerŠÇ—‚©‚çMemoNoteŠÇ—‚É‚È‚é‚æ‚¤‚ÉC³‚·‚é
-OpenRequest‚ğMemoSelectView‚©‚çTreeViewItem‚ÉˆÚ“®
-MemoManager::MakeNewFolder‚ğ‚Ç[‚É‚©‚·‚é
-InactivateDetailsView‚ğ‚È‚ñ‚Æ‚©‚·‚é
+Refactoring: MemoInfo control under MemoManager to MemoNote.
+Move method OpenRequest() from MemoSelectView to TreeViewItem.
+Refactoring : MemoManager::MakeNewFolder
+Refactoring : InactivateDetailsView
 
 == around virtual folder
 
@@ -197,5 +205,4 @@ InactivateDetailsView‚ğ‚È‚ñ‚Æ‚©‚·‚é
 * Disable Cut/Copy/Paste/Disable/Encrypt/Decrypt etc. when virtual node selected.
 * Impliment matching filter notes.match().
 * Error handling when compiling.
-* TS file Property I/F.
 * Impliment sorting function notes.sort().

@@ -922,6 +922,106 @@ DEP_CPP_FILES=\
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\Src\GrepDialog.cpp
+
+!IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
+
+DEP_CPP_GREPD=\
+	"..\..\Src\GrepDialog.h"\
+	"..\..\Src\Message.h"\
+	"..\..\Src\Property.h"\
+	"..\..\Src\PropertyPage.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
+
+DEP_CPP_GREPD=\
+	"..\..\Src\GrepDialog.h"\
+	"..\..\Src\Message.h"\
+	"..\..\Src\Property.h"\
+	"..\..\Src\PropertyPage.h"\
+	
+NODEP_CPP_GREPD=\
+	"..\..\Src\resource.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Release"
+
+DEP_CPP_GREPD=\
+	"..\..\Src\GrepDialog.h"\
+	"..\..\Src\Message.h"\
+	"..\..\Src\Property.h"\
+	"..\..\Src\PropertyPage.h"\
+	
+NODEP_CPP_GREPD=\
+	"..\..\Src\resource.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Debug"
+
+DEP_CPP_GREPD=\
+	"..\..\Src\GrepDialog.h"\
+	"..\..\Src\Message.h"\
+	"..\..\Src\Property.h"\
+	"..\..\Src\PropertyPage.h"\
+	
+NODEP_CPP_GREPD=\
+	"..\..\Src\resource.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Release"
+
+DEP_CPP_GREPD=\
+	"..\..\Src\GrepDialog.h"\
+	"..\..\Src\Message.h"\
+	"..\..\Src\Property.h"\
+	"..\..\Src\PropertyPage.h"\
+	
+NODEP_CPP_GREPD=\
+	"..\..\Src\resource.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Debug"
+
+DEP_CPP_GREPD=\
+	"..\..\Src\GrepDialog.h"\
+	"..\..\Src\Message.h"\
+	"..\..\Src\Property.h"\
+	"..\..\Src\PropertyPage.h"\
+	
+NODEP_CPP_GREPD=\
+	"..\..\Src\resource.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Release"
+
+DEP_CPP_GREPD=\
+	"..\..\Src\GrepDialog.h"\
+	"..\..\Src\Message.h"\
+	"..\..\Src\Property.h"\
+	"..\..\Src\PropertyPage.h"\
+	
+NODEP_CPP_GREPD=\
+	"..\..\Src\resource.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Debug"
+
+DEP_CPP_GREPD=\
+	"..\..\Src\GrepDialog.h"\
+	"..\..\Src\Message.h"\
+	"..\..\Src\Property.h"\
+	"..\..\Src\PropertyPage.h"\
+	
+NODEP_CPP_GREPD=\
+	"..\..\Src\resource.h"\
+	
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\Src\Logger.cpp
 
 !IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
@@ -1128,6 +1228,7 @@ SOURCE=..\..\Src\MainFrame.cpp
 DEP_CPP_MAINF=\
 	"..\..\Src\AboutDialog.h"\
 	"..\..\Src\File.h"\
+	"..\..\Src\GrepDialog.h"\
 	"..\..\Src\Logger.h"\
 	"..\..\Src\MainFrame.h"\
 	"..\..\Src\MemoDetailsView.h"\
@@ -2196,6 +2297,7 @@ DEP_CPP_PROPE=\
 	"..\..\Src\Message.h"\
 	"..\..\Src\PasswordManager.h"\
 	"..\..\Src\Property.h"\
+	"..\..\Src\PropertyPage.h"\
 	"..\..\Src\Tombo.h"\
 	"..\..\Src\TreeViewItem.h"\
 	"..\..\Src\Uniconv.h"\
@@ -2265,6 +2367,61 @@ DEP_CPP_PROPE=\
 	"..\..\Src\FileSelector.h"\
 	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
+	
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\PropertyPage.cpp
+
+!IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
+
+DEP_CPP_PROPER=\
+	"..\..\Src\PropertyPage.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
+
+DEP_CPP_PROPER=\
+	"..\..\Src\PropertyPage.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Release"
+
+DEP_CPP_PROPER=\
+	"..\..\Src\PropertyPage.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Debug"
+
+DEP_CPP_PROPER=\
+	"..\..\Src\PropertyPage.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Release"
+
+DEP_CPP_PROPER=\
+	"..\..\Src\PropertyPage.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Debug"
+
+DEP_CPP_PROPER=\
+	"..\..\Src\PropertyPage.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Release"
+
+DEP_CPP_PROPER=\
+	"..\..\Src\PropertyPage.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Debug"
+
+DEP_CPP_PROPER=\
+	"..\..\Src\PropertyPage.h"\
 	
 
 !ENDIF 
@@ -2553,6 +2710,7 @@ DEP_CPP_SEARCHT=\
 	"..\..\Src\SearchTree.h"\
 	"..\..\Src\TreeViewItem.h"\
 	"..\..\Src\TString.h"\
+	"..\..\Src\Uniconv.h"\
 	"..\..\Src\VarBuffer.h"\
 	
 
@@ -3581,6 +3739,10 @@ SOURCE=..\..\Src\FileSelector.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\Src\GrepDialog.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\Src\Logger.h
 # End Source File
 # Begin Source File
@@ -3626,6 +3788,10 @@ SOURCE=..\..\Src\PasswordManager.h
 # Begin Source File
 
 SOURCE=..\..\Src\Property.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\PropertyPage.h
 # End Source File
 # Begin Source File
 

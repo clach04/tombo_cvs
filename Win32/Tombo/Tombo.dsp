@@ -161,6 +161,10 @@ SOURCE=..\..\Src\FileSelector.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\Src\GrepDialog.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\Src\List.cpp
 # End Source File
 # Begin Source File
@@ -218,6 +222,10 @@ SOURCE=..\..\Src\PasswordManager.cpp
 # Begin Source File
 
 SOURCE=..\..\Src\Property.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\PropertyPage.cpp
 # End Source File
 # Begin Source File
 
@@ -349,6 +357,10 @@ SOURCE=..\..\Src\FileSelector.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\Src\GrepDialog.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\Src\List.h
 # End Source File
 # Begin Source File
@@ -402,6 +414,10 @@ SOURCE=..\..\Src\PasswordManager.h
 # Begin Source File
 
 SOURCE=..\..\Src\Property.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\PropertyPage.h
 # End Source File
 # Begin Source File
 

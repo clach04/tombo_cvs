@@ -10,6 +10,7 @@
 #include "Tombo.h"
 
 #include "Property.h"
+#include "PropertyPage.h"
 #include "resource.h"
 #include "FileSelector.h"
 #include "UniConv.h"
@@ -139,110 +140,25 @@ HFONT Property::DetailsViewFont()
 	return hFont;
 }
 
-///////////////////////////////////////////////////////
-// プロパティページの抽象
-///////////////////////////////////////////////////////
-// 各プロパティページはこのクラスから派生する。
-// プログラム中に複数インスタンスが存在してはならない。(Singletonパターンで強制してもいいが…)
+//////////////////////////////////////////
+// TOMBO general property tab
+//////////////////////////////////////////
 
-class PropertyPage {
+class TomboPropertyTab : public PropertyTab {
 protected:
-	DWORD nResourceID;
-	DLGPROC pDlgProc;
-	TCHAR aTitle[MESSAGE_MAX_SIZE];
-	
 	Property *pProperty;
-
-	static BOOL APIENTRY DefaultPageProc(HWND hDlg, UINT nMessage, WPARAM wParam, LPARAM lParam);
-
-	// 各プロパティページにおいて再定義する関数は以下の3つ。ただしOnCommandは任意。
-
-	virtual void Init(HWND hDlg) {}
-	virtual BOOL OnCommand(HWND hDlg, WPARAM wParam, LPARAM lParam) { return FALSE; }
-	virtual BOOL Apply(HWND hDlg) { return TRUE; } 
-
 public:
-	PropertyPage(Property *prop, DWORD id, DLGPROC proc, DWORD nTitleResID);
-	virtual ~PropertyPage() {}
-
-	DWORD ResourceID() { return nResourceID; }
-	DLGPROC DialogProc() { return pDlgProc; }
-	LPCTSTR Title() { return aTitle; }
-
-	// データの保存
-
-	// データの読み出し
-	virtual BOOL LoadParam(HKEY hRootKey, BOOL *pStrict);
+	TomboPropertyTab(Property *prop, DWORD id, DLGPROC proc, DWORD nTitleResID) : PropertyTab(id, nTitleResID, proc), pProperty(prop) {}
 };
-
-PropertyPage::PropertyPage(Property *prop, DWORD id, DLGPROC proc, DWORD nTitleResID)
- : pProperty(prop), nResourceID(id), pDlgProc(proc) 
-{
-	_tcscpy(aTitle, RESMSG(nTitleResID));
-}
-
-/////////////////////////////////////////////////////
-// ページのデフォルトDialog Procedure
-/////////////////////////////////////////////////////
-
-BOOL APIENTRY PropertyPage::DefaultPageProc(HWND hDlg, UINT nMessage, WPARAM wParam, LPARAM lParam)
-{
-	PropertyPage *pPage;
-
-	if (nMessage == WM_INITDIALOG) {
-		PROPSHEETPAGE *ps = (PROPSHEETPAGE*)lParam;
-		pPage = (PropertyPage*)ps->lParam;
-		SetWindowLong(hDlg, DWL_USER, ps->lParam);
-
-		pPage->Init(hDlg);
-		return TRUE;
-	}
-
-	pPage = (PropertyPage*)GetWindowLong(hDlg, DWL_USER);
-	if (pPage == NULL) return FALSE;
-
-	switch(nMessage) {
-	case WM_COMMAND:
-		return pPage->OnCommand(hDlg, wParam, lParam);
-
-	case WM_NOTIFY:
-		switch (((NMHDR FAR *) lParam)->code) {
-        case PSN_APPLY:
-			if (pPage->Apply(hDlg)) {
-				SetWindowLong(hDlg, DWL_MSGRESULT, PSNRET_NOERROR);
-			} else {
-				SetWindowLong(hDlg, DWL_MSGRESULT, PSNRET_INVALID_NOCHANGEPAGE);
-			}
-			return TRUE;
-		case PSN_KILLACTIVE:
-			if (pPage->Apply(hDlg)) {
-				SetWindowLong(hDlg, DWL_MSGRESULT, FALSE);
-			} else {
-				SetWindowLong(hDlg, DWL_MSGRESULT, TRUE);
-			}
-			return TRUE;
-		}
-	}
-	return FALSE;
-}
-
-//////////////////////////////////////////
-// データのロード
-//////////////////////////////////////////
-
-BOOL PropertyPage::LoadParam(HKEY hRootKey, BOOL *pStrict)
-{
-	return FALSE;
-}
 
 //////////////////////////////////////////
 // フォルダ選択タブ
 //////////////////////////////////////////
 
-class FolderTab : public PropertyPage {
+class FolderTab : public TomboPropertyTab {
 public:
 	FolderTab(Property *p) : 
-	  PropertyPage(p, IDD_PROPTAB_FOLDER,(DLGPROC)DefaultPageProc, IDS_PROPTAB_FOLDER) {}
+	  TomboPropertyTab(p, IDD_PROPTAB_FOLDER,(DLGPROC)DefaultPageProc, IDS_PROPTAB_FOLDER) {}
 	~FolderTab() {}
 	void Init(HWND hDlg);
 	BOOL Apply(HWND hDlg);
@@ -364,10 +280,10 @@ BOOL FolderTab::OnCommand(HWND hDlg, WPARAM wParam, LPARAM lParam)
 // パスワード設定タブ
 //////////////////////////////////////////
 
-class PasswordTab : public PropertyPage {
+class PasswordTab : public TomboPropertyTab {
 public:
 	PasswordTab(Property *p) : 
-	  PropertyPage(p, IDD_PROPTAB_PASSWORD,(DLGPROC)DefaultPageProc, IDS_PROPTAB_PASSWORD) {}
+	  TomboPropertyTab(p, IDD_PROPTAB_PASSWORD,(DLGPROC)DefaultPageProc, IDS_PROPTAB_PASSWORD) {}
 	~PasswordTab() {}
 	void Init(HWND hDlg);
 	BOOL Apply(HWND hDlg);
@@ -496,10 +412,10 @@ BOOL PasswordTab::OnCommand(HWND hDlg, WPARAM wParam, LPARAM lParam)
 // パスワードタイムアウトタブ
 //////////////////////////////////////////
 
-class PassTimeoutTab : public PropertyPage {
+class PassTimeoutTab : public TomboPropertyTab {
 public:
 	PassTimeoutTab(Property *p) : 
-	  PropertyPage(p, IDD_PROPTAB_PASS_TIMEOUT,(DLGPROC)DefaultPageProc, IDS_PROPTAB_PASS_TIMEOUT) {}
+	  TomboPropertyTab(p, IDD_PROPTAB_PASS_TIMEOUT,(DLGPROC)DefaultPageProc, IDS_PROPTAB_PASS_TIMEOUT) {}
 	~PassTimeoutTab() {}
 	void Init(HWND hDlg);
 	BOOL Apply(HWND hDlg);
@@ -534,10 +450,10 @@ BOOL PassTimeoutTab::Apply(HWND hDlg)
 // フォントタブ
 //////////////////////////////////////////
 
-class FontTab : public PropertyPage {
+class FontTab : public TomboPropertyTab {
 public:
 	FontTab(Property *p) :
-	  PropertyPage(p, IDD_PROPTAB_FONT, (DLGPROC)DefaultPageProc, IDS_PROPTAB_FONT) {}
+	  TomboPropertyTab(p, IDD_PROPTAB_FONT, (DLGPROC)DefaultPageProc, IDS_PROPTAB_FONT) {}
 	~FontTab() {}
 	void Init(HWND hDlg);
 	BOOL Apply(HWND hDlg);
@@ -699,10 +615,10 @@ int CALLBACK PropEnumFonts(ENUMLOGFONT FAR *pFont, NEWTEXTMETRIC FAR *pMetric, i
 // 日付フォーマットタブ
 //////////////////////////////////////////
 
-class DateFormatTab : public PropertyPage {
+class DateFormatTab : public TomboPropertyTab {
 public:
 	DateFormatTab(Property *p) :
-	  PropertyPage(p, IDD_PROPTAB_INSDATE, (DLGPROC)DefaultPageProc, IDS_PROPTAB_DATE) {}
+	  TomboPropertyTab(p, IDD_PROPTAB_INSDATE, (DLGPROC)DefaultPageProc, IDS_PROPTAB_DATE) {}
 	~DateFormatTab() {}
 	void Init(HWND hDlg);
 	BOOL Apply(HWND hDlg);
@@ -734,10 +650,10 @@ BOOL DateFormatTab::Apply(HWND hDlg)
 // カーソル位置設定タブ
 //////////////////////////////////////////
 
-class KeepCaretTab : public PropertyPage {
+class KeepCaretTab : public TomboPropertyTab {
 public:
 	KeepCaretTab(Property *p) :
-	  PropertyPage(p, IDD_PROPTAB_KEEPCARET, (DLGPROC)DefaultPageProc, IDS_PROPTAB_KEEPCARET) {}
+	  TomboPropertyTab(p, IDD_PROPTAB_KEEPCARET, (DLGPROC)DefaultPageProc, IDS_PROPTAB_KEEPCARET) {}
 	~KeepCaretTab() {}
 	void Init(HWND hDlg);
 	BOOL Apply(HWND hDlg);
@@ -808,10 +724,10 @@ BOOL KeepCaretTab::Apply(HWND hDlg)
 
 #ifdef COMMENT
 #if defined(PLATFORM_WIN32)
-class SelectMemoTab : public PropertyPage {
+class SelectMemoTab : public TomboPropertyTab {
 public:
 	SelectMemoTab(Property *p) :
-	  PropertyPage(p, IDD_PROPTAB_SELECTMEMO, (DLGPROC)DefaultPageProc, IDS_PROPTAB_SELECTMEMO) {}
+	  TomboPropertyTab(p, IDD_PROPTAB_SELECTMEMO, (DLGPROC)DefaultPageProc, IDS_PROPTAB_SELECTMEMO) {}
 	~SelectMemoTab() {}
 	void Init(HWND hDlg);
 	BOOL Apply(HWND hDlg);
@@ -863,10 +779,10 @@ BOOL SelectMemoTab::Apply(HWND hDlg)
 //////////////////////////////////////////
 
 #if defined(PLATFORM_PKTPC)
-class AppButtonTab : public PropertyPage {
+class AppButtonTab : public TomboPropertyTab {
 public:
 	AppButtonTab(Property *p) :
-	  PropertyPage(p, IDD_PROPTAB_APPBUTTON, (DLGPROC)DefaultPageProc, IDS_PROPTAB_APPBUTTON) {}
+	  TomboPropertyTab(p, IDD_PROPTAB_APPBUTTON, (DLGPROC)DefaultPageProc, IDS_PROPTAB_APPBUTTON) {}
 	~AppButtonTab() {}
 	void Init(HWND hDlg);
 	BOOL Apply(HWND hDlg);
@@ -966,10 +882,10 @@ BOOL AppButtonTab::Apply(HWND hDlg)
 //////////////////////////////////////////
 #if defined(PLATFORM_BE500) && defined(TOMBO_LANG_ENGLISH)
 
-class CodepageTab : public PropertyPage {
+class CodepageTab : public TomboPropertyTab {
 public:
 	CodepageTab(Property *p) :
-	  PropertyPage(p, IDD_PROPTAB_CODEPAGE, (DLGPROC)DefaultPageProc, IDS_PROPTAB_CODEPAGE) {}
+	  TomboPropertyTab(p, IDD_PROPTAB_CODEPAGE, (DLGPROC)DefaultPageProc, IDS_PROPTAB_CODEPAGE) {}
 	~CodepageTab() {}
 	void Init(HWND hDlg);
 	BOOL Apply(HWND hDlg);
@@ -1005,7 +921,7 @@ BOOL CodepageTab::Apply(HWND hDlg)
 
 DWORD Property::Popup(HINSTANCE hInst, HWND hWnd)
 {
-	PropertyPage *pages[PROPTAB_PAGES];
+	PropertyTab *pages[PROPTAB_PAGES];
 	FolderTab pgFolder(this);
 	PassTimeoutTab pgTimeout(this);
 	FontTab pgFont(this);
@@ -1035,33 +951,8 @@ DWORD Property::Popup(HINSTANCE hInst, HWND hWnd)
 #if defined(PLATFORM_BE500) && defined(TOMBO_LANG_ENGLISH)
 	pages[5] = &pgCodepage;
 #endif
-
-    PROPSHEETPAGE psp[PROPTAB_PAGES];
-    PROPSHEETHEADER psh;
-	DWORD i;
-
-	for (i = 0; i < PROPTAB_PAGES; i++) {
-	    psp[i].dwSize = sizeof(PROPSHEETPAGE);
-	    psp[i].dwFlags = PSP_USETITLE;
-	    psp[i].hInstance = hInst;
-	    psp[i].pszTemplate = MAKEINTRESOURCE(pages[i]->ResourceID());
-	    psp[i].pfnDlgProc = pages[i]->DialogProc();
-	    psp[i].pszTitle = pages[i]->Title();
-		psp[i].lParam = (LONG)pages[i];
-	}
-
-    psh.dwSize = sizeof(PROPSHEETHEADER);
-    psh.dwFlags = PSH_USEICONID | PSH_PROPSHEETPAGE | PSH_NOAPPLYNOW;
-    psh.hwndParent = hWnd;
-    psh.hInstance = hInst;
-    psh.pszIcon = MAKEINTRESOURCE(IDI_TOMBO);
-    psh.pszCaption = RESMSG(IDS_PROPTAB_TITLE);
-    psh.nPages = sizeof(psp) / sizeof(PROPSHEETPAGE);
-    psh.nStartPage = 0;
-    psh.ppsp = (LPCPROPSHEETPAGE) &psp;
-    psh.pfnCallback = NULL;
-
-	if (PropertySheet(&psh) == IDOK) {
+	PropertyPage pp;
+	if (pp.Popup(hInst, hWnd, pages, PROPTAB_PAGES, RESMSG(IDS_PROPTAB_TITLE), MAKEINTRESOURCE(IDI_TOMBO)) == IDOK) {
 		if (!Save()) {
 			MessageBox(NULL, MSG_SAVE_DATA_FAILED, TEXT("ERROR"), MB_ICONSTOP | MB_OK);
 		}

@@ -215,6 +215,29 @@ BEGIN
     CTEXT           "検索中...",IDC_SEARCHMSG,0,15,70,8
 END
 
+IDD_GREPTAB_MAIN DIALOG DISCARDABLE  0, 0, 136, 111
+STYLE WS_CHILD | WS_BORDER
+FONT 9, "System"
+BEGIN
+    LTEXT           "検索開始位置:",IDC_STATIC,5,5,44,8
+    LTEXT           "Static",IDC_GREPTAB_MAIN_STARTDIR,55,5,75,8
+    LTEXT           "検索文字列:",IDC_STATIC,5,20,38,8
+    COMBOBOX        IDC_GREPTAB_MAIN_SEARCHSTRING,55,20,80,90,CBS_DROPDOWN | 
+                    WS_VSCROLL | WS_TABSTOP
+    CONTROL         "大文字小文字を区別",IDC_GREPTAB_MAIN_CASESENSITIVE,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,45,76,10
+    CONTROL         "暗号化メモも対象とする",IDC_GREPTAB_MAIN_ENCRYPTNOTE,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,60,81,10
+    CONTROL         "ファイル名に対して検索",IDC_GREPTAB_MAIN_FILENAME,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,75,78,10
+END
+
+IDD_GREPTAB_PERSIST DIALOG DISCARDABLE  0, 0, 141, 111
+STYLE WS_CHILD | WS_BORDER
+FONT 9, "System"
+BEGIN
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -236,6 +259,8 @@ BEGIN
         MENUITEM "検索",                        IDM_SEARCH
         MENUITEM "次を検索",                    IDM_SEARCH_NEXT
         MENUITEM "前を検索",                    IDM_SEARCH_PREV
+        MENUITEM SEPARATOR
+        MENUITEM "Grep",                        IDM_GREP
         MENUITEM SEPARATOR
         MENUITEM "暗号化",                      IDM_ENCRYPT
         MENUITEM "復号化",                      IDM_DECRYPT
@@ -329,6 +354,22 @@ BEGIN
         TOPMARGIN, 7
         BOTTOMMARGIN, 47
     END
+
+    IDD_GREPTAB_MAIN, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 129
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 104
+    END
+
+    IDD_GREPTAB_PERSIST, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 134
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 104
+    END
 END
 #endif    // APSTUDIO_INVOKED
 
@@ -398,6 +439,8 @@ BEGIN
     IDS_PROPTAB_FONT        "メモ"
     IDS_PROPTAB_DATE        "日付"
     IDS_PROPTAB_KEEPCARET   "カーソル"
+    IDS_GREPTAB_MAIN        "メイン"
+    IDS_GREPTAB_PERSIST     "保存"
 END
 
 #endif    // Japanese resources
