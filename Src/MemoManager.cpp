@@ -227,7 +227,7 @@ BOOL MemoManager::SaveIfModify(LPDWORD pYNC, BOOL bDupMode)
 	pMainFrame->SetModifyStatus(FALSE);
 
 	// ヘッドライン文字列の変更
-	pMemoSelectView->UpdateHeadLine(pCurrentNote, sHeadLine.Get());
+	pMemoSelectView->UpdateHeadLine(pCurrentItem, sHeadLine.Get());
 
 	MemoNote::WipeOutAndDelete(p);
 

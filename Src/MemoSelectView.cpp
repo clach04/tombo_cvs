@@ -198,7 +198,8 @@ static BOOL InsertFile(HWND hTree, HTREEITEM hParent, LPCTSTR pPrefix, LPCTSTR p
 
 	*(disp + len - 4) = TEXT('\0');
 	ti.item.pszText = disp;
-	pNote->SetViewItem(InsertNode(hTree, &ti));
+	HTREEITEM hItem = InsertNode(hTree, &ti);
+	ptvi->SetViewItem(hItem);
 	return TRUE;
 }
 
@@ -688,8 +689,7 @@ TreeViewFileItem *MemoSelectView::NewMemoCreated(MemoNote *pNote, LPCTSTR pHeadL
 	ti.item.lParam = (LPARAM)tvi;
 
 	HTREEITEM hItem = ::InsertNode(hViewWnd, &ti);
-
-	pNote->SetViewItem(hItem);
+	tvi->SetViewItem(hItem);
 	return tvi;
 }
 
@@ -826,17 +826,6 @@ void MemoSelectView::DeleteNode(HWND hWnd, HTREEITEM hItem, TreeViewItem *pItem)
 }
 
 ///////////////////////////////////////////
-// 指定されたアイテムを選択状態とする
-///////////////////////////////////////////
-
-void MemoSelectView::SelectNote(MemoNote *pNote)
-{
-	if (!pNote) return;
-	HTREEITEM hItem = pNote->GetViewItem();
-	TreeView_SelectItem(hViewWnd, hItem);
-}
-
-///////////////////////////////////////////
 // フォルダの挿入
 ///////////////////////////////////////////
 
@@ -885,10 +874,12 @@ static HTREEITEM InsertFolder(HWND hTree, HTREEITEM hParent, LPCTSTR pName)
 /////////////////////////////////////////
 // 再ソートが必要となるため、一旦削除して再挿入・ソートしている
 
-BOOL MemoSelectView::UpdateHeadLine(MemoNote *pNote, LPCTSTR pHeadLine)
+BOOL MemoSelectView::UpdateHeadLine(TreeViewFileItem *pItem, LPCTSTR pHeadLine)
 {
-	HTREEITEM hItem = pNote->GetViewItem();
+	HTREEITEM hItem = pItem->GetViewItem();
 	if (hItem == NULL) return FALSE;
+
+	MemoNote *pNote = pItem->GetNote();
 
 #if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
 	HTREEITEM hCurrentSel;
@@ -914,8 +905,9 @@ BOOL MemoSelectView::UpdateHeadLine(MemoNote *pNote, LPCTSTR pHeadLine)
 	ti.item.lParam = (LPARAM)tvi;
 
 	if (IsExpand(hViewWnd, hParent)) {
-		pNote->SetViewItem(::InsertNode(hViewWnd, &ti));
-		TreeView_SelectItem(hViewWnd, pNote->GetViewItem());
+		HTREEITEM hItem = ::InsertNode(hViewWnd, &ti);
+		tvi->SetViewItem(hItem);
+		TreeView_SelectItem(hViewWnd, hItem);
 	} else {
 #if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
 		if (g_Property.IsUseTwoPane()) {
@@ -924,26 +916,6 @@ BOOL MemoSelectView::UpdateHeadLine(MemoNote *pNote, LPCTSTR pHeadLine)
 		}
 #endif
 	}
-	return TRUE;
-}
-
-
-BOOL MemoSelectView::GetHeadLine(MemoNote *pNote, LPTSTR pHeadLine, DWORD nLen)
-{
-	HTREEITEM hItem = pNote->GetViewItem();
-	if (hItem == NULL) return FALSE;
-
-	TCHAR buf[MAX_PATH];
-
-	TV_ITEM ti;
-	ti.mask = TVIF_TEXT;
-	ti.hItem = hItem;
-	ti.pszText = buf;
-	ti.cchTextMax = MAX_PATH;
-	TreeView_GetItem(hViewWnd, &ti);
-
-	CopyKanjiString(pHeadLine, buf, nLen);
-
 	return TRUE;
 }
 

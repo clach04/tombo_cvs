@@ -111,22 +111,16 @@ public:
 	// メモ/フォルダの削除
 	void DeleteNode(HWND hWnd, HTREEITEM hItem, TreeViewItem *pItem);
 
-	// ノードの選択
-	void SelectNote(MemoNote *pNote);
-
 	BOOL CreateNewFolder(HTREEITEM hItem, LPCTSTR pFolder);
 
-	BOOL GetHeadLine(MemoNote *pNote, LPTSTR pHeadLine, DWORD nLen);
 	// ヘッドライン文字列の書き換え
-	BOOL UpdateHeadLine(MemoNote *pNote, LPCTSTR pHeadLine);
+	BOOL UpdateHeadLine(TreeViewFileItem *pItem, LPCTSTR pHeadLine);
 
 	// 現在選択されているアイテムと関連付けられているMemoNoteを返す。
 	// pItemが指定されている場合にはHTREEITEMも返す。
 	// 選択されていない場合には戻り値としてNULLを返す。
 	//MemoNote *GetCurrentItem(HTREEITEM *pItem = NULL);
 	TreeViewItem *GetCurrentItem(HTREEITEM *pItem = NULL);
-
-	//MemoNote *GetNote(TreeViewItem *p);
 
 	TreeViewItem *GetTVItem(HTREEITEM h);
 

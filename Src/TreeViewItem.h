@@ -11,13 +11,15 @@ class MemoManager;
 
 class TreeViewItem {
 	BOOL bHasMultiItem;
+	HTREEITEM hItem;
+
 public:
 	TreeViewItem(BOOL bMultiItem);
 	virtual ~TreeViewItem();
 
 
-	virtual HTREEITEM GetViewItem() = 0;
-	virtual void SetViewItem(HTREEITEM h) = 0;
+	HTREEITEM GetViewItem();
+	void SetViewItem(HTREEITEM h);
 
 	///////////////////////////////////////////////////////
 	// ÉAÉCÉeÉÄÇ…ëŒÇ∑ÇÈëÄçÏ
@@ -63,9 +65,6 @@ protected:
 public:
 	TreeViewFileItem();
 
-	HTREEITEM GetViewItem();
-	void SetViewItem(HTREEITEM h);
-
 	BOOL Move(MemoManager *pMgr, MemoSelectView *pView);
 	BOOL Copy(MemoManager *pMgr, MemoSelectView *pView);
 	BOOL Delete(MemoManager *pMgr, MemoSelectView *pView);
@@ -86,12 +85,8 @@ public:
 /////////////////////////////////////////////
 
 class TreeViewFolderItem : public TreeViewItem {
-	HTREEITEM hItem;
 public:
 	TreeViewFolderItem();
-
-	HTREEITEM GetViewItem();
-	void SetViewItem(HTREEITEM h);
 
 	BOOL Move(MemoManager *pMgr, MemoSelectView *pView);
 	BOOL Copy(MemoManager *pMgr, MemoSelectView *pView);

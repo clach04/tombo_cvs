@@ -86,7 +86,7 @@ SecureBufferA::~SecureBufferA()
 //
 /////////////////////////////////////////////
 
-MemoNote::MemoNote() : pPath(NULL), hItem(NULL)
+MemoNote::MemoNote() : pPath(NULL)
 {
 }
 
@@ -451,7 +451,6 @@ MemoNote *PlainMemoNote::Encrypt(PasswordManager *pMgr, TString *pHeadLine, BOOL
 		return FALSE;
 	}
 
-
 	// 新しいMemoNoteインスタンスを生成
 	CryptedMemoNote *p = new CryptedMemoNote();
 	if (!p->Init(pNotePath)) {
@@ -459,7 +458,6 @@ MemoNote *PlainMemoNote::Encrypt(PasswordManager *pMgr, TString *pHeadLine, BOOL
 		MemoNote::WipeOutAndDelete(pText);
 		return FALSE;
 	}
-	p->SetViewItem(hItem);
 
 	char *pTextA = ConvUnicode2SJIS(pText);
 	MemoNote::WipeOutAndDelete(pText);
@@ -513,7 +511,6 @@ MemoNote *CryptedMemoNote::Decrypt(PasswordManager *pMgr, TString *pHeadLine, BO
 		MemoManager::WipeOutAndDeleteFile(sFullPath.Get());
 		return NULL;
 	}
-	p->SetViewItem(hItem);
 
 	// メモ保存
 	char *pTextA = ConvUnicode2SJIS(pText);

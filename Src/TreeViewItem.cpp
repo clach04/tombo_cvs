@@ -21,12 +21,22 @@
 //  ctor & dtor
 /////////////////////////////////////////////
 
-TreeViewItem::TreeViewItem(BOOL bItem) : bHasMultiItem(bItem)
+TreeViewItem::TreeViewItem(BOOL bItem) : bHasMultiItem(bItem), hItem(NULL)
 {
 }
 
 TreeViewItem::~TreeViewItem()
 {
+}
+
+HTREEITEM TreeViewItem::GetViewItem()
+{
+	return hItem;
+}
+
+void TreeViewItem::SetViewItem(HTREEITEM h)
+{
+	hItem = h;
 }
 
 /////////////////////////////////////////////
@@ -206,15 +216,6 @@ DWORD TreeViewFileItem::GetIcon(MemoSelectView *, DWORD nStatus)
 	}
 }
 
-HTREEITEM TreeViewFileItem::GetViewItem()
-{
-	return pNote ? pNote->GetViewItem() : NULL;
-}
-
-void TreeViewFileItem::SetViewItem(HTREEITEM h)
-{
-	if (pNote) pNote->SetViewItem(h);
-}
 
 DWORD TreeViewFileItem::ItemOrder()
 {
@@ -225,7 +226,7 @@ DWORD TreeViewFileItem::ItemOrder()
 //  Folder
 /////////////////////////////////////////////
 
-TreeViewFolderItem::TreeViewFolderItem() : hItem(NULL), TreeViewItem(TRUE)
+TreeViewFolderItem::TreeViewFolderItem() : TreeViewItem(TRUE)
 {
 }
 
@@ -415,20 +416,6 @@ BOOL TreeViewFolderItem::Rename(MemoManager *pMgr, MemoSelectView *pView, LPCTST
 		}
 	}
 	return bResult;
-}
-
-/////////////////////////////////////////////
-//
-/////////////////////////////////////////////
-
-HTREEITEM TreeViewFolderItem::GetViewItem()
-{
-	return hItem;
-}
-
-void TreeViewFolderItem::SetViewItem(HTREEITEM h)
-{
-	hItem = h;
 }
 
 DWORD TreeViewFolderItem::ItemOrder()
