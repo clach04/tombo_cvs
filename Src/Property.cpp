@@ -46,6 +46,8 @@
 #define KEEP_TITLE_ATTR_NAME TEXT("KeepTitle")
 #define PROP_FOLDER_ATTR_NAME TEXT("PropertyDir")
 #define CODEPAGE_ATTR_NAME TEXT("CodePage")
+#define DISABLEEXTRAACTIONBUTTON_ATTR_NAME TEXT("DisableExtraActionButton")
+#define HIDESTATUSBAR_ATTR_NAME TEXT("HideStatusBar")
 
 #define TOMBO_WINSIZE_ATTR_NAME TEXT("WinSize")
 #define TOMBO_REBARHIST_ATTR_NAME TEXT("RebarPos")
@@ -1239,6 +1241,22 @@ BOOL Property::Load(BOOL *pStrict)
 	}
 #endif
 
+#if defined(PLATFORM_PKTPC)
+	// Disable open/close notes when action button pushed
+	siz = sizeof(nDisableExtraActionButton);
+	res = RegQueryValueEx(hTomboRoot, DISABLEEXTRAACTIONBUTTON_ATTR_NAME, NULL, &typ, (LPBYTE)&nDisableExtraActionButton, &siz);
+	if (res != ERROR_SUCCESS) {
+		nDisableExtraActionButton = 0;
+	}
+#endif
+
+#if defined(PLATFORM_HPC) || defined(PLATFORM_WIN32)
+	siz = sizeof(nHideStatusBar);
+	res = RegQueryValueEx(hTomboRoot, HIDESTATUSBAR_ATTR_NAME, NULL, &typ, (LPBYTE)&nHideStatusBar, &siz);
+	if (res != ERROR_SUCCESS) {
+		nHideStatusBar = 0;
+	}
+
 	RegCloseKey(hTomboRoot);
 	return TRUE;
 }
@@ -1323,6 +1341,14 @@ BOOL Property::Save()
 #if defined(PLATFORM_BE500)
 	if (!SetDWORDToReg(hTomboRoot, CODEPAGE_ATTR_NAME, nCodePage)) return FALSE;
 #endif
+
+#if defined(PLATFORM_PKTPC)
+	if (!SetDWORDToReg(hTomboRoot, DISABLEEXTRAACTIONBUTTON_ATTR_NAME, nDisableExtraActionButton)) return FALSE;
+#endif
+#if defined(PLATFORM_HPC) || defined(PLATFORM_WIN32)
+	if (!SetDWORDToReg(hTomboRoot, HIDESTATUSBAR_ATTR_NAME, nHideStatusBar)) return FALSE;
+#endif
+
 
 #if defined(PLATFORM_BE500)
 	CGDFlushRegistry();

@@ -43,6 +43,12 @@ class Property {
 #if defined(PLATFORM_BE500)
 	DWORD nCodePage;
 #endif
+#if defined(PLATFORM_PKTPC)
+	DWORD nDisableExtraActionButton;
+#endif
+#if defined(PLATFORM_HPC) || defined(PLATFORM_WIN32)
+	DWORD nHideStatusBar;
+#endif
 
 public:
 	Property();
@@ -101,7 +107,17 @@ public:
 	LPCTSTR PropertyDir() { return aPropDir; }
 
 #if defined(PLATFORM_BE500)
+	// Codepage selection
 	DWORD CodePage() { return nCodePage; }
+#endif
+
+#if defined(PLATFORM_PKTPC)
+	// Disable open/close notes when action button pushed
+	DWORD DisableExtraActionButton() { return nDisableExtraActionButton; }
+#endif
+#if defined(PLATFORM_HPC) || defined(PLATFORM_WIN32)
+	// Hide status bar
+	DWORD HideStatusBar() { return nHideStatusBar; }
 #endif
 
 	// ウィンドウサイズ関連の保存・復元
