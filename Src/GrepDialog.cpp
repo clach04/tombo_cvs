@@ -7,6 +7,8 @@
 #include "Property.h"
 #include "PropertyPage.h"
 
+#define NUM_GREP_PROP_PAGES 1
+
 /////////////////////////////////////////
 // ctor & dtor
 /////////////////////////////////////////
@@ -102,7 +104,7 @@ BOOL GrepPersistTab::OnCommand(HWND hDlg, WPARAM wParam, LPARAM lParam)
 
 DWORD GrepDialog::Popup(HINSTANCE hInst, HWND hParent)
 {
-	PropertyTab *pages[1];
+	PropertyTab *pages[NUM_GREP_PROP_PAGES];
 	GrepMainTab pgMain(this);
 	GrepPersistTab pgPersist;
 
@@ -111,6 +113,6 @@ DWORD GrepDialog::Popup(HINSTANCE hInst, HWND hParent)
 
 	PropertyPage pp;
 
-	return pp.Popup(hInst, hParent, pages, 2, MSG_GREPTAB_MAIN_TTL, MAKEINTRESOURCE(IDI_TOMBO));
+	return pp.Popup(hInst, hParent, pages, NUM_GREP_PROP_PAGES, MSG_GREPTAB_MAIN_TTL, MAKEINTRESOURCE(IDI_TOMBO));
 }
 
