@@ -368,10 +368,11 @@ Return to main trunk.
 * Popup find dialog when push F3/Shift+F3 at first finding.(#1464)
 
 ////////////////////////////////
-// 
+// B107
 ////////////////////////////////
 
-* Add "Search" to right click menu. 
+* Add "Search" to right click menu. (#2108)
+* Check folder path when copying/moving folders.(#2602,#2603)
 
 /////////////////////////////////////////////////////////////////////////
 // TODO
