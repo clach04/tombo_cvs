@@ -313,17 +313,18 @@ BOOL MemoManager::ClearMemo()
 }
 
 ////////////////////////////////////////////////////////
-// カーソル位置の保存
+// Save cursor position
 ////////////////////////////////////////////////////////
 
 BOOL MemoManager::StoreCursorPos()
 {
 	if (g_Property.KeepCaret()) {
-		// オープン位置の保存
+
 		DWORD nPos = pMemoDetailsView->GetCursorPos();
+		DWORD nInitPos = pMemoDetailsView->GetInitialPos();
 
 		MemoInfo mi;
-		if (pCurrentNote) {
+		if (pCurrentNote && nPos != nInitPos) {
 			mi.WriteInfo(pCurrentNote->MemoPath(), nPos);
 		}
 	}

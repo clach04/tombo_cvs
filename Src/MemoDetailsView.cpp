@@ -228,6 +228,8 @@ BOOL MemoDetailsView::SetMemo(LPCTSTR pMemo, DWORD nPos, BOOL bReadOnly)
 {
 	SetReadOnly(bReadOnly);
 
+	nInitialPos = nPos;
+
 	SetWindowText(hViewWnd, pMemo);
 	if (g_Property.KeepCaret()) {
 		SendMessage(hViewWnd, EM_SETSEL, nPos, nPos);

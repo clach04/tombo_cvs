@@ -26,6 +26,8 @@ class MemoDetailsView {
 
 	BOOL bReadOnly;		// is read only mode?
 
+	DWORD nInitialPos;	// cursor position when open this note.
+
 public:
 	///////////////////////
 	// èâä˙âªä÷òA
@@ -58,6 +60,7 @@ public:
 	void ResetModify() { SendMessage(hViewWnd, EM_SETMODIFY, (WPARAM)(UINT)FALSE, 0); }
 
 	DWORD GetCursorPos();
+	DWORD GetInitialPos() { return nInitialPos; }
 
 	void SelectAll();		// ëSëIë
 	void SetModifyStatus();
