@@ -122,6 +122,8 @@
 #define IDC_FILTERDEF_TS_OLDER          1056
 #define IDC_FILTERDEF_TS_NEWER          1057
 #define IDC_FILTERDEF_SORT_TYPE         1058
+#define IDC_FONT_SELECT_CLEARTYPE       1059
+#define IDC_FONT_DETAILS_CLEARTYPE      1060
 #define IDM_EXIT                        40001
 #define IDM_NEWMEMO                     40002
 #define IDM_RETURNLIST                  40003
@@ -162,7 +164,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        141
 #define _APS_NEXT_COMMAND_VALUE         40035
-#define _APS_NEXT_CONTROL_VALUE         1059
+#define _APS_NEXT_CONTROL_VALUE         1060
 #define _APS_NEXT_SYMED_VALUE           108
 #endif
 #endif

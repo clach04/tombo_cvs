@@ -115,6 +115,8 @@
 #define IDC_FILTERDEF_TS_OLDER          1056
 #define IDC_FILTERDEF_TS_NEWER          1057
 #define IDC_FILTERDEF_SORT_TYPE         1058
+#define IDC_FONT_SELECT_CLEARTYPE       1059
+#define IDC_FONT_DETAILS_CLEARTYPE      1060
 #define IDM_ACTIONBUTTON                30001
 #define IDM_FILE_EXIT                   40002
 #define IDM_HELP_ABOUT                  40003

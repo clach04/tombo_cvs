@@ -13,7 +13,7 @@
 // version info
 
 //#define TOMBO_VERSION_INFO TEXT("Tombo version 1.7")
-#define TOMBO_VERSION_INFO TEXT("Tombo SNAPSHOT 20030603")
+#define TOMBO_VERSION_INFO TEXT("Tombo SNAPSHOT 20030605")
 
 // コピーライト表記
 

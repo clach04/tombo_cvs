@@ -347,6 +347,15 @@ Return to main trunk.
 
 * FIX: Save memo may be fail if multibyte char is used in folder name.
 
+////////////////////////////////
+// B105 (SNAPSHOT_20030605)
+////////////////////////////////
+
+* Replace macro "iskanji" to IsDBCSLeadByte() for better support of DBCS.
+* Change IDD_FILTERDEF_FILTER's font to "System" on BE-300 version.
+* Add ClearType font support.
+
+
 /////////////////////////////////////////////////////////////////////////
 // TODO
 /////////////////////////////////////////////////////////////////////////

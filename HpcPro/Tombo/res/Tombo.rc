@@ -152,6 +152,10 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,30,5,105,10
     CONTROL         "デフォルトフォントを使用",IDC_FONT_DETAILS_USEDEFAULT,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,30,55,105,10
+    CONTROL         "クリアタイプフォント",IDC_FONT_SELECT_CLEARTYPE,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,75,40,72,10
+    CONTROL         "クリアタイプフォント",IDC_FONT_DETAILS_CLEARTYPE,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,75,90,72,10
 END
 
 IDD_PROPTAB_INSDATE DIALOG DISCARDABLE  0, 0, 152, 121

@@ -622,7 +622,7 @@ static BOOL GetHeadLineFromMemoText(LPCTSTR pMemo, TString *pHeadLine)
 	while(*p) {
 		if ((*p == TEXT('\r')) || (*p == TEXT('\n'))) break;
 #ifndef _WIN32_WCE
-		if (iskanji(*p)) {
+		if (IsDBCSLeadByte(*p)) {
 			p += 2;
 			n += 2;
 			continue;
@@ -745,7 +745,7 @@ static BOOL GetHeadLineFromFilePath(LPCTSTR pFilePath, TString *pHeadLine)
 #else
 	while (*p) {
 		if (*p == TEXT('\\')) q = p;
-		if (iskanji(*p)) {
+		if (IsDBCSLeadByte(*p)) {
 			p++;
 		}
 		p++;

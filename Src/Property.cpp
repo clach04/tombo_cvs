@@ -29,8 +29,10 @@
 #define PASSTIMEOUT_ATTR_NAME TEXT("PassTimeOut")
 #define SELECTVIEW_FONTNAME_ATTR_NAME TEXT("SelectViewFontName")
 #define SELECTVIEW_FONTSIZE_ATTR_NAME TEXT("SelectViewFontSize")
+#define SELECTVIEW_FONTQUALITY_ATTR_NAME TEXT("SelectViewFontQuality")
 #define DETAILSVIEW_FONTNAME_ATTR_NAME TEXT("DetailsViewFontName")
 #define DETAILSVIEW_FONTSIZE_ATTR_NAME TEXT("DetailsViewFontSize")
+#define DETAILSVIEW_FONTQUALITY_ATTR_NAME TEXT("DetailsViewFontQuality")
 #define DETAILSVIEW_DATEFORMAT1_ATTR_NAME TEXT("DateFormat1")
 #define DETAILSVIEW_DATEFORMAT2_ATTR_NAME TEXT("DateFormat2")
 #define DETAILSVIEW_KEEPCARET_ATTR_NAME TEXT("KeepCaret")
@@ -70,6 +72,8 @@
 #define DEFAULT_FONTNAME TEXT("Tahoma")
 #define DEFAULT_FONTSIZE 9
 
+#define CLEARTYPE_QUALITY 5
+
 // デフォルトのディレクトリ
 #if defined(PLATFORM_WIN32)
 #define MEMO_TOP_DIR TEXT("c:\\My Documents\\Pocket_PC My Documents\\TomboRoot")
@@ -87,7 +91,7 @@
 #define DEFAULTDATEFORMAT2 TEXT("%h:%m:%s")
 
 static BOOL CreateDirectories(LPCTSTR pDir);
-static BOOL MakeFont(HFONT *phFont, LPCTSTR pName, DWORD nSize);
+static BOOL MakeFont(HFONT *phFont, LPCTSTR pName, DWORD nSize, BYTE bQuality);
 
 
 //////////////////////////////////////////
@@ -141,14 +145,14 @@ Property::~Property()
 HFONT Property::SelectViewFont()
 {
 	HFONT hFont = NULL;
-	MakeFont(&hFont, aSelectViewFontName, nSelectViewFontSize);
+	MakeFont(&hFont, aSelectViewFontName, nSelectViewFontSize, bSelectViewFontQuality);
 	return hFont;
 }
 
 HFONT Property::DetailsViewFont()
 {
 	HFONT hFont = NULL;
-	MakeFont(&hFont, aDetailsViewFontName, nDetailsViewFontSize);
+	MakeFont(&hFont, aDetailsViewFontName, nDetailsViewFontSize, bDetailsViewFontQuality);
 	return hFont;
 }
 
@@ -517,7 +521,7 @@ static void SetFontSize(HWND hFontSize, DWORD nDefaultSize)
 	}
 }
 
-static void InitFontControls(HDC hDC, HWND hName, HWND hSize, HWND hDefault, LPCTSTR pPropName, DWORD nPropSize)
+static void InitFontControls(HDC hDC, HWND hName, HWND hSize, HWND hDefault, HWND hCT, LPCTSTR pPropName, DWORD nPropSize, BYTE bQuality)
 {
 	LPCTSTR pFont;
 	DWORD nSize;
@@ -528,15 +532,22 @@ static void InitFontControls(HDC hDC, HWND hName, HWND hSize, HWND hDefault, LPC
 		SendMessage(hDefault, BM_SETCHECK, BST_CHECKED, 0);
 		EnableWindow(hName, FALSE);
 		EnableWindow(hSize, FALSE);
+		EnableWindow(hCT, FALSE);
 	} else {
 		SendMessage(hDefault, BM_SETCHECK, BST_UNCHECKED, 0);
 		EnableWindow(hName, TRUE);
 		EnableWindow(hSize, TRUE);
+		EnableWindow(hCT, TRUE);
 		pFont = pPropName;
 		nSize = nPropSize;
 	}
 	SetFontName(hDC, hName, pFont);
 	SetFontSize(hSize, nSize);
+	if (bQuality == DEFAULT_QUALITY) {
+		SendMessage(hCT, BM_SETCHECK, BST_UNCHECKED, 0);
+	} else {
+		SendMessage(hCT, BM_SETCHECK, BST_CHECKED, 0);
+	}
 }
 
 void FontTab::Init(HWND hDlg)
@@ -544,20 +555,22 @@ void FontTab::Init(HWND hDlg)
 	HWND hSelectUseDefault = GetDlgItem(hDlg, IDC_FONT_SELECT_USEDEFAULT);
 	HWND hSelectName = GetDlgItem(hDlg, IDC_FONT_SELECT_NAME);
 	HWND hSelectSize = GetDlgItem(hDlg, IDC_FONT_SELECT_SIZE);
+	HWND hSelectCT   = GetDlgItem(hDlg, IDC_FONT_SELECT_CLEARTYPE);
 
 	HWND hDetailsUseDefault = GetDlgItem(hDlg, IDC_FONT_DETAILS_USEDEFAULT);
 	HWND hDetailsName = GetDlgItem(hDlg, IDC_FONT_DETAILS_NAME);
 	HWND hDetailsSize = GetDlgItem(hDlg, IDC_FONT_DETAILS_SIZE);
+	HWND hDetailsCT   = GetDlgItem(hDlg, IDC_FONT_DETAILS_CLEARTYPE);
 
 	HDC hDC = GetDC(hDlg);
 
-	InitFontControls(hDC, hSelectName, hSelectSize, hSelectUseDefault, pProperty->aSelectViewFontName, pProperty->nSelectViewFontSize);
-	InitFontControls(hDC, hDetailsName, hDetailsSize, hDetailsUseDefault, pProperty->aDetailsViewFontName, pProperty->nDetailsViewFontSize);
+	InitFontControls(hDC, hSelectName, hSelectSize, hSelectUseDefault, hSelectCT, pProperty->aSelectViewFontName, pProperty->nSelectViewFontSize, pProperty->bSelectViewFontQuality);
+	InitFontControls(hDC, hDetailsName, hDetailsSize, hDetailsUseDefault, hDetailsCT, pProperty->aDetailsViewFontName, pProperty->nDetailsViewFontSize, pProperty->bDetailsViewFontQuality);
 
 	ReleaseDC(hDlg, hDC);
 }
 
-static void GetFontStat(HWND hName, HWND hSize, HWND hDefault, LPTSTR pName, LPDWORD pSize)
+static void GetFontStat(HWND hName, HWND hSize, HWND hDefault, HWND hCT, LPTSTR pName, LPDWORD pSize, LPBYTE pClearType)
 {
 	DWORD nStat = SendMessage(hDefault, BM_GETCHECK, 0, 0);
 	if (nStat & BST_CHECKED) {
@@ -569,6 +582,14 @@ static void GetFontStat(HWND hName, HWND hSize, HWND hDefault, LPTSTR pName, LPD
 		SendMessage(hName, CB_GETLBTEXT, n, (LPARAM)pName);
 		*pSize = SendMessage(hSize, CB_GETCURSEL, 0, 0) + FONTSIZE_MIN;
 	}
+
+	DWORD nCT = SendMessage(hCT, BM_GETCHECK, 0, 0);
+	if (nCT & BST_CHECKED) {
+		*pClearType = CLEARTYPE_QUALITY;
+	} else {
+		*pClearType = DEFAULT_QUALITY;
+	}
+
 }
 
 BOOL FontTab::Apply(HWND hDlg)
@@ -576,26 +597,31 @@ BOOL FontTab::Apply(HWND hDlg)
 	HWND hSelectUseDefault = GetDlgItem(hDlg, IDC_FONT_SELECT_USEDEFAULT);
 	HWND hSelectName = GetDlgItem(hDlg, IDC_FONT_SELECT_NAME);
 	HWND hSelectSize = GetDlgItem(hDlg, IDC_FONT_SELECT_SIZE);
+	HWND hSelectCT   = GetDlgItem(hDlg, IDC_FONT_SELECT_CLEARTYPE);
+
 	HWND hDetailsUseDefault = GetDlgItem(hDlg, IDC_FONT_DETAILS_USEDEFAULT);
 	HWND hDetailsName = GetDlgItem(hDlg, IDC_FONT_DETAILS_NAME);
 	HWND hDetailsSize = GetDlgItem(hDlg, IDC_FONT_DETAILS_SIZE);
+	HWND hDetailsCT   = GetDlgItem(hDlg, IDC_FONT_DETAILS_CLEARTYPE);
 
-	GetFontStat(hSelectName, hSelectSize, hSelectUseDefault, pProperty->aSelectViewFontName, &(pProperty->nSelectViewFontSize));
-	GetFontStat(hDetailsName, hDetailsSize, hDetailsUseDefault, pProperty->aDetailsViewFontName, &(pProperty->nDetailsViewFontSize));
+	GetFontStat(hSelectName, hSelectSize, hSelectUseDefault, hSelectCT, pProperty->aSelectViewFontName, &(pProperty->nSelectViewFontSize), &(pProperty->bSelectViewFontQuality));
+	GetFontStat(hDetailsName, hDetailsSize, hDetailsUseDefault, hDetailsCT, pProperty->aDetailsViewFontName, &(pProperty->nDetailsViewFontSize), &(pProperty->bDetailsViewFontQuality));
 
 	return TRUE;
 }
 
-static void ToggleDefault(HWND hName, HWND hSize, HWND hDefault)
+static void ToggleDefault(HWND hName, HWND hSize, HWND hDefault, HWND hCT)
 {
 	if (SendMessage(hDefault, BM_GETCHECK, 0, 0) & BST_CHECKED) {
 		// デフォルトフォント
 		EnableWindow(hName, FALSE);
 		EnableWindow(hSize, FALSE);
+		EnableWindow(hCT, FALSE);
 	} else {
 		// ユーザ定義フォント
 		EnableWindow(hName, TRUE);
 		EnableWindow(hSize, TRUE);
+		EnableWindow(hCT, TRUE);
 	}
 }
 
@@ -604,16 +630,18 @@ BOOL FontTab::OnCommand(HWND hDlg, WPARAM wParam, LPARAM lParam)
 	HWND hSelectUseDefault = GetDlgItem(hDlg, IDC_FONT_SELECT_USEDEFAULT);
 	HWND hSelectName = GetDlgItem(hDlg, IDC_FONT_SELECT_NAME);
 	HWND hSelectSize = GetDlgItem(hDlg, IDC_FONT_SELECT_SIZE);
+	HWND hSelectCT   = GetDlgItem(hDlg, IDC_FONT_SELECT_CLEARTYPE);
 	HWND hDetailsUseDefault = GetDlgItem(hDlg, IDC_FONT_DETAILS_USEDEFAULT);
 	HWND hDetailsName = GetDlgItem(hDlg, IDC_FONT_DETAILS_NAME);
 	HWND hDetailsSize = GetDlgItem(hDlg, IDC_FONT_DETAILS_SIZE);
+	HWND hDetailsCT   = GetDlgItem(hDlg, IDC_FONT_DETAILS_CLEARTYPE);
 
 	switch (wParam) {
 	case IDC_FONT_SELECT_USEDEFAULT:
-		ToggleDefault(hSelectName, hSelectSize, hSelectUseDefault);
+		ToggleDefault(hSelectName, hSelectSize, hSelectUseDefault, hSelectCT);
 		break;
 	case IDC_FONT_DETAILS_USEDEFAULT:
-		ToggleDefault(hDetailsName, hDetailsSize, hDetailsUseDefault);
+		ToggleDefault(hDetailsName, hDetailsSize, hDetailsUseDefault, hDetailsCT);
 		break;
 	}
 	return TRUE;
@@ -1046,7 +1074,7 @@ BOOL Property::Load(BOOL *pStrict)
 		*pStrict = FALSE;
 	}
 
-	// フォント
+	// fonts
 	siz = sizeof(aSelectViewFontName);
 	res = RegQueryValueEx(hTomboRoot, SELECTVIEW_FONTNAME_ATTR_NAME, NULL, &typ, (LPBYTE)aSelectViewFontName, &siz);
 	if (res != ERROR_SUCCESS) {
@@ -1057,6 +1085,7 @@ BOOL Property::Load(BOOL *pStrict)
 	if (res != ERROR_SUCCESS) {
 		nSelectViewFontSize = 0xFFFFFFFF;
 	}
+	bSelectViewFontQuality = (BYTE)GetDWORDFromReg(hTomboRoot, SELECTVIEW_FONTQUALITY_ATTR_NAME, DEFAULT_QUALITY);
 
 	siz = sizeof(aDetailsViewFontName);
 	res = RegQueryValueEx(hTomboRoot, DETAILSVIEW_FONTNAME_ATTR_NAME, NULL, &typ, (LPBYTE)aDetailsViewFontName, &siz);
@@ -1068,6 +1097,7 @@ BOOL Property::Load(BOOL *pStrict)
 	if (res != ERROR_SUCCESS) {
 		nDetailsViewFontSize = 0xFFFFFFFF;
 	}
+	bDetailsViewFontQuality = (BYTE)GetDWORDFromReg(hTomboRoot, DETAILSVIEW_FONTQUALITY_ATTR_NAME, DEFAULT_QUALITY);
 
 	// 日付フォーマット
 	siz = sizeof(aDateFormat1);
@@ -1249,6 +1279,9 @@ BOOL Property::Save()
 	if (!SetDWORDToReg(hTomboRoot, SELECTVIEW_FONTSIZE_ATTR_NAME, nSelectViewFontSize)) return FALSE;
 	if (!SetDWORDToReg(hTomboRoot, DETAILSVIEW_FONTSIZE_ATTR_NAME, nDetailsViewFontSize)) return FALSE;
 
+	if (!SetDWORDToReg(hTomboRoot, SELECTVIEW_FONTQUALITY_ATTR_NAME, bSelectViewFontQuality)) return FALSE;
+	if (!SetDWORDToReg(hTomboRoot, DETAILSVIEW_FONTQUALITY_ATTR_NAME, bDetailsViewFontQuality)) return FALSE;
+
 	// 日付フォーマット
 	if (!SetSZToReg(hTomboRoot, DETAILSVIEW_DATEFORMAT1_ATTR_NAME, aDateFormat1)) return FALSE;
 	if (!SetSZToReg(hTomboRoot, DETAILSVIEW_DATEFORMAT2_ATTR_NAME, aDateFormat2)) return FALSE;
@@ -1348,7 +1381,7 @@ static BOOL CreateDirectories(LPCTSTR pDir)
 				*q++ = *p++;
 				break;
 			}
-			if (iskanji(*p)) {
+			if (IsDBCSLeadByte(*p)) {
 				*q++ = *p++;
 			}
 			*q++ = *p++;
@@ -1359,7 +1392,7 @@ static BOOL CreateDirectories(LPCTSTR pDir)
 				*q++ = *p++;
 				break;
 			}
-			if (iskanji(*p)) {
+			if (IsDBCSLeadByte(*p)) {
 				*q++ = *p++;
 			}
 			*q++ = *p++;
@@ -1479,7 +1512,7 @@ static BOOL SetMultiSZToReg(HKEY hKey, LPCTSTR pAttr, LPCTSTR pValue, DWORD nSiz
 // フォントの取得
 ///////////////////////////////////////////////////
 
-static BOOL MakeFont(HFONT *phFont, LPCTSTR pName, DWORD nSize)
+static BOOL MakeFont(HFONT *phFont, LPCTSTR pName, DWORD nSize, BYTE bQuality)
 {
 	if (nSize == 0xFFFFFFFF) {
 		*phFont = NULL;
@@ -1497,7 +1530,9 @@ static BOOL MakeFont(HFONT *phFont, LPCTSTR pName, DWORD nSize)
 	lf.lfCharSet = DEFAULT_CHARSET;
 	lf.lfOutPrecision = OUT_DEFAULT_PRECIS;
 	lf.lfClipPrecision = CLIP_DEFAULT_PRECIS;
-	lf.lfQuality = DEFAULT_QUALITY;
+	lf.lfQuality = bQuality;
+//	lf.lfQuality = DEFAULT_QUALITY;
+//	lf.lfQuality = 5;
 	lf.lfPitchAndFamily = DEFAULT_PITCH;
 	_tcscpy(lf.lfFaceName, pName);
 	*phFont = CreateFontIndirect(&lf);

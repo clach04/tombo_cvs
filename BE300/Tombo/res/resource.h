@@ -101,7 +101,9 @@
 #define IDC_GREPTAB_MAIN_STARTDIR       1039
 #define IDC_PROP_READONLY               1040
 #define IDC_FILTERCTL_LIST              1041
+#define IDC_FONT_SELECT_CLEARTYPE       1041
 #define IDC_FILTERCTL_KEEP              1042
+#define IDC_FONT_DETAILS_CLEARTYPE      1042
 #define IDC_FILTERCTL_UP                1043
 #define IDC_FILTERDEF_SRC_PATH          1043
 #define IDC_FILTERCTL_DOWN              1044
@@ -189,7 +191,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        140
 #define _APS_NEXT_COMMAND_VALUE         40058
-#define _APS_NEXT_CONTROL_VALUE         1041
+#define _APS_NEXT_CONTROL_VALUE         1043
 #define _APS_NEXT_SYMED_VALUE           112
 #endif
 #endif

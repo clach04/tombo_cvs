@@ -292,11 +292,13 @@ static BOOL GetDateText(TString *pInsStr, LPCTSTR pFormat)
 	DWORD nLen = 0;
 	LPCTSTR p = pFormat;
 	while(*p) {
-		if (iskanji(*p)) {
+#if defined(PLATFORM_WIN32)
+		if (IsDBCSLeadByte(*p)) {
 			p += 2;
 			nLen += 2;
 			continue;
 		}
+#endif
 		if (*p == TEXT('%')) {
 			p++;
 			switch(*p) {
@@ -326,11 +328,13 @@ static BOOL GetDateText(TString *pInsStr, LPCTSTR pFormat)
 	LPTSTR q = pInsStr->Get();
 	p = pFormat;
 	while(*p) {
-		if (iskanji(*p)) {
+#if defined(PLATFORM_WIN32)
+		if (IsDBCSLeadByte(*p)) {
 			*q++ = *p++;
 			*q++ = *p++;
 			continue;
 		}
+#endif
 		if (*p == TEXT('%')) {
 			p++;
 			switch(*p) {

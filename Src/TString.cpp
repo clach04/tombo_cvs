@@ -90,7 +90,7 @@ BOOL TString::GetDirectoryPath(LPCTSTR pFullPath)
 #else
 	while (*p) {
 		if (*p == TEXT('\\')) q = p;
-		if (iskanji(*p)) {
+		if (IsDBCSLeadByte(*p)) {
 			p++;
 		}
 		p++;
@@ -148,7 +148,7 @@ static LPTSTR GetTail(LPTSTR pBuf)
 	LPTSTR p = pBuf;
 	LPTSTR pTail = pBuf;
 	while(*p) {
-		if (iskanji(*p)) {
+		if (IsDBCSLeadByte(*p)) {
 			pTail = p++;
 			if (*p) p++;
 		} else {
@@ -186,7 +186,7 @@ BOOL TString::GetPathTail(LPCTSTR pFullPath)
 #else
 	while (*p) {
 		if (*p == TEXT('\\')) q = p;
-		if (iskanji(*p)) {
+		if (IsDBCSLeadByte(*p)) {
 			p++;
 		}
 		p++;
@@ -247,7 +247,7 @@ void DropInvalidFileChar(LPTSTR pDst, LPCTSTR pSrc)
 	// ファイル名として使用できない文字をスキップしてヘッドラインをコピー
 	while(*p) {
 #ifndef _WIN32_WCE
-		if (iskanji(*p)) {
+		if (IsDBCSLeadByte(*p)) {
 			*q++ = *p++;
 			*q++ = *p++;
 			continue;
@@ -273,7 +273,7 @@ BOOL GetBaseName(TString *pBase, LPCTSTR pFull)
 	LPCTSTR pLastYen = NULL;
 	while (*p) {
 #ifndef _WIN32_WCE
-		if (iskanji(*p)) {
+		if (IsDBCSLeadByte(*p)) {
 			p += 2;
 			continue;
 		}

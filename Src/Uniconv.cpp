@@ -1082,7 +1082,7 @@ static LPTSTR GetTail(LPTSTR pBuf)
 	LPTSTR p = pBuf;
 	LPTSTR pTail = pBuf;
 	while(*p) {
-		if (iskanji(*p)) {
+		if (IsDBCSLeadByte(*p)) {
 			pTail = p++;
 			if (*p) p++;
 		} else {
@@ -1128,12 +1128,12 @@ LPTSTR StringDup(LPCTSTR pStr)
 
 void CopyKanjiString(LPTSTR pDst, LPCTSTR pSrc, DWORD nLen)
 {
-#ifdef WIN32_WCE
+#ifndef _WIN32_WCE
 	LPCTSTR p = pSrc;
 	LPTSTR q = pDst;
 	DWORD n = 0;
 	while(*p) {
-		if (iskanji(*p)) {
+		if (IsDBCSLeadByte(*p)) {
 			if (n < nLen - 1) {
 				*q++ = *p++;
 				*q++ = *p++;

@@ -20,9 +20,11 @@ class Property {
 
 	TCHAR aSelectViewFontName[LF_FACESIZE];
 	DWORD nSelectViewFontSize;
+	BYTE  bSelectViewFontQuality;
 
 	TCHAR aDetailsViewFontName[LF_FACESIZE];
 	DWORD nDetailsViewFontSize;
+	BYTE bDetailsViewFontQuality;
 
 	TCHAR aDateFormat1[MAX_DATEFORMAT_LEN];
 	TCHAR aDateFormat2[MAX_DATEFORMAT_LEN];
@@ -56,6 +58,7 @@ class Property {
 #endif
 	DWORD nWrapText;
 	BOOL bOpenReadOnly;
+
 
 public:
 	Property();
