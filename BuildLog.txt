@@ -253,11 +253,20 @@ PG: Change copyright dialog for expat.
 * Create new note the same level of the virtual link note what is selected.
 
 ////////////////////////////////
-// B094 (CURRENT)
+// B094
 ////////////////////////////////
 
+* Disable new folder menu item when virtual folder nodes selected.
 * FIX:Memo discarded when select other note(#1313,#1314)
-* Keep wrap text status.
+* Keep wrap text status(#1524).
+* FIX: When resize task bar, main window size not changed.(#1134)
+* Control grep menu.
+* FIX: when vfolder.xml is not exists, grep don't work.
+* Add hMSToolMenu and GetMSToolMenu() for BE-X00.
+* Update NUM_IMG_BUTTONS for PsPC.
+* Support menu control for PsPC, PocktPC, BE-X00.
+
+
 
 /////////////////////////////////////////////////////////////////////////
 // TODO
