@@ -1304,9 +1304,9 @@ BOOL MemoSelectView::SearchOneItem(HTREEITEM hItem, BOOL bSearchEncryptedMemo, B
 			TreeView_GetItem(hViewWnd, &ti);
 
 #ifdef _WIN32_WCE
-			char bufA[MAX_PATH * 2];
-			WideCharToMultiByte(CP_ACP, 0, buf, -1, bufA, MAX_PATH * 2 - 1, NULL, NULL);
+			char *bufA = ConvUnicode2SJIS(buf);
 			bMatch = pMemoMgr->GetSearchEngine()->SearchForward(bufA, 0, FALSE);
+			delete [] bufA;
 #else
 			bMatch = pMemoMgr->GetSearchEngine()->SearchForward(buf, 0, FALSE);
 #endif
