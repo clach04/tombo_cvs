@@ -376,7 +376,6 @@ void MemoSelectView::SetFocus()
 // 結果としてTRUE, FALSEの意思表示をしたい場合にはその値を返す。
 // デフォルトの動作に従いたい場合には0xFFFFFFFFを返す。
 
-
 LRESULT MemoSelectView::OnNotify(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
 	LPNM_TREEVIEW pHdr = (LPNM_TREEVIEW)lParam;
@@ -413,12 +412,12 @@ LRESULT MemoSelectView::OnNotify(HWND hWnd, WPARAM wParam, LPARAM lParam)
 			TreeViewItem *tvi = (TreeViewItem*)it.lParam;
 			if (!tvi) break;
 
-			// シングルクリックモード・自動追従モードの場合、2回ロードされることになるが、とりあえずこのまま
+
 			// Viewの切り替えだけではSelectViewにフォーカスがあたってしまう。なぜ？
 			if (!tvi->HasMultiItem()) {
-				// TODO: リークを消す
 				TreeViewFileItem *ptvfi = (TreeViewFileItem*)tvi;
-				MemoLocator *ploc = new MemoLocator(ptvfi->GetNote(), ptvfi->GetViewItem());
+				// If 3rd parameter is TRUE, object are deleted by MainFrame::RequestOpenMemo() 
+				MemoLocator *ploc = new MemoLocator(ptvfi->GetNote(), ptvfi->GetViewItem(), TRUE);
 				pMemoMgr->GetMainFrame()->PostRequestOpen(ploc, OPEN_REQUEST_MSVIEW_ACTIVE);
 			}
 			// 暗黙でExpand/Collapseが発生
@@ -517,11 +516,9 @@ LRESULT MemoSelectView::OnNotify(HWND hWnd, WPARAM wParam, LPARAM lParam)
 				// プログラムによるものの場合、切り替えは発生させない
 				pMemoMgr->SetMSSearchFlg(TRUE);
 				if (!tvi->HasMultiItem()) {
-					// TODO: リークを消す
 					TreeViewFileItem *ptvfi = (TreeViewFileItem*)tvi;
-					MemoLocator *ploc = new MemoLocator(ptvfi->GetNote(), ptvfi->GetViewItem());
-
-					pMemoMgr->GetMainFrame()->PostRequestOpen(ploc, OPEN_REQUEST_MDVIEW_ACTIVE);
+					MemoLocator loc(ptvfi->GetNote(), ptvfi->GetViewItem());
+					pMemoMgr->GetMainFrame()->SendRequestOpen(&loc, OPEN_REQUEST_MDVIEW_ACTIVE);
 				}
 			}
 		}

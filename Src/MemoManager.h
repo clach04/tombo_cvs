@@ -20,11 +20,13 @@ class SearchEngineA;
 class MemoLocator {
 	MemoNote *pNote;
 	HTREEITEM hItem;
+	BOOL bDeleteReceived;
 public:
-	MemoLocator(MemoNote *p, HTREEITEM h) : pNote(p), hItem(h) {}
+	MemoLocator(MemoNote *p, HTREEITEM h, BOOL bDel = FALSE) : pNote(p), hItem(h), bDeleteReceived(bDel) {}
 
 	MemoNote *GetNote() { return pNote; }
 	HTREEITEM GetHITEM() { return hItem; }
+	BOOL IsDeleteReceived() { return bDeleteReceived; }
 };
 
 /////////////////////////////////////

@@ -1388,10 +1388,14 @@ void MainFrame::About()
 void MainFrame::RequestOpenMemo(MemoLocator *pLoc, DWORD nSwitchView)
 {
 	MemoNote *pNote = pLoc->GetNote();
-	if (pNote == NULL) return; // フォルダの場合
+	if (pNote == NULL) {
+		if (pLoc->IsDeleteReceived()) delete pLoc;
+		return; // フォルダの場合
+	}
 	if (((nSwitchView & OPEN_REQUEST_MSVIEW_ACTIVE) == 0) && (pNote->IsEncrypted() && !pmPasswordMgr.IsRememberPassword())) {
 		// bSwitchViewがFALSEで、メモを開くためにパスワードを問い合わせる必要がある場合には
 		// メモは開かない
+		if (pLoc->IsDeleteReceived()) delete pLoc;
 		return;
 	}
 	mmMemoManager.SetMemo(pLoc);
@@ -1437,6 +1441,7 @@ void MainFrame::RequestOpenMemo(MemoLocator *pLoc, DWORD nSwitchView)
 			ActivateView(FALSE);
 		}
 	}
+	if (pLoc->IsDeleteReceived()) delete pLoc;
 }
 
 ///////////////////////////////////////////////////
