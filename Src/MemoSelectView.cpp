@@ -16,8 +16,6 @@
 #include "Property.h"
 #include "TString.h"
 #include "TreeViewItem.h"
-#include "PasswordManager.h"
-#include "SearchEngine.h"
 #include "Message.h"
 #include "GrepDialog.h"
 

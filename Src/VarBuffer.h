@@ -22,9 +22,14 @@ public:
 	BOOL Init(DWORD nInitBytes, DWORD nDeltaBytes);
 
 	BOOL Add(LPBYTE pData, DWORD nBytes, LPDWORD pOffset);
+	BOOL Extend(DWORD nPos, DWORD nExtendBytes);
+	BOOL Shorten(DWORD nPos, DWORD nShortenBytes);
+
 	LPBYTE GetBuffer() { return pBuf; }
 	LPBYTE Get(DWORD nOffset) { return pBuf + nOffset; }
 	DWORD CurrentUse() { return nCurrentUse; }
+
+	BOOL Clear(BOOL bReAlloc);
 };
 
 ////////////////////////////////////////////////////
@@ -65,6 +70,12 @@ public:
 	T* GetBuf() { return (T*)VarBufferImpl::GetBuffer(); }
 	T* GetUnit(DWORD n) { return (T*)VarBufferImpl::Get(n * sizeof(T)); }
 	DWORD NumItems() { return CurrentUse() / sizeof(T); }
+
+	BOOL Extend(DWORD nIndex, DWORD nExtendItems) { return VarBufferImpl::Extend(nIndex * sizeof(T), nExtendItems * sizeof(T)); }
+	BOOL Shorten(DWORD nIndex, DWORD nShortenItems) { return VarBufferImpl::Shorten(nIndex * sizeof(T), nShortenItems * sizeof(T)); }
+
+	BOOL Clear(BOOL bReAlloc) { return VarBufferImpl::Clear(bReAlloc); }
+
 };
 
 

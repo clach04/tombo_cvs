@@ -72,4 +72,11 @@ extern PasswordManager *g_pPasswordManager;
 // Number of preserving history about search string.
 #define NUM_SEARCH_HISTORY 10
 
+enum SearchResult {
+	SR_FOUND,
+	SR_NOTFOUND,
+	SR_FAILED,
+	SR_CANCELED
+};
+
 #endif

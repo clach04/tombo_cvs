@@ -1,5 +1,6 @@
 #include <windows.h>
 #include <tchar.h>
+#include "Tombo.h"
 #include "resource.h"
 #include "UniConv.h"
 #include "SearchEngine.h"
@@ -128,7 +129,7 @@ void SearchTree::CancelRequest()
 // search main
 /////////////////////////////////////////
 
-SearchTree::SearchResult SearchTree::Search()
+SearchResult SearchTree::Search()
 {
 	_tcscpy(aPath, pStartPath);
 	LPTSTR pBase = aPath + nBaseOffset + 1;
@@ -138,7 +139,7 @@ SearchTree::SearchResult SearchTree::Search()
 	return srResult;
 }
 
-SearchTree::SearchResult SearchTree::SearchTreeRec(LPCTSTR pNextParse, LPTSTR pBase)
+SearchResult SearchTree::SearchTreeRec(LPCTSTR pNextParse, LPTSTR pBase)
 {
 	// expand directory list
 	DirList dl;
@@ -217,7 +218,7 @@ SearchTree::SearchResult SearchTree::SearchTreeRec(LPCTSTR pNextParse, LPTSTR pB
 // search one file
 /////////////////////////////////////////
 
-SearchTree::SearchResult SearchTree::SearchOneItem()
+SearchResult SearchTree::SearchOneItem()
 {
 	if (bSkipOne) {
 		bSkipOne = FALSE;
@@ -225,39 +226,13 @@ SearchTree::SearchResult SearchTree::SearchOneItem()
 	}
 
 	LPCTSTR p = aPath + nBaseOffset + 1;
-
-	// if target is filename
-	if (pRegex->IsFileNameOnly()) {
-		TString sPartName;
-		if (!GetBaseName(&sPartName, p)) return SR_FAILED;
-
-		BOOL bMatch;
-#ifdef _WIN32_WCE
-		char *bufA = ConvUnicode2SJIS(sPartName.Get());
-		bMatch = pRegex->SearchForward(bufA, 0, FALSE);
-		delete [] bufA;
-#else
-		bMatch = pRegex->SearchForward(sPartName.Get(), 0, FALSE);
-#endif
-		return bMatch ? SR_FOUND : SR_NOTFOUND;
-	}
-
-	// skip crypted note if it is not search target.
-	if (!pRegex->IsSearchEncryptMemo() && MemoNote::IsNote(p) == NOTE_TYPE_CRYPTED) return SR_NOTFOUND;
-
-	MemoNote *pNote;
+	MemoNote *pNote = NULL;
 	if (!MemoNote::MemoNoteFactory(TEXT(""), p, &pNote)) return SR_FAILED;
+	if (pNote == NULL) return SR_NOTFOUND;
 
-	char *pMemo = pNote->GetMemoBodyA(pRegex->GetPasswordManager());
-	if (pMemo == NULL) {
-		delete pNote;
-		return SR_FAILED;
-	}
-
-	BOOL bMatch = pRegex->SearchForward(pMemo, 0, FALSE);
-	MemoNote::WipeOutAndDelete(pMemo);
+	SearchResult result = pRegex->Search(pNote);
 	delete pNote;
-	return bMatch ? SR_FOUND : SR_NOTFOUND;
+	return result;
 }
 
 /////////////////////////////////////////

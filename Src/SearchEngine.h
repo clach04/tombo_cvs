@@ -2,11 +2,15 @@
 #define SEARCHENGINE_H
 
 class PasswordManager;
+class MemoNote;
+enum SearchResult;
+
 ///////////////////////////////////////////////////////////
 // テキスト検索ロジック(SJIS版)
 ///////////////////////////////////////////////////////////
 
 class SearchEngineA {
+protected:
 	DWORD nMatchStart;
 	DWORD nMatchEnd;
 
@@ -38,8 +42,11 @@ public:
 	BOOL SearchForward(const char *pText, DWORD nStartPos, BOOL bShift);
 	BOOL SearchBackward(const char *pText, DWORD nStartPos, BOOL bShift);
 
+	SearchResult Search(MemoNote *pNote);
+
 	//////////////////////////////
 	// 結果取得
+
 	DWORD MatchStart() { return nMatchStart; }
 	DWORD MatchEnd() { return nMatchEnd; }
 

@@ -2065,18 +2065,18 @@ void MainFrame::DoSearchTree(BOOL bFirst, BOOL bForward)
 	TCHAR buf[1024];
 
 	switch(st.GetResult()) {
-	case SearchTree::SR_FOUND:
+	case SR_FOUND:
 		msView.ShowItem(st.GetPartPath());
 		mmMemoManager.SearchDetailsView(TRUE, TRUE, TRUE, TRUE);
 		break;
-	case SearchTree::SR_NOTFOUND:
+	case SR_NOTFOUND:
 		MessageBox(MSG_STRING_NOT_FOUND, TOMBO_APP_NAME, MB_OK | MB_ICONINFORMATION);
 		break;
-	case SearchTree::SR_CANCELED:
+	case SR_CANCELED:
 		msView.ShowItem(st.GetPartPath());
 		MessageBox(MSG_STRING_SEARCH_CANCELED, TOMBO_APP_NAME, MB_OK | MB_ICONINFORMATION);
 		break;
-	case SearchTree::SR_FAILED:
+	case SR_FAILED:
 		wsprintf(buf, MSG_SEARCH_FAILED, GetLastError());
 		msView.ShowItem(st.GetPartPath());
 		MessageBox(buf, TOMBO_APP_NAME, MB_OK | MB_ICONERROR);

@@ -4,6 +4,7 @@
 class MemoNote;
 class SearchEngineA;
 class PasswordManager;
+#include "VarBuffer.h"
 
 ////////////////////////////////////
 ////////////////////////////////////
@@ -24,6 +25,11 @@ public:
 	BOOL Init(MemoNote *p, LPCTSTR pFileName);
 
 	MemoNote *GetNote() { return pNote; }
+
+	// If ClearNote() is not called and VFNote is deleted, 
+	// pNote is deleted, too. To prevent deleting, you should call ClearNote().
+	// In this case, deleting pNote is due to caller.
+	void ClearNote() { pNote = NULL; }
 	LPCTSTR GetFileName() { return pFileName; }
 };
 
@@ -38,13 +44,26 @@ public:
 	VFStream();
 	virtual ~VFStream();
 
-	virtual BOOL Prepare();
-	virtual BOOL Store(VFNote *p) = 0;
-	virtual BOOL PostActivate();
+	///////////////////////////
+	// Create/delete filter chains.
 
 	BOOL SetNext(VFStream *p);
-
 	virtual void FreeObject();
+
+	///////////////////////////
+	// Notes filtering.
+
+	// Initialize classes before sequence of Store().
+	// by default, Prepare() calls pNext->Prepare().
+	virtual BOOL Prepare();
+
+	// Try to store VFNote. If success, retrun TRUE. If errors, return FALSE.
+	// if a class VFStream's subclass decide discard p, the class should delete p.
+	virtual BOOL Store(VFNote *p) = 0;
+
+	// Finalize classes after calling sequence of Store().
+	// by default PostActive() calls pNext->PostActive().
+	virtual BOOL PostActivate();
 };
 
 ////////////////////////////////////
@@ -88,22 +107,21 @@ public:
 
 protected:
 	enum OrderInfo oiOrder;
-
-	VFNote **ppArray;
-	DWORD nPos;
-	DWORD nCapacity;
+	TVector <VFNote*> vNotes;
 
 public:
 	VFStore(enum OrderInfo odr);
 	~VFStore();
+	BOOL Init();
+
 	void FreeObject();
 
 	BOOL Prepare();
 	BOOL Store(VFNote *p);
 	BOOL PostActivate();
 
-	DWORD NumItem() { return nPos; }
-	VFNote **GetNotes() { return ppArray; }
+	DWORD NumItem() { return vNotes.NumItems(); }
+	VFNote *GetNote(DWORD n) { return *vNotes.GetUnit(n); }
 
 	// free VFNote array. 
 	// VFNote in array is deleted, but MemoNote in each VFNote is not deleted.

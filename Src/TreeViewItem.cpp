@@ -629,7 +629,8 @@ BOOL TreeViewVirtualFolderRoot::StreamObjectsFactory(VFInfo *pInfo, TreeViewVirt
 	*ppStore = new VFStore(VFStore::ORDER_TITLE);
 	LPTSTR pPath = StringDup(pInfo->pPath);
 	if (!pRegex || !*ppVf || !*ppGen || !*ppStore || !pPath ||
-		!(*ppGen)->Init(pPath, pInfo->nFlag & VFINFO_FLG_CHECKCRYPTED)) { // pPassMgr
+		!(*ppGen)->Init(pPath, pInfo->nFlag & VFINFO_FLG_CHECKCRYPTED) ||
+		!(*ppStore)->Init()) { // pPassMgr
 		delete pRegex;
 		delete *ppVf;
 		delete *ppGen;
@@ -739,15 +740,16 @@ BOOL TreeViewVirtualFolder::Expand(MemoSelectView *pView)
 		return FALSE;
 	}
 
-	// insert to tree
+	// Insert notes to tree
 	DWORD n = pStore->NumItem();
-	VFNote **ppNotes = pStore->GetNotes();
+	VFNote *pNote;
 	for (DWORD i = 0; i < n; i++) {
-		MemoNote *p = ppNotes[i]->GetNote();
-		LPCTSTR pTitle = ppNotes[i]->GetFileName();
+		pNote = pStore->GetNote(i);
+		MemoNote *p = pNote->GetNote();
+		pNote->ClearNote(); // to prevent deleting p
+		LPCTSTR pTitle = pNote->GetFileName();
 		pView->InsertFile(hItem, p, pTitle, TRUE);
 	}
-	pStore->FreeArray(); ppNotes = NULL;
-
+	pStore->FreeArray();
 	return TRUE;
 }

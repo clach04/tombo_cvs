@@ -3,6 +3,7 @@
 
 #include "VarBuffer.h"
 
+enum SearchResult;
 class SearchEngineA;
 class DirList;
 
@@ -11,14 +12,7 @@ class DirList;
 ///////////////////////////////////////////////////////////
 
 class SearchTree {
-public:
-	enum SearchResult {
-		SR_FOUND,
-		SR_NOTFOUND,
-		SR_FAILED,
-		SR_CANCELED
-	};
-private:
+protected:
 	///////////////////////////////
 	// dialog
 

@@ -187,6 +187,20 @@ a note does not open correctly.
 
 * Support filtering. (File only mode is not yet.)
 
+////////////////////////////////
+// B087
+////////////////////////////////
+
+* Fix memory leak when filter discards note.
+* Support file only mode.
+
+PG: Import VarBuffer.* from YAE(Yet Another Editor).
+PG: Change VFStore's vector implimentation to TVector.
+PG: Move search logic from SearchTree::SearchOneItem to SearchEngineA::Search
+PG: Merge SearchTree:SearchResult and SearchEngineA::SearchResult to global SearchResult(in Tombo.h)
+PG: Change VFRegexFilter::Store's matching logic to SearchEngineA::Search
+
+
 /////////////////////////////////////////////////////////////////////////
 // TODO
 /////////////////////////////////////////////////////////////////////////
@@ -202,13 +216,6 @@ Refactoring : InactivateDetailsView
 
 == around virtual folder
 
-* Move array currently keep VFStore to Runtime-environment.
-* Pass VFStream::Activate to Runtime-environment.
-
-* Treat encrypted memo.
-* Change object create method to MemoMonte's factory method.
-* Change icon at virtual node.
+* Change icon at virtual node ?
 * Disable Cut/Copy/Paste/Disable/Encrypt/Decrypt etc. when virtual node selected.
-* Impliment matching filter notes.match().
-* Error handling when compiling.
-* Impliment sorting function notes.sort().
+* Impliment sorting.

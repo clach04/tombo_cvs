@@ -46,7 +46,10 @@ public:
 };
 
 void DropInvalidFileChar(LPTSTR pDst, LPCTSTR pSrc);
+
+// Get base file name (except path and extensions)
 BOOL GetBaseName(TString *pBase, LPCTSTR pFull);
+
 LPCTSTR GetNextDirSeparator(LPCTSTR pStart);
 
 #endif

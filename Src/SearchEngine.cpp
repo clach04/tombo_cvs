@@ -3,8 +3,11 @@
 #include <tchar.h>
 #include <string.h>
 
+#include "Tombo.h"
 #include "SearchEngine.h"
+#include "TString.h"
 #include "UniConv.h"
+#include "MemoNote.h"
 
 extern "C" {
 void* Regex_Compile(const char *pPattern, BOOL bIgnoreCase, const char **ppReason);
@@ -149,4 +152,36 @@ BOOL SearchEngineA::SearchBackward(const char *pText, DWORD nStartPos, BOOL bShi
 		return FALSE;
 	}
 	return FALSE;
+}
+
+////////////////////////////////////////////////////////
+// Matching to MemoNote
+////////////////////////////////////////////////////////
+
+SearchResult SearchEngineA::Search(MemoNote *pNote)
+{
+	if (bFileNameOnly) {
+		TString sPartName;
+		if (!GetBaseName(&sPartName, pNote->MemoPath())) return SR_FAILED;
+
+		BOOL bMatch;
+#ifdef _WIN32_WCE
+		char *bufA = ConvUnicode2SJIS(sPartName.Get());
+		bMatch = SearchForward(bufA, 0, FALSE);
+		delete [] bufA;
+#else
+		bMatch = SearchForward(sPartName.Get(), 0, FALSE);
+#endif
+		return bMatch ? SR_FOUND : SR_NOTFOUND;
+	} else {
+		// skip crypted note if it is not search target.
+		if (!IsSearchEncryptMemo() && pNote->IsEncrypted()) return SR_NOTFOUND;
+
+		char *pMemo = pNote->GetMemoBodyA(g_pPasswordManager);
+		if (pMemo == NULL) return SR_FAILED;
+
+		BOOL bMatch = SearchForward(pMemo, 0, FALSE);
+		MemoNote::WipeOutAndDelete(pMemo);
+		return bMatch ? SR_FOUND : SR_NOTFOUND;
+	}
 }

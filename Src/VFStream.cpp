@@ -20,7 +20,8 @@
 
 VFNote::~VFNote()
 {
-	delete pFileName;
+	delete [] pFileName;
+	delete pNote;
 }
 
 BOOL VFNote::Init(MemoNote *p, LPCTSTR pFile)
@@ -181,12 +182,17 @@ BOOL VFDirectoryGenerator::Store(VFNote *p)
 // VFStore implimentation
 ////////////////////////////////////
 
-VFStore::VFStore(enum OrderInfo odr) : oiOrder(odr), ppArray(NULL)
+VFStore::VFStore(enum OrderInfo odr) : oiOrder(odr)
 {
 }
 
 VFStore::~VFStore()
 {
+}
+
+BOOL VFStore::Init()
+{
+	return vNotes.Init(STORE_INIT_SIZE, STORE_EXTEND_DELTA);
 }
 
 void VFStore::FreeObject()
@@ -196,35 +202,13 @@ void VFStore::FreeObject()
 
 BOOL VFStore::Prepare()
 {
-	// free if already allocated.
-	if (ppArray) {
-		LocalFree(ppArray);
-	}
-
-	nCapacity = STORE_INIT_SIZE;
-	// allocate array
-	ppArray = (VFNote **)LocalAlloc(LMEM_FIXED, sizeof(VFNote*) * STORE_INIT_SIZE);
-	if (ppArray == NULL) {
-		SetLastError(ERROR_NOT_ENOUGH_MEMORY);
-		return FALSE;
-	}
-
-	nPos = 0;
+	if (!vNotes.Clear(TRUE)) return FALSE;
 	return TRUE;
 }
 
 BOOL VFStore::Store(VFNote *p)
 {
-	if (nPos >= nCapacity) {
-		// extend array.
-		// array's address is changed by LocalReAlloc.
-		nCapacity += STORE_EXTEND_DELTA;
-		ppArray = (VFNote**)LocalReAlloc(ppArray, sizeof(VFNote*) * nCapacity, LMEM_MOVEABLE);
-		if (ppArray == NULL) return FALSE;
-	}
-
-	ppArray[nPos++] = p;
-	return TRUE;
+	return vNotes.Add(&p);
 }
 
 BOOL VFStore::PostActivate()
@@ -235,16 +219,11 @@ BOOL VFStore::PostActivate()
 
 void VFStore::FreeArray()
 {
-	// release VFNote;
-	for (DWORD i = 0; i < nPos; i++) {
-		delete ppArray[i];
+	DWORD n = vNotes.NumItems();
+	for (DWORD i = 0; i < n; i++) {
+		delete (*vNotes.GetUnit(i));
 	}
-
-	if (ppArray) {
-		LocalFree(ppArray);
-		ppArray = NULL;
-		nCapacity = nPos = 0;
-	}
+	vNotes.Clear(FALSE);
 }
 
 ////////////////////////////////////
@@ -273,14 +252,15 @@ BOOL VFRegexFilter::Store(VFNote *p)
 {
 	MemoNote *pNote = p->GetNote();
 	if (pNote == NULL) return FALSE;
-	char *pText = pNote->GetMemoBodyA(pRegex->GetPasswordManager());
-	if (pText == NULL) return FALSE;
-
-	if (pRegex->SearchForward(pText, 0, 0)) {
-		BOOL bResult = pNext->Store(p);
-		delete [] pText;
-		return bResult;
-	} else {
+	switch(pRegex->Search(pNote)) {
+	case SR_NOTFOUND:
+		delete p; // when discarding, Store() must delete object p.
 		return TRUE;
+	case SR_FOUND:
+		return pNext->Store(p);
+	case SR_CANCELED:
+	case SR_FAILED:
+	default:
+		return FALSE;
 	}
 }
