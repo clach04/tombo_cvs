@@ -91,6 +91,10 @@ public:
 	BOOL MDSearchFlg() { return bMDSearchFlg; }
 	void SetMDSearchFlg(BOOL b) { bMDSearchFlg = b; }
 
+	/////////////////////////////////////
+	// 
+	void ChangeURINotify(const TomboURI *pNewURI);
+
 };
 
 #endif

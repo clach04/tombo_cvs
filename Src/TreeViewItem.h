@@ -109,6 +109,8 @@ protected:
 
 	Locator loc;
 	BOOL bIsEncrypted;
+
+	BOOL CopyMove(BOOL bCopy, MemoManager *pMgr, MemoSelectView *pView);
 public:
 	TreeViewFileItem();
 	~TreeViewFileItem();
@@ -149,6 +151,7 @@ public:
 /////////////////////////////////////////////
 
 class TreeViewFolderItem : public TreeViewItem {
+	BOOL CopyMove(BOOL bCopy, MemoManager *pMgr, MemoSelectView *pView, LPCTSTR *ppErr);
 public:
 	TreeViewFolderItem();
 

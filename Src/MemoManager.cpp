@@ -275,3 +275,8 @@ BOOL MemoManager::IsNoteDisplayed(const TomboURI *pURI)
 	if (pMemoDetailsView->GetCurrentURI() == NULL) return FALSE;
 	return _tcsicmp(pURI->GetFullURI(), pMemoDetailsView->GetCurrentURI()->GetFullURI()) == 0;
 }
+
+void MemoManager::ChangeURINotify(const TomboURI *pNewURI)
+{
+	pMemoDetailsView->SetCurrentNote(pNewURI);
+}

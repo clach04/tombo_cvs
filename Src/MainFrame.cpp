@@ -541,8 +541,9 @@ void MainFrame::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	roOpt.bKeepTitle = g_Property.KeepTitle();
 
 	roOpt.bSafeFileName = g_Property.UseSafeFileName();
+	roOpt.pTopDir = g_Property.TopDir();
 
-	g_Repository.Init(g_Property.TopDir(), &roOpt);
+	g_Repository.Init(&roOpt);
 
 	// create toolbar
 	pPlatform->Create(hWnd, pcs->hInstance);
@@ -1442,6 +1443,15 @@ void MainFrame::OnProperty()
 	bDisableHotKey = bPrev;
 	if (nResult != IDOK) return;
 
+	// Repository setting
+	RepositoryOption roOpt;
+	roOpt.bKeepCaret = g_Property.KeepCaret();
+	roOpt.bKeepTitle = g_Property.KeepTitle();
+	roOpt.bSafeFileName = g_Property.UseSafeFileName();
+	roOpt.pTopDir = g_Property.TopDir();
+
+	g_Repository.SetRepositoryOption(&roOpt);
+
 	// font setting
 	msView.SetFont(g_Property.SelectViewFont());
 	pDetailsView->SetFont(g_Property.DetailsViewFont());
@@ -1457,6 +1467,7 @@ void MainFrame::OnProperty()
 		SetWindowText(hMainWnd, TOMBO_APP_NAME);
 	}
 #endif
+
 }
 
 ///////////////////////////////////////////////////

@@ -105,22 +105,7 @@ void TreeViewFileItem::SetNote(const TomboURI *p)
 	bIsEncrypted = g_Repository.IsEncrypted(loc.getURI());
 }
 
-BOOL TreeViewFileItem::Move(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR *ppErr)
-{
-	if (!Copy(pMgr, pView, ppErr)) {
-		return FALSE;
-	}
-	if (g_Property.IsUseTwoPane() && pMgr->IsNoteDisplayed(loc.getURI())) {
-		// close current note
-		pMgr->NewMemo();
-	}
-
-	URIOption opt;
-	if (!g_Repository.Delete(loc.getURI(), &opt)) return FALSE;
-	return TRUE;
-}
-
-BOOL TreeViewFileItem::Copy(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR *ppErr)
+BOOL TreeViewFileItem::CopyMove(BOOL bCopy, MemoManager *pMgr, MemoSelectView *pView)
 {
 	TomboURI sCopyToURI;
 	TomboURI sCurURI;
@@ -130,10 +115,24 @@ BOOL TreeViewFileItem::Copy(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR *p
 
 	HTREEITEM hParent = pView->ShowItemByURI(&sCopyToURI, FALSE, FALSE);
 	URIOption opt;
-	if (!g_Repository.Copy(loc.getURI(), &sCopyToURI, &opt)) return FALSE;
+	if (bCopy) {
+		if (!g_Repository.Copy(loc.getURI(), &sCopyToURI, &opt)) return FALSE;
+	} else {
+		if (!g_Repository.Move(loc.getURI(), &sCopyToURI, &opt)) return FALSE;
+	}
 
 	pView->InsertFile(hParent, opt.pNewURI, opt.pNewHeadLine->Get(), FALSE, FALSE);
 	return TRUE;
+}
+
+BOOL TreeViewFileItem::Move(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR *ppErr)
+{
+	return CopyMove(FALSE, pMgr, pView);
+}
+
+BOOL TreeViewFileItem::Copy(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR *ppErr)
+{
+	return CopyMove(TRUE, pMgr, pView);
 }
 
 BOOL TreeViewFileItem::Delete(MemoManager *pMgr, MemoSelectView *pView)
@@ -180,6 +179,7 @@ BOOL TreeViewFileItem::Encrypt(MemoManager *pMgr, MemoSelectView *pView)
 	// replace MemoNote that TreeViewItem have
 	loc.set(opt.pNewURI);
 	bIsEncrypted = TRUE;
+	pView->GetManager()->ChangeURINotify(opt.pNewURI);
 
 	// update icon and headline string
 	if (!pView->UpdateItemStatusNotify(this, opt.pNewHeadLine->Get())) {
@@ -217,6 +217,7 @@ BOOL TreeViewFileItem::Decrypt(MemoManager *pMgr, MemoSelectView *pView)
 	// replace MemoNote that TreeViewItem have
 	loc.set(opt.pNewURI);
 	bIsEncrypted = FALSE;
+	pView->GetManager()->ChangeURINotify(opt.pNewURI);
 
 	// update icon and headline string
 	if (!pView->UpdateItemStatusNotify(this, opt.pNewHeadLine->Get())) {
@@ -404,11 +405,13 @@ static BOOL IsSubFolder(LPCTSTR pSrc, LPCTSTR pDst)
 	return FALSE;
 }
 
-BOOL TreeViewFolderItem::Move(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR *ppErr)
+BOOL TreeViewFolderItem::CopyMove(BOOL bCopy, MemoManager *pMgr, MemoSelectView *pView, LPCTSTR *ppErr)
 {
 	// Inactivate edit view
 	pMgr->InactiveDetailsView();
-	pView->TreeCollapse(GetViewItem());
+	if (!bCopy) {
+		pView->TreeCollapse(GetViewItem());
+	}
 
 	// convert to URI
 	TomboURI sSrcURI, sDstURI;
@@ -423,7 +426,13 @@ BOOL TreeViewFolderItem::Move(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR 
 	HTREEITEM hParentX = pView->ShowItemByURI(&sDstURI, FALSE, FALSE);
 
 	URIOption opt;
-	if (!g_Repository.Move(&sSrcURI, &sDstURI, &opt)) {
+	BOOL bResult;
+	if (bCopy) {
+		bResult = g_Repository.Copy(&sSrcURI, &sDstURI, &opt);
+	} else {
+		bResult = g_Repository.Move(&sSrcURI, &sDstURI, &opt);
+	}
+	if (!bResult) {
 		if (GetLastError() == ERROR_TOMBO_W_OPERATION_NOT_PERMITTED) {
 			*ppErr = MSG_DST_FOLDER_IS_SRC_SUBFOLDER;
 		}
@@ -436,36 +445,14 @@ BOOL TreeViewFolderItem::Move(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR 
 	return TRUE;
 }
 
+BOOL TreeViewFolderItem::Move(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR *ppErr)
+{
+	return CopyMove(FALSE, pMgr, pView, ppErr);
+}
+
 BOOL TreeViewFolderItem::Copy(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR *ppErr)
 {
-	// Inactivate edit view
-	pMgr->InactiveDetailsView();
-
-	// convert to URI
-	TomboURI sSrcURI, sDstURI;
-	HTREEITEM hSrcItem = GetViewItem();
-	if (!pView->GetURI(&sSrcURI, hSrcItem)) return FALSE;
-
-	HTREEITEM hDstItem;
-	TomboURI sSelURI;
-	if (!pView->GetCurrentItem(&hDstItem)) return FALSE;
-	if (!pView->GetURI(&sSelURI, hDstItem)) return FALSE;
-	if (!g_Repository.GetAttachURI(&sSelURI, &sDstURI)) return FALSE;
-	HTREEITEM hParentX = pView->ShowItemByURI(&sDstURI, FALSE, FALSE);
-
-	URIOption opt;
-	if (!g_Repository.Copy(&sSrcURI, &sDstURI, &opt)) {
-		if (GetLastError() == ERROR_TOMBO_W_OPERATION_NOT_PERMITTED) {
-			*ppErr = MSG_DST_FOLDER_IS_SRC_SUBFOLDER;
-		}
-		return FALSE;
-	}
-
-	TString sHL;
-	if (!g_Repository.GetHeadLine(&sSrcURI, &sHL)) return FALSE;
-
-	pView->CreateNewFolder(hParentX, sHL.Get());
-	return TRUE;
+	return CopyMove(TRUE, pMgr, pView, ppErr);
 }
 
 BOOL TreeViewFolderItem::Delete(MemoManager *pMgr, MemoSelectView *pView)

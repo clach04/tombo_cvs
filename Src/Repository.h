@@ -48,6 +48,8 @@ public:
 	BOOL bKeepTitle;
 	BOOL bKeepCaret;
 	BOOL bSafeFileName; // scramble filename
+
+	LPCTSTR pTopDir;
 };
 
 //////////////////////////////////////////////////////////////
@@ -65,7 +67,9 @@ public:
 	Repository();
 	~Repository();
 
-	BOOL Init(LPCTSTR pTopDir, const RepositoryOption *pOpt);
+	BOOL Init(const RepositoryOption *pOpt);
+
+	BOOL SetRepositoryOption(const RepositoryOption *pOpt);
 
 	BOOL Create(const TomboURI *pTemplate, LPCTSTR pData, TString *pRealHeadLine, TomboURI *pAllocedURI);
 

@@ -15,7 +15,6 @@
 
 Repository g_Repository;
 
-
 /////////////////////////////////////////
 // Repository ctor & dtor, initializer
 /////////////////////////////////////////
@@ -28,15 +27,21 @@ Repository::~Repository()
 {
 }
 
-BOOL Repository::Init(LPCTSTR pTop, const RepositoryOption *pOpt)
+BOOL Repository::Init(const RepositoryOption *pOpt)
 {
 	roOption = *pOpt;
 
 	LocalFileRepository *pImpl;
 	
-	if ((pImpl = new LocalFileRepository()) == NULL || !pImpl->Init(pTop, &roOption)) return FALSE;
+	if ((pImpl = new LocalFileRepository()) == NULL || !pImpl->Init(&roOption)) return FALSE;
 	pDefaultImpl = pImpl;
 	return TRUE;
+}
+
+BOOL Repository::SetRepositoryOption(const RepositoryOption *pOpt)
+{
+	roOption = *pOpt;
+	return pDefaultImpl->SetRepositoryOption(&roOption);
 }
 
 BOOL Repository::Create(const TomboURI *pTemplate, LPCTSTR pData, 

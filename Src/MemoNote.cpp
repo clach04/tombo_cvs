@@ -532,6 +532,12 @@ MemoNote *MemoNote::CopyMemo(const MemoNote *pOrig, LPCTSTR pMemoPath, TString *
 		delete pNote;
 		return NULL;
 	}
+	// the result of copying tdt is not checked.
+	TString sOrigTDT, sNewTDT;
+	if (sOrigTDT.Join(sOrigPath.Get(), TEXT(".tdt")) && 
+		sNewTDT.Join(sNewFullPath.Get(), TEXT(".tdt"))) {
+		CopyFile(sOrigTDT.Get(), sNewTDT.Get(), TRUE);
+	}
 	return pNote;
 }
 

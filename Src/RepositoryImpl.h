@@ -23,6 +23,8 @@ public:
 	////////////////////////////
 	// Interface definitions
 
+	virtual BOOL SetRepositoryOption(const RepositoryOption *pOpt) = 0;
+
 	virtual BOOL Create(const TomboURI *pTemplate, LPCTSTR pData, TString *pRealHeadLine, TomboURI *pAllocedURI) = 0;
 
 	virtual BOOL Update(const TomboURI *pCurrentURI, LPCTSTR pData, TomboURI *pNewURI, TString *pNewHeadLine) = 0;
@@ -79,7 +81,7 @@ protected:
 	BOOL DecryptLeaf(const TomboURI *pCurrentURI, URIOption *pOption);
 	BOOL EnDecryptFolder(const TomboURI *pCurrentURI, URIOption *pOption);
 
-	TomboURI *DoEncryptFile(MemoNote *pNote, TString *pHeadLine);
+	TomboURI *DoEncryptFile(const TomboURI *pOldURI, MemoNote *pNote, TString *pHeadLine);
 	BOOL NegotiateNewName(LPCTSTR pMemoPath, LPCTSTR pText, 
 							 LPCTSTR pMemoDir,
 							 TString *pFullPath, LPTSTR *ppNotePath, TString *pHeadLine);
@@ -93,10 +95,12 @@ public:
 	LocalFileRepository();
 	virtual ~LocalFileRepository();
 
-	BOOL Init(LPCTSTR pRoot, const RepositoryOption *pOpt);
+	BOOL Init(const RepositoryOption *pOpt);
 
 	///////////////////////////////
 	// impliment RepositoryImpl methods
+
+	BOOL SetRepositoryOption(const RepositoryOption *pOpt);
 
 	BOOL Create(const TomboURI *pTemplate, LPCTSTR pData, TString *pRealHeadLine, TomboURI *pAllocedURI);
 	BOOL Update(const TomboURI *pCurrentURI, LPCTSTR pData, TomboURI *pNewURI, TString *pNewHeadLine);

@@ -58,10 +58,17 @@ LocalFileRepository::~LocalFileRepository()
 	delete[] pTopDir;
 }
 
-BOOL LocalFileRepository::Init(LPCTSTR pRoot, const RepositoryOption *p)
+BOOL LocalFileRepository::Init(const RepositoryOption *p)
 {
 	pOpt = p;
-	pTopDir = StringDup(pRoot);
+	pTopDir = StringDup(pOpt->pTopDir);
+	return TRUE;
+}
+
+BOOL LocalFileRepository::SetRepositoryOption(const RepositoryOption *p)
+{
+	pOpt = p;
+	pTopDir = StringDup(pOpt->pTopDir);
 	return TRUE;
 }
 
@@ -451,7 +458,7 @@ BOOL LocalFileRepository::NegotiateNewName(LPCTSTR pMemoPath, LPCTSTR pText, LPC
 //
 // assume pCurURI is Leaf.
 
-TomboURI *LocalFileRepository::DoEncryptFile(MemoNote *pNote, TString *pHeadLine)
+TomboURI *LocalFileRepository::DoEncryptFile(const TomboURI *pOldURI, MemoNote *pNote, TString *pHeadLine)
 {
 	TString sMemoDir;
 	if (!sMemoDir.GetDirectoryPath(pNote->MemoPath())) return NULL;
@@ -482,6 +489,15 @@ TomboURI *LocalFileRepository::DoEncryptFile(MemoNote *pNote, TString *pHeadLine
 	// Save memo
 	if (!p->SaveData(g_pPassManager, pTextA, sFullPath.Get())) return NULL;
 
+	// rename TDT
+	TString sOrigTDT;
+	TString sNewTDT;
+	if (GetTDTFullPath(pOldURI, &sOrigTDT) &&
+		sNewTDT.Join(sFullPath.Get(), TEXT(".tdt"))) {
+		DeleteFile(sNewTDT.Get());
+		MoveFile(sOrigTDT.Get(), sNewTDT.Get());
+	}
+
 	// generate new URI
 	TomboURI *pURI = new TomboURI();
 	if (pURI == NULL || !p->GetURI(pURI)) return NULL;
@@ -497,7 +513,7 @@ BOOL LocalFileRepository::EncryptLeaf(const TomboURI *pPlainURI, URIOption *pOpt
 	pOption->pNewHeadLine = new TString();
 	if (pOption->pNewHeadLine == NULL) return FALSE;
 
-	pOption->pNewURI = DoEncryptFile(pPlain, pOption->pNewHeadLine);
+	pOption->pNewURI = DoEncryptFile(pPlainURI, pPlain, pOption->pNewHeadLine);
 	if (pOption->pNewURI == NULL) return FALSE;
 
 	if (!pPlain->DeleteMemoData()) {
@@ -523,6 +539,15 @@ BOOL LocalFileRepository::DecryptLeaf(const TomboURI *pCurrentURI, URIOption *pO
 	pOption->pNewURI = new TomboURI();
 	if (pOption->pNewURI == NULL) return FALSE;
 	if (!p->GetURI(pOption->pNewURI)) return FALSE;
+
+	// rename TDT
+	TString sOrigTDT;
+	TString sNewTDT;
+	if (GetTDTFullPath(pCurrentURI, &sOrigTDT) &&
+		GetTDTFullPath(pOption->pNewURI, &sNewTDT)) {
+		DeleteFile(sNewTDT.Get());
+		MoveFile(sOrigTDT.Get(), sNewTDT.Get());
+	}
 
 	if (!pCur->DeleteMemoData()) {
 		SetLastError(ERROR_TOMBO_W_DELETEOLD_FAILED);
@@ -678,7 +703,11 @@ BOOL LocalFileRepository::Copy(const TomboURI *pCopyFrom, const TomboURI *pCopyT
 				if (!sBase.Set(sNewBase.Get())) return FALSE;
 			}
 			if (!CopyFile(sOrigFull.Get(), sNewPath.Get(), TRUE)) return FALSE;
-
+			TString sOrigTDT, sNewTDT;
+			if (sOrigTDT.Join(sOrigFull.Get(), TEXT(".tdt")) &&
+				sNewTDT.Join(sNewPath.Get(), TEXT(".tdt"))) {
+				CopyFile(sOrigTDT.Get(), sNewTDT.Get(), TRUE);
+			}
 			if (!GetHeadLine(pCopyFrom, pOption->pNewHeadLine)) return FALSE;
 
 			TString sNewURI;
@@ -704,40 +733,14 @@ BOOL LocalFileRepository::Copy(const TomboURI *pCopyFrom, const TomboURI *pCopyT
 }
 
 /////////////////////////////////////////
-// Move(Rename)
+// Move
 /////////////////////////////////////////
 
 BOOL LocalFileRepository::Move(const TomboURI *pMoveFrom, const TomboURI *pMoveTo, URIOption *pOption)
 {
-	URIOption opt1(NOTE_OPTIONMASK_ENCRYPTED | NOTE_OPTIONMASK_SAFEFILE | NOTE_OPTIONMASK_VALID);
-	if (!GetOption(pMoveFrom, &opt1)) return FALSE;
-
-	URIOption opt2(NOTE_OPTIONMASK_VALID);
-	if (!GetOption(pMoveTo, &opt2)) return FALSE;
-
-	if (!opt1.bValid || !opt2.bValid) {
-		SetLastError(ERROR_TOMBO_E_INVALIDURI);
-		return FALSE;
-	}
-
-	if (opt1.bFolder) {
-		TString sFullSrc;
-		if (!GetPhysicalPath(pMoveFrom, &sFullSrc)) return FALSE;
-		TString sFullDst;
-		if (!GetPhysicalPath(pMoveTo, &sFullDst)) return FALSE;
-
-		if (IsSubFolder(sFullSrc.Get(), sFullDst.Get())) {
-			SetLastError(ERROR_TOMBO_W_OPERATION_NOT_PERMITTED);
-			return FALSE;
-		}
-
-		MemoFolder mfFolder;
-		if (!mfFolder.Init(pTopDir, sFullSrc.Get())) return FALSE;
-		if (!mfFolder.Move(sFullDst.Get())) return FALSE;	
-
-	} else {
-		// not merged yet
-	}
+	if (!Copy(pMoveFrom, pMoveTo, pOption)) return FALSE;
+	URIOption opt;
+	if (!Delete(pMoveFrom, &opt)) return FALSE;
 	return TRUE;
 }
 
