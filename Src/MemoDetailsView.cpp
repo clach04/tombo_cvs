@@ -393,6 +393,10 @@ static BOOL GetDateText(TString *pInsStr, LPCTSTR pFormat)
 				wsprintf(q, TEXT("%02d"), st.wSecond);
 				q += 2;
 				break;
+			case TEXT('n'):
+				wsprintf(q, TEXT("\r\n"));
+				q += 2;
+				break;
 			default:
 				*q++ = TEXT('%');
 				if (*p) *q++ = *p++;
