@@ -532,15 +532,28 @@ PG: Move LoadNodeUnderItem from MemoSelectView to TreeViewFolderItem.
 PG: add VFStream.* TSParser.* as virtual folder classes.
 PG: chagne 1st argument of MemoSelectView::GeneratePath
 
-■
+■ B070 2002/10/27
+
+* FIX: #665,#690 Error when edit closed-notes.
+* FIX: A memo under a folder can't open after renaming the folder that is opened.
+
+PG: if "#vfolder.txt" not exists, disable show virtual folder root node.
+PG: Merge InsertFileToLast and InsertFile.
+PG: Deleting tree view item are moved from TreeViewItem to MemoSelectView.
+PG: Creating MemoNote are moved to factory method.
+PG: Notify MemoSelectView to MemoManager when insert/delete nodes.
+PG: Keep HTREEITEM in MemoManager for support notify.
+PG: lParam changed on message MWM_OPEN_REQUEST: TreeViewFileItem to MemoLocator.
 
 TODO: 
 
-== VFまわり
-#vfolder.txtが読めない場合には仮想フォルダを表示しないようにする
+●PostMessageしている部分についてSendMessageでOKかの確認(統一したい)
+●PostMessage時のMemoLocatorのメモリリーク
+
+== around virtual folder
+
 ストリームで暗号化メモを扱えるようにする
 メモの取得をMemoNoteのメソッドで行うようにする
-MemoNote生成部分のFactorMethod化
 Change icon at virtual node.
 Disable Cut/Copy/Paste/Disable/Encrypt/Decrypt etc. when virtual node selected.
 matchフィルタの追加
@@ -548,13 +561,9 @@ matchフィルタの追加
 TSファイル指定Property I/F
 ツリーへの挿入時のソート
 
-== 全体
-#665 ツリーを閉じて編集するとアプリケーションエラー 直す
-MemoManager::SaveIfModify中のUpdateHeadlineでのメモリリーク直す
-フォルダかどうかの判定をpMemoNoteがNULLかどうかでチェックしている部分の洗い出し・修正
-メニューEnable/Disableの見直し・整理
-フォルダをRenameして編集して大丈夫かの確認
+== entire
 
+メニューEnable/Disableの見直し・整理
 MemoInfoについてMemoManager管理からMemoNote管理になるように修正する
 OpenRequestをMemoSelectViewからTreeViewItemに移動
 MemoManager::MakeNewFolderをどーにかする
