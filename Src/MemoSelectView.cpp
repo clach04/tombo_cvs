@@ -1024,8 +1024,11 @@ BOOL MemoSelectView::UpdateHeadLine(LPCTSTR pOldURI, TomboURI *pNewURI, LPCTSTR 
 		return TRUE;
 	}
 
+
 	// get parent
 	HTREEITEM hParent = TreeView_GetParent(hViewWnd, hOld);
+
+	TreeView_SelectItem(hViewWnd, NULL);
 
 	// remove current node
 	DeleteOneItem(hOld);

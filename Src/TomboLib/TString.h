@@ -58,7 +58,7 @@ public:
 
 	~SharedString();
 
-	BOOL Init(LPCSTR p);
+	BOOL Init(LPCTSTR p);
 	BOOL Init(const SharedString& s);
 
 	BOOL Set(LPCTSTR p);

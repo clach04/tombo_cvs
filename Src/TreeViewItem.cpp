@@ -171,7 +171,6 @@ BOOL TreeViewFileItem::Encrypt(MemoManager *pMgr, MemoSelectView *pView)
 		MessageBox(NULL, g_mMsgRes.GetMsg(opt.nErrorCode), TEXT("TOMBO"), opt.iLevel | MB_OK);
 		return FALSE;
 	}
-
 	// replace MemoNote that TreeViewItem have
 	loc.set(opt.pNewURI);
 	bIsEncrypted = TRUE;

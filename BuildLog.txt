@@ -840,3 +840,12 @@ Encryption is not work correctly at this version.
 * DEV: safe file name listing support.
 
 Encryption is not work correctly at this version.
+
+////////////////////////////////
+// B165
+////////////////////////////////
+
+* DEV: save for safe file name notes support.
+
+Finding and encrypting to the folder may not work.
+

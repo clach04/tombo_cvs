@@ -12,7 +12,8 @@ class RepositoryOption;
 // Option flag definitions
 /////////////////////////////////////////
 
-#define NOTE_OPTIONMASK_ENCRYPTED 1
+#define NOTE_OPTIONMASK_ENCRYPTED  1
+#define NOTE_OPTIONMASK_SAFEFILE   2
 //#define NOTE_OPTIONMASK_POSITION  2
 
 /////////////////////////////////////////
@@ -84,6 +85,7 @@ public:
 	// request section
 	DWORD nFlg;
 	BOOL bEncrypt;
+	BOOL bSafeFileName;
 
 	// result info section
 	// if these value is not set by NULL, delete when NoteOption is deleted.

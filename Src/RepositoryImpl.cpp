@@ -25,7 +25,7 @@ static BOOL IsFileExist(LPCTSTR pFileName);
 static BOOL GetHeadLineFromFilePath(LPCTSTR pFilePath, TString *pHeadLine);
 
 
-static BOOL GetHeadLinePath(LPCTSTR pTopDir, LPCTSTR pMemoPath, LPCTSTR pHeadLine, LPCTSTR pExt, BOOL bEncrypt, 
+static BOOL GetHeadLinePath(LPCTSTR pTopDir, LPCTSTR pMemoPath, LPCTSTR pHeadLine, LPCTSTR pExt,
 							TString *pFullPath, LPTSTR *ppNotePath, TString *pNewHeadLine);
 
 
@@ -92,7 +92,6 @@ BOOL LocalFileRepository::Update(TomboURI *pCurrentURI, LPCTSTR pData,
 /////////////////////////////////////////
 // Update's subfunction
 /////////////////////////////////////////
-
 BOOL LocalFileRepository::Save(const TomboURI *pCurrentURI, LPCTSTR pMemo, 
 							   TomboURI *pNewURI, TString *pNewHeadLine)
 {
@@ -100,46 +99,48 @@ BOOL LocalFileRepository::Save(const TomboURI *pCurrentURI, LPCTSTR pMemo,
 	if (pNote == NULL) return FALSE;
 	AutoPointer<MemoNote> apNote(pNote);
 
-	TString sHeadLine;
-
-	// get old headline from path
-	if (!GetHeadLine(pCurrentURI, pNewHeadLine)) return FALSE;
-
 	TString sOrigFile;
-	if (!sOrigFile.Join(pTopDir, TEXT("\\"), pNote->pPath)) return FALSE;
+	if (!GetPhysicalPath(pCurrentURI, &sOrigFile)) return FALSE;
 
-	if (pOpt->bKeepTitle) {
-		// clone original headline
-		sHeadLine.Set(pNewHeadLine->Get());
-	} else {
-		// Get new headline from memo text
-		if (!GetHeadLineFromMemoText(pMemo, &sHeadLine)) return FALSE;
-		if (_tcslen(sHeadLine.Get()) == 0) {
-			// headline is empty
-			if (!sHeadLine.Set(MSG_DEFAULT_HEADLINE)) return FALSE;
-		}
-	}
-
-	// Prepare write file.
+	// prepare text to write
 	char *pText = ConvUnicode2SJIS(pMemo);
 	if (pText == NULL) return FALSE;
 	SecureBufferA sText(pText);
 
-	DWORD nH = ChopFileNumberLen(pNewHeadLine->Get());
-	DWORD nH2 = ChopFileNumberLen(sHeadLine.Get());
-
-	// check headline has changed.
 	BOOL bResult;
-	if (nH == nH2 && _tcsncmp(pNewHeadLine->Get(), sHeadLine.Get(), nH) == 0) {
-		bResult = SaveIfHeadLineIsNotChanged(pNote, pText, sOrigFile.Get());
+
+	// get current headline from path
+	if (!GetHeadLine(pCurrentURI, pNewHeadLine)) return FALSE;
+
+	URIOption opt(NOTE_OPTIONMASK_SAFEFILE);
+	if (!GetOption(pCurrentURI, &opt)) return FALSE;
+
+	if (pOpt->bKeepTitle || opt.bSafeFileName) {
+		if (!SaveIfHeadLineIsNotChanged(pNote, pText, sOrigFile.Get())) return FALSE;
+
+		// URI is not changed.
+		return pNewURI->Init(*pCurrentURI);
+
 	} else {
-		bResult = SaveIfHeadLineIsChanged(pNote, pText, sOrigFile.Get(), 
-									 sHeadLine.Get(), pNewHeadLine);
+		// Get new headline from memo text
+		TString sHeadLine;
+		if (!GetHeadLineFromMemoText(pMemo, &sHeadLine)) return FALSE;
+
+		DWORD nH = ChopFileNumberLen(pNewHeadLine->Get());
+		DWORD nH2 = ChopFileNumberLen(sHeadLine.Get());
+
+		// check headline has changed.
+		if (nH == nH2 && _tcsncmp(pNewHeadLine->Get(), sHeadLine.Get(), nH) == 0) {
+			bResult = SaveIfHeadLineIsNotChanged(pNote, pText, sOrigFile.Get());
+		} else {
+			bResult = SaveIfHeadLineIsChanged(pNote, pText, sOrigFile.Get(), 
+										 sHeadLine.Get(), pNewHeadLine);
+		}
+		if (bResult) {
+			bResult = pNote->GetURI(pNewURI);
+		}
+		return bResult;
 	}
-	if (bResult) {
-		bResult = pNote->GetURI(pNewURI);
-	}
-	return bResult;
 }
 
 BOOL LocalFileRepository::SaveIfHeadLineIsChanged(
@@ -153,7 +154,7 @@ BOOL LocalFileRepository::SaveIfHeadLineIsChanged(
 		TString sNewFile;
 
 		if (!sMemoDir.GetDirectoryPath(pNote->pPath)) return FALSE;
-		if (!GetHeadLinePath(pTopDir, sMemoDir.Get(), pHeadLine, pNote->GetExtension(), FALSE, 
+		if (!GetHeadLinePath(pTopDir, sMemoDir.Get(), pHeadLine, pNote->GetExtension(),
 							 &sNewFile, &pNotePath, pNewHeadLine)) return FALSE;
 
 		BOOL bResult = pNote->SaveData(g_pPassManager, pText, sNewFile.Get());
@@ -244,6 +245,10 @@ static BOOL GetHeadLineFromMemoText(LPCTSTR pMemo, TString *pHeadLine)
 	if (!pHeadLine->Alloc(n + 1)) return FALSE;
 	DropInvalidFileChar(pHeadLine->Get(), sHeadLineCand.Get());
 	TrimRight(pHeadLine->Get());
+
+	if (_tcslen(pHeadLine->Get()) == 0) {
+		if (!pHeadLine->Set(DEFAULT_HEADLINE)) return FALSE;
+	}
 
 	return TRUE;
 }
@@ -337,6 +342,15 @@ BOOL LocalFileRepository::GetOption(const TomboURI *pURI, URIOption *pOption) co
 	if (pOption->nFlg & NOTE_OPTIONMASK_ENCRYPTED) {
 		pOption->bEncrypt = pURI->IsEncrypted();
 	}
+
+	if (pOption->nFlg & NOTE_OPTIONMASK_SAFEFILE) {
+		LPCTSTR p = pURI->GetFullURI();
+		if (_tcslen(p) > 4 && _tcscmp(p + _tcslen(p) - 4, TEXT(".chs")) == 0) {
+			pOption->bSafeFileName = TRUE;
+		} else {
+			pOption->bSafeFileName = FALSE;
+		}
+	}
 	return TRUE;
 }
 
@@ -417,7 +431,7 @@ static BOOL GetRandomName(LPCTSTR pBaseDir, TString *pFileName)
 //					  必要なら"(n)"でディレクトリで一意となるように調整されている
 //		pNewHeadLine: 一覧表示用新ヘッドライン(必要に応じて"(n)"が付与されている)
 
-static BOOL GetHeadLinePath(LPCTSTR pTopDir, LPCTSTR pMemoPath, LPCTSTR pHeadLine, LPCTSTR pExt, BOOL bEncrypt, 
+static BOOL GetHeadLinePath(LPCTSTR pTopDir, LPCTSTR pMemoPath, LPCTSTR pHeadLine, LPCTSTR pExt,
 							TString *pFullPath, LPTSTR *ppNotePath, TString *pNewHeadLine)
 {
 	DWORD n = _tcslen(pHeadLine);
@@ -478,10 +492,10 @@ BOOL LocalFileRepository::NegotiateNewName(LPCTSTR pMemoPath, LPCTSTR pText, LPC
 			wsprintf(pFileNamePart + 8, TEXT("%04d"), nw);
 			nw = rand() % 100;
 			wsprintf(pFileNamePart + 12, TEXT("%04d"), nw);
-			strcpy(pFileNamePart + 16, TEXT(".chs"));
+			_tcscpy(pFileNamePart + 16, TEXT(".chs"));
 		} while(IsFileExist(pFullPath->Get())); // if same name exists, retry it
 
-		*ppNotePath = pFileNamePart;
+		*ppNotePath = pFullPath->Get() + _tcslen(pTopDir) + 1;
 		if (!GetHeadLineFromMemoText(pText, pNewHeadLine)) return FALSE;
 	} else {
 		if (pOpt->bKeepTitle) {
@@ -490,7 +504,7 @@ BOOL LocalFileRepository::NegotiateNewName(LPCTSTR pMemoPath, LPCTSTR pText, LPC
 			if (!GetHeadLineFromMemoText(pText, &sHeadLine)) return FALSE;
 		}
 	
-		if (!GetHeadLinePath(pTopDir, pMemoDir, sHeadLine.Get(), TEXT(".chi"), FALSE, 
+		if (!GetHeadLinePath(pTopDir, pMemoDir, sHeadLine.Get(), TEXT(".chi"), 
 								pFullPath, ppNotePath, pNewHeadLine)) {
 			return FALSE;
 		}
@@ -522,6 +536,7 @@ TomboURI *LocalFileRepository::DoEncryptFile(MemoNote *pNote, TString *pHeadLine
 
 	// Create new CyrptedMemoNote instance
 	CryptedMemoNote *p = new CryptedMemoNote();
+
 	if (!p->Init(pNotePath)) return NULL;
 	AutoPointer<CryptedMemoNote> ap(p);
 

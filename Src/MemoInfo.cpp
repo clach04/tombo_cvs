@@ -63,7 +63,7 @@ BOOL MemoInfo::RenameInfo(LPCTSTR pOld, LPCTSTR pNew)
 {
 	TString sOldFileName;
 	TString sNewFileName;
-	if (!sOldFileName.Join(pTopDir, pOld, TDT_FILE_EXT) || !sNewFileName.Join(pTopDir, pNew, TDT_FILE_EXT)) return FALSE;
+	if (!sOldFileName.Join(pOld, TDT_FILE_EXT) || !sNewFileName.Join(pNew, TDT_FILE_EXT)) return FALSE;
 	DeleteFile(sNewFileName.Get());
 	return MoveFile(sOldFileName.Get(), sNewFileName.Get());
 }

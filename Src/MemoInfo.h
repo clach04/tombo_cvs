@@ -15,6 +15,8 @@ public:
 	BOOL ReadInfo(LPCTSTR pMemoPath, LPDWORD pPos);
 
 	BOOL DeleteInfo(LPCTSTR pMemoPath);
+
+	// pOldFilePath and pNewFilePath should full path.
 	BOOL RenameInfo(LPCTSTR pOldFilePath, LPCTSTR pNewFilePath);
 };
 
