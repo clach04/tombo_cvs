@@ -35,6 +35,38 @@ public:
 };
 
 ////////////////////////////////////
+// String class with reference count
+////////////////////////////////////
+
+class SharedString {
+	struct SharedBuf {
+		LPTSTR pStr;
+		WORD nRefCount;
+	};
+
+	SharedBuf *pBuf;
+
+	friend class SharedStringTest;
+protected:
+	void ReleaseBuf();
+	void Ref(const SharedString& s);
+
+	BOOL Alloc(DWORD nSize);
+public:
+	SharedString();
+	SharedString(const SharedString& s);
+
+	~SharedString();
+
+	BOOL Init(LPCSTR p);
+	BOOL Init(const SharedString& s);
+
+	BOOL Set(LPCTSTR p);
+	BOOL Set(const SharedString& s);
+	LPCTSTR Get() const;
+};
+
+////////////////////////////////////
 // WCHAR string
 ////////////////////////////////////
 

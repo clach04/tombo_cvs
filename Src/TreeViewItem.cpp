@@ -663,22 +663,25 @@ BOOL TreeViewFolderItem::Expand(MemoSelectView *pView)
 	if (!pView->GetURI(&sURI, hParent)) return FALSE;
 
 	DirList dlDirList;
-	if (!dlDirList.Init(DIRLIST_OPT_CHOPEXTENSION | DIRLIST_OPT_ALLOCMEMONOTE, sURI.GetFullURI())) return FALSE;
+	if (!dlDirList.Init(DIRLIST_OPT_ALLOCURI | DIRLIST_OPT_ALLOCHEADLINE,
+						sURI.GetFullURI())) return FALSE;
 	if (!dlDirList.GetList(pPrefix, pMatchPath)) return FALSE;
 
 	// Insert to folder
 	DWORD n = dlDirList.NumItems();
 	for (DWORD i = 0; i < n; i++) {
 		struct DirListItem *p = dlDirList.GetItem(i);
-		LPCTSTR q = dlDirList.GetFileName(p->nFileNamePos);
+		LPCTSTR q = dlDirList.GetFileName(p->nHeadLinePos);
 		if (p->bFolder) {
 			// folder
 			TreeViewFolderItem *pItem = new TreeViewFolderItem();
 			pView->InsertFolder(hParent, q, pItem, TRUE);
 		} else {
 			// note
+			LPCTSTR pURI = dlDirList.GetFileName(p->nURIPos);
+
 			TomboURI sURI;
-			if (!p->pNote->GetURI(&sURI)) return FALSE;
+			if (!sURI.Init(pURI)) return FALSE;
 			if (!pView->InsertFile(hParent, &sURI, q, TRUE, FALSE)) return FALSE;
 		}
 	}

@@ -3,7 +3,6 @@
 #include "UniConv.h"
 #include "TString.h"
 
-
 ////////////////////////////////////////////////////
 // TString implimentation
 ////////////////////////////////////////////////////
@@ -223,11 +222,10 @@ BOOL WString::Set(TString *pSrc)
 	return TRUE;
 }
 
-
 /////////////////////////////////////////////
-// セキュアなバッファ
+// secure buffer
 /////////////////////////////////////////////
-// 領域開放時に0クリアする
+// clear buffer by zero when deleting
 
 SecureBufferT::~SecureBufferT()
 {
@@ -245,4 +243,80 @@ SecureBufferA::~SecureBufferA()
 		for (DWORD i = 0; i < nBufLen; i++) *p++ = '\0';
 		delete [] pBuf;
 	}
+}
+
+/////////////////////////////////////////////
+// SharedString implimentation
+/////////////////////////////////////////////
+
+SharedString::SharedString() : pBuf(NULL)
+{
+}
+
+SharedString::SharedString(const SharedString& s) : pBuf(NULL)
+{
+	Ref(s);
+}
+
+SharedString::~SharedString()
+{
+	ReleaseBuf();
+}
+
+BOOL SharedString::Init(LPCTSTR p)
+{
+	return Set(p);
+}
+
+BOOL SharedString::Init(const SharedString& s)
+{
+	Ref(s);
+	return TRUE;
+}
+
+void SharedString::ReleaseBuf()
+{
+	if (pBuf) {
+		if (pBuf->nRefCount == 1) {
+			delete [] pBuf->pStr;
+			delete pBuf;
+		} else {
+			pBuf->nRefCount--;
+		}
+		pBuf = NULL;
+	}
+}
+
+BOOL SharedString::Set(LPCTSTR p)
+{
+	ReleaseBuf();
+
+	pBuf = new SharedBuf();
+	if (pBuf == NULL) return FALSE;
+
+	pBuf->pStr = StringDup(p);
+	if (pBuf->pStr == NULL) return FALSE;
+	pBuf->nRefCount = 1;
+	return TRUE;
+}
+
+BOOL SharedString::Set(const SharedString &s)
+{
+	Ref(s);
+	return TRUE;
+}
+
+void SharedString::Ref(const SharedString& s)
+{
+	ReleaseBuf();
+	if (s.pBuf) {
+		pBuf = s.pBuf;
+		pBuf->nRefCount++;
+	}
+}
+
+LPCTSTR SharedString::Get() const
+{
+	if (pBuf == NULL) return NULL;
+	return pBuf->pStr;
 }

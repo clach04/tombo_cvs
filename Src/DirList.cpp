@@ -2,6 +2,9 @@
 #include <tchar.h>
 #include "DirList.h"
 #include "MemoNote.h"
+#include "TString.h"
+#include "TomboURI.h"
+#include "Repository.h"
 
 static StringBufferT *pSortSB;
 extern "C" int SortItems(const void *e1, const void *e2)
@@ -23,10 +26,11 @@ extern "C" int SortItems(const void *e1, const void *e2)
 
 BOOL DirList::Init(DWORD nOption, LPCTSTR pUB)
 {
-	bChopExtension = nOption & DIRLIST_OPT_CHOPEXTENSION;
-	bAllocMemoNotes = nOption & DIRLIST_OPT_ALLOCMEMONOTE;
+	bAllocURI = nOption & DIRLIST_OPT_ALLOCURI;
+	bAllocHeadLine = nOption & DIRLIST_OPT_ALLOCHEADLINE;
 
 	pURIBase = pUB;
+	nURIBaseLen = _tcslen(pURIBase);
 
 	if (!vDirList.Init(50, 10)) return FALSE;
 	if (!sbDirList.Init(400, 20)) return FALSE;
@@ -44,7 +48,6 @@ BOOL DirList::GetList(LPCTSTR pPrefix, LPCTSTR pMatchPath)
 	HANDLE hHandle = FindFirstFile(pMatchPath, &wfd);
 	if (hHandle != INVALID_HANDLE_VALUE) {
 		struct DirListItem di;
-		MemoNote *pNote;
 
 		do {
 			if (_tcscmp(wfd.cFileName, TEXT(".")) == 0 || _tcscmp(wfd.cFileName, TEXT("..")) == 0) continue;
@@ -55,23 +58,33 @@ BOOL DirList::GetList(LPCTSTR pPrefix, LPCTSTR pMatchPath)
 				di.bFolder = TRUE;
 			} else {
 				// file
-				if (bAllocMemoNotes) {
-					if (!MemoNote::MemoNoteFactory(pPrefix, wfd.cFileName, &pNote) || pNote == NULL) continue;
-				} else {
-					DWORD n = MemoNote::IsNote(wfd.cFileName);
-					if (n == NOTE_TYPE_NO || n == NOTE_TYPE_TDT) continue;
-				}
+				DWORD n = MemoNote::IsNote(wfd.cFileName);
+				if (n == NOTE_TYPE_NO || n == NOTE_TYPE_TDT) continue;
 				
 				di.bFolder = FALSE;
-				di.pNote = pNote;
-				if (bChopExtension) {
-					l -= 4;
-					*(wfd.cFileName + l) = TEXT('\0');
-				}
 			}
 
+			if (bAllocURI) {
+				if (!sbDirList.Add(pURIBase, nURIBaseLen, &(di.nURIPos))) return FALSE;
+				DWORD d;
+				if (!sbDirList.Add(wfd.cFileName, l, &d)) return FALSE;
+				if (wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+					if (!sbDirList.Add(TEXT("/"), 1, &d)) return FALSE;
+				}
+				if (!sbDirList.Add(TEXT(""), 1, &d)) return FALSE;
+			}
+
+			if (bAllocHeadLine) {
+				TomboURI sURI;
+				TString sHeadLine;
+				if (!sURI.Init(GetFileName(di.nURIPos))) return FALSE;
+				if (!g_Repository.GetHeadLine(&sURI, &sHeadLine)) return FALSE;
+				if (!sbDirList.Add(sHeadLine.Get(), _tcslen(sHeadLine.Get()) + 1, &(di.nHeadLinePos))) return FALSE;
+			}
+	
 			// Add file name to buffer
 			if (!sbDirList.Add(wfd.cFileName, l + 1, &(di.nFileNamePos))) return FALSE;
+
 			if (!vDirList.Add(&di)) return FALSE;
 
 		} while(FindNextFile(hHandle, &wfd));

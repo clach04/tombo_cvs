@@ -5,17 +5,21 @@
 // Notes path information
 /////////////////////////////////////////////
 
-class TomboURI : TString {
+class TomboURI {
 	int nMaxPathItem;
+
+	SharedString uri;
 
 	friend class TomboURITest;
 public:
 	///////////////////////////////
 	// ctor, dtor and initializer
-	TomboURI() : TString() {}
-	~TomboURI() {}
+	TomboURI();
+	TomboURI(const TomboURI&);
+	~TomboURI();
 
 	BOOL Init(LPCTSTR pURI);
+	BOOL Init(const TomboURI&);
 	BOOL InitByNotePath(LPCTSTR pNotePath);
 
 	///////////////////////////////
@@ -24,7 +28,7 @@ public:
 	BOOL GetRepositoryName(TString *pRepo);
 
 	// get full path of URI.
-	LPCTSTR GetFullURI() const { return Get(); }
+	LPCTSTR GetFullURI() const { return uri.Get(); }
 
 	// get path part of URI.
 	// ex. tombo://default/aa/bb/cc.txt -> /aa/bb/cc.txt
@@ -39,6 +43,11 @@ public:
 
 	DWORD GetMaxPathItem() const { return nMaxPathItem; }
 
+	// get last 1 item from URI.
+	// ex. tombo://default/aa/bb/cc.txt -> cc.txt
+	//     tombo://default/aa/bb/cc/    -> cc
+	BOOL GetBaseName(TString *pBase) const;
+
 	// Is the URI point to crypted file?
 	// Checking does only to URI string. Not confirm to repository.
 	BOOL IsEncrypted() const;
@@ -50,7 +59,8 @@ public:
 	// Get path string
 	// This method will be obsoleted in future version.
 	// ex. tombo://default/aaa/bbb/ccc.txt -> aaa\bbb\ccc.txt
-	BOOL GetFilePath(TString *pPath);
+	BOOL GetFilePath(TString *pPath) const;
+
 
 	///////////////////////////////
 	// helper functions

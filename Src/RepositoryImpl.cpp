@@ -292,21 +292,37 @@ static BOOL IsFileExist(LPCTSTR pFileName)
 
 BOOL LocalFileRepository::GetHeadLine(const TomboURI *pURI, TString *pHeadLine)
 {
-	TomboURI *pThis = (TomboURI*)pURI;
-	TomboURIItemIterator itr(pThis);
-	if (!itr.Init()) return FALSE;
+	BOOL bIsLeaf = pURI->IsLeaf();
 
-	if (!pHeadLine->Alloc(pURI->GetMaxPathItem() + 1)) return FALSE;
-	_tcscpy(pHeadLine->Get(), TEXT("[root]"));
+	// check if the uri is safename
+	if (bIsLeaf) {
+		LPCTSTR pURIstr = pURI->GetFullURI();
+		DWORD n = _tcslen(pURIstr);
+		if (n > 4 && _tcscmp(pURIstr + n - 4, TEXT(".chs")) == 0) {
+			TString sPath;
+			if (!pURI->GetFilePath(&sPath)) return FALSE;
+			CryptedMemoNote cn;
+			cn.Init(sPath.Get());
+			LPTSTR p = cn.GetMemoBody(g_pPassManager);
+			if (p == NULL) return FALSE;
+			SecureBufferT sbt(p);
+			if (!GetHeadLineFromMemoText(p, pHeadLine)) return FALSE;
+			return TRUE;
+		}
+	}
 
-	LPCTSTR p;
-	for (itr.First(); p = itr.Current(); itr.Next()) {
-		_tcscpy(pHeadLine->Get(), p);
-		if (itr.IsLeaf()) {
-			DWORD n = _tcslen(pHeadLine->Get());
-			if (n >= 4) {
-				*(pHeadLine->Get() + n - 4) = TEXT('\0');
-			}
+	if (!pURI->GetBaseName(pHeadLine)) return FALSE;
+
+	if (_tcslen(pHeadLine->Get()) == 0) {
+		// root
+		return pHeadLine->Set(TEXT("[root]"));
+	}
+
+	if (bIsLeaf) {
+		LPTSTR p = pHeadLine->Get();
+		DWORD n = _tcslen(p);
+		if (n > 4) {
+			*(p + n - 4) = TEXT('\0');
 		}
 	}
 	return TRUE;

@@ -2,16 +2,16 @@
 #define DIRLIST_H
 
 #include "VarBuffer.h"
-class MemoNote;
+class TomboURI;
 
 //////////////////////////////////////////////////////
 // option definition
 //////////////////////////////////////////////////////
 
 #define DIRLIST_OPT_NONE          0
-#define DIRLIST_OPT_CHOPEXTENSION 1
-#define DIRLIST_OPT_ALLOCMEMONOTE 2
-#define DIRLIST_OPT_ALLOCURI      4
+#define DIRLIST_OPT_ALLOCURI      1
+#define DIRLIST_OPT_ALLOCHEADLINE 2
+#define DIRLIST_OPT_ALLOCFILENAME 4
 
 //////////////////////////////////////////////////////
 // Directory item information
@@ -20,10 +20,8 @@ class MemoNote;
 struct DirListItem {
 	DWORD nFileNamePos;
 	DWORD nURIPos;
+	DWORD nHeadLinePos;
 	BOOL bFolder;
-	MemoNote *pNote;	
-		// if bAllocMemoNotes is FALSE, this var is always invalid.
-		// if TRUE, caller must delete this object manually.
 };
 
 //////////////////////////////////////////////////////
@@ -31,9 +29,12 @@ struct DirListItem {
 //////////////////////////////////////////////////////
 
 class DirList {
-	BOOL bChopExtension;
-	BOOL bAllocMemoNotes;
+	BOOL bAllocURI;
+	BOOL bAllocHeadLine;
+	DWORD nOption;
+
 	LPCTSTR pURIBase;
+	DWORD nURIBaseLen;
 public:
 	TVector<DirListItem> vDirList;
 	StringBufferT sbDirList;

@@ -732,6 +732,8 @@ DWORD MemoNote::IsNote(LPCTSTR pFile)
 		nType = NOTE_TYPE_PLAIN;
 	} else if (_tcsicmp(p, TEXT(".chi")) == 0) {
 		nType = NOTE_TYPE_CRYPTED;
+	} else if (_tcsicmp(p, TEXT(".chs")) == 0) {
+		nType = NOTE_TYPE_CRYPTED;
 	} else if (_tcsicmp(p, TEXT(".tdt")) == 0) {
 		nType = NOTE_TYPE_TDT;
 	} else {

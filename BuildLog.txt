@@ -833,3 +833,10 @@ to manage Note/folder tree as single virtual tree.
 
 Encryption is not work correctly at this version.
 
+////////////////////////////////
+// B164
+////////////////////////////////
+
+* DEV: safe file name listing support.
+
+Encryption is not work correctly at this version.

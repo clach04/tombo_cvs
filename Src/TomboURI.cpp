@@ -12,6 +12,25 @@ static LPCTSTR pURIPrefix = TEXT("tombo://");
 /////////////////////////////////////////////
 
 /////////////////////////////////////////////
+// ctor & dtor
+/////////////////////////////////////////////
+
+TomboURI::TomboURI()
+{
+}
+
+TomboURI::TomboURI(const TomboURI &u)
+{
+	uri.Set(u.uri);
+	nMaxPathItem = u.nMaxPathItem;
+}
+
+TomboURI::~TomboURI()
+{
+}
+
+
+/////////////////////////////////////////////
 // initialize
 /////////////////////////////////////////////
 
@@ -47,9 +66,15 @@ BOOL TomboURI::Init(LPCTSTR pURI)
 		return FALSE;
 	}
 
-	return Set(pURI);
+	return uri.Set(pURI);
 }
 
+BOOL TomboURI::Init(const TomboURI &u)
+{
+	uri.Set(u.uri);
+	nMaxPathItem = u.nMaxPathItem;
+	return TRUE;
+}
 /////////////////////////////////////////////
 // Yet another initializer
 /////////////////////////////////////////////
@@ -103,7 +128,7 @@ LPCTSTR TomboURI::GetNextSep(LPCTSTR pPartPath)
 
 BOOL TomboURI::GetRepositoryName(TString *pRepo)
 {
-	LPCTSTR p = Get() + 8;
+	LPCTSTR p = uri.Get() + 8;
 	LPCTSTR q = GetNextSep(p);
 
 	if (!pRepo->Alloc(q - p + 1)) return FALSE;
@@ -119,7 +144,7 @@ BOOL TomboURI::GetRepositoryName(TString *pRepo)
 
 LPCTSTR TomboURI::GetPath() const
 {
-	LPCTSTR p = Get() + _tcslen(pURIPrefix);
+	LPCTSTR p = uri.Get() + _tcslen(pURIPrefix);
 
 	// skip repository part
 	p = _tcschr(p, TEXT('/'));
@@ -132,8 +157,8 @@ LPCTSTR TomboURI::GetPath() const
 
 BOOL TomboURI::IsEncrypted() const
 {
-	DWORD n = _tcslen(Get());
-	if (n > 4 && _tcscmp(Get() + n - 4, TEXT(".chi")) == 0) return TRUE;
+	DWORD n = _tcslen(uri.Get());
+	if (n > 4 && _tcscmp(uri.Get() + n - 4, TEXT(".chi")) == 0) return TRUE;
 	else return FALSE;		
 }
 
@@ -144,7 +169,7 @@ BOOL TomboURI::IsEncrypted() const
 BOOL TomboURI::IsLeaf() const
 {
 	if (_tcslen(GetPath() + 1) == 0) return FALSE; // root
-	LPCTSTR p = Get();
+	LPCTSTR p = uri.Get();
 	return *(p + _tcslen(p) - 1) != TEXT('/');
 }
 
@@ -170,9 +195,12 @@ BOOL TomboURI::GetParent(TomboURI *pParent) const
 		// result is root node.
 		q = pBase + 1;
 	}
-	if (!pParent->Alloc(q - Get() + 1)) return FALSE;
-	_tcsncpy(pParent->Get(), Get(), q - Get());
-	*(pParent->Get() + (q - Get())) = TEXT('\0');
+	TString s;
+	if (!s.Alloc(q - uri.Get() + 1)) return FALSE;
+	_tcsncpy(s.Get(), uri.Get(), q - uri.Get());
+	*(s.Get() + (q - uri.Get())) = TEXT('\0');
+
+	if (!pParent->Init(s.Get())) return FALSE;
 	return TRUE;
 }
 
@@ -180,7 +208,7 @@ BOOL TomboURI::GetParent(TomboURI *pParent) const
 // get parent path
 /////////////////////////////////////////////
 
-BOOL TomboURI::GetFilePath(TString *pPath)
+BOOL TomboURI::GetFilePath(TString *pPath) const
 {
 	LPCTSTR p = GetPath();
 	if (*p) *p++;
@@ -194,6 +222,40 @@ BOOL TomboURI::GetFilePath(TString *pPath)
 	}
 	return TRUE;
 }
+
+/////////////////////////////////////////////
+// get base name
+/////////////////////////////////////////////
+
+BOOL TomboURI::GetBaseName(TString *pBase) const
+{
+	LPCTSTR p = GetPath();
+	LPCTSTR q = NULL;
+	while(*p) {
+		if (*p == TEXT('/') && *(p+1) != TEXT('\0')) {
+			q = p;
+			p++;
+			continue;
+		}
+#if defined(PLATFORM_WIN32)
+		p = CharNext(p);
+#else
+		p++;
+#endif
+	}
+
+	if (q == NULL) {
+		// if url point to root
+		if (!pBase->Set(TEXT(""))) return FALSE;
+		return TRUE;
+	}
+	if (!pBase->Set(q + 1)) return FALSE;
+	if (*(q + _tcslen(q) - 1) == TEXT('/')) {
+		*(pBase->Get() + _tcslen(pBase->Get()) - 1) = TEXT('\0');
+	}
+	return TRUE;
+}
+
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
