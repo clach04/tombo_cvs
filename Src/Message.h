@@ -103,6 +103,6 @@
 #define MSG_GREPTAB_MAIN_TTL	MSG("Grep", "Grep")
 #define MSG_INSERTVFOLDER_FAIL	MSG("仮想フォルダの作成に失敗しました", "Create virtual folder failed.")
 #define MSG_GREP_NONAME_LABEL	MSG("検索結果", "Grep result")
-
+#define MSG_VFOLDER_NAME_TTL	MSG("仮想フォルダ名", "Virtual folder name")
 #endif
 
