@@ -46,6 +46,7 @@ public:
 };
 
 void DropInvalidFileChar(LPTSTR pDst, LPCTSTR pSrc);
-
+BOOL GetBaseName(TString *pBase, LPCTSTR pFull);
+LPCTSTR GetNextDirSeparator(LPCTSTR pStart);
 
 #endif

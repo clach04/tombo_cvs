@@ -227,3 +227,52 @@ void DropInvalidFileChar(LPTSTR pDst, LPCTSTR pSrc)
 	}
 	*q = TEXT('\0');
 }
+
+////////////////////////////////////////////////////////////////////
+// パスファイル名からベース名(パスと拡張子を除いたもの)を取得
+////////////////////////////////////////////////////////////////////
+// ...\..\AA.txt -> AA
+BOOL GetBaseName(TString *pBase, LPCTSTR pFull)
+{
+	LPCTSTR p = pFull;
+	LPCTSTR pLastDot = NULL;
+	LPCTSTR pLastYen = NULL;
+	while (*p) {
+#ifndef _WIN32_WCE
+		if (iskanji(*p)) {
+			p += 2;
+			continue;
+		}
+#endif
+		if (*p == TEXT('.')) pLastDot = p;
+		if (*p == TEXT('\\')) pLastYen = p;
+		p++;
+	}
+	if (pLastDot == NULL) pLastDot = p;
+	if (pLastYen == NULL) pLastYen = pFull - 1;
+
+	DWORD n = pLastDot - pLastYen - 1;
+	if (!pBase->Alloc(n + 1)) return FALSE;
+	_tcsncpy(pBase->Get(), pLastYen + 1, n);
+	*(pBase->Get() + n) = TEXT('\0');
+	return TRUE;
+}
+
+////////////////////////////////////////////////////////////////////
+// find next '\\'
+////////////////////////////////////////////////////////////////////
+
+LPCTSTR GetNextDirSeparator(LPCTSTR pStart)
+{
+	LPCTSTR p = pStart;
+	while(*p) {
+		if (IsDBCSLeadByte((BYTE)*p)) {
+			p++;
+			if (*p) p++;
+			continue;
+		}
+		if (*p == TEXT('\\')) return p;
+		p++;
+	}
+	return NULL;
+}
