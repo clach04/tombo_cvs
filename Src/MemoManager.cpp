@@ -253,11 +253,6 @@ BOOL MemoManager::SaveIfModify(LPDWORD pYNC, BOOL bDupMode)
 
 	TString sHeadLine;
 	TString sOldURI, sNewURI;
-	//@save notes
-//	if (!pCurrentNote->GetURI(&sOldURI)) {
-//		MemoNote::WipeOutAndDelete(p);
-//		return FALSE;
-//	}
 	if (!sOldURI.Set(pCurrentURI)) {
 		MemoNote::WipeOutAndDelete(p);
 		return FALSE;
@@ -280,6 +275,7 @@ BOOL MemoManager::SaveIfModify(LPDWORD pYNC, BOOL bDupMode)
 
 	// update headline string
 	pMemoSelectView->UpdateHeadLine(sOldURI.Get(), sNewURI.Get(), pNote);
+	SetCurrentNote(sNewURI.Get());
 
 	delete pNote;
 	MemoNote::WipeOutAndDelete(p);
@@ -386,11 +382,6 @@ BOOL MemoManager::StoreCursorPos()
 	return TRUE;
 }
 
-void MemoManager::ActivateView(BOOL bSVActive)
-{
-	pMainFrame->ActivateView(bSVActive);
-}
-
 ////////////////////////////////////////////////////////
 // ‘S‘I‘ð
 ////////////////////////////////////////////////////////
@@ -408,7 +399,7 @@ void MemoManager::SelectAll()
 
 void MemoManager::InactiveDetailsView()
 {
-	pMainFrame->OnList(TRUE);
+	pMainFrame->LeaveDetailsView(TRUE);
 }
 
 ////////////////////////////////////////////////////////

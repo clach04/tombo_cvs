@@ -21,41 +21,54 @@
 #include "Message.h"
 
 /////////////////////////////////////////
+//  defs
+/////////////////////////////////////////
+
+// Size of each image in IDB_MEMOSELECT_IMAGES
+#define IMAGE_CX 16
+#define IMAGE_CY 16
+
+// Number of items in IDB_MEMOSELECT_IMAGES
+#define NUM_MEMOSELECT_BITMAPS 10
+
+/////////////////////////////////////////
 //  static functions
 /////////////////////////////////////////
 
 static void InsertDummyNode(HWND hTree, HTREEITEM hItem);
 static HTREEITEM FindItem2(HWND hWnd, HTREEITEM hParent, LPCTSTR pStr, DWORD nLen);
-void SelectViewSetWndProc(WNDPROC wp, HWND hParent, HINSTANCE h, MemoSelectView *p);
+void SelectViewSetWndProc(SUPER_WND_PROC wp, HWND hParent, HINSTANCE h, MemoSelectView *p);
 LRESULT CALLBACK NewSelectViewProc( HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam );
+static HIMAGELIST CreateSelectViewImageList(HINSTANCE hInst);
 
 /////////////////////////////////////////
 // create window
 /////////////////////////////////////////
 
-BOOL MemoSelectView::Create(LPCTSTR pName, RECT &r, HWND hParent, DWORD nID, HINSTANCE hInst, HFONT hFont, HIMAGELIST hImgList)
+BOOL MemoSelectView::Create(LPCTSTR pName, RECT &r, HWND hParent, DWORD nID, HINSTANCE hInst, HFONT hFont)
 {
+	hSelectViewImgList = CreateSelectViewImageList(hInst);
+
 	DWORD nWndStyle;
 	nWndStyle = WS_CHILD | WS_VSCROLL | WS_HSCROLL | TVS_HASLINES | TVS_HASBUTTONS | TVS_SHOWSELALWAYS | TVS_EDITLABELS;
+
 
 #if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
 	hViewWnd = CreateWindowEx(WS_EX_CLIENTEDGE, WC_TREEVIEW, pName, nWndStyle,
 								r.left, r.top, r.right, r.bottom,
 								hParent, (HMENU)nID, hInst, this);
 #else
-	hViewWnd = CreateWindow(WC_TREEVIEW, pName, nWndStyle,
+	hViewWnd = CreateWindow(WC_TREEVIEW, pName, nWndStyle | WS_BORDER,
 							r.left, r.top, r.right, r.bottom, 
 							hParent, (HMENU)nID, hInst, this);
 #endif
 	if (hViewWnd == NULL) return FALSE;
 
-#if !defined(PLATFORM_PSPC) && !defined(PLATFORM_BE500)
-	WNDPROC wp = (WNDPROC)GetWindowLong(hViewWnd, GWL_WNDPROC);
+	SUPER_WND_PROC wp = (SUPER_WND_PROC)GetWindowLong(hViewWnd, GWL_WNDPROC);
 	SelectViewSetWndProc(wp, hParent, g_hInstance, this);
 	SetWindowLong(hViewWnd, GWL_WNDPROC, (LONG)NewSelectViewProc);
-#endif
 
-	TreeView_SetImageList(hViewWnd, hImgList, TVSIL_NORMAL);
+	TreeView_SetImageList(hViewWnd, hSelectViewImgList, TVSIL_NORMAL);
 
 	if (hFont != NULL) {
 		SendMessage(hViewWnd, WM_SETFONT, (WPARAM)hFont, MAKELPARAM(TRUE, 0));
@@ -392,8 +405,9 @@ LRESULT MemoSelectView::OnNotify(HWND hWnd, WPARAM wParam, LPARAM lParam)
 			if (!tvi) break;
 
 			if (!tvi->HasMultiItem()) {
-				tvi->OpenMemo(this, OPEN_REQUEST_MSVIEW_ACTIVE);
-				pMemoMgr->GetMainFrame()->PostSwitchView(OPEN_REQUEST_MSVIEW_ACTIVE);
+				tvi->LoadMemo(this, TRUE);
+				pMemoMgr->GetMainFrame()->PostSwitchView(OPEN_REQUEST_MDVIEW_ACTIVE);
+				return 0;
 			}
 			// ˆÃ–Ù‚ÅExpand/Collapse‚ª”­¶
 		}
@@ -415,8 +429,8 @@ LRESULT MemoSelectView::OnNotify(HWND hWnd, WPARAM wParam, LPARAM lParam)
 				ToggleExpandFolder(hItem, it.state & TVIS_EXPANDED);
 			} else {
 				// switch to edit view
-				tvi->OpenMemo(this, OPEN_REQUEST_MSVIEW_ACTIVE);
-				pMemoMgr->GetMainFrame()->ActivateView(FALSE);
+				tvi->LoadMemo(this, TRUE);
+				pMemoMgr->GetMainFrame()->ActivateView(MainFrame::VT_DetailsView);
 			}
 		}
 		break;
@@ -467,7 +481,7 @@ LRESULT MemoSelectView::OnNotify(HWND hWnd, WPARAM wParam, LPARAM lParam)
 			if (g_Property.IsUseTwoPane() && (p->action == TVC_BYMOUSE || p->action == TVC_BYKEYBOARD)) {
 				// change notes if operated by user. Otherwise no switching occured.
 				pMemoMgr->SetMSSearchFlg(TRUE);
-				tvi->OpenMemo(this, OPEN_REQUEST_MDVIEW_ACTIVE);
+				tvi->LoadMemo(this, FALSE);
 			}
 		}
 		break;
@@ -707,6 +721,16 @@ void MemoSelectView::GetSize(LPWORD pWidth, LPWORD pHeight)
 	GetWindowRect(hViewWnd, &r);
 	*pWidth = (WORD)(r.right - r.left);
 	*pHeight = (WORD)(r.bottom - r.top);
+}
+
+void MemoSelectView::GetSize(LPRECT pRect)
+{
+	GetWindowRect(hViewWnd, pRect);
+}
+
+void MemoSelectView::GetClientRect(LPRECT pRect)
+{
+	::GetClientRect(hViewWnd, pRect);
 }
 
 ///////////////////////////////////////////
@@ -1218,7 +1242,7 @@ void MemoSelectView::OnGetFocus()
 {
 	MainFrame *pMf = pMemoMgr->GetMainFrame();
 	if (pMf) {
-		pMf->ActivateView(TRUE);
+		pMf->ActivateView(MainFrame::VT_SelectView);
 	}
 	ControlMenu();
 }
@@ -1565,4 +1589,19 @@ void MemoSelectView::SelPrevBrother()
 	if (h) {
 		TreeView_SelectItem(hViewWnd, h);
 	}
+}
+
+static HIMAGELIST CreateSelectViewImageList(HINSTANCE hInst)
+{
+	HIMAGELIST hImageList;
+	// Create Imagelist.
+	if ((hImageList = ImageList_Create(IMAGE_CX, IMAGE_CY, ILC_MASK, NUM_MEMOSELECT_BITMAPS, 0)) == NULL) return NULL;
+	HBITMAP hBmp = LoadBitmap(hInst, MAKEINTRESOURCE(IDB_MEMOSELECT_IMAGES));
+
+	// Transparent color is GREEN
+	COLORREF rgbTransparent = RGB(0,255,0);
+	ImageList_AddMasked(hImageList, hBmp, rgbTransparent);
+	DeleteObject(hBmp);
+
+	return hImageList;
 }

@@ -36,6 +36,28 @@ LPCTSTR pWeekE[7] = {
 	TEXT("Sun"), TEXT("Mon"), TEXT("Tue"), TEXT("Wed"), TEXT("Thr"), TEXT("Fri"), TEXT("Sat")
 };
 
+///////////////////////////////////////////
+// 
+///////////////////////////////////////////
+
+MemoDetailsView::MemoDetailsView(MemoDetailsViewCallback *p) : pCallback(p)
+{
+}
+
+MemoDetailsView::~MemoDetailsView()
+{
+	delete pCallback;
+}
+
+///////////////////////////////////////////
+// initializer
+///////////////////////////////////////////
+
+SimpleEditor::SimpleEditor(MemoDetailsViewCallback *p) : MemoDetailsView(p), hViewWnd(NULL)
+{
+}
+
+
 BOOL SimpleEditor::Init(MemoManager *p, DWORD id, DWORD id_nf)
 {
 	nID = id;
@@ -44,8 +66,29 @@ BOOL SimpleEditor::Init(MemoManager *p, DWORD id, DWORD id_nf)
 	return TRUE;
 }
 
+extern SUPER_WND_PROC gDefaultProc;
+extern DWORD gDelta;
+LRESULT CALLBACK DetailsViewSuperProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam );
+
+BOOL SimpleEditor::RegisterClass(HINSTANCE hInst)
+{
+	// superclassing
+	WNDCLASS wc;
+	GetClassInfo(hInst, TEXT("EDIT"), &wc);
+
+	wc.hInstance = hInst;
+	wc.lpszClassName = TEXT("TomboSimpleEditor");
+	gDelta = wc.cbWndExtra;
+	wc.cbWndExtra = ((wc.cbWndExtra + sizeof(MemoDetailsView*)) / 4 + 1)* 4;
+
+	gDefaultProc = (SUPER_WND_PROC)wc.lpfnWndProc;
+
+	wc.lpfnWndProc = DetailsViewSuperProc;
+
+	return  ::RegisterClass(&wc) != 0;
+}
 ///////////////////////////////////////////
-// ウィンドウ生成
+// Create window
 ///////////////////////////////////////////
 extern HINSTANCE g_hInstance;
 
@@ -55,37 +98,37 @@ BOOL SimpleEditor::Create(LPCTSTR pName, RECT &r, HWND hParent, HINSTANCE hInst,
 
 	nWndStyle = WS_CHILD | WS_VSCROLL | ES_MULTILINE | ES_WANTRETURN;
 
-#if defined(PLATFORM_PKTPC) || defined(PLATFORM_PSPC) || defined(PLATFORM_BE500)
-	nLeftOffset = 3;
+#if defined(PLATFORM_PSPC) || defined(PLATFORM_BE500)
+//	nLeftOffset = 3;
+	// for draw border, left offset has disabled.
+	nLeftOffset = 0;
 #else
 	nLeftOffset = 0;
 #endif
 	
 #if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
-	hViewWnd_fd = CreateWindowEx(WS_EX_CLIENTEDGE, TEXT("EDIT"), pName, nWndStyle, 
+	hViewWnd_fd = CreateWindowEx(WS_EX_CLIENTEDGE, TEXT("TomboSimpleEditor"), pName, nWndStyle, 
 							r.left + nLeftOffset, r.top, r.right - nLeftOffset, r.bottom, 
 							hParent, (HMENU)nID, hInst, this);
-	hViewWnd_nf = CreateWindowEx(WS_EX_CLIENTEDGE, TEXT("EDIT"), pName, nWndStyle | ES_AUTOHSCROLL | WS_HSCROLL, 
+	hViewWnd_nf = CreateWindowEx(WS_EX_CLIENTEDGE, TEXT("TomboSimpleEditor"), pName, nWndStyle | ES_AUTOHSCROLL | WS_HSCROLL, 
 							r.left + nLeftOffset, r.top, r.right - nLeftOffset, r.bottom, 
 							hParent, (HMENU)nID_nf, hInst, this);
 #else
-	hViewWnd_fd = CreateWindow(TEXT("EDIT"), pName, nWndStyle, 
+	hViewWnd_fd = CreateWindow(TEXT("TomboSimpleEditor"), pName, nWndStyle | WS_BORDER, 
 							r.left + nLeftOffset, r.top, r.right - nLeftOffset, r.bottom, 
-							hParent, (HMENU)nID, hInst, NULL);
-	hViewWnd_nf = CreateWindow(TEXT("EDIT"), pName, nWndStyle | ES_AUTOHSCROLL | WS_HSCROLL, 
+							hParent, (HMENU)nID, hInst, this);
+	hViewWnd_nf = CreateWindow(TEXT("TomboSimpleEditor"), pName, nWndStyle | ES_AUTOHSCROLL | WS_HSCROLL | WS_BORDER, 
 							r.left + nLeftOffset, r.top, r.right - nLeftOffset, r.bottom, 
-							hParent, (HMENU)nID_nf, hInst, NULL);
+							hParent, (HMENU)nID_nf, hInst, this);
 #endif
 	if (hViewWnd_fd == NULL || hViewWnd_nf == NULL) return FALSE;
 	hViewWnd = hViewWnd_fd;
 
-//#if !defined(PLATFORM_PSPC) && !defined(PLATFORM_BE500)
-	// EDIT Controlのサブクラス化
+	// sub classing of edit control
 	SUPER_WND_PROC wp = (SUPER_WND_PROC)GetWindowLong(hViewWnd, GWL_WNDPROC);
 	SetWndProc(wp, hParent, g_hInstance, this, pMemoMgr);
 	SetWindowLong(hViewWnd_nf, GWL_WNDPROC, (LONG)NewDetailsViewProc);
 	SetWindowLong(hViewWnd_fd, GWL_WNDPROC, (LONG)NewDetailsViewProc);
-//#endif
 
 	if (hFont != NULL) {
 		SetFont(hFont);
@@ -95,7 +138,7 @@ BOOL SimpleEditor::Create(LPCTSTR pName, RECT &r, HWND hParent, HINSTANCE hInst,
 }
 
 ///////////////////////////////////////////
-// 表示/非表示切り替え
+// hide/show window
 ///////////////////////////////////////////
 
 BOOL SimpleEditor::Show(int nCmdShow)
@@ -197,26 +240,7 @@ BOOL SimpleEditor::OnHotKey(HWND hWnd, WPARAM wParam)
 
 void SimpleEditor::OnGetFocus()
 {
-	if (!g_Property.IsUseTwoPane()) return;
-
-	MainFrame *pMf = pMemoMgr->GetMainFrame();
-	if (pMf) {
-		// switch view
-		pMf->ActivateView(FALSE);
-
-		// menu control
-		pMf->EnableDelete(FALSE);
-		pMf->EnableRename(FALSE);
-		pMf->EnableEncrypt(FALSE);
-		pMf->EnableDecrypt(FALSE);
-		pMf->EnableNewFolder(FALSE);
-		pMf->EnableGrep(FALSE);
-
-		pMf->EnableCut(TRUE);
-		pMf->EnableCopy(TRUE);
-		pMf->EnablePaste(TRUE);
-	}
-	SetModifyStatus();
+	pCallback->GetFocusCallback(this);
 }
 
 ///////////////////////////////////////////
@@ -528,7 +552,7 @@ static BOOL GetDateText(TString *pInsStr, LPCTSTR pFormat, TString *pPath)
 
 void SimpleEditor::SetModifyStatus()
 {
-	pMemoMgr->GetMainFrame()->SetModifyStatus(IsModify());
+	pCallback->SetModifyStatusCallback(this);
 }
 
 /////////////////////////////////////////
@@ -610,7 +634,8 @@ void SimpleEditor::SetTabstop() {
 BOOL SimpleEditor::Search(BOOL bFirstSearch, BOOL bForward, BOOL bNFMsg, BOOL bSearchFromTop)
 {
 	SearchEngineA *pSE;
-	pSE = pMemoMgr->GetSearchEngine();
+//	pSE = pMemoMgr->GetSearchEngine();
+	pSE = pCallback->GetSearchEngine(this);
 	if (pSE == NULL) return FALSE;
 
 	LPTSTR pT = GetMemo();
@@ -688,8 +713,16 @@ BOOL SimpleEditor::Search(BOOL bFirstSearch, BOOL bForward, BOOL bNFMsg, BOOL bS
 void SimpleEditor::SetReadOnly(BOOL bro)
 {
 	bReadOnly = bro;
-//	SendMessage(hViewWnd, EM_SETREADONLY, (WPARAM)bReadOnly, 0);
-	if (pMemoMgr) pMemoMgr->GetMainFrame()->SetReadOnlyStatus(bReadOnly);
+	pCallback->SetReadOnlyStatusCallback(this);
+}
+
+/////////////////////////////////////////
+//
+/////////////////////////////////////////
+
+void SimpleEditor::SetMDSearchFlg(BOOL bFlg)
+{
+	pCallback->SetSearchFlg(bFlg);
 }
 
 /////////////////////////////////////////
@@ -701,7 +734,8 @@ void SimpleEditor::InsertDate1()
 	TString sDate;
 
 	TString sPathStr;
-	pMemoMgr->GetCurrentSelectedPath(&sPathStr);
+//	pMemoMgr->GetCurrentSelectedPath(&sPathStr);
+	pCallback->GetCurrentSelectedPath(this, &sPathStr);
 
 	if (!GetDateText(&sDate, g_Property.DateFormat1(), &sPathStr)) {
 		TomboMessageBox(NULL, MSG_GET_DATE_FAILED, TEXT("ERROR"), MB_ICONERROR | MB_OK);
@@ -715,7 +749,8 @@ void SimpleEditor::InsertDate2()
 	TString sDate;
 
 	TString sPathStr;
-	pMemoMgr->GetCurrentSelectedPath(&sPathStr);
+//	pMemoMgr->GetCurrentSelectedPath(&sPathStr);
+	pCallback->GetCurrentSelectedPath(this, &sPathStr);
 
 	if (!GetDateText(&sDate, g_Property.DateFormat2(), &sPathStr)) {
 		TomboMessageBox(NULL, MSG_GET_DATE_FAILED, TEXT("ERROR"), MB_ICONERROR | MB_OK);

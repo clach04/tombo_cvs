@@ -25,10 +25,11 @@ static BOOL APIENTRY DlgProcTemplate(HWND hDlg, UINT nMessage, WPARAM wParam, LP
 
 	switch (nMessage) {
 	case WM_COMMAND:
-		switch (wParam) {
+		switch (LOWORD(wParam)) {
 		case IDOK:
+			pDlg->SetResult(IDOK);
 			if (pDlg->OnOK()) {
-				EndDialog(hDlg, IDOK);
+				EndDialog(hDlg, pDlg->GetResult());
 			}
 			break;
 		case IDCANCEL:

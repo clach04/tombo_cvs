@@ -29,8 +29,7 @@ void TomboDocCallback::OnModifyStatusChanged(YAEditDoc *pDoc, BOOL bOld, BOOL bN
 }
 
 
-
-YAEditor::YAEditor() : pEdit(NULL), pMemoMgr(NULL)
+YAEditor::YAEditor(MemoDetailsViewCallback *pCB) : MemoDetailsView(pCB), pEdit(NULL), pMemoMgr(NULL)
 {
 }
 
@@ -110,4 +109,9 @@ void YAEditor::ResetModify()
 BOOL YAEditor::OnCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
 	return FALSE;
+}
+
+void YAEditor::SetMDSearchFlg(BOOL bFlg)
+{
+	pCallback->SetSearchFlg(bFlg);
 }

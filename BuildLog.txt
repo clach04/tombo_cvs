@@ -612,3 +612,85 @@ other fix:
 // 2.0 branch
 
 * merged B128-B130(main trunk) updates.
+
+////////////////////////////////
+// B134
+////////////////////////////////
+// main trunk
+
+* add SetCurrentNote when saving notes.
+* refactoring around platform dependent routines (especially toolbar, menu etc..)
+
+////////////////////////////////
+// B135
+////////////////////////////////
+// main trunk
+
+* move IDM_TOGGLEPANE to PlatformLayer
+* supporting two-pane layout for PocketPC version.
+
+////////////////////////////////
+// B136
+////////////////////////////////
+// main trunk
+
+* impliment IDM_TOGGLEPANE (PocketPC version)
+
+////////////////////////////////
+// B137
+////////////////////////////////
+// main trunk
+
+* major refactoring
+	- modify MemoDetailsView for multi instance support.
+	- impliment MemoDetailsViewDlg for support morden PocketPC style but not used in this version.
+
+////////////////////////////////
+// B138
+////////////////////////////////
+// main trunk
+
+* more more refactoring.
+* move imagelist to MemoSelectView.
+* two pane mode support for PocketPC (yet fully implimented).
+
+////////////////////////////////
+// B139
+////////////////////////////////
+// main trunk
+
+* support two pane and edit view style on PocketPC.
+* support BE-x00
+	PsPC is not yet.
+Not fully tested on both platform, probably it will work.
+
+////////////////////////////////
+// B139(?)
+////////////////////////////////
+// main trunk
+
+* support Two pane mode menu's check for BE-x00
+
+////////////////////////////////
+// B140
+////////////////////////////////
+// main trunk
+
+* FIX: when tapping edit view then tapping tree view, menu don't be changed.
+* FIX: window size is not correct when 2 pane view.
+
+////////////////////////////////
+// B141 (TOMBO 1.9 beta 1)
+////////////////////////////////
+// main trunk
+
+* modify menubar width on PocketPC(English).
+
+////////////////////////////////
+// B142
+////////////////////////////////
+// 2.0 branch
+
+* merged B130 to B141 on main trunk
+	project files and resource files are not merged.
+

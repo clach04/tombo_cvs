@@ -516,6 +516,14 @@ SOURCE=..\..\Src\PasswordManager.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\Src\PlatformLayer.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\PlatformLayer.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\Src\Property.cpp
 # End Source File
 # Begin Source File
@@ -587,6 +595,14 @@ SOURCE=..\..\Src\SearchTree.h
 # Begin Source File
 
 SOURCE=..\..\Src\SelectViewWndProc.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\StatusBar.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\StatusBar.h
 # End Source File
 # Begin Source File
 
@@ -667,6 +683,14 @@ SOURCE=..\..\Src\VFStream.cpp
 # Begin Source File
 
 SOURCE=..\..\Src\VFStream.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\Win32Platform.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\Win32Platform.h
 # End Source File
 # Begin Source File
 

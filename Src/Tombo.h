@@ -15,7 +15,6 @@ class PasswordManager;
 // MWM_OPEN_REQUEST オプション
 #define OPEN_REQUEST_MDVIEW_ACTIVE 0
 #define OPEN_REQUEST_MSVIEW_ACTIVE 1
-#define OPEN_REQUEST_NO_ACTIVATE_VIEW 2
 
 // MWM_RAISE_MAINFRAME : トップレベルウィンドウをRaiseして再前面にもってくる
 // WPARAM, LPARAM: 0
@@ -85,5 +84,11 @@ enum SearchResult {
 //
 #define VFOLDER_IMAGE_PERSIST	8
 #define VFOLDER_IMAGE_TEMP		6
+
+#ifdef STRICT 
+typedef WNDPROC SUPER_WND_PROC;
+#else 
+typedef FARPROC SUPER_WND_PROC;
+#endif 
 
 #endif

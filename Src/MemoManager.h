@@ -77,8 +77,6 @@ public:
 
 	BOOL StoreCursorPos();
 
-	void ActivateView(BOOL bSelectViewActive);
-
 	void SelectAll();	// 全選択(詳細ビュー)
 
 	// 指定したメモが現在詳細ビューで表示されているか

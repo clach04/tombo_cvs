@@ -3,16 +3,36 @@
 
 class MemoManager;
 
-#ifdef STRICT 
-typedef WNDPROC SUPER_WND_PROC;
-#else 
-typedef FARPROC SUPER_WND_PROC;
-#endif 
+class MemoDetailsView;
+class SearchEngineA;
+class TString;
+
+///////////////////////////////////////
+// Callback handler
+///////////////////////////////////////
+
+class MemoDetailsViewCallback {
+public:
+	virtual void GetFocusCallback(MemoDetailsView *pView) = 0;
+	virtual void SetModifyStatusCallback(MemoDetailsView *pView) = 0;
+	virtual void SetReadOnlyStatusCallback(MemoDetailsView *pView) = 0;
+
+	virtual void SetSearchFlg(BOOL bFlg) = 0;
+
+	virtual SearchEngineA *GetSearchEngine(MemoDetailsView *pView) = 0;
+	virtual void GetCurrentSelectedPath(MemoDetailsView *pView, TString *pPath) = 0;
+};
+
+///////////////////////////////////////
+// Edit view abstraction
+///////////////////////////////////////
 
 class MemoDetailsView {
+protected:
+	MemoDetailsViewCallback *pCallback;
 public:
-	MemoDetailsView() {}
-	virtual ~MemoDetailsView() {}
+	MemoDetailsView(MemoDetailsViewCallback *p);
+	virtual ~MemoDetailsView();
 
 	virtual BOOL Create(LPCTSTR pName, RECT &r, HWND hParent, HINSTANCE hInst, HFONT hFont) = 0;
 
@@ -22,6 +42,8 @@ public:
 	virtual BOOL IsReadOnly() = 0;
 
 	virtual void SetModifyStatus() = 0;
+
+	virtual void SetMDSearchFlg(BOOL bFlg) = 0;
 
 	virtual BOOL Show(int nCmdShow) = 0;
 	virtual void SetFocus() = 0;
@@ -70,10 +92,11 @@ public:
 	///////////////////////
 	// Initialize
 
-	SimpleEditor() : hViewWnd(NULL) {}
+	SimpleEditor(MemoDetailsViewCallback *p);
 	BOOL Init(MemoManager *p, DWORD nID, DWORD nID_nf);
 	BOOL Create(LPCTSTR pName, RECT &r, HWND hParent, HINSTANCE hInst, HFONT hFont);
 
+	static BOOL RegisterClass(HINSTANCE hInst);
 
 	///////////////////////
 	// Properties
@@ -105,6 +128,9 @@ public:
 	LPTSTR GetMemo();
 	BOOL IsModify() { if (hViewWnd) return SendMessage(hViewWnd, EM_GETMODIFY, 0, 0); else return FALSE; }
 	void ResetModify() { SendMessage(hViewWnd, EM_SETMODIFY, (WPARAM)(UINT)FALSE, 0); }
+
+	void SetMDSearchFlg(BOOL bFlg);
+
 
 	DWORD GetCursorPos();
 	DWORD GetInitialPos() { return nInitialPos; }

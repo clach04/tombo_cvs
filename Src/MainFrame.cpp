@@ -21,6 +21,17 @@
 #include "BookMark.h"
 #include "DialogTemplate.h"
 #include "BookMarkDlg.h"
+#include "StatusBar.h"
+#include "PlatformLayer.h"
+#include "Win32Platform.h"
+#include "PocketPCPlatform.h"
+#include "PsPCPlatform.h"
+#include "HPCPlatform.h"
+#include "LagendaPlatform.h"
+#if defined(PLATFORM_PKTPC)
+#include "DialogTemplate.h"
+#include "DetailsViewDlg.h"
+#endif
 
 #ifdef _WIN32_WCE
 #if defined(PLATFORM_PKTPC)
@@ -56,212 +67,24 @@ static HIMAGELIST CreateSelectViewImageList(HINSTANCE hInst);
 #define SHGetSubMenu(hWndMB,ID_MENU) (HMENU)SendMessage((hWndMB), SHCMBM_GETSUBMENU, (WPARAM)0, (LPARAM)ID_MENU);
 #define SHSetSubMenu(hWndMB,ID_MENU) (HMENU)SendMessage((hWndMB), SHCMBM_SETSUBMENU, (WPARAM)0, (LPARAM)ID_MENU);
 
-// 左右ペイン間の柱の幅
+// splitter width
 #if defined(PLATFORM_WIN32)
 #define BORDER_WIDTH 2
 #endif
-#if defined(PLATFORM_HPC)
+#if defined(PLATFORM_HPC) || defined(PLATFORM_PKTPC) || defined(PLATFORM_PSPC) || defined(PLATFORM_BE500)
 #define BORDER_WIDTH 5
 #endif
 
-// Size of each image in IDB_MEMOSELECT_IMAGES
-#define IMAGE_CX 16
-#define IMAGE_CY 16
-
-// Number of items in IDB_MEMOSELECT_IMAGES
-#define NUM_MEMOSELECT_BITMAPS 10
-
 // Bookmark menu ID base value
 #define BOOKMARK_ID_BASE 41000
-#define BOOKMARK_MENU_POS 2
-#define NUM_BOOKMARK_SUBMENU_DEFAULT 3
-
-///////////////////////////////////////
-// defs about toolbar/commandbar
-///////////////////////////////////////
-///////////////////////////////////////
-// Pocket PC
-
-#if defined(PLATFORM_PKTPC)
-#define NUM_TOOLBAR_BMP 12
-
-#define NUM_MS_TOOLTIP 1
-LPTSTR pMSToolTip[] = {
-	MSG_TOOLTIPS_NEWMEMO,
-};
-
-#define NUM_MD_TOOLTIP 6
-LPTSTR pMDToolTip[] = {
-	MSG_TOOLTIPS_RETURNLIST,
-	MSG_TOOLTIPS_SAVE,
-	TEXT(""),
-	TEXT(""),
-	MSG_TOOLTIPS_INSDATE1,
-	MSG_TOOLTIPS_INSDATE2,
-};
-#endif
-
-///////////////////////////////////////
-// PSPC version
-
-#if defined(PLATFORM_PSPC)
-#define NUM_CMDBAR_BUTTONS 4
-#define NUM_IMG_BUTTONS 12
-
-#define NUM_MD_CMDBAR_BUTTONS 7
-#define NUM_MD_IMG_BUTTONS 1
-
-#define BOOKMARK_MENU_POS 2
-
-static TBBUTTON aCmdBarButtons[NUM_CMDBAR_BUTTONS] = {
-	{0,  0,              TBSTATE_ENABLED, TBSTYLE_SEP,    0, 0, 0, -1},
-	{17, IDM_NEWMEMO   , TBSTATE_ENABLED, TBSTYLE_BUTTON, 0, 0, 0, -1}, 
-//	{0,  0,              TBSTATE_ENABLED, TBSTYLE_SEP,    0, 0, 0, -1},
-	{22, IDM_SEARCH_PREV,              0, TBSTYLE_BUTTON, 0, 0, 0, -1},
-	{23, IDM_SEARCH_NEXT,              0, TBSTYLE_BUTTON, 0, 0, 0, -1},
-//	{0,  0,              TBSTATE_ENABLED, TBSTYLE_SEP,    0, 0, 0, -1},
-};
-
-static TBBUTTON aMDCmdBarButtons[NUM_MD_CMDBAR_BUTTONS] = {
-	{0,            0,              TBSTATE_ENABLED, TBSTYLE_SEP,    0, 0, 0, -1},
-	{15,           IDM_RETURNLIST, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0, 0, 0, -1},
-	{STD_FILESAVE, IDM_SAVE,       TBSTATE_ENABLED, TBSTYLE_BUTTON, 0, 0, 0, -1},
-	{0,            0,              TBSTATE_ENABLED, TBSTYLE_SEP,    0, 0, 0, -1},
-	{22,           IDM_SEARCH_PREV,              0, TBSTYLE_BUTTON, 0, 0, 0, -1},
-	{23,           IDM_SEARCH_NEXT,              0, TBSTYLE_BUTTON, 0, 0, 0, -1},
-	{0,            0,              TBSTATE_ENABLED, TBSTYLE_SEP,    0, 0, 0, -1},
-
-};
-#endif
-
-///////////////////////////////////////
-// H/PC version
-
-#if defined(PLATFORM_HPC)
-static void ControlMenu(HMENU hMenu, BOOL bSelectViewActive);
-static void ControlToolbar(HWND hToolbar, BOOL bSelectViewActive);
-static HWND GetCommandBar(HWND hBand, UINT uBandID);
-
-#define NUM_MY_TOOLBAR_BMPS 0
-#define NUM_CMDBAR_BUTTONS 19
-#define NUM_IMG_BUTTONS 10
-
-static TBBUTTON aCmdBarButtons[NUM_CMDBAR_BUTTONS] = {
-	{0,                                  0,              TBSTATE_ENABLED, TBSTYLE_SEP,    0, 0, 0, -1},
-	{STD_FILENEW + NUM_MY_TOOLBAR_BMPS,  IDM_NEWMEMO,    TBSTATE_ENABLED, TBSTYLE_BUTTON, 0, 0, 0, -1},
-	{STD_FILESAVE + NUM_MY_TOOLBAR_BMPS, IDM_SAVE,       TBSTATE_ENABLED, TBSTYLE_BUTTON, 0, 0, 0, -1},
-	{0,                                  0,              TBSTATE_ENABLED, TBSTYLE_SEP,    0, 0, 0, -1},
-	{STD_CUT + NUM_MY_TOOLBAR_BMPS,      IDM_CUT,        TBSTATE_ENABLED, TBSTYLE_BUTTON, 0, 0, 0, -1},
-	{STD_COPY + NUM_MY_TOOLBAR_BMPS,     IDM_COPY,       TBSTATE_ENABLED, TBSTYLE_BUTTON, 0, 0, 0, -1},
-	{STD_PASTE + NUM_MY_TOOLBAR_BMPS,    IDM_PASTE,      TBSTATE_ENABLED, TBSTYLE_BUTTON, 0, 0, 0, -1},
-	{0,                                  0,              TBSTATE_ENABLED, TBSTYLE_SEP,    0, 0, 0, -1},
-	{STD_DELETE + NUM_MY_TOOLBAR_BMPS,   IDM_DELETEITEM, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0, 0, 0, -1},
-	{0,                                  0,              TBSTATE_ENABLED, TBSTYLE_SEP,    0, 0, 0, -1},
-	{18,                                 IDM_INSDATE1,   TBSTATE_ENABLED, TBSTYLE_BUTTON, 0, 0, 0, -1},
-	{19,                                 IDM_INSDATE2,   TBSTATE_ENABLED, TBSTYLE_BUTTON, 0, 0, 0, -1},
-	{0,                                  0,              TBSTATE_ENABLED, TBSTYLE_SEP,    0, 0, 0, -1},
-	{21,                                 IDM_TOGGLEPANE, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0, 0, 0, -1},
-	{0,                                  0,              TBSTATE_ENABLED, TBSTYLE_SEP,    0, 0, 0, -1},
-	{24,                                 IDM_SEARCH,     TBSTATE_ENABLED, TBSTYLE_BUTTON, 0, 0, 0, -1},
-	{22,                                 IDM_SEARCH_PREV,              0, TBSTYLE_BUTTON, 0, 0, 0, -1},
-	{23,                                 IDM_SEARCH_NEXT,              0, TBSTYLE_BUTTON, 0, 0, 0, -1},
-	{0,                                  0,              TBSTATE_ENABLED, TBSTYLE_SEP,    0, 0, 0, -1},
-};
-
-#define NUM_MD_CMDBAR_BUTTONS 2
-
-static TBBUTTON aMDCmdBarButtons[NUM_MD_CMDBAR_BUTTONS] = {
-	{0,  0,              TBSTATE_ENABLED, TBSTYLE_SEP,    0, 0, 0, -1},
-	{15, IDM_RETURNLIST, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0, 0, 0, -1},
-};
-#endif
-
-///////////////////////////////////////
-// Win32 version
-
-#if defined(PLATFORM_WIN32)
-static void ControlMenu(HMENU hMenu, BOOL bSelectViewActive);
-static void ControlToolbar(HWND hToolbar, BOOL bSelectViewActive);
-
-#define NUM_MY_TOOLBAR_BMPS 12
-#define NUM_TOOLBAR_BUTTONS 19
-
-static TBBUTTON aToolbarButtons[NUM_TOOLBAR_BUTTONS] = {
-	{STD_FILENEW + NUM_MY_TOOLBAR_BMPS,  IDM_NEWMEMO,    TBSTATE_ENABLED, TBSTYLE_BUTTON, 0, 0, 0, -1},
-	{STD_FILESAVE + NUM_MY_TOOLBAR_BMPS, IDM_SAVE,       TBSTATE_ENABLED, TBSTYLE_BUTTON, 0, 0, 0, -1},
-	{0,                                  0,              TBSTATE_ENABLED, TBSTYLE_SEP,    0, 0, 0, -1},
-	{STD_CUT + NUM_MY_TOOLBAR_BMPS,      IDM_CUT,        TBSTATE_ENABLED, TBSTYLE_BUTTON, 0, 0, 0, -1},
-	{STD_COPY + NUM_MY_TOOLBAR_BMPS,     IDM_COPY,       TBSTATE_ENABLED, TBSTYLE_BUTTON, 0, 0, 0, -1},
-	{STD_PASTE + NUM_MY_TOOLBAR_BMPS,    IDM_PASTE,      TBSTATE_ENABLED, TBSTYLE_BUTTON, 0, 0, 0, -1},
-	{0,                                  0,              TBSTATE_ENABLED, TBSTYLE_SEP,    0, 0, 0, -1},
-	{STD_DELETE + NUM_MY_TOOLBAR_BMPS,   IDM_DELETEITEM, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0, 0, 0, -1},
-	{0,                                  0,              TBSTATE_ENABLED, TBSTYLE_SEP,    0, 0, 0, -1},
-	{3,                                  IDM_INSDATE1,   TBSTATE_ENABLED, TBSTYLE_BUTTON, 0, 0, 0, -1},
-	{4,                                  IDM_INSDATE2,   TBSTATE_ENABLED, TBSTYLE_BUTTON, 0, 0, 0, -1},
-	{0,                                  0,              TBSTATE_ENABLED, TBSTYLE_SEP,    0, 0, 0, -1},
-	{9,                                  IDM_SEARCH,     TBSTATE_ENABLED, TBSTYLE_BUTTON, 0, 0, 0, -1},
-	{7,                                  IDM_SEARCH_PREV,              0, TBSTYLE_BUTTON, 0, 0, 0, -1},
-	{8,                                  IDM_SEARCH_NEXT,              0, TBSTYLE_BUTTON, 0, 0, 0, -1},
-	{0,                                  0,              TBSTATE_ENABLED, TBSTYLE_SEP,    0, 0, 0, -1},
-	{6,                                  IDM_TOGGLEPANE, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0, 0, 0, -1},
-	{10,                                 IDM_TOPMOST,    TBSTATE_ENABLED, TBSTYLE_BUTTON, 0, 0, 0, -1},
-	{0,                                  0,              TBSTATE_ENABLED, TBSTYLE_SEP,    0, 0, 0, -1},
-};
-#endif
-
-///////////////////////////////////////
-// l'agenda version
-#if defined(PLATFORM_BE500)
-
-#define NUM_IMG_BUTTONS 0
-#define NUM_MD_IMG_BUTTONS 0
-
-#define NUM_SV_CMDBAR_BUTTONS 10
-CSOBAR_BUTTONINFO	aSVCSOBarButtons[NUM_SV_CMDBAR_BUTTONS] = 
-{
-	IDM_SV_MENU_1,  CSOBAR_BUTTON_SUBMENU_DOWN,  CSO_BUTTON_DISP, (-1),         NULL, MSG_MEMO, NULL,   CSOBAR_CODEPOS_CENTER, 1, (-1), (-1), (-1), (-1), 0, CLR_INVALID, CLR_INVALID, CLR_INVALID, FALSE, FALSE,
-	IDM_SV_MENU_2,  CSOBAR_BUTTON_SUBMENU_DOWN,  CSO_BUTTON_DISP, IDB_TOOL,     NULL, NULL,     NULL,   CSOBAR_CODEPOS_CENTER, 1, (-1), (-1), (-1), (-1), 0, CLR_INVALID, CLR_INVALID, CLR_INVALID, FALSE, FALSE,
-	0,              CSOBAR_SEP,                  CSO_BUTTON_DISP, (-1),         NULL, NULL,     NULL,   0,                     1, (-1), (-1), (-1), (-1), 0, CLR_INVALID, CLR_INVALID, CLR_INVALID, FALSE, FALSE,
-	IDM_SV_MENU_3,  CSOBAR_BUTTON_SUBMENU_DOWN,  CSO_BUTTON_DISP, IDB_BOOKMARK, NULL, NULL,     NULL,   CSOBAR_CODEPOS_CENTER, 1, (-1), (-1), (-1), (-1), 0, CLR_INVALID, CLR_INVALID, CLR_INVALID, FALSE, FALSE,
-	0,              CSOBAR_SEP,                  CSO_BUTTON_DISP, (-1),         NULL, NULL,     NULL,   0,                     1, (-1), (-1), (-1), (-1), 0, CLR_INVALID, CLR_INVALID, CLR_INVALID, FALSE, FALSE,
-	IDM_NEWMEMO,    CSOBAR_BUTTON_NORM,          CSO_BUTTON_DISP, IDB_NEWMEMO,  NULL, NULL,     NULL,   CSOBAR_CODEPOS_CENTER, 1, (-1), (-1), (-1), (-1), 0, CLR_INVALID, CLR_INVALID, CLR_INVALID, FALSE, FALSE,
-	0,              CSOBAR_SEP,                  CSO_BUTTON_DISP, (-1),         NULL, NULL,     NULL,   0,                     1, (-1), (-1), (-1), (-1), 0, CLR_INVALID, CLR_INVALID, CLR_INVALID, FALSE, FALSE,
-//	IDM_DELETEITEM, CSOBAR_BUTTON_NORM,          CSO_BUTTON_DISP, IDB_DELETE,   NULL, NULL,     NULL,   CSOBAR_CODEPOS_CENTER, 1, (-1), (-1), (-1), (-1), 0, CLR_INVALID, CLR_INVALID, CLR_INVALID, FALSE, FALSE,
-//	0,              CSOBAR_SEP,                  CSO_BUTTON_DISP, (-1),         NULL, NULL,     NULL,   0,                     1, (-1), (-1), (-1), (-1), 0, CLR_INVALID, CLR_INVALID, CLR_INVALID, FALSE, FALSE,
-	IDM_SEARCH,     CSOBAR_BUTTON_NORM,         CSO_BUTTON_DISP, IDB_FIND,      NULL, NULL,     NULL,   CSOBAR_CODEPOS_CENTER, 1, (-1), (-1), (-1), (-1), 0, CLR_INVALID, CLR_INVALID, CLR_INVALID, FALSE, FALSE,
-	IDM_SEARCH_PREV,CSOBAR_BUTTON_NORM,         CSO_BUTTON_DISP, IDB_FINDPREV,  NULL, NULL,     NULL,   CSOBAR_CODEPOS_CENTER, 1, (-1), (-1), (-1), (-1), 0, CLR_INVALID, CLR_INVALID, CLR_INVALID, FALSE, FALSE,
-	IDM_SEARCH_NEXT,CSOBAR_BUTTON_NORM,         CSO_BUTTON_DISP, IDB_FINDNEXT,  NULL, NULL,     NULL,   CSOBAR_CODEPOS_CENTER, 1, (-1), (-1), (-1), (-1), 0, CLR_INVALID, CLR_INVALID, CLR_INVALID, FALSE, FALSE,
-};
-
-#define NUM_DV_CMDBAR_BUTTONS 12
-
-// ビットマップを張る場合にはOnCreateでInstanceを設定すること
-CSOBAR_BUTTONINFO	aDVCSOBarButtons[NUM_DV_CMDBAR_BUTTONS] = 
-{
-	IDM_RETURNLIST, CSOBAR_COMMON_BUTTON,       CSO_BUTTON_DISP, (-1),            NULL, NULL,     NULL,   CSOBAR_CODEPOS_CENTER, 1, (-1), (-1), (-1), (-1), CSO_ID_BACK, CLR_INVALID, CLR_INVALID, CLR_INVALID, FALSE, FALSE,
-	0,              CSOBAR_SEP,                 CSO_BUTTON_DISP, (-1),            NULL, NULL,     NULL,   0,                     1, (-1), (-1), (-1), (-1), 0,           CLR_INVALID, CLR_INVALID, CLR_INVALID, FALSE, FALSE,
-	IDM_DV_MENU_1,  CSOBAR_BUTTON_SUBMENU_DOWN, CSO_BUTTON_DISP, (-1),            NULL, MSG_EDIT, NULL,   CSOBAR_CODEPOS_CENTER, 1, (-1), (-1), (-1), (-1), 0,           CLR_INVALID, CLR_INVALID, CLR_INVALID, FALSE, FALSE,
-	0,              CSOBAR_SEP,                 CSO_BUTTON_DISP, (-1),            NULL, NULL,     NULL,   0,                     1, (-1), (-1), (-1), (-1), 0,           CLR_INVALID, CLR_INVALID, CLR_INVALID, FALSE, FALSE,
-	IDM_SAVE,       CSOBAR_BUTTON_NORM,         CSO_BUTTON_DISP, IDB_SAVE,        NULL, NULL,     NULL,   CSOBAR_CODEPOS_CENTER, 1, (-1), (-1), (-1), (-1), 0,           CLR_INVALID, CLR_INVALID, CLR_INVALID, FALSE, FALSE,
-	0,              CSOBAR_SEP,                 CSO_BUTTON_DISP, (-1),            NULL, NULL,     NULL,   0,                     1, (-1), (-1), (-1), (-1), 0,           CLR_INVALID, CLR_INVALID, CLR_INVALID, FALSE, FALSE,
-	IDM_CUT,        CSOBAR_BUTTON_NORM,         CSO_BUTTON_DISP, IDB_CUT,         NULL, NULL,     NULL,   CSOBAR_CODEPOS_CENTER, 1, (-1), (-1), (-1), (-1), 0,           CLR_INVALID, CLR_INVALID, CLR_INVALID, FALSE, FALSE,
-	IDM_COPY,       CSOBAR_BUTTON_NORM,         CSO_BUTTON_DISP, IDB_COPY,        NULL, NULL,     NULL,   CSOBAR_CODEPOS_CENTER, 1, (-1), (-1), (-1), (-1), 0,           CLR_INVALID, CLR_INVALID, CLR_INVALID, FALSE, FALSE,
-	IDM_PASTE,      CSOBAR_BUTTON_NORM,         CSO_BUTTON_DISP, IDB_PASTE,       NULL, NULL,     NULL,   CSOBAR_CODEPOS_CENTER, 1, (-1), (-1), (-1), (-1), 0,           CLR_INVALID, CLR_INVALID, CLR_INVALID, FALSE, FALSE,
-	0,              CSOBAR_SEP,                 CSO_BUTTON_DISP, (-1),            NULL, NULL,     NULL,   0,                     1, (-1), (-1), (-1), (-1), 0,           CLR_INVALID, CLR_INVALID, CLR_INVALID, FALSE, FALSE,
-	IDM_INSDATE1,   CSOBAR_BUTTON_NORM,         CSO_BUTTON_DISP, IDB_INSDATE1,    NULL, NULL,     NULL,   CSOBAR_CODEPOS_CENTER, 1, (-1), (-1), (-1), (-1), 0,           CLR_INVALID, CLR_INVALID, CLR_INVALID, FALSE, FALSE,
-	IDM_INSDATE2,   CSOBAR_BUTTON_NORM,         CSO_BUTTON_DISP, IDB_INSDATE2,    NULL, NULL,     NULL,   CSOBAR_CODEPOS_CENTER, 1, (-1), (-1), (-1), (-1), 0,           CLR_INVALID, CLR_INVALID, CLR_INVALID, FALSE, FALSE,
-
-//	IDM_SEARCH_PREV,CSOBAR_BUTTON_NORM,         CSO_BUTTON_DISP, IDB_FINDPREV,    NULL, NULL,     NULL,   CSOBAR_CODEPOS_CENTER, 2, (-1), (-1), (-1), (-1), 0,           CLR_INVALID, CLR_INVALID, CLR_INVALID, FALSE, FALSE,
-//	IDM_SEARCH_NEXT,CSOBAR_BUTTON_NORM,         CSO_BUTTON_DISP, IDB_FINDNEXT,    NULL, NULL,     NULL,   CSOBAR_CODEPOS_CENTER, 2, (-1), (-1), (-1), (-1), 0,           CLR_INVALID, CLR_INVALID, CLR_INVALID, FALSE, FALSE,
-};
-
-#endif
 
 ///////////////////////////////////////
 // ctor
 ///////////////////////////////////////
 
-MainFrame::MainFrame() : bResizePane(FALSE), bSelectViewActive(FALSE), pBookMark(NULL), pDetailsView(NULL)
+MainFrame::MainFrame() : bResizePane(FALSE), //bSelectViewActive(FALSE), 
+	vtFocusedView(VT_Unknown),
+	pBookMark(NULL), pDetailsView(NULL), pPlatform(NULL), lCurrentLayout(LT_Unknown)
 {
 }
 
@@ -271,13 +94,13 @@ MainFrame::MainFrame() : bResizePane(FALSE), bSelectViewActive(FALSE), pBookMark
 
 MainFrame::~MainFrame()
 {
-	if (pDetailsView) delete pDetailsView;
-	if (pBookMark) delete pBookMark;
+	delete pDetailsView;
+	delete pBookMark;
+	delete pPlatform;
 }
 
-
 ///////////////////////////////////////
-// ウィンドウクラスの登録
+// Regist window class
 ///////////////////////////////////////
 
 BOOL MainFrame::RegisterClass(HINSTANCE hInst)
@@ -290,7 +113,7 @@ BOOL MainFrame::RegisterClass(HINSTANCE hInst)
 	wc.cbWndExtra = sizeof(LONG);
 	wc.hInstance = hInst;
 	wc.hIcon = NULL;
-#if defined(PLATFORM_PKTPC) || defined(PLATFORM_PSPC) || defined(PLATFORM_BE500)
+#if defined(PLATFORM_PSPC) || defined(PLATFORM_BE500)
 	wc.hCursor = NULL;
 	wc.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);
 #else
@@ -307,7 +130,6 @@ BOOL MainFrame::RegisterClass(HINSTANCE hInst)
 	::RegisterClass(&wc);
 	return TRUE;
 }
-
 
 ///////////////////////////////////////////////////
 // Event Handler
@@ -340,10 +162,10 @@ static LRESULT CALLBACK MainFrameWndProc(HWND hWnd, UINT nMessage, WPARAM wParam
 		if (bRes != 0xFFFFFFFF) return bRes;
 		break;
 	case MWM_SWITCH_VIEW:
-		if (lParam == OPEN_REQUEST_MDVIEW_ACTIVE) {
-			frm->ActivateView(FALSE);
-		} else if (lParam == OPEN_REQUEST_MSVIEW_ACTIVE) {
-			frm->ActivateView(TRUE);
+		if (wParam == OPEN_REQUEST_MDVIEW_ACTIVE) {
+			frm->ActivateView(MainFrame::VT_DetailsView);
+		} else if (wParam == OPEN_REQUEST_MSVIEW_ACTIVE) {
+			frm->ActivateView(MainFrame::VT_SelectView);
 		}
 		return 0;
 	case WM_SETFOCUS:
@@ -489,7 +311,7 @@ int MainFrame::MainLoop() {
 
 #endif
 		// 本来の処理
-		if (!TranslateAccelerator(hMainWnd, bSelectViewActive ? hAccelSv : hAccelDv, &msg)) {
+		if (!TranslateAccelerator(hMainWnd, SelectViewActive() ? hAccelSv : hAccelDv, &msg)) {
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 		}
@@ -498,17 +320,86 @@ int MainFrame::MainLoop() {
 }
 
 ///////////////////////////////////////////////////
-// ウィンドウ生成
+// DetailsView callback
+///////////////////////////////////////////////////
+
+class MFDetailsViewCallback : public MemoDetailsViewCallback {
+	MainFrame *pMainFrame;
+public:
+	MFDetailsViewCallback(MainFrame *p) : pMainFrame(p) {}
+	void GetFocusCallback(MemoDetailsView *pView);
+	void SetModifyStatusCallback(MemoDetailsView *pView);
+	SearchEngineA *GetSearchEngine(MemoDetailsView *pView);
+	void SetReadOnlyStatusCallback(MemoDetailsView *pView);
+	void GetCurrentSelectedPath(MemoDetailsView *pView, TString *pPath);
+
+	void SetSearchFlg(BOOL bFlg);
+};
+
+void MFDetailsViewCallback::GetFocusCallback(MemoDetailsView *pView)
+{
+	if (!g_Property.IsUseTwoPane()) return;
+
+	MainFrame *pMf = pMainFrame;
+	if (pMf) {
+		pMf->SetFocus(MainFrame::VT_DetailsView);
+
+		// menu control
+		pMf->EnableDelete(FALSE);
+		pMf->EnableRename(FALSE);
+		pMf->EnableEncrypt(FALSE);
+		pMf->EnableDecrypt(FALSE);
+		pMf->EnableNewFolder(FALSE);
+		pMf->EnableGrep(FALSE);
+
+		pMf->EnableCut(TRUE);
+		pMf->EnableCopy(TRUE);
+		pMf->EnablePaste(TRUE);
+	}
+	pView->SetModifyStatus();
+}
+
+void MFDetailsViewCallback::SetModifyStatusCallback(MemoDetailsView *pView)
+{
+	pMainFrame->SetModifyStatus(pView->IsModify());
+}
+
+void MFDetailsViewCallback::SetReadOnlyStatusCallback(MemoDetailsView *pView)
+{
+	pMainFrame->SetReadOnlyStatus(pView->IsReadOnly());
+}
+
+SearchEngineA *MFDetailsViewCallback::GetSearchEngine(MemoDetailsView *pView)
+{
+	return pMainFrame->GetManager()->GetSearchEngine();
+}
+
+void MFDetailsViewCallback::GetCurrentSelectedPath(MemoDetailsView *pView, TString *pPath)
+{
+	pMainFrame->GetManager()->GetCurrentSelectedPath(pPath);
+}
+
+void MFDetailsViewCallback::SetSearchFlg(BOOL bFlg)
+{
+	pMainFrame->GetManager()->SetMDSearchFlg(bFlg);
+}
+
+///////////////////////////////////////////////////
+// Create main window
 ///////////////////////////////////////////////////
 
 BOOL MainFrame::Create(LPCTSTR pWndName, HINSTANCE hInst, int nCmdShow)
 {
 	hInstance = hInst;
 
-//	SimpleEditor *pSe = new SimpleEditor();
+	SimpleEditor::RegisterClass(hInst);
+
+	MFDetailsViewCallback *pCb = new MFDetailsViewCallback(this);
+
+//	SimpleEditor *pSe = new SimpleEditor(pCb);
 //	pDetailsView = pSe;
 
-	YAEditor *pYAE = new YAEditor();
+	YAEditor *pYAE = new YAEditor(pCb);
 	pDetailsView = pYAE;
 
 	mmMemoManager.Init(this, pDetailsView, &msView);
@@ -562,19 +453,10 @@ BOOL MainFrame::Create(LPCTSTR pWndName, HINSTANCE hInst, int nCmdShow)
 #endif
 #endif
 
-#if defined(PLATFORM_WIN32)
-	// set app icon
-	HICON hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_TOMBO));
-	SendMessage(hMainWnd, WM_SETICON, (WPARAM)ICON_BIG, (LPARAM)hIcon);
-#endif
-#if defined(PLATFORM_HPC)
-	HICON hIcon =  (HICON)LoadImage(hInstance,
-                                MAKEINTRESOURCE(IDI_TOMBO),
-                                IMAGE_ICON, 16, 16, LR_DEFAULTCOLOR);
-	SendMessage(hMainWnd, WM_SETICON, (WPARAM)ICON_SMALL, (LPARAM)hIcon);
-#endif
+	// set application icon
+	SetAppIcon(hInstance, hMainWnd);
 
-
+	// load window positions
 #if defined(PLATFORM_WIN32)
 	WINDOWPLACEMENT wpl;
 	wpl.length = sizeof(wpl);
@@ -597,55 +479,7 @@ BOOL MainFrame::Create(LPCTSTR pWndName, HINSTANCE hInst, int nCmdShow)
 }
 
 ///////////////////////////////////////////////////
-// コマンドバー生成
-///////////////////////////////////////////////////
-
-#if defined(PLATFORM_PSPC)
-static HWND MakeCommandBar(HINSTANCE hInst, HWND hWnd, 
-						   DWORD nCtlID, WORD nMenuID, 
-						   TBBUTTON *pButtons,
-						   DWORD nButton, DWORD nImages, DWORD nBitmap)
-{
-	HWND h;
-	h = CommandBar_Create(hInst, hWnd, nCtlID);
-	int boffset;
-	CommandBar_AddBitmap(h, HINST_COMMCTRL,IDB_STD_SMALL_COLOR, 15, 0, 0);
-	boffset = CommandBar_AddBitmap(h, hInst, nBitmap, nImages, 0, 0);
-
-	CommandBar_InsertMenubar(h, hInst, nMenuID, 0);
-	CommandBar_AddButtons(h, nButton, pButtons);
-	CommandBar_AddAdornments(h, 0, 0);
-	return h;
-}
-#endif
-
-///////////////////////////////////////////////////
-// CSOBar生成
-///////////////////////////////////////////////////
-#if defined(PLATFORM_BE500)
-static HWND MakeCSOBar(HINSTANCE hInst, HWND hWnd, 
-						   DWORD nCtlID)
-{
-	CSOBAR_BASEINFO cb;
-	cb.x = cb.y = cb.width = cb.height = -1;
-	cb.line = 1;
-	cb.backColor = CSOBAR_DEFAULT_BACKCOLOR;
-	cb.titleColor = CSOBAR_DEFAULT_CODECOLOR;
-	cb.titleText = NULL;
-	cb.titleBmpResId = NULL;
-	cb.titleBmpResIns = NULL;
-
-	HWND h;
-	h = CSOBar_Create(hInst, hWnd, nCtlID, cb);
-	CSOBar_AddAdornments(h, hInst, 1, CSOBAR_ADORNMENT_CLOSE, 0);
-	return h;
-}
-#endif
-
-HWND CreateToolBar(HWND hParent, HINSTANCE hInst);
-
-///////////////////////////////////////////////////
-// ウィンドウ初期化
+// Initialize window
 ///////////////////////////////////////////////////
 
 void MainFrame::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
@@ -653,12 +487,13 @@ void MainFrame::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	hMainWnd = hWnd;
 	LPCREATESTRUCT pcs = (LPCREATESTRUCT)lParam;
 
-	DWORD nHOffset;
+	pPlatform = PLATFORM_TYPE::PlatformFactory();
+	if (!pPlatform || !pPlatform->Init(hMainWnd)) return;
 
 	RECT r;
 	GetClientRect(hWnd, &r);
 
-	// プロパティのロード
+	// load properties
 	BOOL bResult, bStrict;
 	bResult = g_Property.Load(&bStrict);
 	if (!(bResult && bStrict)) {
@@ -671,229 +506,28 @@ void MainFrame::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 			return;
 		}
 	}
+	// create toolbar
+	pPlatform->Create(hWnd, pcs->hInstance);
 
-	nHOffset = 0;
-	// コマンドバー
-#if defined(PLATFORM_PKTPC)
-	SHMENUBARINFO mbi;
-	memset(&mbi, 0, sizeof(SHMENUBARINFO));
-	mbi.cbSize = sizeof(SHMENUBARINFO);
-	mbi.hwndParent = hWnd;
-	mbi.nToolBarId = IDM_MAIN_MENU;
-	mbi.hInstRes =pcs->hInstance;
-	mbi.nBmpId = IDB_TOOLBAR;
-	mbi.cBmpImages = NUM_TOOLBAR_BMP;
-	if (!SHCreateMenuBar(&mbi)) {
-		TomboMessageBox(hWnd, TEXT("SHCreateMenuBar failed."), TEXT("DEBUG"), MB_OK);
-	}
-	hMSCmdBar = mbi.hwndMB;
-
-	SendMessage(hMSCmdBar, TB_SETTOOLTIPS, (WPARAM)NUM_MS_TOOLTIP, (LPARAM)pMSToolTip);
-
-	memset(&mbi, 0, sizeof(SHMENUBARINFO));
-	mbi.cbSize = sizeof(SHMENUBARINFO);
-	mbi.hwndParent = hWnd;
-	mbi.nToolBarId = IDM_DETAILS_MENU;
-	mbi.hInstRes =pcs->hInstance;
-	mbi.nBmpId = IDB_TOOLBAR;
-	mbi.cBmpImages = NUM_TOOLBAR_BMP;
-	if (!SHCreateMenuBar(&mbi)) {
-		TomboMessageBox(hWnd, TEXT("SHCreateMenuBar failed."), TEXT("DEBUG"), MB_OK);
-	}
-	hMDCmdBar = mbi.hwndMB;
-
-	SendMessage(hMDCmdBar, TB_SETTOOLTIPS, (WPARAM)NUM_MD_TOOLTIP, (LPARAM)pMDToolTip);
-
-	ShowWindow(hMDCmdBar, SW_HIDE);
-
-	RECT rMenuRect;
-	GetWindowRect(hMSCmdBar, &rMenuRect);
-	nHOffset = rMenuRect.bottom - rMenuRect.top;
-
-	r.bottom -= nHOffset - 1;
-#endif
-#if defined(PLATFORM_PSPC)
-	hMSCmdBar = MakeCommandBar(pcs->hInstance, hWnd, ID_CMDBAR_MAIN,
-								IDR_MENU_MAIN, aCmdBarButtons, 
-								NUM_CMDBAR_BUTTONS, NUM_IMG_BUTTONS, 
-								IDB_TOOLBAR);
-	hMDCmdBar = MakeCommandBar(pcs->hInstance, hWnd, ID_CMDBAR_DETAILS,
-								IDR_MENU_DETAILS, aMDCmdBarButtons,
-								NUM_MD_CMDBAR_BUTTONS, NUM_IMG_BUTTONS,
-								IDB_TOOLBAR);
-    CommandBar_Show(hMSCmdBar, TRUE);
-	nHOffset = CommandBar_Height(hMSCmdBar);
-	r.top += nHOffset;
-	r.bottom -= nHOffset;
-#endif
-#if defined(PLATFORM_HPC)
-	HWND hBand, hwnd;
-	REBARBANDINFO arbbi[2];
-
-	// CommandBand生成
-	HIMAGELIST himl = ImageList_Create(16,16,ILC_COLOR, 0, 1);
-	HBITMAP hBmp = LoadBitmap(pcs->hInstance, MAKEINTRESOURCE(IDB_REBAR));
-	ImageList_Add(himl, hBmp, (HBITMAP)NULL);
-	DeleteObject(hBmp);
-
-	hBand = CommandBands_Create(pcs->hInstance, hWnd, IDC_CMDBAND,
-								RBS_AUTOSIZE | RBS_VARHEIGHT | RBS_BANDBORDERS | RBS_SMARTLABELS, 
-								himl);
-	arbbi[0].cbSize = sizeof(REBARBANDINFO);
-	arbbi[0].fMask = RBBIM_ID | RBBIM_STYLE | RBBIM_SIZE | RBBIM_IMAGE;
-	arbbi[0].fStyle = RBBS_NOGRIPPER;
-	arbbi[0].wID = ID_CMDBAR_MAIN;
-	arbbi[0].cx = 280;
-	arbbi[0].iImage = 0;
-
-	arbbi[1].cbSize = sizeof(REBARBANDINFO);
-	arbbi[1].fMask = RBBIM_ID | RBBIM_STYLE | RBBIM_SIZE;
-	arbbi[1].fStyle = 0;
-	arbbi[1].wID = ID_BUTTONBAND;
-	arbbi[1].cx = 360;
-
-	// restore commandbar info
-	COMMANDBANDSRESTOREINFO cbri[2];
-	BOOL bRestoreFlg = GetCommandbarInfo(cbri, 2);
-	if (bRestoreFlg) {
-		arbbi[0].fStyle = cbri[0].fStyle;
-		arbbi[0].cx = cbri[0].cxRestored;
-
-		arbbi[1].fMask |= RBBIM_STYLE;
-		arbbi[1].fStyle = cbri[1].fStyle;
-		arbbi[1].cx = cbri[1].cxRestored;
-	}
-
-	CommandBands_AddBands(hBand, pcs->hInstance, 2, arbbi);
-	// 0番目のバンド(メニュー)の設定
-	hwnd = GetCommandBar(hBand, ID_CMDBAR_MAIN);
-	CommandBar_InsertMenubar(hwnd, pcs->hInstance, IDR_MENU_MAIN, 0);
-
-	// 1番目のバンド(ボタン)の設定
-	hwnd = GetCommandBar(hBand, ID_BUTTONBAND);
-
-	CommandBar_AddBitmap(hwnd, HINST_COMMCTRL, IDB_STD_SMALL_COLOR, 15, 0, 0);
-	CommandBar_AddBitmap(hwnd, pcs->hInstance, IDB_TOOLBAR, NUM_IMG_BUTTONS, 0, 0);
-
-	CommandBar_AddButtons(hwnd, sizeof(aCmdBarButtons)/sizeof(TBBUTTON), aCmdBarButtons);
-
-	hMSCmdBar = hBand;
-	CommandBands_AddAdornments(hBand, pcs->hInstance, 0, NULL);
-	nHOffset = CommandBands_Height(hBand);
-	r.top += nHOffset;
-	r.bottom -= nHOffset;
-
-	if (bRestoreFlg) {
-		if (cbri[0].fMaximized) {
-			SendMessage(hBand, RB_MAXIMIZEBAND, 0, (LPARAM)0);
-		}
-		if (cbri[1].fMaximized) {
-			SendMessage(hBand, RB_MAXIMIZEBAND, 1, (LPARAM)0);
-		}
-	}
-	
-#endif
-#if defined(PLATFORM_BE500)
-	// 一覧ビュー
-	hMSCmdBar = MakeCSOBar(pcs->hInstance, hWnd, ID_CMDBAR_MAIN);
-	HMENU hMSMenu = LoadMenu(pcs->hInstance, MAKEINTRESOURCE(IDR_MENU_MAIN));
-	hMSMemoMenu     = aSVCSOBarButtons[0].SubMenu = GetSubMenu(hMSMenu, 0);
-	hMSToolMenu     = aSVCSOBarButtons[1].SubMenu = GetSubMenu(hMSMenu, 1);
-	hMSBookMarkMenu = aSVCSOBarButtons[3].SubMenu = GetSubMenu(hMSMenu, 2);
-	for (int i = 0; i < NUM_SV_CMDBAR_BUTTONS; i++) {
-		aSVCSOBarButtons[i].reshInst = pcs->hInstance;
-	}
-	CSOBar_AddButtons(hMSCmdBar, pcs->hInstance, NUM_SV_CMDBAR_BUTTONS, &aSVCSOBarButtons[0]);
-
-	// 詳細ビュー
-	hMDCmdBar = MakeCSOBar(pcs->hInstance, hWnd, ID_CMDBAR_DETAILS);
-	HMENU hMDMenu = LoadMenu(pcs->hInstance, MAKEINTRESOURCE(IDR_MENU_DETAILS));
-	hMDEditMenu = aDVCSOBarButtons[2].SubMenu	= GetSubMenu(hMDMenu, 0);
-	for (i = 0; i < NUM_DV_CMDBAR_BUTTONS; i++) {
-		aDVCSOBarButtons[i].reshInst = pcs->hInstance;
-	}
-	CSOBar_AddButtons(hMDCmdBar, pcs->hInstance, NUM_DV_CMDBAR_BUTTONS, &aDVCSOBarButtons[0]);
-
-    CSOBar_Show(hMSCmdBar, TRUE);
-	nHOffset = CSOBar_Height(hMSCmdBar);
-	r.top += nHOffset;
-	r.bottom -= nHOffset;
-#endif
-#if defined(PLATFORM_WIN32)
-	// Rebar
-	 hRebar = CreateWindowEx(WS_EX_TOOLWINDOW, REBARCLASSNAME, NULL,
-								WS_BORDER | RBS_BANDBORDERS | RBS_AUTOSIZE | 
-								WS_CHILD|WS_VISIBLE|WS_CLIPSIBLINGS| RBS_TOOLTIPS | 
-								WS_CLIPCHILDREN|RBS_VARHEIGHT,
-								0, 0, 0, 0,
-								hWnd, NULL, pcs->hInstance, NULL);
-	REBARINFO rbi;
-	rbi.cbSize = sizeof(rbi);
-	rbi.fMask = 0;
-	rbi.himl = NULL;
-	SendMessage(hRebar, RB_SETBARINFO, 0, (LPARAM)&rbi);
-
-	hToolBar = CreateToolBar(hRebar, pcs->hInstance);
-
-	REBARBANDINFO rbband;
-	rbband.cbSize = sizeof(rbband);
-	rbband.fMask = RBBIM_SIZE | RBBIM_CHILD | RBBIM_CHILDSIZE | RBBIM_STYLE ;
-	rbband.fStyle = RBBS_CHILDEDGE | RBBS_GRIPPERALWAYS;
-
-	DWORD dwBtnSize = SendMessage(hToolBar, TB_GETBUTTONSIZE, 0, 0);
-
- 	rbband.cbSize = sizeof(rbband);
-	rbband.hwndChild  = hToolBar;
-	rbband.cxMinChild = 0;
-	rbband.cyMinChild = HIWORD(dwBtnSize);
-	rbband.cx         = 250;
-
-	SendMessage(hRebar, RB_INSERTBAND, (WPARAM)-1, (LPARAM)&rbband);
-	SendMessage(hRebar, RB_MAXIMIZEBAND, 0, 0);
-#endif
+	// adjust client area to remove toolbar area
+	pPlatform->AdjustUserRect(&r);
 
 	// Status Bar
-#if defined(PLATFORM_HPC)
-	hStatusBar = CreateStatusWindow(WS_CHILD , TEXT(""), 
-									hWnd, IDC_STATUS);
-#endif
-#if defined(PLATFORM_WIN32)
-	hStatusBar = CreateStatusWindow(WS_CHILD | SBARS_SIZEGRIP, "", 
-									hWnd, IDC_STATUS);
-#endif
-#if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
-	ResizeStatusBar();
-	SendMessage(hStatusBar, SB_SETTEXT, 0 | SBT_NOBORDERS , (LPARAM)"");
 	SetNewMemoStatus(g_Property.IsUseTwoPane());
 	SetModifyStatus(FALSE);
 
+#if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
 	// control show/hide status bar
-	HMENU hMenu = GetMainMenu();
+	HMENU hMenu = pPlatform->GetMainMenu();
 	if (g_Property.HideStatusBar()) {
 		CheckMenuItem(hMenu, IDM_SHOWSTATUSBAR, MF_BYCOMMAND | MF_UNCHECKED);
 	} else {
 		CheckMenuItem(hMenu, IDM_SHOWSTATUSBAR, MF_BYCOMMAND | MF_CHECKED);
-		ShowWindow(hStatusBar, SW_SHOW);
+		pPlatform->ShowStatusBar(TRUE);
 	}	
-
-
 #endif
 
-#if defined(PLATFORM_WIN32)
-	// 1-Pane状態で起動された場合、ツールバーの画面切り替えボタンを押下状態とする
-	if (!g_Property.IsUseTwoPane()) {
-		SendMessage(hToolBar, TB_PRESSBUTTON, IDM_TOGGLEPANE, MAKELONG(TRUE, 0));
-		HMENU hMenu = GetMenu(hWnd);
-		BOOL b = CheckMenuItem(hMenu, IDM_TOGGLEPANE, MF_BYCOMMAND | MF_UNCHECKED);
-	}
-#endif
-#if defined(PLATFORM_HPC)
-	if (!g_Property.IsUseTwoPane()) {
-		HMENU hMenu = CommandBar_GetMenu(GetCommandBar(hMSCmdBar, ID_CMDBAR_MAIN), 0);
-		SendMessage(GetCommandBar(hMSCmdBar, ID_BUTTONBAND), TB_PRESSBUTTON, IDM_TOGGLEPANE, MAKELONG(TRUE, 0));
-		CheckMenuItem(hMenu, IDM_TOGGLEPANE, MF_BYCOMMAND | MF_UNCHECKED);
-	}
-#endif
+	pPlatform->CheckMenu(IDM_TOGGLEPANE, g_Property.IsUseTwoPane());
 
 	// Create edit view
 	pDetailsView->Create(TEXT("MemoDetails"), r, hWnd,  hInstance, g_Property.DetailsViewFont());
@@ -903,17 +537,15 @@ void MainFrame::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	}
 
 	// Create tree view
-	hSelectViewImgList = CreateSelectViewImageList(hInstance);
-	msView.Create(TEXT("MemoSelect"), r, hWnd, IDC_MEMOSELECTVIEW, hInstance, g_Property.SelectViewFont(), hSelectViewImgList);
+	msView.Create(TEXT("MemoSelect"), r, hWnd, IDC_MEMOSELECTVIEW, hInstance, g_Property.SelectViewFont());
 	msView.InitTree(pVFManager);
 
+	// set auto switch mode
 	if (g_Property.IsUseTwoPane()) {
-		// 自動切換えモードに設定
 		msView.SetAutoLoadMode(g_Property.AutoSelectMemo());
 		msView.SetSingleClickMode(g_Property.SingleClickOpenMemo());
-
-		// マルチペインに伴うウィンドウの再レイアウト
 	}
+
 	LoadWinSize(hWnd);
 	pDetailsView->SetMemo(TEXT(""), 0, FALSE);
 
@@ -922,13 +554,14 @@ void MainFrame::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	}
 
 	if (g_Property.IsUseTwoPane()) {
-		// 初期表示時の詳細ビューは新規メモと同様の扱いとする
+		// set new notes
 		mmMemoManager.NewMemo();
 	}
 #if defined(PLATFORM_WIN32)
 	SetTopMost();
 #endif
-	ActivateView(TRUE);
+//	ActivateView(TRUE);
+	ActivateView(VT_SelectView);
 
 	// init password manager
 	pmPasswordMgr.Init(hMainWnd, hInstance);
@@ -946,102 +579,26 @@ void MainFrame::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	if (_tcslen(g_Property.GetDefaultNote()) != 0) {
 		msView.ShowItemByURI(g_Property.GetDefaultNote());
 	}
-
-	// Raize window for some PocketPC devices.
-//	SetForegroundWindow(hMainWnd);
 }
-
-static HIMAGELIST CreateSelectViewImageList(HINSTANCE hInst)
-{
-	HIMAGELIST hImageList;
-	// Create Imagelist.
-	if ((hImageList = ImageList_Create(IMAGE_CX, IMAGE_CY, ILC_MASK, NUM_MEMOSELECT_BITMAPS, 0)) == NULL) return NULL;
-	HBITMAP hBmp = LoadBitmap(hInst, MAKEINTRESOURCE(IDB_MEMOSELECT_IMAGES));
-
-	// Transparent color is GREEN
-	COLORREF rgbTransparent = RGB(0,255,0);
-	ImageList_AddMasked(hImageList, hBmp, rgbTransparent);
-	DeleteObject(hBmp);
-
-	return hImageList;
-}
-
-#if defined(PLATFORM_WIN32)
-///////////////////////////////////////////////////
-// ツールバーの生成
-
-HWND CreateToolBar(HWND hParent, HINSTANCE hInst)
-{
-	HWND hwndTB;
-	TBADDBITMAP tbab;
-
-	hwndTB = CreateWindowEx(WS_EX_TOOLWINDOW, TOOLBARCLASSNAME, (LPSTR)NULL, 
-							WS_CHILD | 
-							WS_CLIPSIBLINGS | WS_CLIPCHILDREN | CCS_NODIVIDER | CCS_NORESIZE |
-							TBSTYLE_FLAT | TBSTYLE_ALTDRAG |
-							TBSTYLE_TOOLTIPS| CCS_ADJUSTABLE ,
-							0, 0, 0, 0, 
-							hParent, (HMENU)IDC_TOOLBAR, hInst, NULL);
-	SendMessage(hwndTB, TB_BUTTONSTRUCTSIZE, (WPARAM)sizeof(TBBUTTON), 0);
-
-	tbab.hInst = hInst;
-	tbab.nID = IDB_TOOLBAR;
-    SendMessage(hwndTB, TB_ADDBITMAP, (WPARAM) 3, (LPARAM) &tbab);  
-
-	tbab.hInst = HINST_COMMCTRL;
-	tbab.nID = IDB_STD_SMALL_COLOR;
-    SendMessage(hwndTB, TB_ADDBITMAP, (WPARAM) NUM_TOOLBAR_BUTTONS, (LPARAM) &tbab);  
-
-    
-	SendMessage(hwndTB, TB_ADDBUTTONS, (WPARAM) NUM_TOOLBAR_BUTTONS, 
-        (LPARAM) (LPTBBUTTON) &aToolbarButtons); 
-     return hwndTB; 
-}
-#endif
-
-#if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
-///////////////////////////////////////////////////
-// resize status bar
-///////////////////////////////////////////////////
-void MainFrame::ResizeStatusBar()
-{
-	RECT r;
-	GetClientRect(hStatusBar, &r);
-	DWORD nHeight = r.bottom - r.top;
-	DWORD nWidth = r.right - r.left;
-
-	int nSep[4];
-
-	DWORD nWndSize = nHeight * 2;
-	nSep[0] = nWidth - nWndSize*3 - nHeight;
-	nSep[1] = nSep[0] + nWndSize;
-	nSep[2] = nSep[1] + nWndSize;
-	nSep[3] = nSep[2] + nWndSize;
-	SendMessage(hStatusBar, SB_SETPARTS, (WPARAM)4, (LPARAM)nSep);
-}
-#endif
 
 ///////////////////////////////////////////////////
 // set status indicator on statusbar
 ///////////////////////////////////////////////////
 
-void MainFrame::SetStatusIndicator(DWORD nPos, LPCTSTR pText, BOOL bDisp)
-{
-#if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
-	LPCTSTR p;
-	if (bDisp) {
-		p = pText;
-	} else {
-		p = TEXT("");
-	}
-	SendMessage(hStatusBar, SB_SETTEXT, nPos, (LPARAM)p);
-#endif
-}
-
 void MainFrame::SetModifyStatus(BOOL bModify)
 {
 	EnableSaveButton(bModify);
-	SetStatusIndicator(3, MSG_UPDATE, bModify);
+	pPlatform->SetStatusIndicator(3, MSG_UPDATE, bModify);
+}
+
+void MainFrame::SetReadOnlyStatus(BOOL bReadOnly) 
+{
+	pPlatform->SetStatusIndicator(1, MSG_RONLY, bReadOnly); 
+}
+
+void MainFrame::SetNewMemoStatus(BOOL bNew)
+{
+	pPlatform->SetStatusIndicator(2, MSG_NEW, bNew); 
 }
 
 ///////////////////////////////////////////////////
@@ -1055,15 +612,15 @@ BOOL MainFrame::OnExit()
 		TCHAR buf[1024];
 		wsprintf(buf, MSG_SAVE_FAILED, GetLastError());
 		TomboMessageBox(hMainWnd, buf, TEXT("ERROR"), MB_ICONSTOP | MB_OK);
-		ActivateView(FALSE);
+//		ActivateView(FALSE);
+		ActivateView(VT_DetailsView);
 		return FALSE;
 	}
 	if (nYNC == IDCANCEL) return FALSE;
 	pmPasswordMgr.ForgetPassword();
-#if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
+
 	SaveWinSize();
 	g_Property.SaveStatusBarStat();
-#endif
 
 	g_Property.SaveWrapTextStat();
 
@@ -1074,8 +631,8 @@ BOOL MainFrame::OnExit()
 	// save rebar info
 	COMMANDBANDSRESTOREINFO cbri[2];
 	cbri[0].cbSize = cbri[1].cbSize = sizeof(COMMANDBANDSRESTOREINFO);
-	CommandBands_GetRestoreInformation(hMSCmdBar, SendMessage(hMSCmdBar, RB_IDTOINDEX, ID_CMDBAR_MAIN, 0), &cbri[0]);
-	CommandBands_GetRestoreInformation(hMSCmdBar, SendMessage(hMSCmdBar, RB_IDTOINDEX, ID_BUTTONBAND, 0), &cbri[1]);
+	CommandBands_GetRestoreInformation(pPlatform->hMSCmdBar, SendMessage(pPlatform->hMSCmdBar, RB_IDTOINDEX, ID_CMDBAR_MAIN, 0), &cbri[0]);
+	CommandBands_GetRestoreInformation(pPlatform->hMSCmdBar, SendMessage(pPlatform->hMSCmdBar, RB_IDTOINDEX, ID_BUTTONBAND, 0), &cbri[1]);
 	SetCommandbarInfo(cbri, 2);
 #endif
 
@@ -1095,10 +652,13 @@ BOOL MainFrame::OnExit()
 void MainFrame::OnCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
 	// First, current active view tries to handle WM_COMMAND
-	if (bSelectViewActive) {
+	switch(vtFocusedView) {
+	case VT_SelectView:
 		if (msView.OnCommand(hWnd, wParam, lParam)) return;
-	} else {
+		break;
+	case VT_DetailsView:
 		if (pDetailsView->OnCommand(hWnd, wParam, lParam)) return;
+		break;
 	}
 
 	// if active view can't handle, try to handle main window.
@@ -1120,7 +680,7 @@ void MainFrame::OnCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		About();
 		break;
 	case IDM_RETURNLIST:
-		OnList(TRUE);
+		LeaveDetailsView(TRUE);
 		break;
 	case IDM_PROPERTY:
 		OnProperty();
@@ -1142,11 +702,9 @@ void MainFrame::OnCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		g_Property.SetWrapText(!g_Property.WrapText());
 		SetWrapText(g_Property.WrapText());
 		break;
-#if defined(PLATFORM_HPC) || defined(PLATFORM_WIN32)
 	case IDM_TOGGLEPANE:
 		TogglePane();
 		break;
-#endif
 #if defined(PLATFORM_WIN32)
 	case IDM_TOPMOST:
 		g_Property.ToggleStayTopMost();
@@ -1188,10 +746,10 @@ void MainFrame::OnCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 }
 
 ///////////////////////////////////////////////////
-// WM_NOTIFYの処理
+// WM_NOTIFY
 ///////////////////////////////////////////////////
-// 基本は各ViewにDispatchする。
-// Dispatchに失敗したらFALSEを返す。
+// basically dispatch to each view.
+// return false if dispatch is failed.
 
 BOOL MainFrame::OnNotify(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
@@ -1213,9 +771,8 @@ BOOL MainFrame::OnNotify(HWND hWnd, WPARAM wParam, LPARAM lParam)
 }
 
 ///////////////////////////////////////////////////
-// システム設定の変更
+// WM_SETTINGCHANGE
 ///////////////////////////////////////////////////
-// 現在はIMEのON/OFFのチェックのみ
 
 void MainFrame::OnSettingChange(WPARAM wParam)
 {
@@ -1244,35 +801,20 @@ void MainFrame::OnSettingChange(WPARAM wParam)
 
 void MainFrame::OnSIPResize(BOOL bImeOn, RECT *pSipRect)
 {
-	DWORD nClientBottom = pSipRect->top;
 
-#ifdef _WIN32_WCE
-#if defined(PLATFORM_PKTPC)
-	RECT r, rWinRect;
-
-	DWORD nDelta = g_Property.SipSizeDelta();
-
-	GetClientRect(hMainWnd, &rWinRect);
-	GetWindowRect(hMSCmdBar, &r);
-	RECT rx;
-	GetWindowRect(hMainWnd, &rx);
-
-	if (bImeOn) {
-		msView.MoveWindow(rWinRect.left, rWinRect.top, rWinRect.right, nClientBottom - rx.top - nDelta);
-		pDetailsView->MoveWindow(rWinRect.left, rWinRect.top, rWinRect.right, nClientBottom - rx.top - nDelta);
-	} else {
-		DWORD nBottom = rWinRect.bottom - (r.bottom - r.top); 
-		msView.MoveWindow(rWinRect.left, rWinRect.top, rWinRect.right, nBottom);
-		pDetailsView->MoveWindow(rWinRect.left, rWinRect.top, rWinRect.right, nBottom);
-	}
+#if defined(PLATFORM_PKTPC) || defined(PLATFORM_BE500)
+	SetLayout();
 #endif
+
+#ifdef COMMENT
 #if defined(PLATFORM_PSPC) || defined(PLATFORM_BE500)
 	DWORD nTop, nBottom;
+	DWORD nClientBottom = pSipRect->top;
 
 #if defined(PLATFORM_PSPC)
-	DWORD nHOffset = CommandBar_Height(hMDCmdBar);
+	DWORD nHOffset = CommandBar_Height(pPlatform->hMDCmdBar);
 #else
-	DWORD nHOffset = CSOBar_Height(hMDCmdBar);
+	DWORD nHOffset = CSOBar_Height(pPlatform->hMDCmdBar);
 #endif
 	nTop = nHOffset;
 	nBottom = 320 - nHOffset * 2;
@@ -1281,9 +823,6 @@ void MainFrame::OnSIPResize(BOOL bImeOn, RECT *pSipRect)
 		GetWindowRect(hMainWnd, &rx);
 		msView.MoveWindow(0, nTop, 240, nClientBottom - rx.top - nTop);
 		pDetailsView->MoveWindow(0, nTop, 240, nClientBottom - rx.top - nTop);
-		
-//		msView.MoveWindow(0, nTop, 240, nBottom - nSipHeight);
-//		mdView.MoveWindow(0, nTop, 240, nBottom - nSipHeight);
 	} else {
 		msView.MoveWindow(0, nTop, 240, nBottom);
 		pDetailsView->MoveWindow(0, nTop, 240, nBottom);
@@ -1293,79 +832,23 @@ void MainFrame::OnSIPResize(BOOL bImeOn, RECT *pSipRect)
 }
 
 ///////////////////////////////////////////////////
-// KeyUpイベントのハンドリング
+// hotkey events
 ///////////////////////////////////////////////////
 
 BOOL MainFrame::OnHotKey(WPARAM wParam, LPARAM lParam)
 {
 	if (::bDisableHotKey) return FALSE;
-	if (bSelectViewActive) {
+	switch (vtFocusedView) {
+	case VT_SelectView:
 		return msView.OnHotKey(hMainWnd, wParam);
-	} else {
+	case VT_DetailsView:
 		return pDetailsView->OnHotKey(hMainWnd, wParam);
 	}
+	return FALSE;
 }
 
 ///////////////////////////////////////////////////
-//  リサイズ
-///////////////////////////////////////////////////
-
-void MainFrame::OnResize(WPARAM wParam, LPARAM lParam)
-{
-#if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
-	WORD fwSizeType = wParam;
-	WORD nWidth = LOWORD(lParam);
-	WORD nHeight = HIWORD(lParam);
-
-#if defined(PLATFORM_WIN32)
-	RECT r;
-	GetWindowRect(hRebar, &r);
-	WORD nRebarH = (WORD)(r.bottom - r.top);
-#endif
-#if defined(PLATFORM_HPC)
-	WORD nRebarH = CommandBands_Height(hMSCmdBar);
-#endif
-
-	WORD wLeftWidth, wHeight;
-	msView.GetSize(&wLeftWidth, &wHeight);
-
-	WORD nStatusHeight;
-	if (g_Property.HideStatusBar()) {
-		nStatusHeight = 0;
-		ShowWindow(hStatusBar, SW_HIDE);
-	} else {
-		RECT rStatus;
-		GetWindowRect(hStatusBar, &rStatus);
-		nStatusHeight = (WORD)(rStatus.bottom - rStatus.top);
-		ShowWindow(hStatusBar, SW_SHOW);
-	}
-
-	if (g_Property.IsUseTwoPane()) {
-		msView.MoveWindow(0, nRebarH , wLeftWidth, nHeight-nRebarH - nStatusHeight);
-		pDetailsView->MoveWindow(wLeftWidth + BORDER_WIDTH, nRebarH, nWidth - wLeftWidth - BORDER_WIDTH, nHeight-nRebarH - nStatusHeight);
-	} else {
-		RECT rc;
-		GetClientRect(hMainWnd, &rc);
-
-		msView.MoveWindow(0, nRebarH, rc.right, rc.bottom - nRebarH - nStatusHeight);
-		pDetailsView->MoveWindow(0, nRebarH, rc.right, rc.bottom - nRebarH - nStatusHeight);
-	}
-
-#endif // PLATFORM_WIN32 || PLATFORM_HPC
-
-#if defined(PLATFORM_WIN32)
-	// Rebar
-	SendMessage(hRebar, WM_SIZE, wParam, lParam);
-#endif
-#if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
-	// Staus bar
-	SendMessage(hStatusBar, WM_SIZE, wParam, lParam);
-	ResizeStatusBar();
-#endif
-}
-
-///////////////////////////////////////////////////
-//  ツールチップ
+//  Tooltips
 ///////////////////////////////////////////////////
 
 void MainFrame::OnTooltip(WPARAM wParam, LPARAM lParam)
@@ -1373,70 +856,69 @@ void MainFrame::OnTooltip(WPARAM wParam, LPARAM lParam)
 }
 
 ///////////////////////////////////////////////////
-//  左ボタン押下
+//  Press left button
 ///////////////////////////////////////////////////
 //
-// ペイン配分の変更開始
+// start splitter moving
 
 void MainFrame::OnLButtonDown(WPARAM wParam, LPARAM lParam)
 {
-#if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
 	WORD fwKeys = wParam;
 	WORD xPos = LOWORD(lParam);
 
 	if (!(fwKeys & MK_LBUTTON)) return;
 	bResizePane = TRUE;
 	SetCapture(hMainWnd);
-#endif
 }
 
 ///////////////////////////////////////////////////
-//  マウスドラッグ
+//  Dragging
 ///////////////////////////////////////////////////
-//
-// ペイン配分の変更中
 
 void MainFrame::OnMouseMove(WPARAM wParam, LPARAM lParam)
 {
-#if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
 	WORD fwKeys = wParam;
 	WORD xPos = LOWORD(lParam);
 
-	SHORT yPos = (SHORT)HIWORD(lParam);
+	if (!(fwKeys & MK_LBUTTON) && !bResizePane) return;
 
 	RECT rClient;
 	GetClientRect(hMainWnd, &rClient);
+
+#if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
+
+	SHORT yPos = (SHORT)HIWORD(lParam);
+
 	SHORT yLimit = (SHORT)rClient.bottom;
+#ifdef COMMENT
 	if (!g_Property.HideStatusBar()) {
 		RECT rStatBar;
-		GetWindowRect(hStatusBar, &rStatBar);
+		pPlatform->GetStatusWindowRect(&rStatBar);
 		yLimit -= (SHORT)rStatBar.bottom;
-
 	}
-
+#endif
 	if (yPos < 0 || yPos > yLimit) return;
-
-	if (!(fwKeys & MK_LBUTTON) && !bResizePane) return;
 	MovePane(xPos);
 #endif
 }
 
 ///////////////////////////////////////////////////
-//  左ボタン開放
+//  Left button up
 ///////////////////////////////////////////////////
 //
-// ペイン配分の変更終了
+// end splitter move
 
 void MainFrame::OnLButtonUp(WPARAM wParam, LPARAM lParam)
 {
-#if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
 	WORD fwKeys = wParam;
 	WORD xPos = LOWORD(lParam);
+	WORD yPos = HIWORD(lParam);
 
 	if (!(fwKeys & MK_LBUTTON) && !bResizePane) return;
 	bResizePane = FALSE;
 	ReleaseCapture();
 
+#if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
 	RECT r;
 	GetClientRect(hMainWnd, &r);
 	WORD wTotalWidth = (WORD)(r.right - r.left);
@@ -1448,51 +930,55 @@ void MainFrame::OnLButtonUp(WPARAM wParam, LPARAM lParam)
 	}
 	MovePane(xPos);
 #endif 
-}
-
-///////////////////////////////////////////////////
-//  ペイン配分の変更処理
-///////////////////////////////////////////////////
-void MainFrame::MovePane(WORD width)
-{
-#if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
-	if (!g_Property.IsUseTwoPane()) return;
-
-	WORD wLeftWidth, wHeight;
-	msView.GetSize(&wLeftWidth, &wHeight);
+#if defined(PLATFORM_PKTPC) || defined(PLATFORM_PSPC) || defined(PLATFORM_BE500)
 	RECT r;
 	GetClientRect(hMainWnd, &r);
-	WORD wTotalWidth = (WORD)(r.right - r.left);
-
-#if defined(PLATFORM_WIN32)
-	RECT r2;
-	GetWindowRect(hRebar, &r2);
-	WORD nRebarH = (WORD)(r2.bottom - r2.top);
-#endif
-#if defined(PLATFORM_HPC)
-	WORD nRebarH = CommandBands_Height(hMSCmdBar);
-#endif
-	msView.MoveWindow(0, nRebarH, width, wHeight);
-	pDetailsView->MoveWindow(width + BORDER_WIDTH , nRebarH, 
-						wTotalWidth - width - BORDER_WIDTH, wHeight);
-#endif
+	WORD wTotalHeight = (WORD)(r.bottom - r.top);
+	if (yPos < 20) {
+		yPos = 20;
+	}
+	if (yPos > wTotalHeight - 20) {
+		yPos = wTotalHeight - 20;
+	}
+	MovePane(yPos);
+#endif 
 }
 
 ///////////////////////////////////////////////////
-// 
+//  move pane spliter
 ///////////////////////////////////////////////////
 
-void MainFrame::SetFocus()
+void MainFrame::MovePane(WORD nSplit)
 {
-	if (bSelectViewActive) {
+	if (!g_Property.IsUseTwoPane()) return;
+	nSplitterSize = nSplit;
+	SetLayout();
+}
+
+///////////////////////////////////////////////////
+// Focus window
+///////////////////////////////////////////////////
+
+void MainFrame::SetFocus(ViewType vt)
+{
+	if (vt != VT_Unknown) {
+		vtFocusedView = vt;
+	}
+
+	switch(vtFocusedView) {
+	case VT_SelectView:
+		pPlatform->CloseDetailsView();
 		msView.SetFocus();
-	} else {
+		break;
+	case VT_DetailsView:
+		pPlatform->OpenDetailsView();
 		pDetailsView->SetFocus();
+		break;
 	}
 }
 
 ///////////////////////////////////////////////////
-// 新規メモ
+// Create new notes
 ///////////////////////////////////////////////////
 
 void MainFrame::NewMemo()
@@ -1502,18 +988,19 @@ void MainFrame::NewMemo()
 		TomboMessageBox(hMainWnd, MSG_GETSIPSTAT_FAILED, TEXT("ERROR"), MB_ICONSTOP | MB_OK);
 	}
 
-	// メモ編集中に新規メモを作成した場合、保存確認して新規メモに移る
+	// if modifying notes, confirm save.
 	if (g_Property.IsUseTwoPane()) {
-		OnList(TRUE);
+		LeaveDetailsView(TRUE);
 	}
 	SetNewMemoStatus(TRUE);
 	mmMemoManager.NewMemo();
 
-	ActivateView(FALSE);
+//	ActivateView(FALSE);
+	ActivateView(VT_DetailsView);
 }
 
 ///////////////////////////////////////////////////
-// 新規フォルダ
+// Create new folder
 ///////////////////////////////////////////////////
 
 void MainFrame::NewFolder(TreeViewItem *pItem)
@@ -1524,10 +1011,127 @@ void MainFrame::NewFolder(TreeViewItem *pItem)
 }
 
 ///////////////////////////////////////////////////
-// メモ一覧に戻る
+// version dialog
 ///////////////////////////////////////////////////
 
-void MainFrame::OnList(BOOL bAskSave)
+void MainFrame::About()
+{
+	AboutDialog dlg;
+	BOOL bPrev = bDisableHotKey;
+	bDisableHotKey = TRUE;
+	dlg.Popup(hInstance, hMainWnd);
+	bDisableHotKey = bPrev;
+}
+
+///////////////////////////////////////////////////
+// Set note's headline to window title
+///////////////////////////////////////////////////
+
+void MainFrame::SetWindowTitle(TomboURI *pURI)
+{
+#if defined(PLATFORM_WIN32) || defined(PLATFORM_PKTPC)
+	if (g_Property.SwitchWindowTitle()) {
+		// change window title
+		LPCTSTR pPrefix = TEXT("Tombo - ");
+		LPCTSTR pBase;
+		TString sHeadLine;
+		if (pURI->GetHeadLine(&sHeadLine)) {
+			pBase = sHeadLine.Get();
+		} else {
+			pBase = TEXT("");
+		}
+		LPCTSTR pWinTitle;
+#if defined(PLATFORM_PKTPC)
+		pWinTitle = pBase;
+#else
+		TString sWinTitle;
+		if (sWinTitle.Join(pPrefix, pBase)) {
+			pWinTitle = sWinTitle.Get();
+		} else {
+			pWinTitle = pPrefix;
+		}
+#endif
+		SetWindowText(hMainWnd, pWinTitle);
+	}
+#endif
+}
+
+///////////////////////////////////////////////////
+// popup edit dialog
+///////////////////////////////////////////////////
+
+#ifdef COMMENT
+void MainFrame::PopupEditViewDlg()
+{
+#if defined(PLATFORM_PKTPC)
+	LPTSTR p = pDetailsView->GetMemo(); // p is deleted by DetailsViewDlg
+
+	DetailsViewDlg dlg;
+	int result = dlg.Popup(g_hInstance, hMainWnd, &mmMemoManager, p);
+
+	if (result == IDYES) {
+	}
+
+#endif
+}
+#endif
+
+///////////////////////////////////////////////////
+// Request open the note
+///////////////////////////////////////////////////
+// switch edit view when bSwitchView is TRUE
+
+void MainFrame::OpenDetailsView(LPCTSTR pURI, DWORD nSwitchView)
+{
+	TomboURI uri;
+	if (!uri.Init(pURI)) return;
+
+	if (((nSwitchView & OPEN_REQUEST_MSVIEW_ACTIVE) == 0) && (uri.IsEncrypted() && !pmPasswordMgr.IsRememberPassword())) {
+		// bSwitchViewがFALSEで、メモを開くためにパスワードを問い合わせる必要がある場合には
+		// メモは開かない
+		return;
+	}
+	mmMemoManager.SetMemo(&uri);
+	SetNewMemoStatus(FALSE);
+
+	SetWindowTitle(&uri);
+
+	if (g_Property.IsUseTwoPane()) {
+		if (nSwitchView & OPEN_REQUEST_MSVIEW_ACTIVE) {
+			ActivateView(VT_DetailsView);
+		}
+	} else {
+		ActivateView(VT_DetailsView);
+	}
+}
+
+///////////////////////////////////////////////////
+// load notes
+///////////////////////////////////////////////////
+
+void MainFrame::LoadMemo(LPCTSTR pURI, BOOL bAskPass)
+{
+	TomboURI uri;
+	if (!uri.Init(pURI)) return;
+
+	if (uri.IsEncrypted() && 
+		!pmPasswordMgr.IsRememberPassword() &&
+		bAskPass == FALSE) {
+		// if TOMBO doesn't keep password even though it is need
+		// and caller don't want to ask password, nothing to do
+		return;
+	}
+	mmMemoManager.SetMemo(&uri);
+	SetNewMemoStatus(FALSE);
+
+	SetWindowTitle(&uri);
+}
+
+///////////////////////////////////////////////////
+// leave edit view and return to treeview
+///////////////////////////////////////////////////
+
+void MainFrame::LeaveDetailsView(BOOL bAskSave)
 {
 	SipControl sc;
 	if (!sc.Init() || !sc.SetSipStat(FALSE)) {
@@ -1546,19 +1150,21 @@ void MainFrame::OnList(BOOL bAskSave)
 		TCHAR buf[1024];
 		wsprintf(buf, MSG_SAVE_FAILED, GetLastError());
 		TomboMessageBox(hMainWnd, buf, TEXT("ERROR"), MB_ICONSTOP | MB_OK);
-		ActivateView(FALSE);
+//		ActivateView(FALSE);
+		ActivateView(VT_DetailsView);
 		return;
 	}
 	if (nYNC == IDCANCEL) return;
 
-	ActivateView(TRUE);
+//	ActivateView(TRUE);
+	ActivateView(VT_SelectView);
 
 	if (g_Property.IsUseTwoPane()) {
-		// 2Paneの場合、暗号化されたメモのみクリアする
+		// clear encrypted notes if two pane mode
 		if (nYNC == IDNO) {
-			// メモを破棄し、旧メモをリロード
+			// discard current note and load old one.
 			if (mmMemoManager.GetCurrentURI()) {
-				RequestOpenMemo(mmMemoManager.GetCurrentURI(), OPEN_REQUEST_MDVIEW_ACTIVE);
+				OpenDetailsView(mmMemoManager.GetCurrentURI(), OPEN_REQUEST_MDVIEW_ACTIVE);
 			} else {
 				mmMemoManager.NewMemo();
 			}
@@ -1584,384 +1190,158 @@ void MainFrame::OnList(BOOL bAskSave)
 }
 
 ///////////////////////////////////////////////////
-// バージョン情報表示
-///////////////////////////////////////////////////
-
-void MainFrame::About()
-{
-	AboutDialog dlg;
-	BOOL bPrev = bDisableHotKey;
-	bDisableHotKey = TRUE;
-	dlg.Popup(hInstance, hMainWnd);
-	bDisableHotKey = bPrev;
-}
-
-///////////////////////////////////////////////////
-// Request open the note
-///////////////////////////////////////////////////
-// bSwitchViewがTRUEの場合には詳細ビューに切り替える
-
-void MainFrame::RequestOpenMemo(LPCTSTR pURI, DWORD nSwitchView)
-{
-	TomboURI uri;
-	if (!uri.Init(pURI)) return;
-
-	if (((nSwitchView & OPEN_REQUEST_MSVIEW_ACTIVE) == 0) && (uri.IsEncrypted() && !pmPasswordMgr.IsRememberPassword())) {
-		// bSwitchViewがFALSEで、メモを開くためにパスワードを問い合わせる必要がある場合には
-		// メモは開かない
-		return;
-	}
-	mmMemoManager.SetMemo(&uri);
-	SetNewMemoStatus(FALSE);
-
-#if defined(PLATFORM_WIN32) || defined(PLATFORM_PKTPC)
-	if (g_Property.SwitchWindowTitle()) {
-		// change window title
-		LPCTSTR pPrefix = TEXT("Tombo - ");
-		LPCTSTR pBase;
-		TString sHeadLine;
-		if (uri.GetHeadLine(&sHeadLine)) {
-			pBase = sHeadLine.Get();
-		} else {
-			pBase = TEXT("");
-		}
-		LPCTSTR pWinTitle;
-#if defined(PLATFORM_PKTPC)
-		pWinTitle = pBase;
-#else
-		TString sWinTitle;
-		if (sWinTitle.Join(pPrefix, pBase)) {
-			pWinTitle = sWinTitle.Get();
-		} else {
-			pWinTitle = pPrefix;
-		}
-#endif
-		SetWindowText(hMainWnd, pWinTitle);
-	}
-#endif
-
-	if (!(nSwitchView & OPEN_REQUEST_NO_ACTIVATE_VIEW)) {
-		if (g_Property.IsUseTwoPane()) {
-			if (nSwitchView & OPEN_REQUEST_MSVIEW_ACTIVE) {
-				ActivateView(FALSE);
-			}
-		} else {
-			ActivateView(FALSE);
-		}
-	}
-}
-
-///////////////////////////////////////////////////
 // switch view
 ///////////////////////////////////////////////////
-// if bList is TRUE, activate TreeView.
-// if FALSE, activate EditView
 
-void MainFrame::ActivateView(BOOL bList)
+void MainFrame::ActivateView(ViewType vt)
 {
-	if (bSelectViewActive == bList) return;
-
-	bSelectViewActive = bList;
-
-	// メニューのコントロール
-#if defined(PLATFORM_WIN32)
-	HMENU hMenu = GetMenu(hMainWnd);
-	ControlMenu(hMenu, bSelectViewActive);
-	ControlToolbar(hToolBar, bSelectViewActive);
-#endif
-#if defined(PLATFORM_HPC)
-	HMENU hMenu = CommandBar_GetMenu(GetCommandBar(hMSCmdBar, ID_CMDBAR_MAIN), 0);
-	ControlMenu(hMenu, bSelectViewActive);
-	ControlToolbar(GetCommandBar(hMSCmdBar, ID_BUTTONBAND), bSelectViewActive);
-#endif
-
-	if (g_Property.IsUseTwoPane()) {
-		// 2-Pane版では両ビューを同時表示
-		pDetailsView->Show(SW_SHOW);
-		msView.Show(SW_SHOW);
-	} else {
-		// CE版(& CEデバグ版 on Win32) ではビューの切り替えを行う
-		// ビューの表示・非表示の切り替え
-		// コマンドバーの切り替え
-		// フォーカスの切り替え
-
-		if (bSelectViewActive) {
-			// tree view
-			pDetailsView->Show(SW_HIDE);
-			msView.Show(SW_SHOW);
-#if defined(PLATFORM_PKTPC)
-			ShowWindow(hMDCmdBar, SW_HIDE);
-			ShowWindow(hMSCmdBar, SW_SHOW);
-#endif
-#if defined(PLATFORM_PSPC) 
-			CommandBar_Show(hMDCmdBar, SW_HIDE);
-			CommandBar_Show(hMSCmdBar, SW_SHOW);
-#endif
-#if defined(PLATFORM_BE500)
-			CSOBar_Show(hMDCmdBar, SW_HIDE);
-			CSOBar_Show(hMSCmdBar, SW_SHOW);
-#endif
-		} else {
-			// edit view
-			msView.Show(SW_HIDE);
-			pDetailsView->Show(SW_SHOW);
-
-#if defined(PLATFORM_PKTPC)
-			ShowWindow(hMSCmdBar, SW_HIDE);
-			ShowWindow(hMDCmdBar, SW_SHOW);
-#endif
-#if defined(PLATFORM_PSPC)
-			CommandBar_Show(hMSCmdBar, SW_HIDE);
-			CommandBar_Show(hMDCmdBar, SW_SHOW);
-#endif
-#if defined(PLATFORM_BE500)
-			CSOBar_Show(hMSCmdBar, SW_HIDE);
-			CSOBar_Show(hMDCmdBar, SW_SHOW);
-#endif
-		}
+	if (vt == vtFocusedView) {
+		SetFocus();
+		return;
 	}
+
+	vtFocusedView = vt;
+	SetLayout();
 	SetFocus();
 }
 
 ///////////////////////////////////////////////////
-// menu control
+// change layout
+///////////////////////////////////////////////////
 
-#if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
-static void ControlMenu(HMENU hMenu, BOOL bSelectViewActive)
+void MainFrame::SetLayout()
 {
-	UINT uDisableFlg = MF_BYCOMMAND | MF_GRAYED;
-#if defined(PLATFORM_WIN32)
-	uDisableFlg |= MF_DISABLED;
+	if (g_Property.IsUseTwoPane()) {
+#if defined(PLATFORM_HPC) || defined(PLATFORM_WIN32)
+		ChangeLayout(LT_TwoPane);
 #endif
-
-	UINT uFlg1, uFlg2;
-	if (bSelectViewActive) {
-		uFlg1 = MF_BYCOMMAND | MF_ENABLED;
-		uFlg2 = uDisableFlg;
+#if defined(PLATFORM_PKTPC) || defined(PLATFORM_PSPC) || defined(PLATFORM_BE500)
+		switch(vtFocusedView) {
+		case VT_SelectView:
+			ChangeLayout(LT_TwoPane);
+			break;
+		case VT_DetailsView:
+			ChangeLayout(LT_OnePaneDetailsView);
+			break;
+		}
+#endif
 	} else {
-		uFlg1 = uDisableFlg;
-		uFlg2 = MF_BYCOMMAND | MF_ENABLED;
+		switch (vtFocusedView) {
+		case VT_SelectView:
+			ChangeLayout(LT_OnePaneSelectView);
+			break;
+		case VT_DetailsView:
+			ChangeLayout(LT_OnePaneDetailsView);
+			break;
+		}
+	}
+}
+
+///////////////////////////////////////////////////
+// Switch pane mode
+///////////////////////////////////////////////////
+void MainFrame::TogglePane()
+{
+	pPlatform->CheckMenu(IDM_TOGGLEPANE, !g_Property.IsUseTwoPane());
+
+	if (g_Property.IsUseTwoPane()) {
+		SaveWinSize();
 	}
 
-	EnableMenuItem(hMenu, IDM_FORGETPASS, uFlg1);
-	EnableMenuItem(hMenu, IDM_PROPERTY, uFlg1);
-//	EnableMenuItem(hMenu, IDM_TOGGLEPANE, uFlg1);
+	DWORD nPane = g_Property.IsUseTwoPane() ? MF_UNCHECKED : MF_CHECKED;
+	g_Property.SetUseTwoPane(nPane);
 
-	EnableMenuItem(hMenu, IDM_INSDATE1, uFlg2);
-	EnableMenuItem(hMenu, IDM_INSDATE2, uFlg2);
-	EnableMenuItem(hMenu, IDM_DETAILS_HSCROLL, uFlg2);
+	SetLayout();
 }
-#endif
 
 ///////////////////////////////////////////////////
-// update menus status on toolbar
+// Switch pane
 ///////////////////////////////////////////////////
-void MainFrame::EnableMenu(UINT uId, BOOL bEnable)
+
+void MainFrame::ChangeLayout(LayoutType layout)
 {
+	pPlatform->ShowStatusBar(!g_Property.HideStatusBar());
+
+	// get tree/edit view area
+	RECT r, rc;
+	GetClientRect(hMainWnd, &r);
+	rc = r;
+	pPlatform->AdjustUserRect(&rc);
+
+	switch(layout) {
+	case LT_TwoPane:
+		{
 #if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
-	HMENU hMenu = GetMainMenu();
-	UINT uDisableFlg = MF_BYCOMMAND | MF_GRAYED;
-#if defined(PLATFORM_WIN32)
-	uDisableFlg |= MF_DISABLED;
+			// split vertical
+			msView.MoveWindow(rc.left, rc.top , nSplitterSize, rc.bottom);
+			pDetailsView->MoveWindow(nSplitterSize + BORDER_WIDTH, rc.top, rc.right - nSplitterSize - BORDER_WIDTH, rc.bottom);
+#else
+			// split horizontal
+			msView.MoveWindow(rc.left, rc.top , rc.right, nSplitterSize);
+//			pDetailsView->MoveWindow(rc.left, rc.top + nSplitterSize + BORDER_WIDTH, rc.right, rc.bottom - nSplitterSize - BORDER_WIDTH - rc.top);
+			pDetailsView->MoveWindow(
+				rc.left, rc.top + nSplitterSize + BORDER_WIDTH, 
+				rc.right, rc.bottom - nSplitterSize - BORDER_WIDTH);
 #endif
 
-	UINT uFlg1;
-	if (bEnable) {
-		uFlg1 = MF_BYCOMMAND | MF_ENABLED;
-	} else {
-		uFlg1 = uDisableFlg;
+			msView.Show(SW_SHOW);
+			pDetailsView->Show(SW_SHOW);
+		}
+		break;
+	case LT_OnePaneSelectView:
+		{
+			WORD wLeftWidth, wHeight;
+			msView.GetSize(&wLeftWidth, &wHeight);
+
+			msView.MoveWindow(rc.left, rc.top, rc.right, rc.bottom);
+			pDetailsView->MoveWindow(rc.left, rc.top, rc.right, rc.bottom);
+
+			pDetailsView->Show(SW_HIDE);
+			msView.Show(SW_SHOW);
+		}
+		break;
+	case LT_OnePaneDetailsView:
+		{
+			WORD wLeftWidth, wHeight;
+			msView.GetSize(&wLeftWidth, &wHeight);
+
+			msView.MoveWindow(rc.left, rc.top, rc.right, rc.bottom);
+			pDetailsView->MoveWindow(rc.left, rc.top, rc.right, rc.bottom);
+
+			pDetailsView->Show(SW_SHOW);
+			msView.Show(SW_HIDE);
+		}
+		break;
 	}
-	EnableMenuItem(hMenu, uId, uFlg1);
-#endif
+	lCurrentLayout = layout;
+
+	// Staus bar & rebar
+	pPlatform->ResizeStatusBar(0, MAKELPARAM(r.right - r.left, r.bottom - r.top));
 }
 
-
 ///////////////////////////////////////////////////
-// update button status on toolbar
+//  Resize window
 ///////////////////////////////////////////////////
 
-#if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
-static void ControlToolbar(HWND hToolbar, BOOL bSelectViewActive)
+void MainFrame::OnResize(WPARAM wParam, LPARAM lParam)
 {
-	SendMessage(hToolbar, TB_ENABLEBUTTON, IDM_INSDATE1, MAKELONG(!bSelectViewActive, 0));
-	SendMessage(hToolbar, TB_ENABLEBUTTON, IDM_INSDATE2, MAKELONG(!bSelectViewActive, 0));
-
-//	SendMessage(hToolbar, TB_ENABLEBUTTON, IDM_TOGGLEPANE, MAKELONG(bSelectViewActive, 0));
+	SetLayout();
 }
-#endif
 
 ///////////////////////////////////////////////////
 // Menu control
 ///////////////////////////////////////////////////
-
-void MainFrame::EnableEncrypt(BOOL bEnable)
-{
-	HMENU hMenu = GetMSEditMenu();
-	if (bEnable) {
-		EnableMenuItem(hMenu, IDM_ENCRYPT, MF_BYCOMMAND | MF_ENABLED);
-	} else {
-		EnableMenuItem(hMenu, IDM_ENCRYPT, MF_BYCOMMAND | MF_GRAYED);
-	}
-}
-
-void MainFrame::EnableDecrypt(BOOL bEnable)
-{
-	HMENU hMenu = GetMSEditMenu();
-	if (bEnable) {
-		EnableMenuItem(hMenu, IDM_DECRYPT, MF_BYCOMMAND | MF_ENABLED);
-	} else {
-		EnableMenuItem(hMenu, IDM_DECRYPT, MF_BYCOMMAND | MF_GRAYED);
-	}
-}
-
-void MainFrame::EnableDelete(BOOL bEnable)
-{
-#if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
-	EnableMenu(IDM_DELETEITEM, bEnable);
-	SendMessage(GetMainToolBar(), TB_ENABLEBUTTON, IDM_DELETEITEM, MAKELONG(bEnable, 0));
-#endif
-#if defined(PLATFORM_PKTPC) || defined(PLATFORM_BE500) || defined(PLATFORM_PSPC)
-	HMENU hMenu = GetMSEditMenu();
-	if (bEnable) {
-		EnableMenuItem(hMenu, IDM_DELETEITEM, MF_BYCOMMAND | MF_ENABLED);
-	} else {
-		EnableMenuItem(hMenu, IDM_DELETEITEM, MF_BYCOMMAND | MF_GRAYED);
-	}
-#endif
-#if defined(PLATFORM_BE500)
-	if (bEnable) {
-		CSOBar_SetButtonState(hMSCmdBar, TRUE, IDM_DELETEITEM, 1, CSO_BUTTON_DISP);
-	} else {
-		CSOBar_SetButtonState(hMSCmdBar, TRUE, IDM_DELETEITEM, 1, CSO_BUTTON_GRAYED);
-	}
-#endif
-}
-
-void MainFrame::EnableRename(BOOL bEnable)
-{
-#if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
-	EnableMenu(IDM_RENAME, bEnable);
-#endif
-#if defined(PLATFORM_PKTPC) || defined(PLATFORM_BE500) || defined(PLATFORM_PSPC)
-	HMENU hMenu = GetMSEditMenu();
-	if (bEnable) {
-		EnableMenuItem(hMenu, IDM_RENAME, MF_BYCOMMAND | MF_ENABLED);
-	} else {
-		EnableMenuItem(hMenu, IDM_RENAME, MF_BYCOMMAND | MF_GRAYED);
-	}
-#endif
-}
-
-void MainFrame::EnableNew(BOOL bEnable)
-{
-#if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
-	EnableMenu(IDM_NEWMEMO, bEnable);
-	SendMessage(GetMainToolBar(), TB_ENABLEBUTTON, IDM_NEWMEMO, MAKELONG(bEnable, 0));
-#endif
-#if defined(PLATFORM_PKTPC)
-	HMENU hMenu = GetMSEditMenu();
-	if (bEnable) {
-		EnableMenuItem(hMenu, IDM_NEWMEMO, MF_BYCOMMAND | MF_ENABLED);
-	} else {
-		EnableMenuItem(hMenu, IDM_NEWMEMO, MF_BYCOMMAND | MF_GRAYED);
-	}
-	SendMessage(hMSCmdBar, TB_ENABLEBUTTON, IDM_NEWMEMO, MAKELONG(bEnable, 0));
-#endif
-#if defined(PLATFORM_BE500) || defined(PLATFORM_PSPC)
-	HMENU hMenu = GetMSEditMenu();
-	if (bEnable) {
-		EnableMenuItem(hMenu, IDM_NEWMEMO, MF_BYCOMMAND | MF_ENABLED);
-	} else {
-		EnableMenuItem(hMenu, IDM_NEWMEMO, MF_BYCOMMAND | MF_GRAYED);
-	}
-#endif
-}
-
-void MainFrame::EnableCut(BOOL bEnable)
-{
-#if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
-	EnableMenu(IDM_CUT, bEnable);
-	SendMessage(GetMainToolBar(), TB_ENABLEBUTTON, IDM_CUT, MAKELONG(bEnable, 0));
-#endif
-#if defined(PLATFORM_PKTPC) || defined(PLATFORM_BE500) || defined(PLATFORM_PSPC)
-	HMENU hMenu = GetMSEditMenu();
-	if (bEnable) {
-		EnableMenuItem(hMenu, IDM_CUT, MF_BYCOMMAND | MF_ENABLED);
-	} else {
-		EnableMenuItem(hMenu, IDM_CUT, MF_BYCOMMAND | MF_GRAYED);
-	}
-#endif
-}
-
-void MainFrame::EnableCopy(BOOL bEnable)
-{
-#if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
-	EnableMenu(IDM_COPY, bEnable);
-	SendMessage(GetMainToolBar(), TB_ENABLEBUTTON, IDM_COPY, MAKELONG(bEnable, 0));
-#endif
-#if defined(PLATFORM_PKTPC) || defined(PLATFORM_BE500) || defined(PLATFORM_PSPC)
-	HMENU hMenu = GetMSEditMenu();
-	if (bEnable) {
-		EnableMenuItem(hMenu, IDM_COPY, MF_BYCOMMAND | MF_ENABLED);
-	} else {
-		EnableMenuItem(hMenu, IDM_COPY, MF_BYCOMMAND | MF_GRAYED);
-	}
-#endif
-}
-
-void MainFrame::EnablePaste(BOOL bEnable)
-{
-#if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
-	EnableMenu(IDM_PASTE, bEnable);
-	SendMessage(GetMainToolBar(), TB_ENABLEBUTTON, IDM_PASTE, MAKELONG(bEnable, 0));
-#endif
-#if defined(PLATFORM_PKTPC) || defined(PLATFORM_BE500) || defined(PLATFORM_PSPC)
-	HMENU hMenu = GetMSEditMenu();
-	if (bEnable) {
-		EnableMenuItem(hMenu, IDM_PASTE, MF_BYCOMMAND | MF_ENABLED);
-	} else {
-		EnableMenuItem(hMenu, IDM_PASTE, MF_BYCOMMAND | MF_GRAYED);
-	}
-#endif
-}
-
-void MainFrame::EnableNewFolder(BOOL bEnable)
-{
-#if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
-	EnableMenu(IDM_NEWFOLDER, bEnable);
-#endif
-#if defined(PLATFORM_PKTPC) || defined(PLATFORM_PSPC)
-	HMENU hMenu = GetMSEditMenu();
-	if (bEnable) {
-		EnableMenuItem(hMenu, IDM_NEWFOLDER, MF_BYCOMMAND | MF_ENABLED);
-	} else {
-		EnableMenuItem(hMenu, IDM_NEWFOLDER, MF_BYCOMMAND | MF_GRAYED);
-	}
-#endif
-#if defined(PLATFORM_BE500)
-	HMENU hMenu = GetMSToolMenu();
-	if (bEnable) {
-		EnableMenuItem(hMenu, IDM_NEWFOLDER, MF_BYCOMMAND | MF_ENABLED);
-	} else {
-		EnableMenuItem(hMenu, IDM_NEWFOLDER, MF_BYCOMMAND | MF_GRAYED);
-	}
-#endif
-}
-
-void MainFrame::EnableGrep(BOOL bEnable)
-{
-#if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
-	EnableMenu(IDM_GREP, bEnable);
-#endif
-#if defined(PLATFORM_PKTPC) || defined(PLATFORM_BE500) || defined(PLATFORM_PSPC)
-	HMENU hMenu = GetMSEditMenu();
-	if (bEnable) {
-		EnableMenuItem(hMenu, IDM_GREP, MF_BYCOMMAND | MF_ENABLED);
-	} else {
-		EnableMenuItem(hMenu, IDM_GREP, MF_BYCOMMAND | MF_GRAYED);
-	}
-#endif
-}
+void MainFrame::EnableEncrypt(BOOL bEnable) { pPlatform->EnableMenu(IDM_ENCRYPT, bEnable);}
+void MainFrame::EnableDecrypt(BOOL bEnable) { pPlatform->EnableMenu(IDM_DECRYPT, bEnable);}
+void MainFrame::EnableDelete(BOOL bEnable) { pPlatform->EnableMenu(IDM_DELETEITEM, bEnable); }
+void MainFrame::EnableRename(BOOL bEnable) { pPlatform->EnableMenu(IDM_RENAME, bEnable); }
+void MainFrame::EnableNew(BOOL bEnable) { pPlatform->EnableMenu(IDM_NEWMEMO, bEnable); }
+void MainFrame::EnableCut(BOOL bEnable) { pPlatform->EnableMenu(IDM_CUT, bEnable); }
+void MainFrame::EnableCopy(BOOL bEnable) { pPlatform->EnableMenu(IDM_COPY, bEnable); }
+void MainFrame::EnablePaste(BOOL bEnable) { pPlatform->EnableMenu(IDM_PASTE, bEnable); }
+void MainFrame::EnableNewFolder(BOOL bEnable) { pPlatform->EnableMenu(IDM_NEWFOLDER, bEnable); }
+void MainFrame::EnableGrep(BOOL bEnable) { pPlatform->EnableMenu(IDM_GREP, bEnable);}
+void MainFrame::EnableSaveButton(BOOL bEnable) { pPlatform->EnableMenu(IDM_SAVE, bEnable); }
 
 ///////////////////////////////////////////////////
 // erase password information
@@ -1974,7 +1354,8 @@ void MainFrame::OnForgetPass()
 		TCHAR buf[1024];
 		wsprintf(buf, MSG_SAVE_FAILED, GetLastError());
 		TomboMessageBox(hMainWnd, buf, TEXT("ERROR"), MB_ICONSTOP | MB_OK);
-		ActivateView(FALSE);
+//		ActivateView(FALSE);
+		ActivateView(VT_DetailsView);
 		return;
 	}
 	if (nYNC == IDCANCEL) return;
@@ -2028,18 +1409,14 @@ void MainFrame::OnProperty()
 void MainFrame::OnTimer(WPARAM nTimerID)
 {
 	if (nTimerID == 0) {
-		if (!bSelectViewActive) {
+		if (!SelectViewActive()) {
 			if (mmMemoManager.GetCurrentURI()) {
 				TomboURI uri;
 				if (!uri.Init(mmMemoManager.GetCurrentURI())) return;
 				if (uri.IsEncrypted()) {
-					OnList(FALSE);
+					LeaveDetailsView(FALSE);
 				}
 			}
-//			MemoNote *pCurrent = mmMemoManager.CurrentNote();
-//			if (pCurrent && pCurrent->IsEncrypted()) {
-//				OnList(FALSE);
-//			}
 		}
 		pmPasswordMgr.ForgetPassword();
 	} else if (nTimerID == ID_PASSWORDTIMER) {
@@ -2113,12 +1490,10 @@ BOOL MainFrame::EnableApplicationButton(HWND hWnd)
 
 void MainFrame::SaveWinSize()
 {
-#if defined(PLATFORM_HPC) || defined(PLATFORM_WIN32)
-
 	RECT r;
 	UINT flags, showCmd;
 
-#if defined(PLATFORM_HPC)
+#if defined(PLATFORM_HPC) || defined(PLATFORM_PKTPC) || defined(PLATFORM_PSPC) || defined(PLATFORM_BE500)
 	GetWindowRect(hMainWnd,&r);
 	flags = showCmd = 0;
 #else
@@ -2130,24 +1505,21 @@ void MainFrame::SaveWinSize()
 	showCmd = wpl.showCmd;
 #endif
 
-	WORD nWidth;
+	WORD nPane;
 	if (g_Property.IsUseTwoPane()) {
-		WORD nHeight;
-		msView.GetSize(&nWidth, &nHeight);
+		nPane = nSplitterSize;
 	} else {
 		UINT u1, u2;
 		RECT r2;
-		if (!Property::GetWinSize(&u1, &u2, &r2, &nWidth)) {
-			nWidth = (r.right - r.left) / 3;	
+		if (!Property::GetWinSize(&u1, &u2, &r2, &nPane)) {
+#if defined(PLATFORM_PKTPC) || defined(PLATFORM_BE500) || defined(PLATFORM_PSPC)
+			nPane = (r.bottom - r.top) / 3 * 2;
+#else
+			nPane = (r.right - r.left) / 3;	
+#endif
 		}
 	}
-//	r.bottom = r.bottom - r.top;
-//	r.right = r.right - r.left;
-//	Property::SaveWinSize(0, 0, &r, nWidth);
-
-//	Property::SaveWinSize2(wpl.flags, wpl.showCmd, &(wpl.rcNormalPosition), nWidth);
-	Property::SaveWinSize(flags, showCmd, &r, nWidth);
-#endif
+	Property::SaveWinSize(flags, showCmd, &r, nPane);
 }
 
 ///////////////////////////////////////////////////
@@ -2156,101 +1528,19 @@ void MainFrame::SaveWinSize()
 
 void MainFrame::LoadWinSize(HWND hWnd)
 {
-#if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
 	RECT rMainFrame;
-	WORD nSelectViewWidth;
 	RECT rClientRect;
 	GetClientRect(hWnd, &rClientRect);
 
 	UINT u1, u2;
-	if (!Property::GetWinSize(&u1, &u2, &rMainFrame, &nSelectViewWidth)) {
-		nSelectViewWidth = (rClientRect.right - rClientRect.left) / 3;	
-	} else {
-#if defined(PLATFORM_HPC)
-		rMainFrame = rClientRect;
+	if (!Property::GetWinSize(&u1, &u2, &rMainFrame, &nSplitterSize)) {
+#if defined(PLATFORM_PKTPC) || defined(PLATFORM_BE500) || defined(PLATFORM_PSPC)
+		nSplitterSize = (rClientRect.right - rClientRect.left) / 3 * 2;
+#else
+		nSplitterSize = (rClientRect.right - rClientRect.left) / 3;
 #endif
-		MoveWindow(hWnd, rMainFrame.left, rMainFrame.top, rMainFrame.right, rMainFrame.bottom, TRUE);
 	}
-
-	msView.MoveWindow(0, 0, nSelectViewWidth, rClientRect.bottom);
-	// edit view size is determined by tree view size, it is not modified here
-#endif
 }
-
-///////////////////////////////////////////////////
-// Editview - Tools menu
-///////////////////////////////////////////////////
-
-HMENU MainFrame::GetMDToolMenu()
-{
-#if defined(PLATFORM_WIN32)
-	return GetMenu(hMainWnd);
-#endif
-#if defined(PLATFORM_PKTPC)
-	return SHGetSubMenu(hMDCmdBar, IDM_DETAILS_TOOL);
-#endif
-#if defined(PLATFORM_PSPC)
-	return CommandBar_GetMenu(hMDCmdBar, 0);
-#endif
-#if defined(PLATFORM_BE500)
-	return hMDEditMenu;
-#endif
-#if defined(PLATFORM_HPC)
-	return CommandBar_GetMenu(GetCommandBar(hMSCmdBar, ID_CMDBAR_MAIN), 0);
-#endif
-}
-
-HMENU MainFrame::GetMSEditMenu()
-{
-#if defined(PLATFORM_WIN32)
-	return GetMenu(hMainWnd);
-#endif
-#if defined(PLATFORM_PKTPC)
-	return SHGetSubMenu(hMSCmdBar, IDM_EDIT_MEMO);
-#endif
-#if defined(PLATFORM_PSPC)
-	return CommandBar_GetMenu(hMSCmdBar, 0);
-#endif
-#if defined(PLATFORM_HPC)
-	return CommandBar_GetMenu(GetCommandBar(hMSCmdBar, ID_CMDBAR_MAIN), 0);
-#endif
-#if defined(PLATFORM_BE500)
-	return hMSMemoMenu;
-#endif
-}
-
-HMENU MainFrame::GetMSBookMarkMenu()
-{
-#if defined(PLATFORM_WIN32)
-	HMENU hMenu = GetMenu(hMainWnd);
-	return GetSubMenu(hMenu, BOOKMARK_MENU_POS);
-#endif
-#if defined(PLATFORM_HPC)
-	HMENU hMenu = GetMainMenu();
-	return GetSubMenu(hMenu, BOOKMARK_MENU_POS);
-#endif
-#if defined(PLATFORM_PKTPC)
-	HMENU h = SHGetSubMenu(hMSCmdBar, IDM_MS_BOOKMARK);
-	if (h == NULL) {
-		MessageBox(TEXT("GetMSBookMarkMenu fail"), TEXT("DEBUG"), MB_OK);
-	}
-	return h;
-#endif
-#if defined(PLATFORM_PSPC)
-	HMENU h = CommandBar_GetMenu(hMSCmdBar, 0);
-	return GetSubMenu(h, BOOKMARK_MENU_POS);
-#endif
-#if defined(PLATFORM_BE500)
-	return hMSBookMarkMenu;
-#endif
-}
-
-#if defined(PLATFORM_BE500)
-HMENU MainFrame::GetMSToolMenu()
-{
-	return hMSToolMenu;
-}
-#endif
 
 ///////////////////////////////////////////////////
 // set wrpping text or not
@@ -2258,107 +1548,23 @@ HMENU MainFrame::GetMSToolMenu()
 
 void MainFrame::SetWrapText(BOOL bWrap)
 {
-	UINT uCheckFlg;
-
-	HMENU hMenu = GetMDToolMenu();
-
-	if (bWrap) {
-		uCheckFlg = MF_CHECKED;
-	} else {
-		uCheckFlg = MF_UNCHECKED;
-	}
-
 	// Change edit view status
 	if (!pDetailsView->SetFolding(bWrap)) {
 		TomboMessageBox(NULL, MSG_FOLDING_FAILED, TOMBO_APP_NAME, MB_ICONERROR | MB_OK);
 		return;
 	}
 
-	// CheckMenuItem is superseded, but CE don't have SetMenuItemInfo.
-	CheckMenuItem(hMenu, IDM_DETAILS_HSCROLL, MF_BYCOMMAND | uCheckFlg);
-}
-
-///////////////////////////////////////////////////
-// Switch pane
-///////////////////////////////////////////////////
-// 2-Pane
-//		Menu                   : Do checked
-//		Toolbar                : Not pressed
-//		Property::IsUseTwoPane : TRUE
-// 1-Pane
-//		Menu                   : Do not checked
-//		Toolbar                : Pressed
-//		Property::IsUseTwoPane : FALSE
-
-void MainFrame::TogglePane()
-{
-#if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
-	MENUITEMINFO mii;
-	mii.cbSize = sizeof(mii);
-	mii.fMask = MIIM_STATE;
-
-	HMENU hMenu;
-	BOOL bFolding;
 	UINT uCheckFlg;
 
-#if defined(PLATFORM_WIN32)
-	hMenu = GetMenu(hMainWnd);
-#endif
-#if defined(PLATFORM_HPC)
-	hMenu = CommandBar_GetMenu(GetCommandBar(hMSCmdBar, ID_CMDBAR_MAIN), 0);
-#endif
-
-	// get menu status
-	if (!GetMenuItemInfo(hMenu, IDM_TOGGLEPANE, FALSE, &mii)) return;
-	// invert menu status
-	if (mii.fState & MFS_CHECKED) {
-		bFolding = TRUE;
-		uCheckFlg = MF_UNCHECKED;
-	} else {
-		bFolding = FALSE;
+	HMENU hMenu = pPlatform->GetMDToolMenu();
+	if (bWrap) {
 		uCheckFlg = MF_CHECKED;
-	}
-	// CheckMenuItem is superseeded funcs, but in CE, SetMenuItemInfo can't set values, so use it.
-	CheckMenuItem(hMenu, IDM_TOGGLEPANE, MF_BYCOMMAND | uCheckFlg);
-
-	// control toolbar
-#if defined(PLATFORM_WIN32)
-	SendMessage(hToolBar, TB_PRESSBUTTON, IDM_TOGGLEPANE, MAKELONG(!uCheckFlg, 0));
-#endif
-#if defined(PLATFORM_HPC)
-	SendMessage(GetCommandBar(hMSCmdBar, ID_BUTTONBAND), TB_PRESSBUTTON, IDM_TOGGLEPANE, MAKELONG(!uCheckFlg, 0));
-#endif
-	if (g_Property.IsUseTwoPane()) {
-		SaveWinSize();
-	}
-
-	g_Property.SetUseTwoPane(uCheckFlg);
-	RECT r;
-	GetClientRect(hMainWnd, &r);
-
-	if (g_Property.IsUseTwoPane()) {
-		// 1->2Pane
-		UINT u1, u2;
-		RECT rr;
-		WORD nWidth;
-		g_Property.GetWinSize(&u1, &u2, &rr, &nWidth);
-		msView.MoveWindow(0, 0, nWidth, rr.bottom - rr.top);
-		OnResize(0, MAKELPARAM(r.right - r.left, r.bottom - r.top));
-		msView.Show(SW_SHOW);
-		pDetailsView->Show(SW_SHOW);
 	} else {
-		// 2->1Pane
-		if (bSelectViewActive) {
-			OnResize(0, MAKELPARAM(r.right - r.left, r.bottom - r.top));
-			pDetailsView->Show(SW_HIDE);
-			msView.Show(SW_SHOW);
-		} else {
-			OnResize(0, MAKELPARAM(r.right - r.left, r.bottom - r.top));
-			pDetailsView->Show(SW_SHOW);
-			msView.Show(SW_HIDE);
-		}
+		uCheckFlg = MF_UNCHECKED;
 	}
-#endif
+
+	// CheckMenuItem is superseded, but CE don't have SetMenuItemInfo.
+	CheckMenuItem(hMenu, IDM_DETAILS_HSCROLL, MF_BYCOMMAND | uCheckFlg);
 }
 
 ///////////////////////////////////////////////////
@@ -2377,7 +1583,7 @@ void MainFrame::SetTitle(LPCTSTR pTitle) {
 void MainFrame::OnSearch()
 {
 	SearchDialog sd;
-	if (sd.Popup(g_hInstance, hMainWnd, bSelectViewActive) != IDOK) return;
+	if (sd.Popup(g_hInstance, hMainWnd, SelectViewActive()) != IDOK) return;
 
 	SearchEngineA *pSE = new SearchEngineA();
 	if(!pSE->Init(sd.IsSearchEncryptMemo(), sd.IsFileNameOnly(), &pmPasswordMgr)) {
@@ -2399,25 +1605,12 @@ void MainFrame::OnSearch()
 	mmMemoManager.SetSearchEngine(pSE);
 
 	// Enable FindNext/Prev button
-#if defined(PLATFORM_WIN32)
-	SendMessage(hToolBar, TB_SETSTATE, IDM_SEARCH_PREV, MAKELONG(TBSTATE_ENABLED, 0)); 
-	SendMessage(hToolBar, TB_SETSTATE, IDM_SEARCH_NEXT, MAKELONG(TBSTATE_ENABLED, 0)); 
-#endif
-#if defined(PLATFORM_HPC)
-	SendMessage(GetCommandBar(hMSCmdBar, ID_BUTTONBAND), TB_SETSTATE, IDM_SEARCH_PREV, MAKELONG(TBSTATE_ENABLED, 0)); 
-	SendMessage(GetCommandBar(hMSCmdBar, ID_BUTTONBAND), TB_SETSTATE, IDM_SEARCH_NEXT, MAKELONG(TBSTATE_ENABLED, 0)); 
-#endif
-#if defined(PLATFORM_PKTPC) || defined(PLATFORM_PSPC)
-	SendMessage(hMSCmdBar, TB_SETSTATE, IDM_SEARCH_PREV, MAKELONG(TBSTATE_ENABLED, 0)); 
-	SendMessage(hMSCmdBar, TB_SETSTATE, IDM_SEARCH_NEXT, MAKELONG(TBSTATE_ENABLED, 0)); 
-	SendMessage(hMDCmdBar, TB_SETSTATE, IDM_SEARCH_PREV, MAKELONG(TBSTATE_ENABLED, 0)); 
-	SendMessage(hMDCmdBar, TB_SETSTATE, IDM_SEARCH_NEXT, MAKELONG(TBSTATE_ENABLED, 0)); 
-#endif
+	pPlatform->EnableSearchNext();
 
-	bSearchStartFromTreeView = bSelectViewActive;
+	bSearchStartFromTreeView = SelectViewActive();
 
 	// execute searching
-	if (bSelectViewActive) {
+	if (SelectViewActive()) {
 		DoSearchTree(TRUE, !sd.IsSearchDirectionUp());
 		mmMemoManager.SetMSSearchFlg(FALSE);
 	} else {
@@ -2475,7 +1668,7 @@ void MainFrame::OnSearchNext(BOOL bForward)
 		return;
 	}
 
-	if (bSelectViewActive) {
+	if (SelectViewActive()) {
 		DoSearchTree(mmMemoManager.MSSearchFlg(), bForward);
 		mmMemoManager.SetMSSearchFlg(FALSE);
 	} else {
@@ -2484,7 +1677,8 @@ void MainFrame::OnSearchNext(BOOL bForward)
 		BOOL bMatched = pDetailsView->Search(mmMemoManager.MDSearchFlg(), bForward, !bSearchStartFromTreeView, FALSE);
 		mmMemoManager.SetMDSearchFlg(FALSE);
 		if (bSearchStartFromTreeView && !bMatched) {
-			ActivateView(TRUE);
+//			ActivateView(TRUE);
+			ActivateView(VT_SelectView);
 			DoSearchTree(mmMemoManager.MSSearchFlg(), bForward);
 			mmMemoManager.SetMSSearchFlg(FALSE);
 		}
@@ -2500,11 +1694,7 @@ void MainFrame::ToggleShowStatusBar()
 {
 	g_Property.ToggleShowStatusBar();
 
-#if defined(PLATFORM_WIN32)
-	HMENU hMenu = GetMenu(hMainWnd);
-#else
-	HMENU hMenu = CommandBar_GetMenu(GetCommandBar(hMSCmdBar, ID_CMDBAR_MAIN), 0);
-#endif
+	HMENU hMenu = pPlatform->GetMainMenu();
 
 	if (g_Property.HideStatusBar()) {
 		CheckMenuItem(hMenu, IDM_SHOWSTATUSBAR, MF_BYCOMMAND | MF_UNCHECKED);
@@ -2519,55 +1709,8 @@ void MainFrame::ToggleShowStatusBar()
 #endif
 
 ///////////////////////////////////////////////////
-// enable/disable save button
-///////////////////////////////////////////////////
-
-void MainFrame::EnableSaveButton(BOOL bEnable)
-{
-	WORD nStat;
-	if (bEnable) {
-		nStat = TBSTATE_ENABLED;
-	} else {
-		nStat = 0;
-	}
-#if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
-	EnableMenu(IDM_SAVE, bEnable);
-	SendMessage(GetMainToolBar(), TB_SETSTATE, IDM_SAVE, MAKELONG(nStat, 0)); 
-#endif
-
-#if defined(PLATFORM_PKTPC) || defined(PLATFORM_PSPC)
-	SendMessage(hMDCmdBar, TB_ENABLEBUTTON, IDM_SAVE, MAKELONG(nStat, 0)); 
-#endif
-#if defined(PLATFORM_BE500)
-	if (bEnable) {
-		CSOBar_SetButtonState(hMDCmdBar, TRUE, IDM_SAVE, 1, CSO_BUTTON_DISP);
-	} else {
-		CSOBar_SetButtonState(hMDCmdBar, TRUE, IDM_SAVE, 1, CSO_BUTTON_GRAYED);
-	}
-#endif
-}
-
-///////////////////////////////////////////////////
 // get command bar from command band by ID
 ///////////////////////////////////////////////////
-
-#if defined(PLATFORM_HPC)
-static HWND GetCommandBar(HWND hBand, UINT uBandID)
-{
-	UINT idx = SendMessage(hBand, RB_IDTOINDEX, uBandID, 0);
-	if (idx == -1) return NULL;
-	HWND hwnd = CommandBands_GetCommandBar(hBand, idx);
-	return hwnd;
-}
-HMENU MainFrame::GetMainMenu() 
-{ 
-	return CommandBar_GetMenu(GetCommandBar(hMSCmdBar, ID_CMDBAR_MAIN), 0); 
-}
-HWND MainFrame::GetMainToolBar() 
-{ 
-	return GetCommandBar(hMSCmdBar, ID_BUTTONBAND); 
-}
-#endif
 
 int MainFrame::MessageBox(LPCTSTR pText, LPCTSTR pCaption, UINT uType)
 {
@@ -2610,12 +1753,12 @@ void MainFrame::SetTopMost()
 
 	if (g_Property.StayTopMost()) {
 		CheckMenuItem(hMenu, IDM_TOPMOST, MF_BYCOMMAND | MF_CHECKED);
-		SendMessage(hToolBar, TB_SETSTATE, IDM_TOPMOST, MAKELONG(TBSTATE_ENABLED |TBSTATE_PRESSED, 0)); 
+		SendMessage(pPlatform->hToolBar, TB_SETSTATE, IDM_TOPMOST, MAKELONG(TBSTATE_ENABLED |TBSTATE_PRESSED, 0)); 
 
 		SetWindowPos(hMainWnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
 	} else {
 		CheckMenuItem(hMenu, IDM_TOPMOST, MF_BYCOMMAND | MF_UNCHECKED);
-		SendMessage(hToolBar, TB_SETSTATE, IDM_TOPMOST, MAKELONG(TBSTATE_ENABLED, 0)); 
+		SendMessage(pPlatform->hToolBar, TB_SETSTATE, IDM_TOPMOST, MAKELONG(TBSTATE_ENABLED, 0)); 
 
 		SetWindowPos(hMainWnd, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
 	}
@@ -2631,11 +1774,11 @@ void MainFrame::OnVFolderDef()
 	FilterCtlDlg dlg;
 	if (!dlg.Init(&msView, pVFManager)) return;
 	msView.CloseVFRoot();
-	dlg.Popup(g_hInstance, hMainWnd, hSelectViewImgList);
+	dlg.Popup(g_hInstance, hMainWnd, msView.GetImageList());
 }
 
 ///////////////////////////////////////////////////
-// stay topmost of the screen
+// Bookmark related members
 ///////////////////////////////////////////////////
 
 void MainFrame::OnBookMarkAdd(HWND hWnd, WPARAM wParam, LPARAM lParam)
@@ -2648,7 +1791,7 @@ void MainFrame::OnBookMarkAdd(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	const BookMarkItem *pItem = pBookMark->Assign(sURI.Get());
 	if (pItem == NULL) return;
 
-	AppendBookMark(GetMSBookMarkMenu(), pItem);
+	AppendBookMark(pPlatform->GetMSBookMarkMenu(), pItem);
 }
 
 void MainFrame::OnBookMarkConfig(HWND hWnd, WPARAM wParam, LPARAM lParam)
@@ -2658,7 +1801,7 @@ void MainFrame::OnBookMarkConfig(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 	// release current bookmark
 	const BookMarkItem *p;
-	HMENU hBookMark = GetMSBookMarkMenu();
+	HMENU hBookMark = pPlatform->GetMSBookMarkMenu();
 	DWORD n = pBookMark->NumItems();
 	for (DWORD i = 0; i < n; i++) {
 		p = pBookMark->GetUnit(i);
@@ -2710,7 +1853,7 @@ void MainFrame::LoadBookMark(LPCTSTR pBookMarks)
 {
 	const BookMarkItem *p;
 
-	HMENU hBookMark = GetMSBookMarkMenu();
+	HMENU hBookMark = pPlatform->GetMSBookMarkMenu();
 
 	// release current bookmark
 	DWORD n = pBookMark->NumItems();

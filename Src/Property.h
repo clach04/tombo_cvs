@@ -146,6 +146,9 @@ public:
 	// Hide status bar
 	DWORD HideStatusBar() { return nHideStatusBar; }
 	void ToggleShowStatusBar() { nHideStatusBar = !nHideStatusBar; }
+#else
+	DWORD HideStatusBar() { return TRUE; }
+	void ToggleShowStatusBar() { /* nop */ }
 #endif
 #if defined(PLATFORM_WIN32)
 	BOOL StayTopMost() { return nTopMost; }

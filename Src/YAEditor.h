@@ -12,7 +12,7 @@ class YAEditor : public MemoDetailsView {
 	DWORD nID;
 public:
 
-	YAEditor();
+	YAEditor(MemoDetailsViewCallback *pCB);
 	virtual ~YAEditor();
 	BOOL Init(MemoManager *pMemoMgr, DWORD nID);
 
@@ -24,6 +24,8 @@ public:
 	BOOL SetMemo(LPCTSTR pMemo, DWORD nPos, BOOL bReadOnly);
 	BOOL IsModify();
 	void ResetModify();
+
+	void SetMDSearchFlg(BOOL bFlg);
 
 	//////////////////////////
 	// implimenting
