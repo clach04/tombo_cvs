@@ -265,7 +265,7 @@ void FilterCtlDlg::Command_New(HWND hDlg)
 	VFInfo *pInfo = new VFInfo();
 	LPTSTR pEmpty;
 	if (!pInfo ||
-		!(pEmpty = StringDup("")) ||
+		!(pEmpty = StringDup(TEXT(""))) ||
 		!(pInfo->pGenerator = new VFDirectoryGenerator()) ||
 		!pInfo->pGenerator->Init(pEmpty, FALSE) ||
 		!(pInfo->pStore = new VFStore()) ||
