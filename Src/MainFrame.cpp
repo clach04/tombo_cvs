@@ -82,7 +82,7 @@ LPTSTR pMDToolTip[] = {
 
 #if defined(PLATFORM_PSPC)
 #define NUM_CMDBAR_BUTTONS 6
-#define NUM_IMG_BUTTONS 10
+#define NUM_IMG_BUTTONS 11
 
 #define NUM_MD_CMDBAR_BUTTONS 7
 #define NUM_MD_IMG_BUTTONS 1
@@ -727,7 +727,7 @@ void MainFrame::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	hMSCmdBar = MakeCSOBar(pcs->hInstance, hWnd, ID_CMDBAR_MAIN);
 	HMENU hMSMenu = LoadMenu(pcs->hInstance, MAKEINTRESOURCE(IDR_MENU_MAIN));
 	hMSMemoMenu = aSVCSOBarButtons[0].SubMenu	= GetSubMenu(hMSMenu, 0);
-	aSVCSOBarButtons[1].SubMenu	= GetSubMenu(hMSMenu, 1);
+	hMSToolMenu = aSVCSOBarButtons[1].SubMenu	= GetSubMenu(hMSMenu, 1);
 	for (int i = 0; i < NUM_SV_CMDBAR_BUTTONS; i++) {
 		aSVCSOBarButtons[i].reshInst = pcs->hInstance;
 	}
@@ -1658,7 +1658,6 @@ void MainFrame::EnableEncrypt(BOOL bEnable)
 	}
 }
 
-
 void MainFrame::EnableDecrypt(BOOL bEnable)
 {
 	HMENU hMenu = GetMSEditMenu();
@@ -1675,12 +1674,28 @@ void MainFrame::EnableDelete(BOOL bEnable)
 	EnableMenu(IDM_DELETEITEM, bEnable);
 	SendMessage(GetMainToolBar(), TB_ENABLEBUTTON, IDM_DELETEITEM, MAKELONG(bEnable, 0));
 #endif
+#if defined(PLATFORM_PKTPC) || defined(PLATFORM_BE500) || defined(PLATFORM_PSPC)
+	HMENU hMenu = GetMSEditMenu();
+	if (bEnable) {
+		EnableMenuItem(hMenu, IDM_DELETEITEM, MF_BYCOMMAND | MF_ENABLED);
+	} else {
+		EnableMenuItem(hMenu, IDM_DELETEITEM, MF_BYCOMMAND | MF_GRAYED);
+	}
+#endif
 }
 
 void MainFrame::EnableRename(BOOL bEnable)
 {
 #if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
 	EnableMenu(IDM_RENAME, bEnable);
+#endif
+#if defined(PLATFORM_PKTPC) || defined(PLATFORM_BE500) || defined(PLATFORM_PSPC)
+	HMENU hMenu = GetMSEditMenu();
+	if (bEnable) {
+		EnableMenuItem(hMenu, IDM_RENAME, MF_BYCOMMAND | MF_ENABLED);
+	} else {
+		EnableMenuItem(hMenu, IDM_RENAME, MF_BYCOMMAND | MF_GRAYED);
+	}
 #endif
 }
 
@@ -1690,7 +1705,23 @@ void MainFrame::EnableNew(BOOL bEnable)
 	EnableMenu(IDM_NEWMEMO, bEnable);
 	SendMessage(GetMainToolBar(), TB_ENABLEBUTTON, IDM_NEWMEMO, MAKELONG(bEnable, 0));
 #endif
-
+#if defined(PLATFORM_PKTPC)
+	HMENU hMenu = GetMSEditMenu();
+	if (bEnable) {
+		EnableMenuItem(hMenu, IDM_NEWMEMO, MF_BYCOMMAND | MF_ENABLED);
+	} else {
+		EnableMenuItem(hMenu, IDM_NEWMEMO, MF_BYCOMMAND | MF_GRAYED);
+	}
+	SendMessage(hMSCmdBar, TB_ENABLEBUTTON, IDM_NEWMEMO, MAKELONG(bEnable, 0));
+#endif
+#if defined(PLATFORM_BE500) || defined(PLATFORM_PSPC)
+	HMENU hMenu = GetMSEditMenu();
+	if (bEnable) {
+		EnableMenuItem(hMenu, IDM_NEWMEMO, MF_BYCOMMAND | MF_ENABLED);
+	} else {
+		EnableMenuItem(hMenu, IDM_NEWMEMO, MF_BYCOMMAND | MF_GRAYED);
+	}
+#endif
 }
 
 void MainFrame::EnableCut(BOOL bEnable)
@@ -1698,6 +1729,14 @@ void MainFrame::EnableCut(BOOL bEnable)
 #if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
 	EnableMenu(IDM_CUT, bEnable);
 	SendMessage(GetMainToolBar(), TB_ENABLEBUTTON, IDM_CUT, MAKELONG(bEnable, 0));
+#endif
+#if defined(PLATFORM_PKTPC) || defined(PLATFORM_BE500) || defined(PLATFORM_PSPC)
+	HMENU hMenu = GetMSEditMenu();
+	if (bEnable) {
+		EnableMenuItem(hMenu, IDM_CUT, MF_BYCOMMAND | MF_ENABLED);
+	} else {
+		EnableMenuItem(hMenu, IDM_CUT, MF_BYCOMMAND | MF_GRAYED);
+	}
 #endif
 }
 
@@ -1707,6 +1746,14 @@ void MainFrame::EnableCopy(BOOL bEnable)
 	EnableMenu(IDM_COPY, bEnable);
 	SendMessage(GetMainToolBar(), TB_ENABLEBUTTON, IDM_COPY, MAKELONG(bEnable, 0));
 #endif
+#if defined(PLATFORM_PKTPC) || defined(PLATFORM_BE500) || defined(PLATFORM_PSPC)
+	HMENU hMenu = GetMSEditMenu();
+	if (bEnable) {
+		EnableMenuItem(hMenu, IDM_COPY, MF_BYCOMMAND | MF_ENABLED);
+	} else {
+		EnableMenuItem(hMenu, IDM_COPY, MF_BYCOMMAND | MF_GRAYED);
+	}
+#endif
 }
 
 void MainFrame::EnablePaste(BOOL bEnable)
@@ -1715,6 +1762,14 @@ void MainFrame::EnablePaste(BOOL bEnable)
 	EnableMenu(IDM_PASTE, bEnable);
 	SendMessage(GetMainToolBar(), TB_ENABLEBUTTON, IDM_PASTE, MAKELONG(bEnable, 0));
 #endif
+#if defined(PLATFORM_PKTPC) || defined(PLATFORM_BE500) || defined(PLATFORM_PSPC)
+	HMENU hMenu = GetMSEditMenu();
+	if (bEnable) {
+		EnableMenuItem(hMenu, IDM_PASTE, MF_BYCOMMAND | MF_ENABLED);
+	} else {
+		EnableMenuItem(hMenu, IDM_PASTE, MF_BYCOMMAND | MF_GRAYED);
+	}
+#endif
 }
 
 void MainFrame::EnableNewFolder(BOOL bEnable)
@@ -1722,12 +1777,36 @@ void MainFrame::EnableNewFolder(BOOL bEnable)
 #if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
 	EnableMenu(IDM_NEWFOLDER, bEnable);
 #endif
+#if defined(PLATFORM_PKTPC) || defined(PLATFORM_PSPC)
+	HMENU hMenu = GetMSEditMenu();
+	if (bEnable) {
+		EnableMenuItem(hMenu, IDM_NEWFOLDER, MF_BYCOMMAND | MF_ENABLED);
+	} else {
+		EnableMenuItem(hMenu, IDM_NEWFOLDER, MF_BYCOMMAND | MF_GRAYED);
+	}
+#endif
+#if defined(PLATFORM_BE500)
+	HMENU hMenu = GetMSToolMenu();
+	if (bEnable) {
+		EnableMenuItem(hMenu, IDM_NEWFOLDER, MF_BYCOMMAND | MF_ENABLED);
+	} else {
+		EnableMenuItem(hMenu, IDM_NEWFOLDER, MF_BYCOMMAND | MF_GRAYED);
+	}
+#endif
 }
 
 void MainFrame::EnableGrep(BOOL bEnable)
 {
 #if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
 	EnableMenu(IDM_GREP, bEnable);
+#endif
+#if defined(PLATFORM_PKTPC) || defined(PLATFORM_BE500) || defined(PLATFORM_PSPC)
+	HMENU hMenu = GetMSEditMenu();
+	if (bEnable) {
+		EnableMenuItem(hMenu, IDM_GREP, MF_BYCOMMAND | MF_ENABLED);
+	} else {
+		EnableMenuItem(hMenu, IDM_GREP, MF_BYCOMMAND | MF_GRAYED);
+	}
 #endif
 }
 
@@ -1952,6 +2031,13 @@ HMENU MainFrame::GetMSEditMenu()
 	return hMSMemoMenu;
 #endif
 }
+
+#if defined(PLATFORM_BE500)
+HMENU MainFrame::GetMSToolMenu()
+{
+	return hMSToolMenu;
+}
+#endif
 
 ///////////////////////////////////////////////////
 // è⁄ç◊ÉrÉÖÅ[ÇÃê‹ÇËï‘Çµï\é¶ÇÃêßå‰
