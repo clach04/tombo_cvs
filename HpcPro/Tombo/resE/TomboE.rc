@@ -236,7 +236,7 @@ BEGIN
         MENUITEM "Insert Date1\tCtrl+1",        IDM_INSDATE1
         MENUITEM "Insert Date2\tCtrl+2",        IDM_INSDATE2
     END
-    POPUP "&Tool"
+    POPUP "&Tools"
     BEGIN
         MENUITEM "Wrap Text",                   IDM_DETAILS_HSCROLL, CHECKED
         MENUITEM "Two panes",                   IDM_TOGGLEPANE, CHECKED

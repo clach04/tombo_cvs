@@ -134,7 +134,7 @@ BEGIN
         MENUITEM "Find Next",                   IDM_SEARCH_NEXT
         MENUITEM "Find Prev",                   IDM_SEARCH_PREV
     END
-    POPUP "Tool"
+    POPUP "Tools"
     BEGIN
         MENUITEM "Wrap Text",                   IDM_DETAILS_HSCROLL, CHECKED
         MENUITEM SEPARATOR
@@ -509,7 +509,7 @@ STRINGTABLE DISCARDABLE
 BEGIN
     IDS_MENUITEM40005       "Memo"
     IDS_MENUITEM40011       "s"
-    IDS_MENUITEM40014       "Tool"
+    IDS_MENUITEM40014       "Tools"
 END
 
 STRINGTABLE DISCARDABLE 
