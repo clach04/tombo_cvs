@@ -88,6 +88,8 @@ BEGIN
         MENUITEM "Encrypt",                     IDM_ENCRYPT
         MENUITEM "Decrypt",                     IDM_DECRYPT
         MENUITEM SEPARATOR
+        MENUITEM "Find",                        IDM_SEARCH
+        MENUITEM SEPARATOR
         MENUITEM "New folder",                  IDM_NEWFOLDER
         MENUITEM SEPARATOR
         MENUITEM "Delete",                      IDM_DELETEITEM

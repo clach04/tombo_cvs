@@ -88,6 +88,8 @@ BEGIN
         MENUITEM "暗号化",                      IDM_ENCRYPT
         MENUITEM "復号化",                      IDM_DECRYPT
         MENUITEM SEPARATOR
+        MENUITEM "検索",                        IDM_SEARCH
+        MENUITEM SEPARATOR
         MENUITEM "新規フォルダ",                IDM_NEWFOLDER
         MENUITEM SEPARATOR
         MENUITEM "削除",                        IDM_DELETEITEM
