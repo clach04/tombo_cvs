@@ -1246,231 +1246,10 @@ LRESULT MemoSelectView::EditLabel(TVITEM *pItem)
 }
 
 /////////////////////////////////////////////
-// 次のノードを取得
-/////////////////////////////////////////////
-
-static HTREEITEM GetNextItem(HWND hWnd, HTREEITEM hCurrentItem)
-{
-	HTREEITEM hPrev;
-	HTREEITEM h = hCurrentItem;
-
-	hPrev = h;
-	h = TreeView_GetNextSibling(hWnd, h);
-
-	// SiblingがNULLの場合、親の弟を探す。親の弟がいなければ親の親でさらに挑戦。
-	while (h == NULL) {
-		HTREEITEM hParent = TreeView_GetParent(hWnd, hPrev);
-		if (hParent == NULL) break; // ルートまで来た
-
-		hPrev = hParent;
-		h = TreeView_GetNextSibling(hWnd, hParent);
-	}
-	return h;
-}
-
-static HTREEITEM GetPrevItem(HWND hWnd, HTREEITEM hCurrentItem)
-{
-	HTREEITEM hPrev;
-	HTREEITEM h = hCurrentItem;
-
-	hPrev = h;
-	h = TreeView_GetPrevSibling(hWnd, h);
-
-	while(h == NULL) {
-		HTREEITEM hParent= TreeView_GetParent(hWnd, hPrev);
-		if (hParent == NULL) break;
-
-		hPrev = hParent;
-		h = TreeView_GetPrevSibling(hWnd, hParent);
-	}
-	return h;
-}
-
-// 末っ子を取得
-static  HTREEITEM GetLastChild(HWND hWnd, HTREEITEM hCurrentItem)
-{
-	HTREEITEM h = TreeView_GetChild(hWnd, hCurrentItem);
-	HTREEITEM hPrev;
-
-	hPrev = h;
-	while(h) {
-		hPrev = h;
-		h = TreeView_GetNextSibling(hWnd, h);
-	}
-	return hPrev;
-}
-
-/////////////////////////////////////////////
-// ページ間検索
-/////////////////////////////////////////////
-
-BOOL MemoSelectView::Search(BOOL bFirstSearch, BOOL bForward)
-{
-	HTREEITEM  hItem, hOrigItem;
-
-	SearchEngineA *pSE = pMemoMgr->GetSearchEngine();
-	if (pSE == NULL) return TRUE;
-
-
-	TreeViewItem *pOrigItem = GetCurrentItem(&hOrigItem);
-
-	BOOL bSearchEncryptMemo = pSE->IsSearchEncryptMemo();
-	BOOL bFileNameOnly = pSE->IsFileNameOnly();
-
-	hItem = hOrigItem;
-
-	// ルートフォルダが閉じられていたら開いておく
-	if (TreeView_GetParent(hViewWnd, hItem) == NULL && !IsExpand(hViewWnd, hItem)) {
-		TreeView_Expand(hViewWnd, hItem, TVE_EXPAND);
-		TreeExpand(hItem);
-	}
-
-	if (bSearchEncryptMemo && !bFileNameOnly) {
-		// パスワードチェック
-		// 対象がファイル名のみの場合、パスワードは不要なので条件からはずす
-		PasswordManager *pPM = pMemoMgr->GetPasswordManager();
-		BOOL bCancel;
-		const char *pPasswd;
-		pPasswd = pPM->Password(&bCancel, FALSE);
-		if (pPasswd == NULL && bCancel == TRUE) {
-			return TRUE;
-		}
-	}
-
-	HCURSOR hOrigCursor = SetCursor(LoadCursor(NULL, IDC_WAIT));
-
-	if (!bFirstSearch) {
-		if (bForward) {
-			hItem = GetNextItem(hViewWnd, hItem);
-		} else {
-			hItem = GetPrevItem(hViewWnd, hItem);
-		}
-		if (hItem == NULL) {
-			SetCursor(hOrigCursor);
-			MessageBox(NULL, MSG_STRING_NOT_FOUND, TOMBO_APP_NAME, MB_OK | MB_ICONINFORMATION);
-			return TRUE;
-		}
-	}
-
-	BOOL bResult = SearchItems(hItem, bSearchEncryptMemo, bFileNameOnly, bForward);
-	if (bResult) {
-		TreeView_SelectItem(hViewWnd, hOrigItem);
-		if (pOrigItem && !pOrigItem->HasMultiItem()) {
-			TreeViewFileItem *ptvfi = (TreeViewFileItem*)pOrigItem;
-			MemoLocator loc(ptvfi->GetNote(), ptvfi->GetViewItem());
-			pMemoMgr->GetMainFrame()->SendRequestOpen(&loc, OPEN_REQUEST_NO_ACTIVATE_VIEW);
-		}
-		MessageBox(NULL, MSG_STRING_NOT_FOUND, TOMBO_APP_NAME, MB_OK | MB_ICONINFORMATION);
-	}
-
-	SetCursor(hOrigCursor);
-	return bResult;
-}
-
-/////////////////////////////////////////////
-// ページ間検索時1ファイルに対する検索
-
-BOOL MemoSelectView::SearchOneItem(HTREEITEM hItem, BOOL bSearchEncryptedMemo, BOOL bFileNameOnly)
-{
-	TreeView_SelectItem(hViewWnd, hItem);
-
-	TreeViewItem *pItem;
-	pItem = GetTVItem(hItem);
-
-	if (pItem) {
-		BOOL bMatch;
-		if (bFileNameOnly) {
-			TCHAR buf[MAX_PATH];
-			TV_ITEM ti;
-			ti.mask = TVIF_TEXT;
-			ti.hItem = hItem;
-			ti.pszText = buf;
-			ti.cchTextMax = MAX_PATH - 1;
-			TreeView_GetItem(hViewWnd, &ti);
-
-#ifdef _WIN32_WCE
-			char *bufA = ConvUnicode2SJIS(buf);
-			bMatch = pMemoMgr->GetSearchEngine()->SearchForward(bufA, 0, FALSE);
-			delete [] bufA;
-#else
-			bMatch = pMemoMgr->GetSearchEngine()->SearchForward(buf, 0, FALSE);
-#endif
-		} else {
-			// 暗号化メモが対象外の場合、検索しない
-			MemoNote *pNote = NULL;
-			if (pItem && !pItem->HasMultiItem()) {
-				pNote = ((TreeViewFileItem*)pItem)->GetNote();
-			}
-			if (!bSearchEncryptedMemo && pNote->IsEncrypted()) return TRUE;
-
-			char *pMemo = pNote->GetMemoBodyA(pMemoMgr->GetPasswordManager());
-			if (pMemo == NULL) return TRUE;
-
-			bMatch = pMemoMgr->GetSearchEngine()->SearchForward(pMemo, 0, FALSE);
-			MemoNote::WipeOutAndDelete(pMemo);
-		}
-
-		// ヒットしたら検索を打ち切る
-		if (bMatch) {
-			if (pItem && !pItem->HasMultiItem()) {
-				TreeViewFileItem *ptvfi = (TreeViewFileItem*)pItem;
-				MemoLocator loc(ptvfi->GetNote(), ptvfi->GetViewItem());
-				pMemoMgr->GetMainFrame()->SendRequestOpen(&loc, OPEN_REQUEST_MSVIEW_ACTIVE);
-			}
-			if (!bFileNameOnly) pMemoMgr->SearchDetailsView(TRUE, TRUE, TRUE, TRUE);
-			return FALSE;
-		}
-	}
-	return TRUE;
-
-}
-
-BOOL MemoSelectView::SearchItems(HTREEITEM hTreeItem, BOOL bSearchEncryptedMemo, BOOL bFileNameOnly, BOOL bForward)
-{
-	HTREEITEM h = hTreeItem;
-	BOOL bResult = TRUE;
-	TreeViewItem *pItem;
-
-	while(h && bResult) {
-		pItem = GetTVItem(h);
-
-		if (pItem) {
-			if (pItem->HasMultiItem()) {
-				// サブアイテムが存在 = フォルダ
-				if (!IsExpand(hViewWnd, h)) {
-					// ツリーの展開
-					TreeView_Expand(hViewWnd, h, TVE_EXPAND);
-					TreeExpand(h);
-				}
-				// 再帰
-				// GetChildを取り直しているのはExpandされるため
-				if (IsExpand(hViewWnd, h)) {
-					if (bForward) {
-						h = TreeView_GetChild(hViewWnd, h);
-					} else {
-						h = GetLastChild(hViewWnd, h);
-					}
-					continue;
-				}
-			} else {
-				bResult = SearchOneItem(h, bSearchEncryptedMemo, bFileNameOnly);
-			}
-		}
-
-		if (bForward) {
-			h = GetNextItem(hViewWnd, h);
-		} else {
-			h = GetPrevItem(hViewWnd, h);
-		}
-	}
-	return bResult;
-}
-
-/////////////////////////////////////////////
 // Expand tree and show note
 /////////////////////////////////////////////
 
-static HTREEITEM FindItem(HWND hWnd, HTREEITEM hParent, LPCTSTR pStr)
+static HTREEITEM FindItem(HWND hWnd, HTREEITEM hParent, LPCTSTR pStr, BOOL bNote)
 {
 	HTREEITEM hItem = TreeView_GetChild(hWnd, hParent);
 	TV_ITEM ti;
@@ -1484,7 +1263,11 @@ static HTREEITEM FindItem(HWND hWnd, HTREEITEM hParent, LPCTSTR pStr)
 		ti.hItem = hItem;
 		TreeView_GetItem(hWnd, &ti);
 
-		if (_tcsicmp(buf, pStr) == 0) return hItem;
+		if (_tcsicmp(buf, pStr) == 0) {
+			if (((TreeViewItem*)ti.lParam)->HasMultiItem() == !bNote) {
+				return hItem;
+			}
+		}
 
 		hItem = TreeView_GetNextSibling(hWnd, hItem);
 	}
@@ -1538,7 +1321,7 @@ BOOL MemoSelectView::ShowItem(LPCTSTR pPath)
 		}
 
 		// Get Target Item
-		hTargetItem = FindItem(hViewWnd, hTargetItem, pPartPath);
+		hTargetItem = FindItem(hViewWnd, hTargetItem, pPartPath, bNote);
 		if (hTargetItem == NULL) {
 			return FALSE;
 		}

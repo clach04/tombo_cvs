@@ -36,13 +36,6 @@ class MemoSelectView {
 	///////////////////////////////////
 	LRESULT EditLabel(TVITEM *pItem);
 
-	/////////////////////////////
-	// 検索用内部関数
-
-	BOOL SearchItems(HTREEITEM hItem, BOOL bSearchEncryptedMemo, BOOL bFileNameOnly, BOOL bForward);
-	BOOL SearchOneItem(HTREEITEM hItem, BOOL bSearchEncryptedMemo, BOOL bFileNameOnly);
-
-	/////////////////////////////
 
 public:
 	/////////////////////////////
@@ -92,7 +85,7 @@ public:
 
 	/////////////////////////////
 	// 検索
-	BOOL Search(BOOL bFirstSearch, BOOL bForward);
+//	BOOL Search(BOOL bFirstSearch, BOOL bForward);
 
 	/////////////////////////////
 	// ビューアイテム操作関連
