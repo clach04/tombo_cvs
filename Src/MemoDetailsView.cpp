@@ -81,7 +81,7 @@ BOOL SimpleEditor::RegisterClass(HINSTANCE hInst)
 	gDelta = wc.cbWndExtra;
 	wc.cbWndExtra = ((wc.cbWndExtra + sizeof(MemoDetailsView*)) / 4 + 1)* 4;
 
-	gDefaultProc = wc.lpfnWndProc;
+	gDefaultProc = (SUPER_WND_PROC)wc.lpfnWndProc;
 
 	wc.lpfnWndProc = DetailsViewSuperProc;
 

@@ -1275,7 +1275,10 @@ void MainFrame::ChangeLayout(LayoutType layout)
 #else
 			// split horizontal
 			msView.MoveWindow(rc.left, rc.top , rc.right, nSplitterSize);
-			pDetailsView->MoveWindow(rc.left, rc.top + nSplitterSize + BORDER_WIDTH, rc.right, rc.bottom - nSplitterSize - BORDER_WIDTH + rc.top);
+//			pDetailsView->MoveWindow(rc.left, rc.top + nSplitterSize + BORDER_WIDTH, rc.right, rc.bottom - nSplitterSize - BORDER_WIDTH - rc.top);
+			pDetailsView->MoveWindow(
+				rc.left, rc.top + nSplitterSize + BORDER_WIDTH, 
+				rc.right, rc.bottom - nSplitterSize - BORDER_WIDTH);
 #endif
 
 			msView.Show(SW_SHOW);

@@ -639,3 +639,18 @@ Changes
 * support BE-x00
 	PsPC is not yet.
 Not fully tested on both platform, probably it will work.
+
+////////////////////////////////
+// B139
+////////////////////////////////
+// main trunk
+
+* support Two pane mode menu's check for BE-x00
+
+////////////////////////////////
+// B140
+////////////////////////////////
+// main trunk
+
+* FIX: when tapping edit view then tapping tree view, menu don't be changed.
+* FIX: window size is not correct when 2 pane view.

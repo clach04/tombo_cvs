@@ -142,6 +142,24 @@ void LagendaPlatform::EnableMenu(UINT uid, BOOL bEnable)
 	}
 }
 
+void LagendaPlatform::CheckMenu(UINT uid, BOOL bCheck)
+{
+	HMENU hMenu;
+	BOOL bCBS = FALSE;
+	switch(uid) {
+	case IDM_TOGGLEPANE:
+		bCBS = TRUE;
+		hMenu = hMSToolMenu;
+		break;
+	default:
+		return;
+	}
+
+	if (bCBS) {
+		CheckMenuItem(hMenu, uid, MF_BYCOMMAND | (bCheck ? MF_CHECKED : MF_UNCHECKED));
+	}
+}
+
 void LagendaPlatform::OpenDetailsView()
 {
 	CSOBar_Show(hMSCmdBar, SW_HIDE);

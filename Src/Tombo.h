@@ -85,4 +85,10 @@ enum SearchResult {
 #define VFOLDER_IMAGE_PERSIST	8
 #define VFOLDER_IMAGE_TEMP		6
 
+#ifdef STRICT 
+typedef WNDPROC SUPER_WND_PROC;
+#else 
+typedef FARPROC SUPER_WND_PROC;
+#endif 
+
 #endif

@@ -5,6 +5,7 @@
 #if defined(_WIN32_WCE) && defined(PLATFORM_PKTPC)
 #include <aygshell.h>
 #endif
+#include "Tombo.h"
 #include "resource.h"
 #include "Property.h"
 #include "MemoSelectView.h"
@@ -14,15 +15,15 @@
 #define KEY_CTRL_X 24
 
 extern "C" {
-typedef LRESULT (CALLBACK* WNDPROC)(HWND, UINT, WPARAM, LPARAM);
+//typedef LRESULT (CALLBACK* WNDPROC)(HWND, UINT, WPARAM, LPARAM);
 }
 
-static WNDPROC gSuperProc;
+static SUPER_WND_PROC gSuperProc;
 static HINSTANCE hInst;
 static HWND hParentWnd;
 static MemoSelectView *pView;
 
-void SelectViewSetWndProc(WNDPROC wp, HWND hParent, HINSTANCE h, MemoSelectView *p)
+void SelectViewSetWndProc(SUPER_WND_PROC wp, HWND hParent, HINSTANCE h, MemoSelectView *p)
 {
 	gSuperProc = wp;
 	hParentWnd = hParent;
@@ -30,7 +31,6 @@ void SelectViewSetWndProc(WNDPROC wp, HWND hParent, HINSTANCE h, MemoSelectView 
 	pView = p;
 }
 
-#if !defined(PLATFORM_PSPC) && !defined(PLATFORM_BE500)
 LRESULT CALLBACK NewSelectViewProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch(msg) {
@@ -83,6 +83,5 @@ LRESULT CALLBACK NewSelectViewProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lP
 			break;
 		}
 	}
-    return CallWindowProc((WNDPROC)gSuperProc, hwnd, msg, wParam, lParam);
+    return CallWindowProc(gSuperProc, hwnd, msg, wParam, lParam);
 }
-#endif

@@ -68,7 +68,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPTSTR pCmdLine, int nCmdSh
 	// initialize logger
 	g_pLogger = &g_Logger;
 	// if write debug log, comment out two lines:
-//	g_Logger.Init(TEXT("\\My Documents\\Tombo.log"));
+//	g_Logger.Init(TEXT("\\My Documents\\TomboLog.txt"));
 //	TomboMessageBox(NULL, TEXT("Log mode is ON"), TEXT("DEBUG"), MB_OK);
 
 	bDisableHotKey = FALSE;

@@ -3,12 +3,6 @@
 
 class MemoManager;
 
-#ifdef STRICT 
-typedef WNDPROC SUPER_WND_PROC;
-#else 
-typedef FARPROC SUPER_WND_PROC;
-#endif 
-
 class MemoDetailsView;
 class SearchEngineA;
 class TString;

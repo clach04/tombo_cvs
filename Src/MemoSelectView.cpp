@@ -37,7 +37,7 @@
 
 static void InsertDummyNode(HWND hTree, HTREEITEM hItem);
 static HTREEITEM FindItem2(HWND hWnd, HTREEITEM hParent, LPCTSTR pStr, DWORD nLen);
-void SelectViewSetWndProc(WNDPROC wp, HWND hParent, HINSTANCE h, MemoSelectView *p);
+void SelectViewSetWndProc(SUPER_WND_PROC wp, HWND hParent, HINSTANCE h, MemoSelectView *p);
 LRESULT CALLBACK NewSelectViewProc( HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam );
 static HIMAGELIST CreateSelectViewImageList(HINSTANCE hInst);
 
@@ -64,11 +64,9 @@ BOOL MemoSelectView::Create(LPCTSTR pName, RECT &r, HWND hParent, DWORD nID, HIN
 #endif
 	if (hViewWnd == NULL) return FALSE;
 
-#if !defined(PLATFORM_PSPC) && !defined(PLATFORM_BE500)
-	WNDPROC wp = (WNDPROC)GetWindowLong(hViewWnd, GWL_WNDPROC);
+	SUPER_WND_PROC wp = (SUPER_WND_PROC)GetWindowLong(hViewWnd, GWL_WNDPROC);
 	SelectViewSetWndProc(wp, hParent, g_hInstance, this);
 	SetWindowLong(hViewWnd, GWL_WNDPROC, (LONG)NewSelectViewProc);
-#endif
 
 	TreeView_SetImageList(hViewWnd, hSelectViewImgList, TVSIL_NORMAL);
 
@@ -1225,7 +1223,6 @@ void MemoSelectView::OnGetFocus()
 {
 	MainFrame *pMf = pMemoMgr->GetMainFrame();
 	if (pMf) {
-//		pMf->ActivateView(TRUE);
 		pMf->ActivateView(MainFrame::VT_SelectView);
 	}
 	ControlMenu();

@@ -365,7 +365,7 @@ END
 
 /////////////////////////////////////////////////////////////////////////////
 //
-// Menubar
+// Menu
 //
 
 IDR_MENU_MAIN MENU DISCARDABLE 
@@ -399,6 +399,8 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "à√çÜâª",                      IDM_ENCRYPT
         MENUITEM "ïúçÜâª",                      IDM_DECRYPT
+        MENUITEM SEPARATOR
+        MENUITEM "2âÊñ ÉÇÅ[Éh",                 IDM_TOGGLEPANE
     END
     POPUP "ÇµÇ®ÇË"
     BEGIN
