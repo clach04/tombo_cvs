@@ -1,6 +1,7 @@
 #include <windows.h>
 #include <tchar.h>
 #include "resource.h"
+#include "UniConv.h"
 #include "SearchEngine.h"
 #include "SearchTree.h"
 #include "DirList.h"
@@ -8,7 +9,6 @@
 #include "TString.h"
 #include "Message.h"
 
-static LPCTSTR GetNextDirSeparator(LPCTSTR pStart);
 static DWORD FindList(DirList *pDl, LPCTSTR pString);
 
 ////////////////////////////////
@@ -22,20 +22,11 @@ BOOL SearchTree::Init(SearchEngineA *p, LPCTSTR path, DWORD offset, BOOL bDirect
 	nBaseOffset = offset;
 	bSearchDirectionForward = bDirection;
 	bSkipOne = skip;
-
-//	pItr = new SelectViewIterator();
-//	if (!pItr) {
-//		SetLastError(ERROR_NOT_ENOUGH_MEMORY);
-//		return FALSE;
-//	}
-//	if (!pItr->Init(path, offset, FALSE)) return FALSE;
-
 	return TRUE;
 }
 
 SearchTree::~SearchTree()
 {
-//	if (pItr) delete pItr;
 }
 
 ////////////////////////////////
@@ -140,8 +131,6 @@ void SearchTree::CancelRequest()
 
 SearchTree::SearchResult SearchTree::Search()
 {
-	xxDebug = 0;
-
 	_tcscpy(aPath, pStartPath);
 	LPTSTR pBase = aPath + nBaseOffset + 1;
 	*pBase= TEXT('\0');
@@ -238,6 +227,22 @@ SearchTree::SearchResult SearchTree::SearchOneItem()
 
 	LPCTSTR p = aPath + nBaseOffset + 1;
 
+	// if target is filename
+	if (pRegex->IsFileNameOnly()) {
+		TString sPartName;
+		if (!GetBaseName(&sPartName, p)) return SR_FAILED;
+
+		BOOL bMatch;
+#ifdef _WIN32_WCE
+		char *bufA = ConvUnicode2SJIS(sPartName.Get());
+		bMatch = pRegex->SearchForward(bufA, 0, FALSE);
+		delete [] bufA;
+#else
+		bMatch = pRegex->SearchForward(sPartName.Get(), 0, FALSE);
+#endif
+		return bMatch ? SR_FOUND : SR_NOTFOUND;
+	}
+
 	// skip crypted note if it is not search target.
 	if (!pRegex->IsSearchEncryptMemo() && MemoNote::IsNote(p) == NOTE_TYPE_CRYPTED) return SR_NOTFOUND;
 
@@ -253,29 +258,12 @@ SearchTree::SearchResult SearchTree::SearchOneItem()
 	BOOL bMatch = pRegex->SearchForward(pMemo, 0, FALSE);
 	MemoNote::WipeOutAndDelete(pMemo);
 	delete pNote;
-
-	xxDebug++;
 	return bMatch ? SR_FOUND : SR_NOTFOUND;
 }
 
 /////////////////////////////////////////
 // sub functions
 /////////////////////////////////////////
-
-static LPCTSTR GetNextDirSeparator(LPCTSTR pStart)
-{
-	LPCTSTR p = pStart;
-	while(*p) {
-		if (IsDBCSLeadByte((BYTE)*p)) {
-			p++;
-			if (*p) p++;
-			continue;
-		}
-		if (*p == TEXT('\\')) return p;
-		p++;
-	}
-	return NULL;
-}
 
 // TODO: use binary search
 static DWORD FindList(DirList *pDl, LPCTSTR pString)
@@ -289,237 +277,3 @@ static DWORD FindList(DirList *pDl, LPCTSTR pString)
 	}
 	return 0xFFFFFFFF;
 }
-
-#ifdef COMMENT
-/////////////////////////////////////////
-/////////////////////////////////////////
-// SelectViewIterator implimentation
-/////////////////////////////////////////
-/////////////////////////////////////////
-
-/////////////////////////////////////////
-// Initialize
-/////////////////////////////////////////
-
-BOOL SelectViewIterator::Init(LPCTSTR pPath, DWORD base, BOOL bb)
-{
-	nStackPointer = 0;
-	_tcscpy(aPath, pPath);
-	nBaseOffset = base;
-	pBase = aPath + nBaseOffset;
-	bBack = bb;
-	if (!LayoutInitialStack(pPath)) return FALSE;
-	return GetFirstFile();
-
-}
-
-/////////////////////////////////////////
-// dtor
-/////////////////////////////////////////
-
-SelectViewIterator::~SelectViewIterator()
-{
-	// release all stack items
-	while(Top()) {
-		Pop();
-	}
-}
-
-/////////////////////////////////////////
-// set initial status to the stack
-/////////////////////////////////////////
-
-BOOL SelectViewIterator::LayoutInitialStack(LPCTSTR pPath)
-{
-	LPCTSTR pParsing = pPath + nBaseOffset + 1;
-	LPTSTR p = pBase + 1;
-
-	// push root folder to stack
-	_tcscpy(p, TEXT("*.*"));
-	if (!Push(0)) return FALSE;
-
-	// pickup next path element
-	LPCTSTR pNextSep = GetNextDirSeparator(pParsing);
-
-	// if next element is file or empty, break loop
-	while(pNextSep != NULL) {
-		// append new folder name to parse buffer
-		// p indicates elemental folder name
-		DWORD n = pNextSep - pParsing;
-		_tcsncpy(p, pParsing, n);
-		*(p + n) = TEXT('\0');
-
-		// backpatch upper level DirStackItem's current index
-		if (!Backpatch(p)) return FALSE;
-
-		// append dir separator and wildcards for enum directory.
-		_tcscat(p + n, TEXT("\\*.*"));
-		// alloc new dirlist and enum directory
-//		if (!Push(dsStack[nStackPointer - 1].nPathTail + n + 1)) return FALSE;
-		if (!Push(Top()->nPathTail + n + 1)) return FALSE;
-
-		// chop wildcards
-		*(p + n + 1) = TEXT('\0');
-
-		// for next iteration
-		pParsing = pNextSep + 1;
-		p += n + 1;
-		pNextSep = GetNextDirSeparator(pParsing);
-	}
-
-	// if last element is file, backpatch at the top of the stack.
-	if (*pParsing) {
-		// element is file
-		// backpatch upper level DirStackItem's current index
-		if (!Backpatch(pParsing)) return FALSE;
-		_tcscpy(pBase + Top()->nPathTail + 1, pParsing);
-	}
-
-	return TRUE;
-}
-
-/////////////////////////////////////////
-// Push to stack
-/////////////////////////////////////////
-
-BOOL SelectViewIterator::Push(DWORD npt)
-{
-	DirList *pDl = new DirList();
-	if (!pDl) { SetLastError(ERROR_NOT_ENOUGH_MEMORY); return FALSE; }
-	if (!pDl->Init(FALSE, FALSE)) return FALSE;
-	if (!pDl->GetList(TEXT(""), aPath)) return FALSE;
-
-	dsStack[nStackPointer].pDirList = pDl;
-	dsStack[nStackPointer].nCurrentItem = 0xFFFFFFFF;
-	dsStack[nStackPointer].nPathTail = npt;
-	nStackPointer++;
-
-	return TRUE;
-}
-
-/////////////////////////////////////////
-// Pop from stack
-/////////////////////////////////////////
-// stack item is released.
-
-void SelectViewIterator::Pop()
-{
-	// if at the top of the stack, nothing to do
-	if (!Top()) return;
-
-	nStackPointer--;
-	delete dsStack[nStackPointer].pDirList;
-}
-
-
-/////////////////////////////////////////
-// Backpatch 
-/////////////////////////////////////////
-
-BOOL SelectViewIterator::Backpatch(LPCTSTR pString)
-{
-	DirStackItem *pTop = Top();
-	if (!pTop) return FALSE;
-	pTop->nCurrentItem = FindList(pTop->pDirList, pString);
-	if (pTop->nCurrentItem == 0xFFFFFFF) {
-		// not found.
-		SetLastError(ERROR_INVALID_DATA);
-		return FALSE;
-	}
-	return TRUE;
-}
-
-/////////////////////////////////////////
-// Get first file item
-/////////////////////////////////////////
-BOOL SelectViewIterator::PushOneItem(DWORD k)
-{
-	DirStackItem *pCurrent = Top();		
-
-	DirList *pDl = pCurrent->pDirList;
-	if (pDl->NumItems() == 0) return TRUE; // empty folder
-
-	pCurrent->nCurrentItem = k; // choose kth item;
-	DirListItem *pItem = pDl->GetItem(k);
-	LPCTSTR pPathItem = pDl->GetFileName(pItem->nNamePos);
-
-	DWORD n = _tcslen(pPathItem);
-	DWORD t = pCurrent->nPathTail + 1;
-	_tcscpy(pBase + t, pPathItem);
-
-	// if item is file, return
-	if (!(pItem->bFlg)) return TRUE;
-
-	_tcscpy(pBase + t + n, TEXT("\\*.*"));
-	if (!Push(pCurrent->nPathTail + n + 1)) return FALSE;
-
-	*(pBase + t + n + 1) = TEXT('\0');
-
-	return TRUE;
-}
-
-BOOL SelectViewIterator::StackTopItem()
-{
-	// if selecting item is folder, go recursively.
-	while(TRUE) {
-		if (!PushOneItem(0)) return FALSE;
-		if (Top()->pDirList->NumItems() == 0) break;
-		if (!Top()->pDirList->GetItem(0)->bFlg) break;
-	}
-	return TRUE;
-}
-
-BOOL SelectViewIterator::GetFirstFile()
-{
-	while(TRUE) {
-		// push to top of the item
-		if (Top()->nCurrentItem == 0xFFFFFFFF ||
-			Top()->pDirList->GetItem(Top()->nCurrentItem)->bFlg) {
-			if (!StackTopItem()) return FALSE;
-		}
-		// pop till next item exists
-		while (
-			Top()->pDirList->NumItems() == 0 ||
-			Top()->nCurrentItem + 1 == Top()->pDirList->NumItems()) {
-			Pop();
-			if (!Top()) {
-				// all items are retrieved.
-				return TRUE;
-			}
-			*(pBase + Top()->nPathTail + 1) = TEXT('\0');
-		}
-		(Top()->nCurrentItem)++;
-		if (!Top()->pDirList->GetItem(Top()->nCurrentItem)->bFlg) {
-			DirList *pDl = Top()->pDirList;
-			DirListItem *pItem = pDl->GetItem(Top()->nCurrentItem);
-			LPCTSTR pPathItem = pDl->GetFileName(pItem->nNamePos);
-			_tcscpy(pBase + Top()->nPathTail + 1, pPathItem);
-			break;
-		}
-		if (!PushOneItem(Top()->nCurrentItem)) return FALSE;
-	}
-	return TRUE;
-}
-
-/////////////////////////////////////////
-// retrieve next item
-/////////////////////////////////////////
-
-BOOL SelectViewIterator::Next()
-{
-#ifdef COMMENT
-	if (Top()->nCurrentItem == 0xFFFFFFFF) {
-		// current selecting is directory. Stack first item.
-	}
-
-	DWORD n = Top()->pDirLst->NumItems();
-	if (Top()->nCurrentItem < n) {
-		(Top()->nCurrentItem)++;
-	} else {
-		// Scan finished in this directory. Stack next one.
-		Sleep(1);
-	}
-#endif
-	return TRUE;
-}
-#endif

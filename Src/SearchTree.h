@@ -6,55 +6,6 @@
 class SearchEngineA;
 class DirList;
 
-#ifdef COMMENT
-///////////////////////////////////////////////////////////
-// SelectView iterator
-///////////////////////////////////////////////////////////
-// for support partial traversing on the tree, 
-// current position information are implimented by stack.
-
-struct DirStackItem {
-	DWORD nPathTail;
-	DirList *pDirList;
-	DWORD nCurrentItem; // if not selected, 0xFFFFFFFF
-};
-
-class SelectViewIterator {
-private:
-	// path information
-	TCHAR aPath[MAX_PATH*2];
-	LPTSTR pBase;
-	DWORD nBaseOffset;
-
-	// directory stack
-	DirStackItem dsStack[32]; // TODO: change vector stack
-	DWORD nStackPointer;
-
-	// scan direction
-	BOOL bBack;
-
-protected:
-	BOOL Push(DWORD nPathTail);
-	void Pop();
-	DirStackItem *Top() { return nStackPointer ? dsStack + (nStackPointer - 1) : NULL; }
-	BOOL Backpatch(LPCTSTR pString);
-	BOOL LayoutInitialStack(LPCTSTR pPath);
-
-	BOOL GetFirstFile();
-
-	BOOL StackTopItem();
-	BOOL PushOneItem(DWORD n);
-
-public:
-	~SelectViewIterator();
-	BOOL Init(LPCTSTR pPath, DWORD nBaseOffset, BOOL bBack);
-
-	BOOL Next();
-	BOOL IsFinish();
-	LPCTSTR CurrentPath() { return aPath; }
-};
-#endif
-
 ///////////////////////////////////////////////////////////
 // Popup "searching" dialog and do search another thread
 ///////////////////////////////////////////////////////////
@@ -82,7 +33,6 @@ private:
 	///////////////////////////////
 	// for searching variables
 
-//	SelectViewIterator *pItr;
 	SearchEngineA *pRegex;
 	BOOL bSearchDirectionForward;
 	BOOL bSearchEncryptedMemo;
@@ -129,9 +79,6 @@ public:
 
 	LPCTSTR GetFullPath() { return aPath; }
 	LPCTSTR GetPartPath() { return aPath + nBaseOffset + 1; }
-
-	DWORD xxDebug;
 };
-
 
 #endif
