@@ -575,7 +575,20 @@ void MemoSelectView::OnNotify_RClick()
 		OnPaste();
 		break;
 	case IDM_ENCRYPT:
-		OnEncrypt(pItem);
+		{
+			MemoNote *pNote = ((TreeViewFileItem*)pItem)->GetNote();
+			if (g_Property.IsUseTwoPane() && pMemoMgr->IsNoteDisplayed(pNote->MemoPath())) {
+				pMemoMgr->InactiveDetailsView();
+			}
+			TV_HITTESTINFO hti;
+			hti.pt = pth;
+			TreeView_HitTest(hViewWnd, &hti);
+			if (hti.hItem == NULL) return;
+
+			TreeViewItem *pItem = GetTVItem(hti.hItem);
+
+			OnEncrypt(pItem);
+		}
 		break;
 	case IDM_DECRYPT:
 		OnDecrypt(pItem);
