@@ -242,6 +242,7 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "&Save\tCtrl+S",               IDM_SAVE
         MENUITEM SEPARATOR
+        MENUITEM "&About TOMBO",                IDM_ABOUT
         MENUITEM "E&xit",                       IDM_EXIT
     END
     POPUP "&Edit"
@@ -252,14 +253,16 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "Select &All\tCtrl+A",         IDM_SELALL
         MENUITEM SEPARATOR
+        MENUITEM "Insert Date1\tCtrl+1",        IDM_INSDATE1
+        MENUITEM "Insert Date2\tCtrl+2",        IDM_INSDATE2
+    END
+    POPUP "&Search"
+    BEGIN
         MENUITEM "&Find\tCtrl+F",               IDM_SEARCH
         MENUITEM "Find Next\tF3",               IDM_SEARCH_NEXT
         MENUITEM "Find Prev\tShift+F3",         IDM_SEARCH_PREV
-        MENUITEM SEPARATOR
+        MENUITEM "",                            1
         MENUITEM "Grep\tCtrl+G",                IDM_GREP
-        MENUITEM SEPARATOR
-        MENUITEM "Insert Date1\tCtrl+1",        IDM_INSDATE1
-        MENUITEM "Insert Date2\tCtrl+2",        IDM_INSDATE2
     END
     POPUP "&Tools"
     BEGIN
@@ -273,10 +276,6 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "&Options",                    IDM_PROPERTY
         MENUITEM "Status bar",                  IDM_SHOWSTATUSBAR, CHECKED
-    END
-    POPUP "&Help"
-    BEGIN
-        MENUITEM "&About TOMBO",                IDM_ABOUT
     END
 END
 

@@ -248,6 +248,7 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "保存(&S)\tCtrl+S",            IDM_SAVE
         MENUITEM SEPARATOR
+        MENUITEM "バージョン情報(&A)",          IDM_ABOUT
         MENUITEM "終了(&X)",                    IDM_EXIT
     END
     POPUP "編集(&E)"
@@ -258,14 +259,16 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "全選択(&A)\tCtrl+A",          IDM_SELALL
         MENUITEM SEPARATOR
+        MENUITEM "日付1\tCtrl+1",               IDM_INSDATE1
+        MENUITEM "日付2\tCtrl+2",               IDM_INSDATE2
+    END
+    POPUP "検索(&S)"
+    BEGIN
         MENUITEM "検索(&F)\tCtrl+F",            IDM_SEARCH
         MENUITEM "次を検索\tF3",                IDM_SEARCH_NEXT
         MENUITEM "前を検索\tShift+F3",          IDM_SEARCH_PREV
-        MENUITEM SEPARATOR
+        MENUITEM "",                            2
         MENUITEM "Grep\tCtrl+G",                IDM_GREP
-        MENUITEM SEPARATOR
-        MENUITEM "日付1\tCtrl+1",               IDM_INSDATE1
-        MENUITEM "日付2\tCtrl+2",               IDM_INSDATE2
     END
     POPUP "ツール(&T)"
     BEGIN
@@ -279,10 +282,6 @@ BEGIN
         MENUITEM "パスワード消去(&F)",          IDM_FORGETPASS
         MENUITEM SEPARATOR
         MENUITEM "プロパティ(&O)",              IDM_PROPERTY
-    END
-    POPUP "ヘルプ(&H)"
-    BEGIN
-        MENUITEM "バージョン情報(&A)",          IDM_ABOUT
     END
 END
 
