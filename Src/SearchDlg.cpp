@@ -76,6 +76,8 @@ void SearchDialog::InitDialog(HWND hDlg)
 	EnableWindow(hCheckEncrypt, bCheckEncrypt);
 	HWND hFileNameOnly = GetDlgItem(hDlg, IDC_FILENAMEONLY);
 	EnableWindow(hFileNameOnly, bFileNameOnly);
+	
+	CheckRadioButton(hDlg, IDC_SEARCH_DIRECTION_UP, IDC_SEARCH_DIRECTION_DOWN, IDC_SEARCH_DIRECTION_DOWN);
 }
 
 ////////////////////////////////////////////////////////////////
@@ -117,6 +119,10 @@ BOOL SearchDialog::OnOK()
 
 	HWND hFileNameOnly = GetDlgItem(hDialog, IDC_FILENAMEONLY);
 	bFileNameOnly = (SendMessage(hFileNameOnly, BM_GETCHECK, 0, 0) == BST_CHECKED);
+
+	// Search direction
+	HWND hSearchDirectionUp = GetDlgItem(hDialog, IDC_SEARCH_DIRECTION_UP);
+	bSearchDirectionUp = (SendMessage(hSearchDirectionUp, BM_GETCHECK, 0, 0) == BST_CHECKED);
 
 	// åüçıï∂éöóÒ
 	HWND hSearchWord = GetDlgItem(hDialog, IDC_SEARCH_STRING);

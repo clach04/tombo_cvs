@@ -280,11 +280,16 @@ BEGIN
     PUSHBUTTON      "Cancel",IDCANCEL,130,75,50,14
     LTEXT           "Search strÅF",IDC_STATIC,5,5,45,10
     CONTROL         "Case sensitive",IDC_SEARCH_CASESENSITIVE,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,10,25,165,10
+                    BS_AUTOCHECKBOX | WS_TABSTOP,10,25,100,10
     CONTROL         "Include encrypted memo",IDC_SEARCH_ENCRYPTMEMO,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,10,40,165,10
+                    BS_AUTOCHECKBOX | WS_TABSTOP,10,40,100,10
     CONTROL         "Find to file name",IDC_FILENAMEONLY,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,10,55,165,10
+                    BS_AUTOCHECKBOX | WS_TABSTOP,10,55,100,10
+    CONTROL         "Up",IDC_SEARCH_DIRECTION_UP,"Button",BS_AUTORADIOBUTTON,
+                    135,35,26,10
+    CONTROL         "Down",IDC_SEARCH_DIRECTION_DOWN,"Button",
+                    BS_AUTORADIOBUTTON,135,45,35,10
+    GROUPBOX        "Direction",IDC_STATIC,125,25,55,35
 END
 
 

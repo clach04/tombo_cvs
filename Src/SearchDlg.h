@@ -15,12 +15,13 @@ class SearchDialog {
 	BOOL bCaseSensitive;
 	BOOL bCheckEncrypt;
 	BOOL bFileNameOnly;
+	BOOL bSearchDirectionUp;
 public:
 
 	////////////////////////////////
 	// ctor & dtor
 
-	SearchDialog() : hDialog(NULL), hInstance(NULL), pSearchStr(NULL), bCaseSensitive(FALSE), bFileNameOnly(FALSE) {}
+	SearchDialog() : hDialog(NULL), hInstance(NULL), pSearchStr(NULL), bCaseSensitive(FALSE), bFileNameOnly(FALSE), bSearchDirectionUp(FALSE) {}
 	~SearchDialog();
 
 	////////////////////////////////
@@ -42,6 +43,7 @@ public:
 	BOOL IsCaseSensitive() { return bCaseSensitive; }
 	BOOL IsSearchEncryptMemo() { return bCheckEncrypt; }
 	BOOL IsFileNameOnly() { return bFileNameOnly; }
+	BOOL IsSearchDirectionUp() { return bSearchDirectionUp; }
 };
 
 

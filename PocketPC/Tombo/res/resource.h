@@ -69,6 +69,8 @@
 #define IDC_FILENAMEONLY                1030
 #define IDC_DATEFORMAT_DESC             1032
 #define IDC_VERSIONINFO                 1033
+#define IDC_SEARCH_DIRECTION_UP         1034
+#define IDC_SEARCH_DIRECTION_DOWN       1035
 #define IDM_ACTIONBUTTON                30001
 #define IDM_FILE_EXIT                   40002
 #define IDM_HELP_ABOUT                  40003
@@ -136,7 +138,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        122
 #define _APS_NEXT_COMMAND_VALUE         40067
-#define _APS_NEXT_CONTROL_VALUE         1034
+#define _APS_NEXT_CONTROL_VALUE         1036
 #define _APS_NEXT_SYMED_VALUE           106
 #endif
 #endif
