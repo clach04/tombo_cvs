@@ -3,6 +3,7 @@
 #if defined(_WIN32_WCE) && defined(PLATFORM_PKTPC)
 #include <aygshell.h>
 #endif
+#include "Tombo.h"
 #include "resource.h"
 #include "MemoDetailsView.h"
 #include "MemoManager.h"
@@ -11,11 +12,7 @@
 
 #include "Property.h"
 
-static MemoManager *pManager; 
-//static MemoDetailsView *pView;
-static SimpleEditor *pView;
-static HINSTANCE hInst;
-static HWND hParentWnd;
+//static MemoManager *pManager; 
 static SUPER_WND_PROC gSuperProc;
 
 static BOOL bCtrlKeyDown = FALSE;
@@ -30,15 +27,23 @@ static BOOL bCtrlKeyDown = FALSE;
 void SetWndProc(SUPER_WND_PROC wp, HWND hParent, HINSTANCE h, SimpleEditor *p, MemoManager *pMgr)
 {
 	gSuperProc = wp;
-	hParentWnd = hParent;
-	hInst = h;
-	pView = p;
-	pManager = pMgr;
 }
 
 /////////////////////////////////////////
 // Window procedure for sub classing editview
 /////////////////////////////////////////
+SUPER_WND_PROC gDefaultProc;
+DWORD gDelta;
+
+LRESULT CALLBACK DetailsViewSuperProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	if (msg == WM_CREATE) {
+		LPCREATESTRUCT pCS = (LPCREATESTRUCT)lParam;
+		SimpleEditor *frm = (SimpleEditor*)pCS->lpCreateParams;
+		SetWindowLong(hwnd, gDelta, (LONG)frm);
+	}
+	return CallWindowProc(gDefaultProc, hwnd, msg, wParam, lParam);
+}
 
 #if defined(PLATFORM_SIG3)
 INT nSelBase = -1;
@@ -46,6 +51,11 @@ INT nSelBase = -1;
 
 LRESULT CALLBACK NewDetailsViewProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
+	SimpleEditor *pView = (SimpleEditor*)GetWindowLong(hwnd, gDelta);
+	if (pView == NULL) {
+		return CallWindowProc(gDefaultProc, hwnd, msg, wParam, lParam);
+	}
+
 	switch(msg) {
 	case WM_CLEAR:
 		if (pView->IsReadOnly()) return 0;
@@ -128,7 +138,7 @@ LRESULT CALLBACK NewDetailsViewProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM l
 		}
 		break;
 	case WM_CHAR:
-		pManager->SetMDSearchFlg(TRUE); // clear search status flag
+		pView->SetMDSearchFlg(TRUE); // clear search status flag
 
 		// if read only mode, ignore key events
 		if (pView->IsReadOnly()) return 0;
@@ -136,11 +146,15 @@ LRESULT CALLBACK NewDetailsViewProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM l
 		if (wParam == KEY_CTRL_B) return 0;
 		break;
 
+	case WM_COMMAND:
+		pView->OnCommand(hwnd, wParam, lParam);
+		break;
+
 #if defined(PLATFORM_PKTPC)
 	case WM_LBUTTONDOWN:
 		{
 			// clear search status
-			pManager->SetMDSearchFlg(TRUE);
+			pView->SetMDSearchFlg(TRUE);
 
 			// Tap&hold
 			SHRGINFO rgi;
@@ -154,9 +168,9 @@ LRESULT CALLBACK NewDetailsViewProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM l
 				//IDR_MENUBAR1
 				HMENU hX;
 				HMENU hPopup;
-				hX = LoadMenu(hInst, MAKEINTRESOURCE(IDR_MENUBAR1));
+				hX = LoadMenu(g_hInstance, MAKEINTRESOURCE(IDR_MENUBAR1));
 				hPopup = GetSubMenu(hX, 0);
-				TrackPopupMenuEx(hPopup, 0, rgi.ptDown.x, rgi.ptDown.y, hParentWnd, NULL);
+				TrackPopupMenuEx(hPopup, 0, rgi.ptDown.x, rgi.ptDown.y, hwnd, NULL);
 				DestroyMenu(hX);
 				return 0;
 			}
@@ -165,7 +179,7 @@ LRESULT CALLBACK NewDetailsViewProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM l
 #else
 	case WM_LBUTTONDOWN:
 		// clear search status
-		pManager->SetMDSearchFlg(TRUE);
+		pView->SetMDSearchFlg(TRUE);
 #if defined(PLATFORM_SIG3)
 		{
 			INT xPos, yPos;

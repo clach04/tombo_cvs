@@ -611,3 +611,13 @@ Changes
 // main trunk
 
 * impliment IDM_TOGGLEPANE (PocketPC version)
+
+////////////////////////////////
+// B137
+////////////////////////////////
+// main trunk
+
+* major refactoring
+	- modify MemoDetailsView for multi instance support.
+	- impliment MemoDetailsViewDlg for support morden PocketPC style but not used in this version.
+

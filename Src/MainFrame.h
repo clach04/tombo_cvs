@@ -108,7 +108,6 @@ public:
 	void OnMouseMove(WPARAM wParam, LPARAM lParam);
 	void OnLButtonUp(WPARAM wParam, LPARAM lParam);
 
-//	void SetLayout(DWORD nWidth, DWORD nHeight, DWORD nSplit);
 	void SetLayout(DWORD nSplit);
 
 	////////////////////
@@ -127,6 +126,7 @@ public:
 
 	void RequestOpenMemo(LPCTSTR pURI, DWORD nSwitchView);
 	void PostSwitchView(DWORD nView) { PostMessage(hMainWnd, MWM_SWITCH_VIEW, (WPARAM)nView, (LPARAM)0); }
+//	void PopupEditViewDlg();
 
 	void OnList(BOOL bAskSave);
 
@@ -183,6 +183,7 @@ public:
 	////////////////////////////////
 	// misc funcs
 
+	MemoManager *GetManager() { return &mmMemoManager; }
 	int MessageBox(LPCTSTR pText, LPCTSTR pCaption, UINT uType); 
 };
 

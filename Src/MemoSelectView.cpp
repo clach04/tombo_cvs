@@ -393,7 +393,8 @@ LRESULT MemoSelectView::OnNotify(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 			if (!tvi->HasMultiItem()) {
 				tvi->OpenMemo(this, OPEN_REQUEST_MSVIEW_ACTIVE);
-				pMemoMgr->GetMainFrame()->PostSwitchView(OPEN_REQUEST_MSVIEW_ACTIVE);
+				pMemoMgr->GetMainFrame()->PostSwitchView(OPEN_REQUEST_MDVIEW_ACTIVE);
+				return 0;
 			}
 			// ˆÃ–Ù‚ÅExpand/Collapse‚ª”­¶
 		}

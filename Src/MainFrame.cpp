@@ -28,6 +28,10 @@
 #include "PsPCPlatform.h"
 #include "HPCPlatform.h"
 #include "LagendaPlatform.h"
+#if defined(PLATFORM_PKTPC)
+#include "DialogTemplate.h"
+#include "DetailsViewDlg.h"
+#endif
 
 #ifdef _WIN32_WCE
 #if defined(PLATFORM_PKTPC)
@@ -170,9 +174,9 @@ static LRESULT CALLBACK MainFrameWndProc(HWND hWnd, UINT nMessage, WPARAM wParam
 		if (bRes != 0xFFFFFFFF) return bRes;
 		break;
 	case MWM_SWITCH_VIEW:
-		if (lParam == OPEN_REQUEST_MDVIEW_ACTIVE) {
+		if (wParam == OPEN_REQUEST_MDVIEW_ACTIVE) {
 			frm->ActivateView(FALSE);
-		} else if (lParam == OPEN_REQUEST_MSVIEW_ACTIVE) {
+		} else if (wParam == OPEN_REQUEST_MSVIEW_ACTIVE) {
 			frm->ActivateView(TRUE);
 		}
 		return 0;
@@ -328,14 +332,83 @@ int MainFrame::MainLoop() {
 }
 
 ///////////////////////////////////////////////////
-// ウィンドウ生成
+// DetailsView callback
+///////////////////////////////////////////////////
+
+class MFDetailsViewCallback : public MemoDetailsViewCallback {
+	MainFrame *pMainFrame;
+public:
+	MFDetailsViewCallback(MainFrame *p) : pMainFrame(p) {}
+	void GetFocusCallback(MemoDetailsView *pView);
+	void SetModifyStatusCallback(MemoDetailsView *pView);
+	SearchEngineA *GetSearchEngine(MemoDetailsView *pView);
+	void SetReadOnlyStatusCallback(MemoDetailsView *pView);
+	void GetCurrentSelectedPath(MemoDetailsView *pView, TString *pPath);
+
+	void SetSearchFlg(BOOL bFlg);
+};
+
+void MFDetailsViewCallback::GetFocusCallback(MemoDetailsView *pView)
+{
+	if (!g_Property.IsUseTwoPane()) return;
+
+	MainFrame *pMf = pMainFrame;
+	if (pMf) {
+		// switch view
+		pMf->ActivateView(FALSE);
+
+		// menu control
+		pMf->EnableDelete(FALSE);
+		pMf->EnableRename(FALSE);
+		pMf->EnableEncrypt(FALSE);
+		pMf->EnableDecrypt(FALSE);
+		pMf->EnableNewFolder(FALSE);
+		pMf->EnableGrep(FALSE);
+
+		pMf->EnableCut(TRUE);
+		pMf->EnableCopy(TRUE);
+		pMf->EnablePaste(TRUE);
+	}
+	pView->SetModifyStatus();
+}
+
+void MFDetailsViewCallback::SetModifyStatusCallback(MemoDetailsView *pView)
+{
+	pMainFrame->SetModifyStatus(pView->IsModify());
+}
+
+void MFDetailsViewCallback::SetReadOnlyStatusCallback(MemoDetailsView *pView)
+{
+	pMainFrame->SetReadOnlyStatus(pView->IsReadOnly());
+}
+
+SearchEngineA *MFDetailsViewCallback::GetSearchEngine(MemoDetailsView *pView)
+{
+	return pMainFrame->GetManager()->GetSearchEngine();
+}
+
+void MFDetailsViewCallback::GetCurrentSelectedPath(MemoDetailsView *pView, TString *pPath)
+{
+	pMainFrame->GetManager()->GetCurrentSelectedPath(pPath);
+}
+
+void MFDetailsViewCallback::SetSearchFlg(BOOL bFlg)
+{
+	pMainFrame->GetManager()->SetMDSearchFlg(bFlg);
+}
+
+///////////////////////////////////////////////////
+// Create main window
 ///////////////////////////////////////////////////
 
 BOOL MainFrame::Create(LPCTSTR pWndName, HINSTANCE hInst, int nCmdShow)
 {
 	hInstance = hInst;
 
-	SimpleEditor *pSe = new SimpleEditor();
+	SimpleEditor::RegisterClass(hInst);
+
+	MFDetailsViewCallback *pCb = new MFDetailsViewCallback(this);
+	SimpleEditor *pSe = new SimpleEditor(pCb);
 	pDetailsView = pSe;
 
 //	YAEditor *pYAE = new YAEditor();
@@ -1036,7 +1109,7 @@ void MainFrame::OnList(BOOL bAskSave)
 	if (g_Property.IsUseTwoPane()) {
 		// 2Paneの場合、暗号化されたメモのみクリアする
 		if (nYNC == IDNO) {
-			// メモを破棄し、旧メモをリロード
+			// discard current note and load old one.
 			if (mmMemoManager.GetCurrentURI()) {
 				RequestOpenMemo(mmMemoManager.GetCurrentURI(), OPEN_REQUEST_MDVIEW_ACTIVE);
 			} else {
@@ -1079,7 +1152,7 @@ void MainFrame::About()
 ///////////////////////////////////////////////////
 // Request open the note
 ///////////////////////////////////////////////////
-// bSwitchViewがTRUEの場合には詳細ビューに切り替える
+// switch edit view when bSwitchView is TRUE
 
 void MainFrame::RequestOpenMemo(LPCTSTR pURI, DWORD nSwitchView)
 {
@@ -1122,14 +1195,42 @@ void MainFrame::RequestOpenMemo(LPCTSTR pURI, DWORD nSwitchView)
 
 	if (!(nSwitchView & OPEN_REQUEST_NO_ACTIVATE_VIEW)) {
 		if (g_Property.IsUseTwoPane()) {
+#if defined(PLATFORM_PKTPC)
+			if (nSwitchView & OPEN_REQUEST_MSVIEW_ACTIVE) {
+				if (nSwitchView & OPEN_REQUEST_MAXIMIZE) {
+//					::MessageBox(NULL, TEXT("Maximize"), TEXT("DEBUG"), MB_OK);
+
+					ActivateView(FALSE);
+				} else {
+					ActivateView(FALSE);
+				}
+			}
+#else
 			if (nSwitchView & OPEN_REQUEST_MSVIEW_ACTIVE) {
 				ActivateView(FALSE);
 			}
+#endif
 		} else {
 			ActivateView(FALSE);
 		}
 	}
 }
+
+#ifdef COMMENT
+void MainFrame::PopupEditViewDlg()
+{
+#if defined(PLATFORM_PKTPC)
+	LPTSTR p = pDetailsView->GetMemo(); // p is deleted by DetailsViewDlg
+
+	DetailsViewDlg dlg;
+	int result = dlg.Popup(g_hInstance, hMainWnd, &mmMemoManager, p);
+
+	if (result == IDYES) {
+	}
+
+#endif
+}
+#endif
 
 ///////////////////////////////////////////////////
 // switch view
@@ -1139,7 +1240,10 @@ void MainFrame::RequestOpenMemo(LPCTSTR pURI, DWORD nSwitchView)
 
 void MainFrame::ActivateView(BOOL bList)
 {
-	if (bSelectViewActive == bList) return;
+	if (bSelectViewActive == bList) {
+		SetFocus();
+		return;
+	}
 
 	bSelectViewActive = bList;
 
@@ -1153,31 +1257,18 @@ void MainFrame::ActivateView(BOOL bList)
 #endif
 
 	if (g_Property.IsUseTwoPane()) {
-		// 2-Pane版では両ビューを同時表示
+		// show both pane if two pane mode.
 		pDetailsView->Show(SW_SHOW);
 		msView.Show(SW_SHOW);
 	} else {
-		// CE版(& CEデバグ版 on Win32) ではビューの切り替えを行う
-		// ビューの表示・非表示の切り替え
-		// コマンドバーの切り替え
-		// フォーカスの切り替え
-
 		if (bSelectViewActive) {
 			// tree view
 			pDetailsView->Show(SW_HIDE);
 			msView.Show(SW_SHOW);
-
-#if defined(PLATFORM_PKTPC) || defined(PLATFROM_PSPC) || defined(PLATFORM_BE500)
-			pPlatform->CloseDetailsView();
-#endif
 		} else {
 			// edit view
 			msView.Show(SW_HIDE);
 			pDetailsView->Show(SW_SHOW);
-
-#if defined(PLATFORM_PKTPC) || defined(PLATFROM_PSPC) || defined(PLATFORM_BE500)
-			pPlatform->OpenDetailsView();
-#endif
 		}
 	}
 	SetFocus();
@@ -1464,12 +1555,14 @@ void MainFrame::TogglePane()
 		SaveWinSize();
 	}
 
-	g_Property.SetUseTwoPane(g_Property.IsUseTwoPane() ? MF_UNCHECKED : MF_CHECKED);
+	DWORD nPane = g_Property.IsUseTwoPane() ? MF_UNCHECKED : MF_CHECKED;
+	g_Property.SetUseTwoPane(nPane);
 
 	RECT r;
 	GetClientRect(hMainWnd, &r);
 
-	if (g_Property.IsUseTwoPane()) {
+//	if (g_Property.IsUseTwoPane()) {
+	if (nPane) {
 		// 1->2Pane
 		UINT u1, u2;
 		RECT rr;

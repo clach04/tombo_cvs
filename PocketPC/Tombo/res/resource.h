@@ -14,6 +14,7 @@
 #define IDD_PASSWORD                    105
 #define IDC_MEMODETAILSVIEW_NF          105
 #define IDD_PROPTAB_FOLDER              106
+#define IDC_DETAILSVIEWDLG              106
 #define IDD_FILESELECT                  107
 #define IDB_ARTICLEBOX                  108
 #define IDD_PROPTAB_PASSWORD            109
@@ -37,6 +38,7 @@
 #define IDD_DIALOG2                     127
 #define IDD_PROPTAB_DEFNOTE             127
 #define IDD_PROPTAB_SIP                 128
+#define IDD_DETAILSVIEW                 129
 #define IDD_BOOKMARK_EDIT               134
 #define IDD_FILTERDEF_SRC               138
 #define IDD_FILTERDEF_FILTER            139
@@ -50,6 +52,7 @@
 #define IDS_MAIN_MENUITEM2              412
 #define IDM_MAIN_MENU                   450
 #define IDM_DETAILS_MENU                460
+#define IDM_DETAILSDLG_MENU             461
 #define IDC_PASS                        1001
 #define IDC_TOPFOLDER                   1002
 #define IDC_FOLDERSEL                   1003
@@ -208,9 +211,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        129
+#define _APS_NEXT_RESOURCE_VALUE        130
 #define _APS_NEXT_COMMAND_VALUE         40079
 #define _APS_NEXT_CONTROL_VALUE         1045
-#define _APS_NEXT_SYMED_VALUE           106
+#define _APS_NEXT_SYMED_VALUE           107
 #endif
 #endif

@@ -14,6 +14,7 @@ protected:
 
 	DWORD Popup(HINSTANCE hInst, WORD nID, HWND hParent);
 
+	int nResult;
 public:
 	virtual void InitDialog(HWND hDlg);
 	virtual BOOL OnOK();
@@ -23,6 +24,8 @@ public:
 
 
 	void SetDialog(HWND hDlg);
+	void SetResult(int n) { nResult = n;}
+	int GetResult() { return nResult; }
 };
 
 } // end namespace
