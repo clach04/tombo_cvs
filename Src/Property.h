@@ -118,11 +118,14 @@ public:
 #if defined(PLATFORM_HPC) || defined(PLATFORM_WIN32)
 	// Hide status bar
 	DWORD HideStatusBar() { return nHideStatusBar; }
+	void ToggleShowStatusBar() { nHideStatusBar = !nHideStatusBar; }
 #endif
 
 	// ウィンドウサイズ関連の保存・復元
 	static BOOL SaveWinSize(LPRECT pWinRect, WORD nSelectViewWidth);
 	static BOOL GetWinSize(LPRECT pWinRect, LPWORD pSelectViewWidth);
+
+	BOOL SaveStatusBarStat();
 
 	friend class FolderTab;
 	friend class PasswordTab;

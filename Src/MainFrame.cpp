@@ -781,11 +781,11 @@ void MainFrame::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 	// Status Bar
 #if defined(PLATFORM_HPC)
-	hStatusBar = CreateStatusWindow(WS_CHILD | WS_VISIBLE , TEXT(""), 
+	hStatusBar = CreateStatusWindow(WS_CHILD , TEXT(""), 
 									hWnd, IDC_STATUS);
 #endif
 #if defined(PLATFORM_WIN32)
-	hStatusBar = CreateStatusWindow(WS_CHILD | WS_VISIBLE | SBARS_SIZEGRIP, "", 
+	hStatusBar = CreateStatusWindow(WS_CHILD | SBARS_SIZEGRIP, "", 
 									hWnd, IDC_STATUS);
 #endif
 #if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
@@ -793,6 +793,21 @@ void MainFrame::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	SendMessage(hStatusBar, SB_SETTEXT, 0 | SBT_NOBORDERS , (LPARAM)"");
 	SetNewMemoStatus(g_Property.IsUseTwoPane());
 	SetModifyStatus(FALSE);
+
+	// control show/hide status bar
+#if defined(PLATFORM_WIN32)
+	HMENU hMenu = GetMenu(hWnd);
+#else
+	HMENU hMenu = CommandBar_GetMenu(GetCommandBar(hMSCmdBar, ID_CMDBAR_MAIN), 0);
+#endif
+	if (g_Property.HideStatusBar()) {
+		CheckMenuItem(hMenu, IDM_SHOWSTATUSBAR, MF_BYCOMMAND | MF_UNCHECKED);
+	} else {
+		CheckMenuItem(hMenu, IDM_SHOWSTATUSBAR, MF_BYCOMMAND | MF_CHECKED);
+		ShowWindow(hStatusBar, SW_SHOW);
+	}	
+
+
 #endif
 
 #if defined(PLATFORM_WIN32)
@@ -939,6 +954,7 @@ BOOL MainFrame::OnExit()
 	pmPasswordMgr.ForgetPassword();
 #if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
 	SaveWinSize();
+	g_Property.SaveStatusBarStat();
 #endif
 #if defined(PLATFORM_HPC)
 	// save rebar info
@@ -1019,6 +1035,11 @@ void MainFrame::OnCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	case IDM_SEARCH_PREV:
 		OnSearchNext(FALSE);
 		break;
+#if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
+	case IDM_SHOWSTATUSBAR:
+		ToggleShowStatusBar();
+		break;
+#endif
 	}
 	return;
 }
@@ -1148,9 +1169,16 @@ void MainFrame::OnResize(WPARAM wParam, LPARAM lParam)
 	WORD wLeftWidth, wHeight;
 	msView.GetSize(&wLeftWidth, &wHeight);
 
-	RECT rStatus;
-	GetWindowRect(hStatusBar, &rStatus);
-	WORD nStatusHeight = (WORD)(rStatus.bottom - rStatus.top);
+	WORD nStatusHeight;
+	if (g_Property.HideStatusBar()) {
+		nStatusHeight = 0;
+		ShowWindow(hStatusBar, SW_HIDE);
+	} else {
+		RECT rStatus;
+		GetWindowRect(hStatusBar, &rStatus);
+		nStatusHeight = (WORD)(rStatus.bottom - rStatus.top);
+		ShowWindow(hStatusBar, SW_SHOW);
+	}
 
 	if (g_Property.IsUseTwoPane()) {
 		msView.MoveWindow(0, nRebarH , wLeftWidth, nHeight-nRebarH - nStatusHeight);
@@ -2057,6 +2085,33 @@ void MainFrame::OnSearchNext(BOOL bForward)
 		mmMemoManager.SetMDSearchFlg(FALSE);
 	}
 }
+
+///////////////////////////////////////////////////
+// show/hide status bar
+///////////////////////////////////////////////////
+
+#if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
+void MainFrame::ToggleShowStatusBar()
+{
+	g_Property.ToggleShowStatusBar();
+
+#if defined(PLATFORM_WIN32)
+	HMENU hMenu = GetMenu(hMainWnd);
+#else
+	HMENU hMenu = CommandBar_GetMenu(GetCommandBar(hMSCmdBar, ID_CMDBAR_MAIN), 0);
+#endif
+
+	if (g_Property.HideStatusBar()) {
+		CheckMenuItem(hMenu, IDM_SHOWSTATUSBAR, MF_BYCOMMAND | MF_UNCHECKED);
+	} else {
+		CheckMenuItem(hMenu, IDM_SHOWSTATUSBAR, MF_BYCOMMAND | MF_CHECKED);
+	}
+
+	RECT r;
+	GetClientRect(hMainWnd, &r);
+	OnResize(0, MAKELPARAM(r.right - r.left, r.bottom - r.top));
+}
+#endif
 
 ///////////////////////////////////////////////////
 // コマンドバンドからIDでコマンドバーを取得

@@ -47,8 +47,9 @@
 #define PROP_FOLDER_ATTR_NAME TEXT("PropertyDir")
 #define CODEPAGE_ATTR_NAME TEXT("CodePage")
 #define DISABLEEXTRAACTIONBUTTON_ATTR_NAME TEXT("DisableExtraActionButton")
-#define HIDESTATUSBAR_ATTR_NAME TEXT("HideStatusBar")
 
+// saved each exit time.
+#define HIDESTATUSBAR_ATTR_NAME TEXT("HideStatusBar")
 #define TOMBO_WINSIZE_ATTR_NAME TEXT("WinSize")
 #define TOMBO_REBARHIST_ATTR_NAME TEXT("RebarPos")
 
@@ -1256,6 +1257,7 @@ BOOL Property::Load(BOOL *pStrict)
 	if (res != ERROR_SUCCESS) {
 		nHideStatusBar = 0;
 	}
+#endif
 
 	RegCloseKey(hTomboRoot);
 	return TRUE;
@@ -1745,6 +1747,23 @@ BOOL RetrieveAndSaveHistory(HWND hCombo, LPCTSTR pAttrName, LPCTSTR pSelValue, D
 	delete [] p; 
 
 	return bResult;
+}
+
+///////////////////////////////////////////////////
+// Save statusbar info
+///////////////////////////////////////////////////
+
+BOOL Property::SaveStatusBarStat()
+{
+#if defined(PLATFORM_HPC) || defined(PLATFORM_WIN32)
+	HKEY hTomboRoot = GetTomboRootKey();
+	if (!hTomboRoot) return FALSE;
+
+	if (!SetDWORDToReg(hTomboRoot, HIDESTATUSBAR_ATTR_NAME, nHideStatusBar)) return FALSE;
+
+	RegCloseKey(hTomboRoot);
+	return TRUE;
+#endif
 }
 
 ///////////////////////////////////////////////////

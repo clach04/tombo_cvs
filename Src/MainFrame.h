@@ -129,6 +129,10 @@ public:
 	void SetNewMemoStatus(BOOL bNew) { SetStatusIndicator(2, MSG_NEW, bNew); }
 	void SetModifyStatus(BOOL bModify) { SetStatusIndicator(3, MSG_UPDATE, bModify); }
 
+#if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
+	void ToggleShowStatusBar();
+#endif
+
 	// タイトルの変更
 	void SetTitle(LPCTSTR pTitle);
 
