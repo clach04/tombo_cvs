@@ -173,12 +173,43 @@ LRESULT CALLBACK NewDetailsViewProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM l
 			rgi.ptDown.y = HIWORD(lParam);
 			rgi.dwFlags = SHRG_RETURNCMD;
 
-			if (SHRecognizeGesture(&rgi) == GN_CONTEXTMENU) {
-//				CallWindowProc(gSuperProc, hwnd, msg, wParam, lParam);
 
+			if (SHRecognizeGesture(&rgi) == GN_CONTEXTMENU) {
 				HMENU hPopup = PocketPCPlatform::LoadDetailsViewPopupMenu();
-				TrackPopupMenuEx(hPopup, 0, rgi.ptDown.x, rgi.ptDown.y, hwnd, NULL);
+
+				int x, y;
+				UINT nFlg = TPM_RETURNCMD | TPM_LEFTALIGN | TPM_TOPALIGN;
+				RECT r;
+				GetWindowRect(hwnd, &r);
+
+				x = rgi.ptDown.x;
+				if (x < (r.right - r.left) / 2) {
+					nFlg |= TPM_LEFTALIGN;
+					x++;
+				} else {
+					nFlg |= TPM_RIGHTALIGN;
+					x--;
+				}
+
+				y = rgi.ptDown.y + r.top;
+
+				if (rgi.ptDown.y + r.top < r.bottom / 2) {
+					nFlg |= TPM_TOPALIGN;
+					y++;
+				} else {
+					nFlg |= TPM_BOTTOMALIGN;
+					y--;
+				}
+
+				DWORD nID = TrackPopupMenuEx(hPopup, nFlg, x, y, hwnd, NULL);
 				DestroyMenu(hPopup);
+				if (nID != 0) {
+
+					if (nID == IDM_PASTE) {
+						CallWindowProc(gSuperProc, hwnd, msg, wParam, lParam);
+					}
+					pView->OnCommand(hwnd, MAKEWPARAM(nID, 0), 0);
+				}
 				return 0;
 			}
 			break;

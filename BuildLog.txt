@@ -891,3 +891,10 @@ Finding and encrypting to the folder may not work.
 
 * Revert #5157,#5160 because it causes another problem.
 
+////////////////////////////////
+// B172
+////////////////////////////////
+
+* Re-fix #5157,#5160
+* Improve display position of context menu.
+
