@@ -174,7 +174,7 @@ LRESULT CALLBACK NewDetailsViewProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM l
 			rgi.dwFlags = SHRG_RETURNCMD;
 
 			if (SHRecognizeGesture(&rgi) == GN_CONTEXTMENU) {
-				CallWindowProc(gSuperProc, hwnd, msg, wParam, lParam);
+//				CallWindowProc(gSuperProc, hwnd, msg, wParam, lParam);
 
 				HMENU hPopup = PocketPCPlatform::LoadDetailsViewPopupMenu();
 				TrackPopupMenuEx(hPopup, 0, rgi.ptDown.x, rgi.ptDown.y, hwnd, NULL);
