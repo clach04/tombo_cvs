@@ -320,17 +320,26 @@ PG: Refactoring around VirtualFolderRoot.
 ////////////////////////////////
 // B101(SNAPSHOT_20030511)
 ////////////////////////////////
+On Tombo_1_7b3_branch
 
 * FIX: Grep dialog prop pages
 
 ////////////////////////////////
 // B102
 ////////////////////////////////
+Return to main trunk.
 
 * FIX: Grep dialog isn't displayed (#2064, #2063)
 * Filter control GUI support.
 
+////////////////////////////////
+// B103 (Tombo 1.7 beta 4)
+////////////////////////////////
 
+* Add delete button to filter control dialogs.
+* Adjust dialog size by real devices.
+* Delete SetforegroundWindow in MainFrame::OnCreate.
+	It seems like harm by reporting a user.
 
 /////////////////////////////////////////////////////////////////////////
 // TODO
