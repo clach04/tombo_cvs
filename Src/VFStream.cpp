@@ -274,3 +274,61 @@ BOOL VFRegexFilter::Store(VFNote *p)
 		return FALSE;
 	}
 }
+
+////////////////////////////////////
+//  VFLimitFilter
+////////////////////////////////////
+
+VFLimitFilter::VFLimitFilter() : nLimit(0)
+{
+}
+
+VFLimitFilter::~VFLimitFilter()
+{
+}
+
+BOOL VFLimitFilter::Init(DWORD n)
+{
+	nLimit = n;
+	return TRUE;
+}
+
+BOOL VFLimitFilter::Prepare()
+{
+	nCount = 0;
+	return VFStream::Prepare();
+}
+
+BOOL VFLimitFilter::Store(VFNote *p)
+{
+	if (nCount >= nLimit) {
+		delete p;
+		return TRUE;
+	}
+	nCount++;
+	return pNext->Store(p);
+}
+
+////////////////////////////////////
+//  VFTimestampFilter
+////////////////////////////////////
+
+VFTimestampFilter::VFTimestampFilter()
+{
+}
+
+VFTimestampFilter::~VFTimestampFilter()
+{
+}
+
+BOOL VFTimestampFilter::Init(DWORD nBase, BOOL bNew)
+{
+	nBaseTime = nBase;
+	bNewer = bNew;
+	return TRUE;
+}
+
+BOOL VFTimestampFilter::Store(VFNote *pNote)
+{
+	return TRUE;
+}

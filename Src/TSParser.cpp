@@ -1,5 +1,6 @@
 #include <windows.h>
 #include <commctrl.h>
+#include <tchar.h>
 #define XMLPARSEAPI(type) type __cdecl	// for expat
 #define XML_UNICODE_WCHAR_T
 #include <expat.h>
@@ -53,16 +54,22 @@ TSParser::~TSParser()
 #define TAGID_VFOLDER	3
 #define TAGID_GREP		4
 #define TAGID_SRC		5
+#define TAGID_TIMESTAMP	6
+#define TAGID_LIMIT		7
 
 static DWORD nAllowParent[] = {
 	0,						// TAGID_UNKONWN
 	0,						// TAGID_INITIAL
 	(1 << TAGID_INITIAL),	// TAGID_FOLDERS
 	(1 << TAGID_FOLDERS),	// TAGID_VFOLDER
-	(1 << TAGID_VFOLDER) | (1 << TAGID_GREP),
+	(1 << TAGID_VFOLDER) | (1 << TAGID_GREP) | (1 << TAGID_TIMESTAMP) | (1 << TAGID_LIMIT),
 							// TAGID_GREP
-	(1 << TAGID_VFOLDER) | (1 << TAGID_GREP),
+	(1 << TAGID_VFOLDER) | (1 << TAGID_GREP) | (1 << TAGID_TIMESTAMP) | (1 << TAGID_LIMIT),
 							// TAGID_SRC
+	(1 << TAGID_VFOLDER) | (1 << TAGID_GREP) | (1 << TAGID_TIMESTAMP) | (1 << TAGID_LIMIT),
+							// TAGID_TIMESTAMP
+	(1 << TAGID_VFOLDER) | (1 << TAGID_GREP) | (1 << TAGID_TIMESTAMP) | (1 << TAGID_LIMIT),
+							// TAGID_LIMIT
 };
 
 ///////////////////////////////////////
@@ -292,6 +299,75 @@ BOOL TSVFolderTag::EndElement(ParseInfo *p)
 }
 
 ///////////////////////////////////////
+// "timestamp" tag implimentation
+///////////////////////////////////////
+
+class TSTimestampTag : public TSParseTagItem {
+public:
+	TSTimestampTag() : TSParseTagItem(TAGID_TIMESTAMP) {}
+	~TSTimestampTag() {}
+
+	BOOL StartElement(ParseInfo *p, const XML_Char **atts);
+	BOOL EndElement(ParseInfo *p);
+	
+};
+
+BOOL TSTimestampTag::StartElement(ParseInfo *p, const XML_Char **atts)
+{
+	return TRUE;
+}
+
+BOOL TSTimestampTag::EndElement(ParseInfo *p)
+{
+	return TRUE;
+}
+
+///////////////////////////////////////
+// "limit" tag implimentation
+///////////////////////////////////////
+
+class TSLimitTag : public TSParseTagItem {
+	DWORD nLimit;
+public:
+	TSLimitTag() : TSParseTagItem(TAGID_LIMIT) {}
+	~TSLimitTag() {}
+
+	BOOL StartElement(ParseInfo *p, const XML_Char **atts);
+	BOOL EndElement(ParseInfo *p);
+
+	DWORD GetLimit() { return nLimit; }
+};
+
+BOOL TSLimitTag::StartElement(ParseInfo *p, const XML_Char **atts)
+{
+	nLimit = 0xFFFFFFFF;
+	DWORD i = 0;
+	while(atts[i] != NULL) {
+		if (wcsicmp(atts[i], L"number") == 0) {
+			// atts[i + 1];
+			nLimit = _wtol(atts[i + 1]);
+		}
+		i += 2;
+	}
+	if (nLimit == 0xFFFFFFFF) return FALSE;
+	return TRUE;
+}
+
+BOOL TSLimitTag::EndElement(ParseInfo *p)
+{
+	if (pHead == NULL) return FALSE;
+
+	VFLimitFilter *pFilter = new VFLimitFilter();
+	if (pFilter == NULL || !pFilter->Init(nLimit)) return FALSE;
+	TSParseTagItem *pParent = pNext;
+	pTail->SetNext(pFilter);
+	pParent->pHead = pHead;
+	pParent->pTail = pFilter;
+	return TRUE;
+}
+
+
+///////////////////////////////////////
 // ParseInfo implimentation
 ///////////////////////////////////////
 
@@ -326,6 +402,10 @@ DWORD ParseInfo::GetTagID(const WCHAR *pTagName)
 		return TAGID_GREP;
 	} else if (wcsicmp(pTagName, L"src") == 0) {
 		return TAGID_SRC;
+	} else if (wcsicmp(pTagName, L"timestamp") == 0) {
+		return TAGID_TIMESTAMP;
+	} else if (wcsicmp(pTagName, L"limit") == 0) {
+		return TAGID_LIMIT;
 	} else {
 		return TAGID_UNKNOWN;
 	}
@@ -342,6 +422,10 @@ TSParseTagItem *ParseInfo::GetTagObjectFactory(DWORD nTagID)
 		return new TSGrepTag();
 	case TAGID_SRC:
 		return new TSSrcTag();
+	case TAGID_TIMESTAMP:
+		return new TSTimestampTag();
+	case TAGID_LIMIT:
+		return new TSLimitTag();
 	default:
 		return NULL;
 	}

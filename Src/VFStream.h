@@ -149,4 +149,37 @@ public:
 	// void FreeObject();	inherit to VFStream
 };
 
+////////////////////////////////////
+// Limit number of notes
+////////////////////////////////////
+
+class VFLimitFilter : public VFStream {
+	DWORD nLimit;
+	DWORD nCount;
+
+public:
+	VFLimitFilter();
+	~VFLimitFilter();
+	BOOL Init(DWORD nLimit);
+
+	BOOL Prepare();
+	BOOL Store(VFNote *p);
+};
+
+////////////////////////////////////
+// Check timestamp
+////////////////////////////////////
+
+class VFTimestampFilter : public VFStream {
+	DWORD nBaseTime;
+	BOOL bNewer;
+public:
+	VFTimestampFilter();
+	~VFTimestampFilter();
+	BOOL Init(DWORD nBaseTime, BOOL bNewer);
+
+	// BOOL Prepare();
+	BOOL Store(VFNote *p);
+};
+
 #endif
