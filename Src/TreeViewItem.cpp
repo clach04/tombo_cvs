@@ -15,6 +15,7 @@
 #include "Message.h"
 #include "VFStream.h"
 #include "TSParser.h"
+#include "VarBuffer.h"
 
 #define ITEM_ORDER_FILE		1
 #define ITEM_ORDER_FOLDER	0
@@ -105,19 +106,6 @@ BOOL TreeViewFileItem::Delete(MemoManager *pMgr, MemoSelectView *pView)
 	}
 	return TRUE;
 }
-
-#ifdef COMMENT
-BOOL TreeViewFileItem::DeleteWithoutAsk(MemoManager *pMgr,MemoSelectView *pView)
-{
-	if (g_Property.IsUseTwoPane() && pMgr->IsNoteDisplayed(pNote->MemoPath())) {
-		// 現在表示されているメモの表示をキャンセルする
-		pMgr->NewMemo();
-	}
-	// ファイルの削除
-	if (!pNote->DeleteMemoData()) return FALSE;
-	return TRUE;
-}
-#endif
 
 BOOL TreeViewFileItem::Encrypt(MemoManager *pMgr, MemoSelectView *pView)
 {
@@ -499,6 +487,30 @@ DWORD TreeViewFolderItem::ItemOrder()
 	return ITEM_ORDER_FOLDER;
 }
 
+struct DirList {
+	DWORD nNamePos;
+	char bFlg;
+	MemoNote *pNote;
+};
+
+static StringBufferT *pSortSB;
+extern "C" int SortItems(const void *e1, const void *e2)
+{
+	const DirList *p1 = (const DirList*)e1;
+	const DirList *p2 = (const DirList*)e2;
+	LPCTSTR q1 = pSortSB->Get(p1->nNamePos);
+	LPCTSTR q2 = pSortSB->Get(p2->nNamePos);
+	if (p1->bFlg == p2->bFlg) {
+		return _tcsicmp(q1, q2);
+	} else {
+		if (p1->bFlg == 1) {
+			return -1;
+		} else {
+			return 1;
+		}
+	}
+}
+
 BOOL TreeViewFolderItem::Expand(MemoSelectView *pView)
 {
 	TCHAR buf[MAX_PATH];
@@ -510,24 +522,62 @@ BOOL TreeViewFolderItem::Expand(MemoSelectView *pView)
 	wsprintf(buf2, TEXT("%s\\%s*.*"), g_Property.TopDir(), pPrefix);
 	LPCTSTR pMatchPath = buf2;
 
+	TVector<DirList> vDirList;
+	if (!vDirList.Init(50, 10)) return FALSE;
+	
+	StringBufferT sbDirList;
+	if (!sbDirList.Init(100, 50)) return FALSE;
+
+	// make folder/file list
 	WIN32_FIND_DATA wfd;
 	HANDLE hHandle = FindFirstFile(pMatchPath, &wfd);
 	if (hHandle != INVALID_HANDLE_VALUE) {
+		struct DirList di;
+		MemoNote *pNote;
+
 		do {
 			if (_tcscmp(wfd.cFileName, TEXT(".")) == 0 || _tcscmp(wfd.cFileName, TEXT("..")) == 0) continue;
 
+			DWORD l = _tcslen(wfd.cFileName);
 			if (wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
-				// フォルダ
-				TreeViewFolderItem *pItem = new TreeViewFolderItem();
-				pView->InsertFolder(hParent, wfd.cFileName, pItem, FALSE);
+				// folder 
+				di.bFlg = 1;
 			} else {
-				if (!pView->InsertFile(hParent, pPrefix, wfd.cFileName)) {
-					FindClose(hHandle);
-					return FALSE;
-				}
+				// file
+				if (!MemoNote::MemoNoteFactory(pPrefix, wfd.cFileName, &pNote) || pNote == NULL) continue;
+				
+				di.bFlg = 0;
+				di.pNote = pNote;
+				l -= 4;
+				*(wfd.cFileName + l) = TEXT('\0');
 			}
+
+			// Add file name to buffer
+			if (!sbDirList.Add(wfd.cFileName, l + 1, &(di.nNamePos))) return FALSE;
+			if (!vDirList.Add(&di)) return FALSE;
+
 		} while(FindNextFile(hHandle, &wfd));
 		FindClose(hHandle);
+	}
+
+	DWORD n = vDirList.NumItems();
+
+	// sort 
+	pSortSB = &sbDirList;
+	qsort((LPBYTE)vDirList.GetBuf(), n, sizeof(struct DirList), SortItems);
+
+	// Insert to folder
+	for (DWORD i = 0; i < n; i++) {
+		struct DirList *p = vDirList.GetUnit(i);
+		LPCTSTR q = sbDirList.Get(p->nNamePos);
+		if (p->bFlg) {
+			// folder
+			TreeViewFolderItem *pItem = new TreeViewFolderItem();
+			pView->InsertFolder(hParent, q, pItem, TRUE);
+		} else {
+			// note
+			if (!pView->InsertFile(hParent, p->pNote, q, TRUE)) return FALSE;
+		}
 	}
 	return TRUE;
 }
