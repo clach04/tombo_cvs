@@ -67,12 +67,14 @@ BOOL MemoSelectView::Create(LPCTSTR pName, RECT &r, HWND hParent, DWORD nID, HIN
 	SetWindowLong(hViewWnd, GWL_WNDPROC, (LONG)NewSelectViewProc);
 #endif
 
-	// イメージリストの生成
-	if ((hImageList = ImageList_Create(IMAGE_CX, IMAGE_CY, FALSE, NUM_BITMAPS, 0)) == NULL) return FALSE;
+	// Create Imagelist.
+	if ((hImageList = ImageList_Create(IMAGE_CX, IMAGE_CY, ILC_MASK, NUM_BITMAPS, 0)) == NULL) return FALSE;
 	HBITMAP hBmp = LoadBitmap(hInst, MAKEINTRESOURCE(IDB_MEMOSELECT_IMAGES));
-	ImageList_Add(hImageList, hBmp, (HBITMAP)NULL);
-	DeleteObject(hBmp);
 
+	// Transparent color is GREEN
+	COLORREF rgbTransparent = RGB(0,255,0);
+	ImageList_AddMasked(hImageList, hBmp, rgbTransparent);
+	DeleteObject(hBmp);
 	TreeView_SetImageList(hViewWnd, hImageList, TVSIL_NORMAL);
 
 	// フォント設定
@@ -1115,8 +1117,6 @@ LRESULT MemoSelectView::EditLabel(TVITEM *pItem)
 
 	TreeViewItem *pti = (TreeViewItem*)(pItem->lParam);
 	if (pti == NULL) return FALSE;
-	if (pti->pNote == NULL) return FALSE;
-
 	return pti->Rename(pMemoMgr, this, pItem->pszText);
 }
 
