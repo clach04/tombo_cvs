@@ -115,7 +115,7 @@ BOOL CryptManager::EncryptAndStore(const LPBYTE pData, int nSize, LPCTSTR pFileN
 
 	LPBYTE pBuf = new BYTE[len];
 	if (pBuf == NULL) {
-		MessageBox(NULL, TEXT("CryptManager::EncryptAndStore memory allocation failed"), TEXT("DEBUG"), MB_OK); // XXXX_DEBUG
+		MessageBox(NULL, TEXT("CryptManager::EncryptAndStore memory allocation failed"), TEXT("DEBUG"), MB_OK);
 		SetLastError(ERROR_NOT_ENOUGH_MEMORY);
 		return FALSE;
 	}
@@ -140,7 +140,7 @@ BOOL CryptManager::EncryptAndStore(const LPBYTE pData, int nSize, LPCTSTR pFileN
 		for (i = 0; i < len; i++) pBuf[i] = 0;
 		WipeOutAndDelete((char*)pBuf, len);
 		
-		MessageBox(NULL, TEXT("CryptManager::EncryptAndStore : Encrypt failed"), TEXT("DEBUG"), MB_OK); // XXXX_DEBUG
+		MessageBox(NULL, TEXT("CryptManager::EncryptAndStore : Encrypt failed"), TEXT("DEBUG"), MB_OK);
 		return FALSE;
 	}
 
@@ -153,7 +153,7 @@ BOOL CryptManager::EncryptAndStore(const LPBYTE pData, int nSize, LPCTSTR pFileN
 
 		TCHAR buf[1024];
 		wsprintf(buf, TEXT("CryptManager::EncryptAndStore : Open File failed %s %d"), pFileName, GetLastError());
-		MessageBox(NULL, buf, TEXT("DEBUG"), MB_OK); // XXXX_DEBUG
+		MessageBox(NULL, buf, TEXT("DEBUG"), MB_OK);
 		return FALSE;
 	}
 	if (!outf.Write((LPBYTE)"BF01", 4) ||				// バージョンヘッダ
@@ -161,7 +161,7 @@ BOOL CryptManager::EncryptAndStore(const LPBYTE pData, int nSize, LPCTSTR pFileN
 		!outf.Write(pBuf, len)) {							// データ
 		TCHAR buf[1024];
 		wsprintf(buf, TEXT("CryptManager::EncryptAndStore write failed %d"), GetLastError());
-		MessageBox(NULL, buf, TEXT("DEBUG"), MB_OK); // XXXX_DEBUG
+		MessageBox(NULL, buf, TEXT("DEBUG"), MB_OK);
 	}
 	if (!outf.SetEOF()) return FALSE;
 	outf.Close();

@@ -136,7 +136,7 @@ BOOL TreeViewFileItem::Encrypt(MemoManager *pMgr, MemoSelectView *pView)
 
 	// 暗号化に伴いアイコン・ヘッドラインが変更になる可能性があるので更新依頼
 	if (!pView->UpdateItemStatusNotify(this, sHeadLine.Get())) {
-		MessageBox(NULL, TEXT("UpdateItemStatusNotify failed"), TEXT("DEBUG"), MB_OK);// XXXX_DEBUG
+		MessageBox(NULL, TEXT("UpdateItemStatusNotify failed"), TEXT("DEBUG"), MB_OK);
 		return FALSE;
 	}
 	return TRUE;
