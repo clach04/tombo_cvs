@@ -51,7 +51,6 @@ BOOL MemoManager::Init(MainFrame *mf, MemoDetailsView *md, MemoSelectView *ms)
 	return TRUE; 
 }
 
-
 /////////////////////////////////////////////
 // get current selected path
 /////////////////////////////////////////////
@@ -178,22 +177,13 @@ BOOL MemoManager::SaveIfModify(LPDWORD pYNC, BOOL bDupMode)
 	////////////////////////////////////////////
 
 	if (bDupMode) {
-		// if duplicate mode
-		if (pMemoDetailsView->pCurrentURI == NULL) {
-			// this is new note
-			if (!AllocNewMemo(pText)) return FALSE;
-
-		} else {
-			// note is exist
-			if (!AllocNewMemo(pText, pMemoDetailsView->pCurrentURI)) return FALSE;
-		}
+		if (!AllocNewMemo(pText, pMemoDetailsView->pCurrentURI)) return FALSE;
 		// duplicate mode notes are treated as update because pCurrentURI has set.
 	}
 
 	// Create node if the note is new
 	if (pMemoDetailsView->pCurrentURI == NULL) {
 		if (!AllocNewMemo(pText)) return FALSE;
-
 		// change status because the note is not new note at this point.
 		pMainFrame->SetNewMemoStatus(FALSE);
 	}
@@ -207,9 +197,8 @@ BOOL MemoManager::SaveIfModify(LPDWORD pYNC, BOOL bDupMode)
 	TomboURI sNewURI;
 	TString sNewHeadLine;
 
-	if (!g_Repository.Update(&sCurrentURI, pText, &sNewURI, &sNewHeadLine)) {
-		return FALSE;
-	}
+	if (!g_Repository.Update(&sCurrentURI, pText, &sNewURI, &sNewHeadLine)) return FALSE;
+
 	pMemoDetailsView->ResetModify();
 	// UpdateHeadLine causes TVN_SELCHANGING and call SaveIfModify.
 	// So if not ResetModify is called, infinite calling causes GPF.
@@ -258,22 +247,18 @@ BOOL MemoManager::AllocNewMemo(LPCTSTR pText, LPCTSTR pTemplateURI)
 
 	// allocate new MemoNote instance and associate to tree view
 	TString sHeadLine;
-	MemoNote *pNote;
-	if (pTemplateURI) {
-		MemoNote *pCurrent = MemoNote::MemoNoteFactory(pTemplateURI);
-		if (pCurrent == NULL) return FALSE;
-		AutoPointer<MemoNote> apNote(pCurrent);
-
-		pNote = pCurrent->GetNewInstance();
-	} else {
-		pNote = new PlainMemoNote();
-	}
-	AutoPointer<MemoNote> ap(pNote);
-
-	if (pNote == NULL || !(pNote->InitNewMemo(sMemoPath.Get(), pText, &sHeadLine))) return FALSE;
-
 	TomboURI sNewURI;
-	if (!pNote->GetURI(&sNewURI)) return FALSE;
+
+	TomboURI *pTmpl;
+	TomboURI sTemplateURI;
+	if (pTemplateURI) {
+		if (!sTemplateURI.Init(pTemplateURI)) return FALSE;
+		pTmpl = &sTemplateURI;
+	} else {
+		pTmpl = NULL;
+	}
+
+	if (!g_Repository.RequestAllocateURI(sMemoPath.Get(), pText, &sHeadLine, &sNewURI, pTmpl)) return FALSE;
 
 	HTREEITEM hNewItem = pMemoSelectView->InsertFile(hParent, &sNewURI, sHeadLine.Get(), FALSE, FALSE);
 	pMemoDetailsView->SetCurrentNote(sNewURI.GetFullURI());
@@ -345,6 +330,7 @@ BOOL MemoManager::NewMemo()
 ////////////////////////////////////////////////////////
 // メモのクリア
 ////////////////////////////////////////////////////////
+
 BOOL MemoManager::ClearMemo()
 {
 	return pMemoDetailsView->ClearMemo();
@@ -373,17 +359,6 @@ BOOL MemoManager::StoreCursorPos()
 }
 
 ////////////////////////////////////////////////////////
-// 全選択
-////////////////////////////////////////////////////////
-
-void MemoManager::SelectAll()
-{
-	if (pMemoDetailsView) {
-		pMemoDetailsView->SelectAll();
-	}
-}
-
-////////////////////////////////////////////////////////
 // 
 ////////////////////////////////////////////////////////
 
@@ -402,15 +377,6 @@ void MemoManager::SetSearchEngine(SearchEngineA *p)
 		delete pSearchEngineA;
 	}
 	pSearchEngineA = p;
-}
-
-////////////////////////////////////////////////////////
-// 詳細ビューに対する検索
-////////////////////////////////////////////////////////
-
-BOOL MemoManager::SearchDetailsView(BOOL bFirstSearch, BOOL bForward, BOOL bNFMsg, BOOL bSearchFromTop)
-{
-	return pMemoDetailsView->Search(bFirstSearch, bForward, bNFMsg, bSearchFromTop); 
 }
 
 ////////////////////////////////////////////////////////

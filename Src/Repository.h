@@ -7,6 +7,7 @@ class MemoNote;
 class RepositoryImpl;
 class URIOption;
 class RepositoryOption;
+class DirList;
 
 /////////////////////////////////////////
 // Option flag definitions
@@ -15,7 +16,6 @@ class RepositoryOption;
 #define NOTE_OPTIONMASK_ENCRYPTED  1
 #define NOTE_OPTIONMASK_SAFEFILE   2
 #define NOTE_OPTIONMASK_VALID      4
-//#define NOTE_OPTIONMASK_POSITION  2
 
 /////////////////////////////////////////
 // Custom error code
@@ -110,7 +110,11 @@ public:
 	//     :  tombo://repo/a/b/c/d.txt -> tombo://repo/a/b/c/
 	BOOL GetAttachURI(const TomboURI *pBase, TomboURI *pAttached);
 
+	// Get notes under the url.
+	BOOL GetList(const TomboURI *pFolder, DirList *pList, BOOL bSkipEncrypt);
 
+	// 
+	BOOL RequestAllocateURI(LPCTSTR pMemoPath, LPCTSTR pText, TString *pHeadLine, TomboURI *pURI, const TomboURI *pTemplateURI);
 };
 
 //////////////////////////////////////////////////////////////

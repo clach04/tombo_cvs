@@ -70,8 +70,6 @@ public:
 
 	BOOL StoreCursorPos();
 
-	void SelectAll();	// 全選択(詳細ビュー)
-
 	// 指定したメモが現在詳細ビューで表示されているか
 	BOOL IsNoteDisplayed(LPCTSTR pURI);
 
@@ -84,9 +82,6 @@ public:
 
 	void SetSearchEngine(SearchEngineA *p);
 	SearchEngineA *GetSearchEngine() { return pSearchEngineA; }
-
-	// 詳細ビューに対する検索
-	BOOL SearchDetailsView(BOOL bFirstSearch, BOOL bForward, BOOL bNFMsg, BOOL bSearchFromTop);
 
 	/////////////////////////////////////
 	// data accessor

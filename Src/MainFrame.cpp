@@ -715,7 +715,7 @@ void MainFrame::OnCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		OnForgetPass();
 		break;
 	case IDM_SELALL:
-		mmMemoManager.SelectAll();
+		if (pDetailsView) { pDetailsView->SelectAll(); }
 		break;
 	case IDM_SAVE:
 		if (!mmMemoManager.SaveIfModify(NULL, FALSE)) {
@@ -1662,7 +1662,7 @@ void MainFrame::DoSearchTree(BOOL bFirst, BOOL bForward)
 	switch(st.GetResult()) {
 	case SR_FOUND:
 		msView.ShowItem(st.GetPartPath());
-		mmMemoManager.SearchDetailsView(TRUE, TRUE, TRUE, TRUE);
+		pDetailsView->Search(TRUE, TRUE, TRUE, TRUE); 
 		break;
 	case SR_NOTFOUND:
 		MessageBox(MSG_STRING_NOT_FOUND, TOMBO_APP_NAME, MB_OK | MB_ICONINFORMATION);

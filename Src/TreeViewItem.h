@@ -3,7 +3,6 @@
 
 #include <commctrl.h>
 
-class MemoNote;
 class MemoSelectView;
 class MemoManager;
 class VFDirectoryGenerator;

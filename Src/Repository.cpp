@@ -96,6 +96,16 @@ BOOL Repository::ChangeHeadLine(const TomboURI *pURI, LPCTSTR pReqNewHeadLine, U
 	return pDefaultImpl->ChangeHeadLine(pURI, pReqNewHeadLine, pOption);
 }
 
+BOOL Repository::GetList(const TomboURI *pFolder, DirList *pList, BOOL bSkipEncrypt)
+{
+	return pDefaultImpl->GetList(pFolder, pList, bSkipEncrypt);
+}
+
+BOOL Repository::RequestAllocateURI(LPCTSTR pMemoPath, LPCTSTR pText, TString *pHeadLine, TomboURI *pURI, const TomboURI *pTemplateURI)
+{
+	return pDefaultImpl->RequestAllocateURI(pMemoPath, pText, pHeadLine, pURI, pTemplateURI);
+}
+
 /////////////////////////////////////////
 // get attach URI
 /////////////////////////////////////////
@@ -116,7 +126,6 @@ BOOL Repository::GetAttachURI(const TomboURI *pBase, TomboURI *pAttached)
 
 URIOption::~URIOption()
 {
-//	delete pNewNote;
 	delete pNewURI;
 	delete pNewHeadLine;
 }

@@ -5,6 +5,7 @@ class TomboURI;
 class TString;
 class Repository;
 class URIOption;
+class DirList;
 
 class MemoNote;
 
@@ -37,6 +38,10 @@ public:
 	virtual BOOL SetOption(const TomboURI *pCurrentURI, URIOption *pOption) = 0;
 
 	virtual BOOL GetPhysicalPath(const TomboURI *pURI, TString *pFullPath) = 0;
+
+	virtual BOOL GetList(const TomboURI *pFolder, DirList *pList, BOOL bSkipEncrypt) = 0;
+
+	virtual BOOL RequestAllocateURI(LPCTSTR pMemoPath, LPCTSTR pText, TString *pHeadLine, TomboURI *pURI, const TomboURI *pTemplateURI) = 0;
 
 	////////////////////////////
 	// helper function
@@ -102,6 +107,10 @@ public:
 
 	// change note status
 	BOOL SetOption(const TomboURI *pCurrentURI, URIOption *pOption);
+
+	BOOL GetList(const TomboURI *pFolder, DirList *pList, BOOL bSkipEncrypt);
+
+	BOOL RequestAllocateURI(LPCTSTR pMemoPath, LPCTSTR pText, TString *pHeadLine, TomboURI *pURI, const TomboURI *pTemplateURI);
 };
 
 #endif

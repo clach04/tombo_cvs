@@ -898,3 +898,15 @@ Finding and encrypting to the folder may not work.
 * Re-fix #5157,#5160
 * Improve display position of context menu.
 
+////////////////////////////////
+// B173
+////////////////////////////////
+
+* FIX: wrong file is open when searching.
+* FIX: file order is wrong if its file name is encrypted.
+
+////////////////////////////////
+// B174
+////////////////////////////////
+
+* Some refactoring

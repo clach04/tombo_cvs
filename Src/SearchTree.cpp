@@ -155,10 +155,9 @@ SearchResult SearchTree::SearchTreeRec(LPCTSTR pNextParse, LPTSTR pBase)
 
 	// expand directory list
 	DirList dl;
-//	if (!dl.Init(DIRLIST_OPT_NONE, NULL)) return SR_FAILED;
-	if (!dl.Init(DIRLIST_OPT_ALLOCURI | DIRLIST_OPT_ALLOCHEADLINE, sBaseURI.GetFullURI())) return SR_FAILED;
+	if (!dl.Init(sBaseURI.GetFullURI())) return SR_FAILED;
 	_tcscpy(pBase, TEXT("*.*"));
-	if (!dl.GetList(TEXT(""), aPath, !bSearchEncryptedMemo)) return SR_FAILED;
+	if (!dl.GetList(aPath, !bSearchEncryptedMemo)) return SR_FAILED;
 
 	// check current selecting path
 	DWORD nCurrentSelP;
@@ -240,7 +239,7 @@ SearchResult SearchTree::SearchOneItem()
 
 	LPCTSTR p = aPath + nBaseOffset + 1;
 	MemoNote *pNote = NULL;
-	if (!MemoNote::MemoNoteFactory(TEXT(""), p, &pNote)) return SR_FAILED;
+	if (!MemoNote::MemoNoteFactory(p, &pNote)) return SR_FAILED;
 	if (pNote == NULL) return SR_NOTFOUND;
 
 	SearchResult result = pRegex->Search(pNote);

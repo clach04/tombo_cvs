@@ -11,8 +11,8 @@ extern "C" int SortItems(const void *e1, const void *e2)
 {
 	const DirListItem *p1 = (const DirListItem*)e1;
 	const DirListItem *p2 = (const DirListItem*)e2;
-	LPCTSTR q1 = pSortSB->Get(p1->nFileNamePos);
-	LPCTSTR q2 = pSortSB->Get(p2->nFileNamePos);
+	LPCTSTR q1 = pSortSB->Get(p1->nHeadLinePos);
+	LPCTSTR q2 = pSortSB->Get(p2->nHeadLinePos);
 	if (p1->bFolder == p2->bFolder) {
 		return _tcsicmp(q1, q2);
 	} else {
@@ -24,11 +24,8 @@ extern "C" int SortItems(const void *e1, const void *e2)
 	}
 }
 
-BOOL DirList::Init(DWORD nOption, LPCTSTR pUB)
+BOOL DirList::Init(LPCTSTR pUB)
 {
-	bAllocURI = nOption & DIRLIST_OPT_ALLOCURI;
-	bAllocHeadLine = nOption & DIRLIST_OPT_ALLOCHEADLINE;
-
 	pURIBase = pUB;
 
 	if (!vDirList.Init(50, 10)) return FALSE;
@@ -40,7 +37,7 @@ DirList::~DirList()
 {
 }
 
-BOOL DirList::GetList(LPCTSTR pPrefix, LPCTSTR pMatchPath, BOOL bSkipEncrypt)
+BOOL DirList::GetList(LPCTSTR pMatchPath, BOOL bSkipEncrypt)
 {
 	// make folder/file list
 	WIN32_FIND_DATA wfd;
@@ -63,15 +60,13 @@ BOOL DirList::GetList(LPCTSTR pPrefix, LPCTSTR pMatchPath, BOOL bSkipEncrypt)
 				di.bFolder = FALSE;
 			}
 
-			if (bAllocURI) {
-				if (!sbDirList.Add(pURIBase, _tcslen(pURIBase), &(di.nURIPos))) return FALSE;
-				DWORD d;
-				if (!sbDirList.Add(wfd.cFileName, l, &d)) return FALSE;
-				if (wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
-					if (!sbDirList.Add(TEXT("/"), 1, &d)) return FALSE;
-				}
-				if (!sbDirList.Add(TEXT(""), 1, &d)) return FALSE;
+			if (!sbDirList.Add(pURIBase, _tcslen(pURIBase), &(di.nURIPos))) return FALSE;
+			DWORD d;
+			if (!sbDirList.Add(wfd.cFileName, l, &d)) return FALSE;
+			if (wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+				if (!sbDirList.Add(TEXT("/"), 1, &d)) return FALSE;
 			}
+			if (!sbDirList.Add(TEXT(""), 1, &d)) return FALSE;
 
 			TomboURI sURI;
 			TString sHeadLine;
@@ -80,15 +75,11 @@ BOOL DirList::GetList(LPCTSTR pPrefix, LPCTSTR pMatchPath, BOOL bSkipEncrypt)
 			URIOption opt(NOTE_OPTIONMASK_ENCRYPTED);
 			g_Repository.GetOption(&sURI, &opt);
 
-			if (bAllocHeadLine) {
-				if (!opt.bEncrypt || !bSkipEncrypt) {
-					if (!g_Repository.GetHeadLine(&sURI, &sHeadLine)) return FALSE;
-					if (!sbDirList.Add(sHeadLine.Get(), _tcslen(sHeadLine.Get()) + 1, &(di.nHeadLinePos))) return FALSE;
-				}
-			}
-	
-			// Add file name to buffer
 			if (!opt.bEncrypt || !bSkipEncrypt) {
+				if (!g_Repository.GetHeadLine(&sURI, &sHeadLine)) return FALSE;
+				if (!sbDirList.Add(sHeadLine.Get(), _tcslen(sHeadLine.Get()) + 1, &(di.nHeadLinePos))) return FALSE;
+	
+				// Add file name to buffer
 				if (!sbDirList.Add(wfd.cFileName, l + 1, &(di.nFileNamePos))) return FALSE;
 				if (!vDirList.Add(&di)) return FALSE;
 			}

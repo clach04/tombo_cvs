@@ -103,21 +103,6 @@ void MemoNote::WipeOutAndDelete(char *p)
 #endif
 
 /////////////////////////////////////////////
-// V‹Kƒƒ‚
-/////////////////////////////////////////////
-BOOL MemoNote::InitNewMemo(LPCTSTR pMemoPath, LPCTSTR pText, TString *pHeadLine)
-{
-	TString sFullPath;
-	TString sHeadLine;
-	LPTSTR pNotePath;
-
-	if (!GetHeadLineFromMemoText(pText, &sHeadLine)) return FALSE;
-	if (!GetHeadLinePath(pMemoPath, sHeadLine.Get(), GetExtension(), &sFullPath, &pNotePath, pHeadLine)) return FALSE;
-
-	return Init(pNotePath);
-}
-
-/////////////////////////////////////////////
 // get note's URI
 /////////////////////////////////////////////
 
@@ -649,7 +634,7 @@ DWORD MemoNote::IsNote(LPCTSTR pFile)
 // MemoNote object factory
 /////////////////////////////////////////////
 
-BOOL MemoNote::MemoNoteFactory(LPCTSTR pPrefix, LPCTSTR pFile, MemoNote **ppNote)
+BOOL MemoNote::MemoNoteFactory(LPCTSTR pFile, MemoNote **ppNote)
 {
 	*ppNote = NULL;
 
@@ -666,9 +651,7 @@ BOOL MemoNote::MemoNoteFactory(LPCTSTR pPrefix, LPCTSTR pFile, MemoNote **ppNote
 		return FALSE;
 	}
 
-	TCHAR path[MAX_PATH];
-	wsprintf(path, TEXT("%s%s"), pPrefix, pFile);
-	if (!(*ppNote)->Init(path)) {
+	if (!(*ppNote)->Init(pFile)) {
 		delete (*ppNote);
 		*ppNote = NULL;
 		return FALSE;
@@ -691,7 +674,7 @@ MemoNote *MemoNote::MemoNoteFactory(const TomboURI *pURI)
 		}
 	}
 	MemoNote *pNote = NULL;
-	MemoNote::MemoNoteFactory(TEXT(""), pBuf, &pNote);
+	MemoNote::MemoNoteFactory(pBuf, &pNote);
 	delete [] pBuf;
 	return pNote;
 }

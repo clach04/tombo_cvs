@@ -658,22 +658,13 @@ DWORD TreeViewFolderItem::ItemOrder()
 
 BOOL TreeViewFolderItem::Expand(MemoSelectView *pView)
 {
-	TCHAR buf[MAX_PATH];
 	HTREEITEM hParent = GetViewItem();
-
-	LPTSTR pPrefix = pView->GeneratePath(hParent, buf, MAX_PATH);
-
-	TCHAR buf2[MAX_PATH];
-	wsprintf(buf2, TEXT("%s\\%s*.*"), g_Property.TopDir(), pPrefix);
-	LPCTSTR pMatchPath = buf2;
 
 	TomboURI sURI;
 	if (!pView->GetURI(&sURI, hParent)) return FALSE;
 
 	DirList dlDirList;
-	if (!dlDirList.Init(DIRLIST_OPT_ALLOCURI | DIRLIST_OPT_ALLOCHEADLINE,
-						sURI.GetFullURI())) return FALSE;
-	if (!dlDirList.GetList(pPrefix, pMatchPath, FALSE)) return FALSE;
+	if (!g_Repository.GetList(&sURI, &dlDirList, FALSE)) return FALSE;
 
 	// Insert to folder
 	DWORD n = dlDirList.NumItems();

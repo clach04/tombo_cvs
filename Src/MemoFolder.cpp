@@ -108,7 +108,6 @@ void DSFileDelete::File(LPCTSTR p)
 	// Delete
 	if (!DeleteFile(CurrentPath())) {
 		_tcscpy(aFailPath, CurrentPath());
-//		_tcscpy(aErrorMsg, MSG_RMFILE_FAILED);
 		StopScan();
 		SetLastError(ERROR_TOMBO_E_RMFILE_FAILED);
 	}

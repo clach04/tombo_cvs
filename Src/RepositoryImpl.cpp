@@ -13,6 +13,7 @@
 #include "PasswordManager.h"
 #include "MemoInfo.h"
 
+#include "DirList.h"
 #include "DirectoryScanner.h"
 #include "MemoFolder.h"
 
@@ -752,4 +753,59 @@ BOOL LocalFileRepository::ChangeHeadLine(const TomboURI *pURI, LPCTSTR pReqNewHe
 
 		return TRUE;
 	}
+}
+
+/////////////////////////////////////////
+// GetList
+/////////////////////////////////////////
+
+BOOL LocalFileRepository::GetList(const TomboURI *pFolder, DirList *pList, BOOL bSkipEncrypt)
+{
+	TString sPartPath;
+	if (!pFolder->GetFilePath(&sPartPath)) return FALSE;
+
+	TString sFullPath;
+	if (_tcslen(sPartPath.Get()) > 0) {
+		if (!sFullPath.Join(pTopDir, TEXT("\\"), sPartPath.Get(), TEXT("*.*"))) return FALSE;
+	} else {
+		if (!sFullPath.Join(pTopDir, TEXT("\\*.*"))) return FALSE;
+	}
+
+	if (!pList->Init(pFolder->GetFullURI())) return FALSE;
+	if (!pList->GetList(sFullPath.Get(), FALSE)) return FALSE;
+
+	return TRUE;
+}
+
+/////////////////////////////////////////
+// 
+/////////////////////////////////////////
+BOOL LocalFileRepository::RequestAllocateURI(LPCTSTR pMemoPath, LPCTSTR pText, TString *pHeadLine, TomboURI *pURI, const TomboURI *pTemplateURI)
+{	
+	MemoNote *pNote;
+	if (pTemplateURI) {
+		MemoNote *pCurrent = MemoNote::MemoNoteFactory(pTemplateURI);
+		if (pCurrent == NULL) return FALSE;
+		AutoPointer<MemoNote> apNote(pCurrent);
+
+		pNote = pCurrent->GetNewInstance();
+	} else {
+		pNote = new PlainMemoNote();
+	}
+
+	if (pNote == NULL) return FALSE;
+
+	AutoPointer<MemoNote> ap(pNote);
+	
+	TString sFullPath;
+	TString sHeadLine;
+	LPTSTR pNotePath;
+
+	if (!MemoNote::GetHeadLineFromMemoText(pText, &sHeadLine)) return FALSE;
+	if (!MemoNote::GetHeadLinePath(pMemoPath, sHeadLine.Get(), pNote->GetExtension(), &sFullPath, &pNotePath, pHeadLine)) return FALSE;
+	if (!pNote->Init(pNotePath)) return FALSE;
+
+	if (!pNote->GetURI(pURI)) return FALSE;
+
+	return TRUE;
 }

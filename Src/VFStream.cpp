@@ -144,7 +144,7 @@ void VirtualStreamFolderScanner::File(LPCTSTR p)
 
 	// create MemoNote object
 	MemoNote *pNote = NULL;
-	if (!MemoNote::MemoNoteFactory(TEXT(""), CurrentPath() + nTopDirLen, &pNote)) {
+	if (!MemoNote::MemoNoteFactory(CurrentPath() + nTopDirLen, &pNote)) {
 		StopScan();
 		return;
 	}

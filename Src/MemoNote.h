@@ -44,9 +44,6 @@ public:
 	//////////////////////////////////
 	// memo data operation members
 
-	// create new memo
-	BOOL InitNewMemo(LPCTSTR pMemoPath, LPCTSTR pText, TString *pHeadLine);
-
 	// get memo data
 	virtual LPTSTR GetMemoBody(PasswordManager *pMgr) const;
 	virtual char *GetMemoBodyA(PasswordManager *pMgr) const;
@@ -101,7 +98,7 @@ public:
 	//
 	// if creation failed, return FALSE.
 	// if pFile is not memo, return TRUE and *ppNote sets to NULL.
-	static BOOL MemoNoteFactory(LPCTSTR pPrefix, LPCTSTR pFile, MemoNote **ppNote);
+	static BOOL MemoNoteFactory(LPCTSTR pFile, MemoNote **ppNote);
 	static MemoNote *MemoNoteFactory(const TomboURI *pURI);
 	static MemoNote *MemoNoteFactory(LPCTSTR pURI);
 

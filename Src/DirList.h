@@ -9,8 +9,8 @@ class TomboURI;
 //////////////////////////////////////////////////////
 
 #define DIRLIST_OPT_NONE          0
-#define DIRLIST_OPT_ALLOCURI      1
-#define DIRLIST_OPT_ALLOCHEADLINE 2
+//#define DIRLIST_OPT_ALLOCURI      1
+//#define DIRLIST_OPT_ALLOCHEADLINE 2
 #define DIRLIST_OPT_ALLOCFILENAME 4
 
 //////////////////////////////////////////////////////
@@ -29,8 +29,6 @@ struct DirListItem {
 //////////////////////////////////////////////////////
 
 class DirList {
-	BOOL bAllocURI;
-	BOOL bAllocHeadLine;
 	DWORD nOption;
 
 	LPCTSTR pURIBase;
@@ -38,10 +36,10 @@ public:
 	TVector<DirListItem> vDirList;
 	StringBufferT sbDirList;
 
-	BOOL Init(DWORD nOption, LPCTSTR pURIBase);
+	BOOL Init(LPCTSTR pURIBase);
 	~DirList();
 
-	BOOL GetList(LPCTSTR pPrefix, LPCTSTR pMatchPath, BOOL bSkipEncrypt);
+	BOOL GetList(LPCTSTR pMatchPath, BOOL bSkipEncrypt);
 
 	DWORD NumItems() { return vDirList.NumItems(); }
 	DirListItem *GetItem(DWORD n) { return vDirList.GetUnit(n); }
