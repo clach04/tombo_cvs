@@ -12,7 +12,8 @@
 
 // version info
 
-#define TOMBO_VERSION_INFO TEXT("Tombo version 1.7 beta 1")
+//#define TOMBO_VERSION_INFO TEXT("Tombo version 1.7 beta 2-pre2")
+#define TOMBO_VERSION_INFO TEXT("Tombo 20030404")
 
 // コピーライト表記
 

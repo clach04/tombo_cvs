@@ -273,6 +273,16 @@ PG: Change copyright dialog for expat.
 * Re-FIX: #1134.
 * Add menu item IDM_TOPMOST for Win32(EN).
 
+////////////////////////////////
+// B096 (Tombo SNAPSHOT 20030404)
+////////////////////////////////
+
+* FIX: Disable update *.tdt when the note is not updated.(#1557)
+* FIX: Delete node even though editing labels by pressing DEL key(#1588,1589).
+	and fix Cut/Copy/Paste
+* Add limit filter.
+* Recent filter(implimenting).
+
 /////////////////////////////////////////////////////////////////////////
 // TODO
 /////////////////////////////////////////////////////////////////////////
