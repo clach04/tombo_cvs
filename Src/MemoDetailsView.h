@@ -3,6 +3,13 @@
 
 class MemoManager;
 
+#ifdef STRICT 
+typedef WNDPROC SUPER_WND_PROC;
+#else 
+typedef FARPROC SUPER_WND_PROC;
+#endif 
+
+
 //////////////////////////////////////////
 // メモ内容表示ビュー
 //////////////////////////////////////////
@@ -47,7 +54,7 @@ public:
 	// データアクセス関連
 	BOOL SetMemo(LPCTSTR pMemo, DWORD nPos, BOOL bReadOnly);
 	LPTSTR GetMemo();
-	BOOL IsModify() { return SendMessage(hViewWnd, EM_GETMODIFY, 0, 0); }
+	BOOL IsModify() { if (hViewWnd) return SendMessage(hViewWnd, EM_GETMODIFY, 0, 0); else return FALSE; }
 	void ResetModify() { SendMessage(hViewWnd, EM_SETMODIFY, (WPARAM)(UINT)FALSE, 0); }
 
 	DWORD GetCursorPos();

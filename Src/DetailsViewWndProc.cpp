@@ -11,15 +11,16 @@
 
 static MemoManager *pManager; 
 static MemoDetailsView *pView;
-static WNDPROC gSuperProc;
+//static WNDPROC gSuperProc;
 static HINSTANCE hInst;
 static HWND hParentWnd;
+static SUPER_WND_PROC gSuperProc;
 
 #define KEY_ESC 0x1B
 #define KEY_CTRL_A 1
 #define KEY_CTRL_B 2
 
-void SetWndProc(WNDPROC wp, HWND hParent, HINSTANCE h, MemoDetailsView *p, MemoManager *pMgr)
+void SetWndProc(SUPER_WND_PROC wp, HWND hParent, HINSTANCE h, MemoDetailsView *p, MemoManager *pMgr)
 {
 	gSuperProc = wp;
 	hParentWnd = hParent;
@@ -36,7 +37,7 @@ void SetWndProc(WNDPROC wp, HWND hParent, HINSTANCE h, MemoDetailsView *p, MemoM
 // エディットコントロールに対して
 // ウィンドウプロシージャの乗っ取りを行っている。
 
-#if !defined(PLATFORM_PSPC) && !defined(PLATFORM_BE500)
+//#if !defined(PLATFORM_PSPC) && !defined(PLATFORM_BE500)
 LRESULT CALLBACK NewDetailsViewProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch(msg) {
@@ -50,11 +51,6 @@ LRESULT CALLBACK NewDetailsViewProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM l
 		if (pView->IsReadOnly()) return 0;
 		break;
 	case WM_KEYDOWN:
-//		if (wParam == 'B' && GetKeyState(VK_CONTROL)) {
-//			// toggle browsing mode
-//			pView->SetReadOnly(!pView->IsReadOnly());
-//			return 0;
-//		}
 		if (pView->IsReadOnly()) {
 			if (wParam == VK_DELETE) return 0;
 			if (wParam == VK_BACK || wParam == VK_CONVERT || wParam == VK_LEFT) {
@@ -117,10 +113,10 @@ LRESULT CALLBACK NewDetailsViewProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM l
 		}
 	}
 
-	LRESULT lResult = CallWindowProc((WNDPROC)gSuperProc, hwnd, msg, wParam, lParam);
-	if (pView && (msg == WM_CHAR || msg == WM_KEYDOWN && wParam == VK_DELETE)) {
+	LRESULT lResult = CallWindowProc(gSuperProc, hwnd, msg, wParam, lParam);
+	if (pView && msg != EM_GETMODIFY) {
 		pView->SetModifyStatus();
 	}
     return lResult;
 }
-#endif
+//#endif

@@ -15,9 +15,10 @@
 #include "SearchEngine.h"
 #include "Message.h"
 
+
 static BOOL GetDateText(TString *pInsStr, LPCTSTR pFormat);
 
-void SetWndProc(WNDPROC wp, HWND hParent, HINSTANCE h, MemoDetailsView *p, MemoManager *pMgr);
+void SetWndProc(SUPER_WND_PROC wp, HWND hParent, HINSTANCE h, MemoDetailsView *p, MemoManager *pMgr);
 LRESULT CALLBACK NewDetailsViewProc( HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam );
 
 LPCTSTR pMonth[12] = {
@@ -69,13 +70,13 @@ BOOL MemoDetailsView::Create(LPCTSTR pName, RECT &r, HWND hParent, DWORD nID, DW
 	if (hViewWnd_fd == NULL || hViewWnd_nf == NULL) return FALSE;
 	hViewWnd = hViewWnd_fd;
 
-#if !defined(PLATFORM_PSPC) && !defined(PLATFORM_BE500)
+//#if !defined(PLATFORM_PSPC) && !defined(PLATFORM_BE500)
 	// EDIT Controlのサブクラス化
-	WNDPROC wp = (WNDPROC)GetWindowLong(hViewWnd, GWL_WNDPROC);
+	SUPER_WND_PROC wp = (SUPER_WND_PROC)GetWindowLong(hViewWnd, GWL_WNDPROC);
 	SetWndProc(wp, hParent, g_hInstance, this, pMemoMgr);
 	SetWindowLong(hViewWnd_nf, GWL_WNDPROC, (LONG)NewDetailsViewProc);
 	SetWindowLong(hViewWnd_fd, GWL_WNDPROC, (LONG)NewDetailsViewProc);
-#endif
+//#endif
 
 	if (hFont != NULL) {
 		SetFont(hFont);
