@@ -136,6 +136,13 @@ PG: impliment Search Next/Prev.
 FIX: At the time of searching, when a file name and a directory name are the same, 
 a note does not open correctly.
 
+////////////////////////////////
+// B080 (Tombo 1.6 beta1)
+////////////////////////////////
+
+* NEW: Add search next/prev keyboard shortcut for function key-less devices.(Win32/HPC)(#851)
+* NEW: impliment viewer mode.(#832)
+
 /////////////////////////////////////////////////////////////////////////
 // TODO
 /////////////////////////////////////////////////////////////////////////
