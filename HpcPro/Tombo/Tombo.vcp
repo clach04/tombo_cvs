@@ -128,7 +128,7 @@ RSC=rc.exe
 # ADD RSC /l 0x409 /d UNDER_CE=$(CEVersion) /d _WIN32_WCE=$(CEVersion) /d "NDEBUG" /d "UNICODE" /d "_UNICODE" /d "$(CePlatform)" /d "SHx" /d "SH4" /d "_SH4_" /r
 CPP=shcl.exe
 # ADD BASE CPP /nologo /W3 /D _WIN32_WCE=$(CEVersion) /D "$(CePlatform)" /D "SHx" /D "SH4" /D "_SH4_" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_UNICODE" /D "NDEBUG" /YX /Qsh4 /Oxs /M$(CECrtMT) /c
-# ADD CPP /nologo /W3 /Od /I "./res" /I "." /I "../../Src/regex" /D "SHx" /D "SH4" /D "_SH4_" /D "NDEBUG" /D UNDER_CE=$(CEVersion) /D _WIN32_WCE=$(CEVersion) /D "$(CePlatform)" /D "UNICODE" /D "_UNICODE" /D "TOMBO" /D "PLATFORM_HPC" /D "STRICT" /D "USE_TWO_PANE" /YX /Qsh4 /Oxs /M$(CECrtMT) /c
+# ADD CPP /nologo /W3 /Od /I "./res" /I "." /I "../../Src/regex" /D "SHx" /D "SH4" /D "_SH4_" /D "NDEBUG" /D UNDER_CE=$(CEVersion) /D _WIN32_WCE=$(CEVersion) /D "$(CePlatform)" /D "UNICODE" /D "_UNICODE" /D "TOMBO" /D "PLATFORM_HPC" /D "STRICT" /D "USE_TWO_PANE" /YX /Qsh4 /M$(CECrtMT) /c
 MTL=midl.exe
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /o "NUL" /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /o "NUL" /win32
@@ -480,7 +480,7 @@ RSC=rc.exe
 # ADD RSC /l 0x409 /d UNDER_CE=$(CEVersion) /d _WIN32_WCE=$(CEVersion) /d "NDEBUG" /d "UNICODE" /d "_UNICODE" /d "$(CePlatform)" /d "SHx" /d "SH4" /d "_SH4_" /r
 CPP=shcl.exe
 # ADD BASE CPP /nologo /W3 /Od /D "SHx" /D "SH4" /D "_SH4_" /D "NDEBUG" /D UNDER_CE=$(CEVersion) /D _WIN32_WCE=$(CEVersion) /D "$(CePlatform)" /D "UNICODE" /D "_UNICODE" /D "TOMBO" /D "PLATFORM_HPC" /D "STRICT" /D "USE_TWO_PANE" /YX /Qsh4 /Oxs /M$(CECrtMT) /c
-# ADD CPP /nologo /W3 /Od /I "./resE" /I "./res" /I "." /I "../../Src/regex" /D "SHx" /D "SH4" /D "_SH4_" /D "NDEBUG" /D UNDER_CE=$(CEVersion) /D _WIN32_WCE=$(CEVersion) /D "$(CePlatform)" /D "UNICODE" /D "_UNICODE" /D "TOMBO" /D "PLATFORM_HPC" /D "STRICT" /D "USE_TWO_PANE" /D "TOMBO_LANG_ENGLISH" /YX /Qsh4 /Oxs /M$(CECrtMT) /c
+# ADD CPP /nologo /W3 /Od /I "./resE" /I "./res" /I "." /I "../../Src/regex" /D "SHx" /D "SH4" /D "_SH4_" /D "NDEBUG" /D UNDER_CE=$(CEVersion) /D _WIN32_WCE=$(CEVersion) /D "$(CePlatform)" /D "UNICODE" /D "_UNICODE" /D "TOMBO" /D "PLATFORM_HPC" /D "STRICT" /D "USE_TWO_PANE" /D "TOMBO_LANG_ENGLISH" /YX /Qsh4 /M$(CECrtMT) /c
 MTL=midl.exe
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /o "NUL" /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /o "NUL" /win32
@@ -1131,6 +1131,8 @@ DEP_CPP_DETAI=\
 
 DEP_CPP_DETAI=\
 	"..\..\Src\MemoDetailsView.h"\
+	"..\..\Src\MemoManager.h"\
+	"..\..\Src\Property.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Debug"
@@ -1807,9 +1809,11 @@ DEP_CPP_MAIN_=\
 	"..\..\Src\MemoDetailsView.h"\
 	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoSelectView.h"\
+	"..\..\Src\Message.h"\
 	"..\..\Src\PasswordManager.h"\
 	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
+	"..\..\Src\Uniconv.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Debug"
@@ -2024,10 +2028,14 @@ DEP_CPP_MAINF=\
 	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoNote.h"\
 	"..\..\Src\MemoSelectView.h"\
+	"..\..\Src\Message.h"\
 	"..\..\Src\PasswordManager.h"\
 	"..\..\Src\Property.h"\
+	"..\..\Src\SearchDlg.h"\
+	"..\..\Src\SearchEngine.h"\
 	"..\..\Src\SipControl.h"\
 	"..\..\Src\Tombo.h"\
+	"..\..\Src\TreeViewItem.h"\
 	"..\..\Src\Uniconv.h"\
 	
 
@@ -2283,6 +2291,8 @@ NODEP_CPP_MD5_C=\
 
 DEP_CPP_MD5_C=\
 	"..\..\Src\gnupg\bithelp.h"\
+	"..\..\Src\regex\config.h"\
+	"..\..\Src\regex\ctypeutil.h"\
 	
 NODEP_CPP_MD5_C=\
 	"..\..\Src\gnupg\dynload.h"\
@@ -2431,8 +2441,10 @@ DEP_CPP_MEMOD=\
 	"..\..\Src\MemoDetailsView.h"\
 	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoSelectView.h"\
+	"..\..\Src\Message.h"\
 	"..\..\Src\PasswordManager.h"\
 	"..\..\Src\Property.h"\
+	"..\..\Src\SearchEngine.h"\
 	"..\..\Src\Tombo.h"\
 	"..\..\Src\TString.h"\
 	"..\..\Src\Uniconv.h"\
@@ -2639,7 +2651,13 @@ DEP_CPP_MEMOF=\
 	"..\..\Src\File.h"\
 	"..\..\Src\Logger.h"\
 	"..\..\Src\MemoFolder.h"\
+	"..\..\Src\MemoManager.h"\
+	"..\..\Src\MemoNote.h"\
+	"..\..\Src\Message.h"\
+	"..\..\Src\PasswordManager.h"\
+	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
+	"..\..\Src\TreeViewItem.h"\
 	"..\..\Src\TString.h"\
 	"..\..\Src\Uniconv.h"\
 	
@@ -2998,10 +3016,13 @@ DEP_CPP_MEMOM=\
 	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoNote.h"\
 	"..\..\Src\MemoSelectView.h"\
+	"..\..\Src\Message.h"\
 	"..\..\Src\NewFolderDialog.h"\
 	"..\..\Src\PasswordManager.h"\
 	"..\..\Src\Property.h"\
+	"..\..\Src\SearchEngine.h"\
 	"..\..\Src\Tombo.h"\
+	"..\..\Src\TreeViewItem.h"\
 	"..\..\Src\TString.h"\
 	"..\..\Src\Uniconv.h"\
 	
@@ -3274,9 +3295,11 @@ DEP_CPP_MEMON=\
 	"..\..\Src\MemoInfo.h"\
 	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoNote.h"\
+	"..\..\Src\Message.h"\
 	"..\..\Src\PasswordManager.h"\
 	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
+	"..\..\Src\TreeViewItem.h"\
 	"..\..\Src\TString.h"\
 	"..\..\Src\Uniconv.h"\
 	
@@ -3521,9 +3544,12 @@ DEP_CPP_MEMOS=\
 	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoNote.h"\
 	"..\..\Src\MemoSelectView.h"\
+	"..\..\Src\Message.h"\
 	"..\..\Src\PasswordManager.h"\
 	"..\..\Src\Property.h"\
+	"..\..\Src\SearchEngine.h"\
 	"..\..\Src\Tombo.h"\
+	"..\..\Src\TreeViewItem.h"\
 	"..\..\Src\TString.h"\
 	"..\..\Src\Uniconv.h"\
 	
@@ -3871,10 +3897,13 @@ NODEP_CPP_PASSW=\
 DEP_CPP_PASSW=\
 	"..\..\Src\File.h"\
 	"..\..\Src\Logger.h"\
+	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoNote.h"\
+	"..\..\Src\Message.h"\
 	"..\..\Src\PasswordDialog.h"\
 	"..\..\Src\SipControl.h"\
 	"..\..\Src\Tombo.h"\
+	"..\..\Src\TreeViewItem.h"\
 	"..\..\Src\Uniconv.h"\
 	
 
@@ -4057,6 +4086,7 @@ DEP_CPP_PASSWO=\
 	"..\..\Src\CryptManager.h"\
 	"..\..\Src\File.h"\
 	"..\..\Src\Logger.h"\
+	"..\..\Src\Message.h"\
 	"..\..\Src\PasswordDialog.h"\
 	"..\..\Src\PasswordManager.h"\
 	"..\..\Src\Property.h"\
@@ -4253,10 +4283,13 @@ DEP_CPP_PROPE=\
 	"..\..\Src\File.h"\
 	"..\..\Src\FileSelector.h"\
 	"..\..\Src\Logger.h"\
+	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoNote.h"\
+	"..\..\Src\Message.h"\
 	"..\..\Src\PasswordManager.h"\
 	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
+	"..\..\Src\TreeViewItem.h"\
 	"..\..\Src\Uniconv.h"\
 	
 
@@ -4444,6 +4477,7 @@ NODEP_CPP_REGEX=\
 
 DEP_CPP_REGEX=\
 	"..\..\Src\regex\config.h"\
+	"..\..\Src\regex\ctypeutil.h"\
 	"..\..\Src\regex\regex.h"\
 	
 NODEP_CPP_REGEX=\
@@ -4763,6 +4797,7 @@ DEP_CPP_SEARCH=\
 
 DEP_CPP_SEARCH=\
 	"..\..\Src\SearchEngine.h"\
+	"..\..\Src\Uniconv.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Debug"
@@ -4859,6 +4894,7 @@ DEP_CPP_SELEC=\
 
 DEP_CPP_SELEC=\
 	"..\..\Src\MemoSelectView.h"\
+	"..\..\Src\Property.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Debug"
@@ -5208,12 +5244,15 @@ DEP_CPP_TREEV=\
 	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoNote.h"\
 	"..\..\Src\MemoSelectView.h"\
+	"..\..\Src\Message.h"\
 	"..\..\Src\PasswordManager.h"\
 	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
 	"..\..\Src\TreeViewItem.h"\
+	"..\..\Src\TSParser.h"\
 	"..\..\Src\TString.h"\
 	"..\..\Src\Uniconv.h"\
+	"..\..\Src\VFStream.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Debug"
@@ -5455,6 +5494,7 @@ DEP_CPP_TSPAR=\
 
 DEP_CPP_TSPAR=\
 	"..\..\Src\File.h"\
+	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoSelectView.h"\
 	"..\..\Src\regex\ctypeutil.h"\
 	"..\..\Src\TreeViewItem.h"\
@@ -5768,6 +5808,10 @@ DEP_CPP_UNICO=\
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Release"
 
 DEP_CPP_UNICO=\
+	"..\..\Src\File.h"\
+	"..\..\Src\Logger.h"\
+	"..\..\Src\Property.h"\
+	"..\..\Src\Tombo.h"\
 	"..\..\Src\Uniconv.h"\
 	
 
@@ -5977,6 +6021,7 @@ DEP_CPP_VFSTR=\
 	"..\..\Src\DirectoryScanner.h"\
 	"..\..\Src\File.h"\
 	"..\..\Src\Logger.h"\
+	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoNote.h"\
 	"..\..\Src\MemoSelectView.h"\
 	"..\..\Src\Property.h"\
