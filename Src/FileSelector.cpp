@@ -4,6 +4,47 @@
 #include "FileSelector.h"
 #include "Resource.h"
 
+#if defined(PLATFORM_WIN32)
+////////////////////////////////////////////////////
+////////////////////////////////////////////////////
+// Win32用ファイル選択ダイアログ
+////////////////////////////////////////////////////
+////////////////////////////////////////////////////
+
+#include <shlobj.h>
+
+DWORD FileSelector::Popup(HINSTANCE hInst, HWND hWnd, LPCTSTR pTitle, LPCTSTR pExt)
+{
+	if (pExt != NULL) {
+		MessageBox(hWnd, TEXT("Not Implimented Yet"), TEXT("ERROR"), MB_ICONERROR|MB_OK);
+		return IDCANCEL;
+	}
+
+	LPITEMIDLIST pIdList;
+	TCHAR buf[MAX_PATH];
+	BROWSEINFO bi;
+	ZeroMemory(&bi, sizeof(bi));
+	bi.hwndOwner = hWnd;
+	bi.pszDisplayName = buf;
+	bi.lpszTitle = pTitle;
+	bi.ulFlags = BIF_RETURNONLYFSDIRS;
+
+	pIdList = SHBrowseForFolder(&bi);
+	if (pIdList == NULL) return IDCANCEL;
+
+	SHGetPathFromIDList(pIdList, aPath); 
+	CoTaskMemFree(pIdList);
+	return IDOK;
+}
+
+#else // PLATFORM_WIN32
+////////////////////////////////////////////////////
+////////////////////////////////////////////////////
+// CE用ファイル選択ダイアログ
+////////////////////////////////////////////////////
+////////////////////////////////////////////////////
+
+
 #define IMAGE_CX 16
 #define IMAGE_CY 16
 #define NUM_BITMAPS 4
@@ -374,3 +415,5 @@ void FileSelector::ItemSelect(HWND hDlg, HWND hTree, HTREEITEM hItem)
 	}
 	EnableWindow(hOk, bEnable);
 }
+
+#endif // PLATFORM_WIN32

@@ -5,6 +5,21 @@
 // ファイルもしくはフォルダを選択させるセレクタ
 ///////////////////////////////////////////////////
 
+#if defined(PLATFORM_WIN32)
+class FileSelector {
+	TCHAR aPath[MAX_PATH];
+public:
+	FileSelector() {}
+	~FileSelector(){}
+
+	// pExt == NULL : フォルダの選択
+	// pExt != NULL : 指定した拡張子を持つファイルの選択
+	DWORD Popup(HINSTANCE hInst, HWND hWnd, LPCTSTR pTitle, LPCTSTR pExt);
+
+	LPCTSTR SelectedPath() { return aPath; }
+};
+
+#else
 class FileSelector {
 	HWND hDialog;
 	HIMAGELIST hImg;
@@ -33,5 +48,6 @@ public:
 
 	LPCTSTR SelectedPath() { return pPath; }
 };
+#endif
 
 #endif
