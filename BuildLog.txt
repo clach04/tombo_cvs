@@ -494,3 +494,11 @@ Changes
 ////////////////////////////////
 
 * Add edit bookmark dialog
+
+////////////////////////////////
+// B121
+////////////////////////////////
+
+* Change bookmark format path to URI.
+* Support virtual folder's bookmark/startpage.
+
