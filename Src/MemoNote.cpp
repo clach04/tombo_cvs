@@ -423,7 +423,10 @@ BOOL CryptedMemoNote::SaveData(PasswordManager *pMgr, const char *pText, LPCTSTR
 			return NULL;
 		}
 	}
-	if (!cMgr.Init(pPassword)) return FALSE;
+	if (!cMgr.Init(pPassword)) {
+		MessageBox(NULL, TEXT("In CryptedMemoNote::SaveData,CryptManager::Init failed"), TEXT("DEBUG"), MB_OK); // XXXX_DEBUG
+		return FALSE;
+	}
 	return cMgr.EncryptAndStore((LPBYTE)pText, strlen(pText), pWriteFile);
 }
 
