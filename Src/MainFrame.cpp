@@ -923,7 +923,9 @@ BOOL MainFrame::OnExit()
 {
 	DWORD nYNC;
 	if (!mmMemoManager.SaveIfModify(&nYNC, FALSE)) {
-		TomboMessageBox(hMainWnd, MSG_SAVE_FAILED, TEXT("ERROR"), MB_ICONSTOP | MB_OK);
+		TCHAR buf[1024];
+		wsprintf(buf, MSG_SAVE_FAILED, GetLastError());
+		TomboMessageBox(hMainWnd, buf, TEXT("ERROR"), MB_ICONSTOP | MB_OK);
 		ActivateView(FALSE);
 		return FALSE;
 	}
@@ -989,7 +991,9 @@ void MainFrame::OnCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		break;
 	case IDM_SAVE:
 		if (!mmMemoManager.SaveIfModify(NULL, FALSE)) {
-			TomboMessageBox(NULL, MSG_SAVE_FAILED, TEXT("ERROR"), MB_ICONERROR | MB_OK);
+			TCHAR buf[1024];
+			wsprintf(buf, MSG_SAVE_FAILED, GetLastError());
+			TomboMessageBox(NULL, buf, TEXT("ERROR"), MB_ICONERROR | MB_OK);
 		}
 		break;
 	case IDM_DETAILS_HSCROLL:
@@ -1331,7 +1335,9 @@ void MainFrame::OnList(BOOL bAskSave)
 		bResult = mmMemoManager.SaveIfModify(NULL, TRUE);
 	}
 	if (!bResult) {
-		TomboMessageBox(hMainWnd, MSG_SAVE_FAILED, TEXT("ERROR"), MB_ICONSTOP | MB_OK);
+		TCHAR buf[1024];
+		wsprintf(buf, MSG_SAVE_FAILED, GetLastError());
+		TomboMessageBox(hMainWnd, buf, TEXT("ERROR"), MB_ICONSTOP | MB_OK);
 		ActivateView(FALSE);
 		return;
 	}
@@ -1938,11 +1944,10 @@ void MainFrame::OnSearch()
 	if (!pSE->Prepare(sd.SearchString(), sd.IsCaseSensitive(), &pReason)) {
 		LPTSTR p = ConvSJIS2Unicode(pReason);
 		if (p) {
-			MessageBox(hMainWnd, p, TOMBO_APP_NAME, MB_OK | MB_ICONEXCLAMATION);
+			MessageBox(p, TOMBO_APP_NAME, MB_OK | MB_ICONEXCLAMATION);
 			delete [] p;
 		} else {
-
-			MessageBox(hMainWnd, MSG_NOT_ENOUGH_MEMORY, TOMBO_APP_NAME, MB_OK | MB_ICONEXCLAMATION);
+			MessageBox(MSG_NOT_ENOUGH_MEMORY, TOMBO_APP_NAME, MB_OK | MB_ICONEXCLAMATION);
 		}
 		delete pSE;
 		return;
@@ -1967,7 +1972,7 @@ void MainFrame::OnSearch()
 
 	// åüçıé¿çs
 	if (bSelectViewActive) {
-		msView.Search(TRUE, TRUE);
+		msView.Search(TRUE, !sd.IsSearchDirectionUp());
 		mmMemoManager.SetMSSearchFlg(FALSE);
 	} else {
 		mdView.Search(TRUE, TRUE, TRUE, FALSE);
@@ -2002,3 +2007,9 @@ static HWND GetCommandBar(HWND hBand, UINT uBandID)
 	return hwnd;
 }
 #endif
+
+int MainFrame::MessageBox(LPCTSTR pText, LPCTSTR pCaption, UINT uType)
+{
+	return TomboMessageBox(hMainWnd, pText, pCaption, uType);
+}
+
