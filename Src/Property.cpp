@@ -880,6 +880,8 @@ void AppButtonTab::Init(HWND hDlg)
 	HWND hAppButton4 = GetDlgItem(hDlg, IDC_PROP_APPBUTTON4);
 	HWND hAppButton5 = GetDlgItem(hDlg, IDC_PROP_APPBUTTON5);
 
+	HWND hDisableAppButton = GetDlgItem(hDlg, IDC_PROPTAB_DISABLEACTION);
+
 	if (pProperty->AppButton1()) {
 		SendMessage(hAppButton1, BM_SETCHECK, BST_CHECKED, 0);
 	} else {
@@ -905,6 +907,12 @@ void AppButtonTab::Init(HWND hDlg)
 	} else {
 		SendMessage(hAppButton5, BM_SETCHECK, BST_UNCHECKED, 0);
 	}
+
+	if (pProperty->DisableExtraActionButton()) {
+		SendMessage(hDisableAppButton, BM_SETCHECK, BST_CHECKED, 0);
+	} else {
+		SendMessage(hDisableAppButton, BM_SETCHECK, BST_UNCHECKED, 0);
+	}
 }
 
 BOOL AppButtonTab::Apply(HWND hDlg)
@@ -914,6 +922,7 @@ BOOL AppButtonTab::Apply(HWND hDlg)
 	HWND hAppButton3 = GetDlgItem(hDlg, IDC_PROP_APPBUTTON3);
 	HWND hAppButton4 = GetDlgItem(hDlg, IDC_PROP_APPBUTTON4);
 	HWND hAppButton5 = GetDlgItem(hDlg, IDC_PROP_APPBUTTON5);
+	HWND hDisableAppButton = GetDlgItem(hDlg, IDC_PROPTAB_DISABLEACTION);
 
 	if (SendMessage(hAppButton1, BM_GETCHECK, 0, 0) == BST_CHECKED) {
 		pProperty->nAppButton1 = APPBUTTON_ACTION_ENABLE;
@@ -939,6 +948,12 @@ BOOL AppButtonTab::Apply(HWND hDlg)
 		pProperty->nAppButton5 = APPBUTTON_ACTION_ENABLE;
 	} else {
 		pProperty->nAppButton5 = APPBUTTON_ACTION_DISABLE;
+	}
+
+	if (SendMessage(hDisableAppButton, BM_GETCHECK, 0, 0) == BST_CHECKED) {
+		pProperty->nDisableExtraActionButton = TRUE;
+	} else {
+		pProperty->nDisableExtraActionButton = FALSE;
 	}
 
 	return TRUE;
@@ -1762,8 +1777,8 @@ BOOL Property::SaveStatusBarStat()
 	if (!SetDWORDToReg(hTomboRoot, HIDESTATUSBAR_ATTR_NAME, nHideStatusBar)) return FALSE;
 
 	RegCloseKey(hTomboRoot);
-	return TRUE;
 #endif
+	return TRUE;
 }
 
 ///////////////////////////////////////////////////
