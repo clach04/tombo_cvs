@@ -41,6 +41,11 @@ void TreeViewItem::SetViewItem(HTREEITEM h)
 	hItem = h;
 }
 
+MemoLocator TreeViewItem::ToLocator()
+{
+	return MemoLocator(NULL, NULL);
+}
+
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 //  File
@@ -61,7 +66,13 @@ BOOL TreeViewFileItem::Move(MemoManager *pMgr, MemoSelectView *pView)
 	if (!Copy(pMgr, pView)) {
 		return FALSE;
 	}
-	return DeleteWithoutAsk(pMgr, pView);
+	if (g_Property.IsUseTwoPane() && pMgr->IsNoteDisplayed(pNote->MemoPath())) {
+		// 現在表示されているメモの表示をキャンセルする
+		pMgr->NewMemo();
+	}
+	// ファイルの削除
+	if (!pNote->DeleteMemoData()) return FALSE;
+	return TRUE;
 }
 
 BOOL TreeViewFileItem::Copy(MemoManager *pMgr, MemoSelectView *pView)
@@ -83,36 +94,30 @@ BOOL TreeViewFileItem::Delete(MemoManager *pMgr, MemoSelectView *pView)
 	// ユーザへの意思確認
 	if (TomboMessageBox(NULL, MSG_CONFIRM_DELETE, MSG_DELETE_TTL, MB_ICONQUESTION | MB_OKCANCEL) != IDOK) return FALSE;
 
-	BOOL bResult = DeleteWithoutAsk(pMgr, pView);
-
-	if (!bResult && pNote == NULL) {
-		TomboMessageBox(NULL, MSG_DELETE_FAILED, TEXT("ERROR"), MB_ICONSTOP | MB_OK);
-	}
-	return bResult;
-}
-
-BOOL TreeViewFileItem::DeleteWithoutAsk(MemoManager *pMgr,MemoSelectView *pView)
-{
-	// クリップボードに登録されていたらリセットする
-	pView->CheckResetClipboard(this);
-
-	if (g_Property.IsUseTwoPane() && pMgr->IsNoteDisplayed(pNote)) {
+	if (g_Property.IsUseTwoPane() && pMgr->IsNoteDisplayed(pNote->MemoPath())) {
 		// 現在表示されているメモの表示をキャンセルする
 		pMgr->NewMemo();
 	}
-	BOOL bResult = TRUE;
-
-	// ビュー上からアイテムを削除
-	if (!pView->DeleteItem(this)) {
-		bResult = FALSE;
-	}
-
 	// ファイルの削除
-	if (!pNote->DeleteMemoData()) return FALSE;
-	delete pNote;
-	pNote = NULL;
+	if (!pNote->DeleteMemoData()) {
+		TomboMessageBox(NULL, MSG_DELETE_FAILED, TEXT("ERROR"), MB_ICONSTOP | MB_OK);
+		return FALSE;
+	}
 	return TRUE;
 }
+
+#ifdef COMMENT
+BOOL TreeViewFileItem::DeleteWithoutAsk(MemoManager *pMgr,MemoSelectView *pView)
+{
+	if (g_Property.IsUseTwoPane() && pMgr->IsNoteDisplayed(pNote->MemoPath())) {
+		// 現在表示されているメモの表示をキャンセルする
+		pMgr->NewMemo();
+	}
+	// ファイルの削除
+	if (!pNote->DeleteMemoData()) return FALSE;
+	return TRUE;
+}
+#endif
 
 BOOL TreeViewFileItem::Encrypt(MemoManager *pMgr, MemoSelectView *pView)
 {
@@ -121,7 +126,7 @@ BOOL TreeViewFileItem::Encrypt(MemoManager *pMgr, MemoSelectView *pView)
 
 	// 詳細ビューに表示されているメモを暗号化しようとしているのであれば、
 	// 保存しておく
-	if (g_Property.IsUseTwoPane() && pMgr->IsNoteDisplayed(pNote)) {
+	if (g_Property.IsUseTwoPane() && pMgr->IsNoteDisplayed(pNote->MemoPath())) {
 		pMgr->InactiveDetailsView();
 	}
 
@@ -141,7 +146,7 @@ BOOL TreeViewFileItem::Encrypt(MemoManager *pMgr, MemoSelectView *pView)
 	pNote = p;
 
 	// 暗号化に伴いアイコン・ヘッドラインが変更になる可能性があるので更新依頼
-	if (!pView->UpdateItemStatus(this, sHeadLine.Get())) {
+	if (!pView->UpdateItemStatusNotify(this, sHeadLine.Get())) {
 		return FALSE;
 	}
 	return TRUE;
@@ -154,7 +159,7 @@ BOOL TreeViewFileItem::Decrypt(MemoManager *pMgr, MemoSelectView *pView)
 
 	// 詳細ビューに表示されているメモを復号化しようとしているのであれば、
 	// 保存しておく
-	if (g_Property.IsUseTwoPane() && pMgr->IsNoteDisplayed(pNote)) {
+	if (g_Property.IsUseTwoPane() && pMgr->IsNoteDisplayed(pNote->MemoPath())) {
 		pMgr->InactiveDetailsView();
 	}
 
@@ -174,7 +179,7 @@ BOOL TreeViewFileItem::Decrypt(MemoManager *pMgr, MemoSelectView *pView)
 	pNote = p;
 
 	// 暗号化に伴いアイコン・ヘッドラインが変更になる可能性があるので更新依頼
-	if (!pView->UpdateItemStatus(this, sHeadLine.Get())) {
+	if (!pView->UpdateItemStatusNotify(this, sHeadLine.Get())) {
 		return FALSE;
 	}
 	return TRUE;
@@ -238,6 +243,15 @@ DWORD TreeViewFileItem::ItemOrder()
 }
 
 /////////////////////////////////////////////
+//  Get MemoLocator
+
+MemoLocator TreeViewFileItem::ToLocator()
+{
+	return MemoLocator(pNote, GetViewItem());
+}
+
+
+/////////////////////////////////////////////
 //  Folder
 /////////////////////////////////////////////
 
@@ -263,8 +277,8 @@ BOOL TreeViewFolderItem::Move(MemoManager *pMgr, MemoSelectView *pView)
 	// 存在するかもしれないので詳細ビューを一旦InActiveにする
 	pMgr->InactiveDetailsView();
 
-	// 表示の削除
-	pView->DeleteItem(this);
+	// ツリーのCollapse
+	pView->TreeCollapse(GetViewItem());
 
 	// 移動処理
 	MemoFolder mfFolder;
@@ -343,7 +357,6 @@ BOOL TreeViewFolderItem::Delete(MemoManager *pMgr, MemoSelectView *pView)
 	mf.Init(sCurrentPath.Get());	
 	// 表示の削除
 	if (mf.Delete()) {
-		pView->DeleteItem(this);
 		return TRUE;
 	} else {
 		LPCTSTR pErr = mf.GetErrorReason();
@@ -422,6 +435,9 @@ BOOL TreeViewFolderItem::Rename(MemoManager *pMgr, MemoSelectView *pView, LPCTST
 
 	if (!sCurrentPath.AllocFullPath(pCurrentPath)) return FALSE;
 
+	pMgr->InactiveDetailsView();
+	pView->TreeCollapse(GetViewItem());
+
 	MemoFolder mf;
 	mf.Init(sCurrentPath.Get());	
 
@@ -466,7 +482,7 @@ BOOL TreeViewFolderItem::Expand(MemoSelectView *pView)
 			if (wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
 				// フォルダ
 				TreeViewFolderItem *pItem = new TreeViewFolderItem();
-				pView->InsertFolder(hParent, wfd.cFileName, pItem);
+				pView->InsertFolder(hParent, wfd.cFileName, pItem, FALSE);
 			} else {
 				if (!pView->InsertFile(hParent, pPrefix, wfd.cFileName)) {
 					FindClose(hHandle);
@@ -629,7 +645,7 @@ BOOL TreeViewVirtualFolder::Expand(MemoSelectView *pView)
 	for (DWORD i = 0; i < n; i++) {
 		MemoNote *p = ppNotes[i]->GetNote();
 		LPCTSTR pTitle = ppNotes[i]->GetFileName();
-		pView->InsertFileToLast(hItem, p, pTitle);
+		pView->InsertFile(hItem, p, pTitle, TRUE);
 	}
 	pStore->FreeArray(); ppNotes = NULL;
 

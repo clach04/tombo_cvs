@@ -7,6 +7,9 @@ class MemoManager;
 class VFDirectoryGenerator;
 class VFStore;
 class VFStream;
+class MemoLoctor;
+
+#include "MemoManager.h"
 
 /////////////////////////////////////////////
 //  TreeViewÇÃÉAÉCÉeÉÄÇÃíäè€âª
@@ -55,6 +58,8 @@ public:
 	virtual DWORD ItemOrder() = 0;
 
 	BOOL HasMultiItem() { return bHasMultiItem; }
+
+	virtual MemoLocator ToLocator();
 };
 
 /////////////////////////////////////////////
@@ -64,7 +69,7 @@ class TreeViewFileItem : public TreeViewItem {
 protected:
 	MemoNote *pNote;
 
-	BOOL DeleteWithoutAsk(MemoManager *pMgr, MemoSelectView *pView);
+//	BOOL DeleteWithoutAsk(MemoManager *pMgr, MemoSelectView *pView);
 public:
 	TreeViewFileItem();
 	~TreeViewFileItem();
@@ -82,6 +87,8 @@ public:
 
 	void SetNote(MemoNote *p) { pNote = p; }
 	MemoNote *GetNote() { return pNote; }
+
+	MemoLocator ToLocator();
 };
 
 /////////////////////////////////////////////
