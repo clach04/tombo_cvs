@@ -64,6 +64,7 @@
 #define IDD_FILTERDEF_ADD_SORT          143
 #define IDD_FILTERDEF_VIEWTYPE          144
 #define IDD_PROPTAB_DEFNOTE             146
+#define IDD_BOOKMARK_EDIT               147
 #define IDC_PASS                        1000
 #define IDC_PROP_PASSWORD_DESC          1001
 #define IDC_PASS_TIMEOUT                1002
@@ -132,6 +133,10 @@
 #define IDC_PROPTAB_DEFNOTE_PATH        1061
 #define IDC_PROPTAB_DEFNOTE_SETCURRENT  1062
 #define IDC_PROPTAB_DEFNOTE_SETBLANK    1063
+#define IDC_BMEDIT_LIST                 1063
+#define IDC_BMEDIT_DELETE               1064
+#define IDC_BMEDIT_UP                   1065
+#define IDC_BMEDIT_DOWN                 1066
 #define IDM_EXIT                        40001
 #define IDM_NEWMEMO                     40002
 #define IDM_RETURNLIST                  40003
@@ -173,9 +178,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        147
+#define _APS_NEXT_RESOURCE_VALUE        148
 #define _APS_NEXT_COMMAND_VALUE         40039
-#define _APS_NEXT_CONTROL_VALUE         1063
+#define _APS_NEXT_CONTROL_VALUE         1067
 #define _APS_NEXT_SYMED_VALUE           108
 #endif
 #endif

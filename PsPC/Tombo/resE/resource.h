@@ -34,6 +34,7 @@
 #define IDD_GREPTAB_PERSIST             125
 #define IDD_FILTERCTL                   126
 #define IDD_PROPTAB_DEFNOTE             127
+#define IDD_BOOKMARK_EDIT               134
 #define IDD_FILTERDEF_SRC               138
 #define IDD_FILTERDEF_FILTER            139
 #define IDD_FILTERDEF_ADD_REGEX         140
@@ -84,9 +85,13 @@
 #define IDC_GREPTAB_MAIN_ENCRYPTNOTE    1037
 #define IDC_GREPTAB_MAIN_FILENAME       1038
 #define IDC_GREPTAB_MAIN_STARTDIR       1039
+#define IDC_BMEDIT_LIST                 1039
 #define IDC_PROP_READONLY               1040
+#define IDC_BMEDIT_UP                   1040
 #define IDC_FILTERCTL_LIST              1041
+#define IDC_BMEDIT_DOWN                 1041
 #define IDC_FILTERCTL_KEEP              1042
+#define IDC_BMEDIT_DELETE               1042
 #define IDC_FILTERCTL_UP                1043
 #define IDC_FILTERDEF_SRC_PATH          1043
 #define IDC_FILTERCTL_DOWN              1044

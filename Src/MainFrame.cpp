@@ -19,6 +19,8 @@
 #include "FilterCtlDlg.h"
 #include "VFManager.h"
 #include "BookMark.h"
+#include "DialogTemplate.h"
+#include "BookMarkDlg.h"
 
 #ifdef _WIN32_WCE
 #if defined(PLATFORM_PKTPC)
@@ -176,7 +178,7 @@ static TBBUTTON aMDCmdBarButtons[NUM_MD_CMDBAR_BUTTONS] = {
 static void ControlMenu(HMENU hMenu, BOOL bSelectViewActive);
 static void ControlToolbar(HWND hToolbar, BOOL bSelectViewActive);
 
-#define NUM_MY_TOOLBAR_BMPS 11
+#define NUM_MY_TOOLBAR_BMPS 12
 #define NUM_TOOLBAR_BUTTONS 19
 
 static TBBUTTON aToolbarButtons[NUM_TOOLBAR_BUTTONS] = {
@@ -2648,8 +2650,25 @@ void MainFrame::OnBookMarkAdd(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 void MainFrame::OnBookMarkConfig(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
-	LPTSTR pBookMarks = pBookMark->ExportToMultiSZ();
-	LoadBookMark(pBookMarks);
+	BookMarkDlg dlg;
+	if (!dlg.Init(pBookMark)) return;
+
+	// release current bookmark
+	const BookMarkItem *p;
+	HMENU hBookMark = GetMSBookMarkMenu();
+	DWORD n = pBookMark->NumItems();
+	for (DWORD i = 0; i < n; i++) {
+		p = pBookMark->GetUnit(i);
+		DeleteMenu(hBookMark, p->nID, MF_BYCOMMAND);
+	}
+
+	// popup dialog and get info
+	dlg.Popup(g_hInstance, hMainWnd);
+
+	// set bookmarks
+	LPTSTR pBM = pBookMark->ExportToMultiSZ();
+	LoadBookMark(pBM);
+	delete [] pBM;
 }
 
 void MainFrame::OnBookMark(HWND hWnd, WPARAM wParam, LPARAM lParam)

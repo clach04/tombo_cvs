@@ -133,6 +133,10 @@ SOURCE=..\..\Src\BookMark.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\Src\BookMarkDlg.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\Src\Crypt.cpp
 # End Source File
 # Begin Source File
@@ -346,6 +350,10 @@ SOURCE=..\..\Src\AboutDialog.h
 # Begin Source File
 
 SOURCE=..\..\Src\BookMark.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\BookMarkDlg.h
 # End Source File
 # Begin Source File
 

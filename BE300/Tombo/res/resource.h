@@ -59,6 +59,7 @@
 #define IDD_FILTERDEF_ADD_SORT          143
 #define IDD_FILTERDEF_FILTER            144
 #define IDD_FILTERDEF_SRC               145
+#define IDD_BOOKMARK_EDIT               146
 #define IDM_MAIN_MENUITEM1              401
 #define IDM_MAIN_MENUITEM2              402
 #define IDS_MAIN_MENUITEM1              410
@@ -104,11 +105,15 @@
 #define IDC_GREPTAB_MAIN_ENCRYPTNOTE    1037
 #define IDC_GREPTAB_MAIN_FILENAME       1038
 #define IDC_GREPTAB_MAIN_STARTDIR       1039
+#define IDC_BMEDIT_LIST                 1039
 #define IDC_PROP_READONLY               1040
+#define IDC_BMEDIT_UP                   1040
 #define IDC_FILTERCTL_LIST              1041
 #define IDC_FONT_SELECT_CLEARTYPE       1041
+#define IDC_BMEDIT_DOWN                 1041
 #define IDC_FILTERCTL_KEEP              1042
 #define IDC_FONT_DETAILS_CLEARTYPE      1042
+#define IDC_BMEDIT_DELETE               1042
 #define IDC_FILTERCTL_UP                1043
 #define IDC_FILTERDEF_SRC_PATH          1043
 #define IDC_FILTERCTL_DOWN              1044

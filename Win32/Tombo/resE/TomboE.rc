@@ -459,6 +459,20 @@ BEGIN
     LTEXT           "Top page",IDC_STATIC,5,10,28,8
 END
 
+IDD_BOOKMARK_EDIT DIALOG DISCARDABLE  0, 0, 194, 136
+STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Edit bookmark"
+FONT 9, "‚l‚r ‚oƒSƒVƒbƒN"
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,85,115,50,14
+    PUSHBUTTON      "CANCEL",IDCANCEL,140,115,50,14
+    CONTROL         "List1",IDC_BMEDIT_LIST,"SysListView32",LVS_REPORT | 
+                    WS_BORDER | WS_TABSTOP,25,5,165,105
+    PUSHBUTTON      "Delete",IDC_BMEDIT_DELETE,5,115,50,14
+    PUSHBUTTON      "Up",IDC_BMEDIT_UP,5,25,15,14
+    PUSHBUTTON      "Dn",IDC_BMEDIT_DOWN,5,45,15,14
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -623,6 +637,14 @@ BEGIN
         RIGHTMARGIN, 124
         TOPMARGIN, 7
         BOTTOMMARGIN, 133
+    END
+
+    IDD_BOOKMARK_EDIT, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 187
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 129
     END
 END
 #endif    // APSTUDIO_INVOKED

@@ -157,5 +157,7 @@
 #define MSG_FILTEDEF_VIEW_TYPE_POST \
 								MSG("メモ名の後に表示", "View after file name")
 
+#define MSG_BMDLG_TITLE_NAME	MSG("アイテム名", "Name")
+#define MSG_BMDLG_TITLE_PATH	MSG("パス", "Path")
 #endif
 

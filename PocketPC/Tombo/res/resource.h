@@ -37,6 +37,7 @@
 #define IDD_DIALOG2                     127
 #define IDD_PROPTAB_DEFNOTE             127
 #define IDD_PROPTAB_SIP                 128
+#define IDD_BOOKMARK_EDIT               134
 #define IDD_FILTERDEF_SRC               138
 #define IDD_FILTERDEF_FILTER            139
 #define IDD_FILTERDEF_ADD_REGEX         140
@@ -89,11 +90,15 @@
 #define IDC_PROPTAB_DISABLEACTION       1037
 #define IDC_GREPTAB_MAIN_SEARCHSTRING   1038
 #define IDC_GREPTAB_MAIN_CASESENSITIVE  1039
+#define IDC_BMEDIT_LIST                 1039
 #define IDC_GREPTAB_MAIN_ENCRYPTNOTE    1040
+#define IDC_BMEDIT_UP                   1040
 #define IDC_GREPTAB_MAIN_FILENAME       1041
 #define IDC_FILTERCTL_LIST              1041
+#define IDC_BMEDIT_DOWN                 1041
 #define IDC_GREPTAB_MAIN_STARTDIR       1042
 #define IDC_FILTERCTL_KEEP              1042
+#define IDC_BMEDIT_DELETE               1042
 #define IDC_PROP_READONLY               1043
 #define IDC_FILTERCTL_UP                1043
 #define IDC_FILTERDEF_SRC_PATH          1043

@@ -602,6 +602,101 @@ DEP_CPP_BOOKM=\
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\Src\BookMarkDlg.cpp
+
+!IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
+
+DEP_CPP_BOOKMA=\
+	"..\..\Src\BookMark.h"\
+	"..\..\Src\BookMarkDlg.h"\
+	"..\..\Src\Message.h"\
+	"..\..\Src\TomboLib\DialogTemplate.h"\
+	"..\..\Src\TomboLib\TString.h"\
+	"..\..\Src\TomboLib\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
+
+DEP_CPP_BOOKMA=\
+	"..\..\Src\BookMark.h"\
+	"..\..\Src\BookMarkDlg.h"\
+	"..\..\Src\Message.h"\
+	"..\..\Src\TomboLib\DialogTemplate.h"\
+	"..\..\Src\TomboLib\TString.h"\
+	"..\..\Src\TomboLib\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Release"
+
+DEP_CPP_BOOKMA=\
+	"..\..\Src\BookMark.h"\
+	"..\..\Src\BookMarkDlg.h"\
+	"..\..\Src\Message.h"\
+	"..\..\Src\TomboLib\DialogTemplate.h"\
+	"..\..\Src\TomboLib\TString.h"\
+	"..\..\Src\TomboLib\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Debug"
+
+DEP_CPP_BOOKMA=\
+	"..\..\Src\BookMark.h"\
+	"..\..\Src\BookMarkDlg.h"\
+	"..\..\Src\Message.h"\
+	"..\..\Src\TomboLib\DialogTemplate.h"\
+	"..\..\Src\TomboLib\TString.h"\
+	"..\..\Src\TomboLib\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Release"
+
+DEP_CPP_BOOKMA=\
+	"..\..\Src\BookMark.h"\
+	"..\..\Src\BookMarkDlg.h"\
+	"..\..\Src\Message.h"\
+	"..\..\Src\TomboLib\DialogTemplate.h"\
+	"..\..\Src\TomboLib\TString.h"\
+	"..\..\Src\TomboLib\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Debug"
+
+DEP_CPP_BOOKMA=\
+	"..\..\Src\BookMark.h"\
+	"..\..\Src\BookMarkDlg.h"\
+	"..\..\Src\Message.h"\
+	"..\..\Src\TomboLib\DialogTemplate.h"\
+	"..\..\Src\TomboLib\TString.h"\
+	"..\..\Src\TomboLib\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Release"
+
+DEP_CPP_BOOKMA=\
+	"..\..\Src\BookMark.h"\
+	"..\..\Src\BookMarkDlg.h"\
+	"..\..\Src\Message.h"\
+	"..\..\Src\TomboLib\DialogTemplate.h"\
+	"..\..\Src\TomboLib\TString.h"\
+	"..\..\Src\TomboLib\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Debug"
+
+DEP_CPP_BOOKMA=\
+	"..\..\Src\BookMark.h"\
+	"..\..\Src\BookMarkDlg.h"\
+	"..\..\Src\Message.h"\
+	"..\..\Src\TomboLib\DialogTemplate.h"\
+	"..\..\Src\TomboLib\TString.h"\
+	"..\..\Src\TomboLib\VarBuffer.h"\
+	
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\Src\TomboLib\Clipboard.cpp
 
 !IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
@@ -2033,6 +2128,7 @@ SOURCE=..\..\Src\MainFrame.cpp
 DEP_CPP_MAINF=\
 	"..\..\Src\AboutDialog.h"\
 	"..\..\Src\BookMark.h"\
+	"..\..\Src\BookMarkDlg.h"\
 	"..\..\Src\FilterCtlDlg.h"\
 	"..\..\Src\GrepDialog.h"\
 	"..\..\Src\MainFrame.h"\
@@ -2047,6 +2143,7 @@ DEP_CPP_MAINF=\
 	"..\..\Src\SearchEngine.h"\
 	"..\..\Src\SearchTree.h"\
 	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboLib\DialogTemplate.h"\
 	"..\..\Src\TomboLib\File.h"\
 	"..\..\Src\TomboLib\Logger.h"\
 	"..\..\Src\TomboLib\SipControl.h"\
@@ -4813,6 +4910,10 @@ SOURCE=..\..\Src\gnupg\bithelp.h
 # Begin Source File
 
 SOURCE=..\..\Src\BookMark.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\BookMarkDlg.h
 # End Source File
 # Begin Source File
 

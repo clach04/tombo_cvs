@@ -42,6 +42,7 @@
 #define IDD_GREPTAB_PERSIST             131
 #define IDD_FILTERCTL                   132
 #define IDR_CONTEXTMENU                 133
+#define IDD_BOOKMARK_EDIT               134
 #define IDD_FILTERDEF_SRC               138
 #define IDD_FILTERDEF_FILTER            139
 #define IDD_FILTERDEF_ADD_REGEX         140
@@ -94,8 +95,12 @@
 #define IDC_GREPTAB_MAIN_FILENAME       1035
 #define IDC_GREPTAB_MAIN_STARTDIR       1036
 #define IDC_PROP_READONLY               1037
+#define IDC_BMEDIT_LIST                 1039
+#define IDC_BMEDIT_UP                   1040
 #define IDC_FILTERCTL_LIST              1041
+#define IDC_BMEDIT_DOWN                 1041
 #define IDC_FILTERCTL_KEEP              1042
+#define IDC_BMEDIT_DELETE               1042
 #define IDC_FILTERCTL_UP                1043
 #define IDC_FILTERDEF_SRC_PATH          1043
 #define IDC_FILTERCTL_DOWN              1044
@@ -192,9 +197,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        134
+#define _APS_NEXT_RESOURCE_VALUE        135
 #define _APS_NEXT_COMMAND_VALUE         40063
-#define _APS_NEXT_CONTROL_VALUE         1039
+#define _APS_NEXT_CONTROL_VALUE         1043
 #define _APS_NEXT_SYMED_VALUE           113
 #endif
 #endif

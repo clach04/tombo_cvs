@@ -488,3 +488,9 @@ Changes
 
 * Add bookmark:
    Support PsPC, BE-[35]00
+
+////////////////////////////////
+// B120
+////////////////////////////////
+
+* Add edit bookmark dialog
