@@ -11,6 +11,7 @@
 #include "resource.h"
 #include "Message.h"
 #include "Property.h"
+#include "TString.h"
 #include "SipControl.h"
 
 #ifdef _WIN32_WCE
@@ -31,6 +32,7 @@ UINT WINAPI ImmGetVirtualKey(HWND);
 #include "AboutDialog.h"
 #include "SearchDlg.h"
 #include "SearchEngine.h"
+#include "SearchTree.h"
 
 LPCTSTR MainFrame::pClassName = TOMBO_MAIN_FRAME_WINDOW_CLSS;
 
@@ -1947,7 +1949,7 @@ void MainFrame::OnSearch()
 	if (sd.Popup(g_hInstance, hMainWnd, bSelectViewActive) != IDOK) return;
 
 	SearchEngineA *pSE = new SearchEngineA();
-	if(!pSE->Init(sd.IsSearchEncryptMemo(), sd.IsFileNameOnly())) {
+	if(!pSE->Init(sd.IsSearchEncryptMemo(), sd.IsFileNameOnly(), &pmPasswordMgr)) {
 		delete pSE;
 		return;
 	}
@@ -1983,7 +1985,44 @@ void MainFrame::OnSearch()
 
 	// ŒŸõŽÀs
 	if (bSelectViewActive) {
-		msView.Search(TRUE, !sd.IsSearchDirectionUp());
+		TString sPath, sFullPath;
+		// Get path of selecting on treeview.
+		TreeViewItem *pItem = msView.GetCurrentItem();
+		if (pItem->HasMultiItem()) {
+			// folder
+			if (!msView.GetPathForNewItem(&sPath)) return;
+		} else {
+			// file
+			if (!sPath.Set(((TreeViewFileItem *)pItem)->GetNote()->MemoPath())) return;
+		}
+		if (!sFullPath.Join(g_Property.TopDir(), TEXT("\\"), sPath.Get())) return;
+
+		// Create dialog and do search.
+		SearchTree st;
+		st.Init(pSE, sFullPath.Get(), _tcslen(g_Property.TopDir()), !sd.IsSearchDirectionUp(), FALSE);
+		st.Popup(g_hInstance, hMainWnd);
+
+		TCHAR buf[1024];
+
+		switch(st.GetResult()) {
+		case SearchTree::SR_FOUND:
+			msView.ShowItem(st.GetPartPath());
+			mmMemoManager.SearchDetailsView(TRUE, TRUE, TRUE, TRUE);
+			break;
+		case SearchTree::SR_NOTFOUND:
+			MessageBox(MSG_STRING_NOT_FOUND, TOMBO_APP_NAME, MB_OK | MB_ICONINFORMATION);
+			break;
+		case SearchTree::SR_CANCELED:
+			msView.ShowItem(st.GetPartPath());
+			MessageBox(MSG_STRING_SEARCH_CANCELED, TOMBO_APP_NAME, MB_OK | MB_ICONINFORMATION);
+			break;
+		case SearchTree::SR_FAILED:
+			wsprintf(buf, MSG_SEARCH_FAILED, GetLastError());
+			msView.ShowItem(st.GetPartPath());
+			MessageBox(buf, TOMBO_APP_NAME, MB_OK | MB_ICONERROR);
+			break;
+		}
+//		msView.Search(TRUE, !sd.IsSearchDirectionUp());
 		mmMemoManager.SetMSSearchFlg(FALSE);
 	} else {
 		mdView.Search(TRUE, TRUE, TRUE, FALSE);
