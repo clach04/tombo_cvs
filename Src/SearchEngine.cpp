@@ -57,10 +57,11 @@ SearchEngineA::~SearchEngineA()
 	}
 }
 
-BOOL SearchEngineA::Init(BOOL bSE, BOOL bFo)
+BOOL SearchEngineA::Init(BOOL bSE, BOOL bFo, PasswordManager *pPMgr)
 {
 	bSearchEncrypt = bSE;
 	bFileNameOnly = bFo;
+	pPassMgr = pPMgr;
 	return TRUE;
 }
 

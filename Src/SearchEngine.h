@@ -1,6 +1,7 @@
 #ifndef SEARCHENGINE_H
 #define SEARCHENGINE_H
 
+class PasswordManager;
 ///////////////////////////////////////////////////////////
 // テキスト検索ロジック(SJIS版)
 ///////////////////////////////////////////////////////////
@@ -16,13 +17,15 @@ class SearchEngineA {
 	BOOL bSearchEncrypt;
 
 	void *pCompiledPattern;
+
+	PasswordManager *pPassMgr;
 public:
 
 	//////////////////////////////
 	// ctor & dtor, 初期化
 	SearchEngineA();
 	~SearchEngineA();
-	BOOL Init(BOOL bSearchEncrypt, BOOL bFileNameOnly);
+	BOOL Init(BOOL bSearchEncrypt, BOOL bFileNameOnly, PasswordManager *pPassMgr);
 
 	//////////////////////////////
 	// パターン準備
@@ -42,6 +45,8 @@ public:
 
 	BOOL IsSearchEncryptMemo() { return bSearchEncrypt; }
 	BOOL IsFileNameOnly() { return bFileNameOnly; }
+
+	PasswordManager *GetPasswordManager() { return pPassMgr; }
 };
 
 #endif
