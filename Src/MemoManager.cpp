@@ -233,9 +233,10 @@ BOOL MemoManager::SaveIfModify(LPDWORD pYNC, BOOL bDupMode)
 	}
 	HTREEITEM hOrigItem = pMemoSelectView->GetTreeItemFromPath(pCurrentNote->MemoPath());
 
-	if (hOrigItem != hCurrentItem) {
-		MessageBox(NULL, TEXT("hItem Mismatch"), TEXT("DEBUG"), MB_OK);
-	}
+	// DEBUG
+//	if (hOrigItem != hCurrentItem) {
+//		MessageBox(NULL, TEXT("hItem Mismatch"), TEXT("DEBUG"), MB_OK);
+//	}
 
 	// ヘッドライン文字列の取得
 	TString sHeadLine;
@@ -252,7 +253,7 @@ BOOL MemoManager::SaveIfModify(LPDWORD pYNC, BOOL bDupMode)
 
 	// ヘッドライン文字列の変更
 	if (hCurrentItem) {
-		MemoLocator loc(pCurrentNote, hOrigItem);
+		MemoLocator loc(pCurrentNote, hCurrentItem);
 		pMemoSelectView->UpdateHeadLine(&loc, sHeadLine.Get());
 	}
 
