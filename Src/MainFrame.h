@@ -7,7 +7,6 @@
 #include "MemoManager.h"
 
 class MemoNote;
-class TreeViewFileItem;
 
 ///////////////////////////////////////
 // メインフレームウィンドウ
@@ -103,7 +102,7 @@ public:
 	void TogglePane(); // ペインの切り替え
 
 	// メモオープンの要求
-	void RequestOpenMemo(TreeViewFileItem *pItem, DWORD nSwitchView);
+	void RequestOpenMemo(MemoLocator *pLoc, DWORD nSwitchView);
 
 	void OnList(BOOL bAskSave);
 
@@ -128,7 +127,8 @@ public:
 	// タイトルの変更
 	void SetTitle(LPCTSTR pTitle);
 
-	void SendRequestOpen(TreeViewFileItem *pItem, DWORD nSwitchFlg) { SendMessage(hMainWnd, MWM_OPEN_REQUEST, (WPARAM)nSwitchFlg, (LPARAM)pItem); }
+	void SendRequestOpen(MemoLocator *pLoc, DWORD nSwitchFlg) { SendMessage(hMainWnd, MWM_OPEN_REQUEST, (WPARAM)nSwitchFlg, (LPARAM)pLoc); }
+	void PostRequestOpen(MemoLocator *pLoc, DWORD nSwitchFlg) { PostMessage(hMainWnd, MWM_OPEN_REQUEST, (WPARAM)nSwitchFlg, (LPARAM)pLoc); }
 };
 
 

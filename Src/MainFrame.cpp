@@ -293,7 +293,7 @@ static LRESULT CALLBACK MainFrameWndProc(HWND hWnd, UINT nMessage, WPARAM wParam
 		if (bRes != 0xFFFFFFFF) return bRes;
 		break;
 	case MWM_OPEN_REQUEST:
-		frm->RequestOpenMemo((TreeViewFileItem*)lParam, (BOOL)wParam);
+		frm->RequestOpenMemo((MemoLocator*)lParam, (BOOL)wParam);
 		return 0;
 	case WM_SETFOCUS:
 		frm->SetFocus();
@@ -803,7 +803,7 @@ void MainFrame::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 	// メモ選択ビュー生成
 	msView.Create(TEXT("MemoSelect"), r, hWnd, IDC_MEMOSELECTVIEW, hInstance, g_Property.SelectViewFont());
-	msView.LoadItems();
+	msView.InitTree();
 
 	if (g_Property.IsUseTwoPane()) {
 		// 自動切換えモードに設定
@@ -1326,7 +1326,6 @@ void MainFrame::OnList(BOOL bAskSave)
 	BOOL bResult;
 	if (bAskSave) {
 		bResult = mmMemoManager.SaveIfModify(&nYNC, FALSE);
-//		mmMemoManager.StoreCursorPos();
 	} else {
 		nYNC = IDYES;
 		bResult = mmMemoManager.SaveIfModify(NULL, TRUE);
@@ -1344,14 +1343,16 @@ void MainFrame::OnList(BOOL bAskSave)
 		// 2Paneの場合、暗号化されたメモのみクリアする
 		if (nYNC == IDNO) {
 			// メモを破棄し、旧メモをリロード
-			RequestOpenMemo(mmMemoManager.CurrentItem(), OPEN_REQUEST_MDVIEW_ACTIVE);
+			MemoLocator loc(mmMemoManager.CurrentNote(), NULL);
+			RequestOpenMemo(&loc, OPEN_REQUEST_MDVIEW_ACTIVE);
 		} else {
 			MemoNote *pCurrent = mmMemoManager.CurrentNote();
 			if (pCurrent && pCurrent->IsEncrypted()) {
 				mmMemoManager.NewMemo();
 			} else {
 #if defined(PLATFORM_HPC)
-				RequestOpenMemo(mmMemoManager.CurrentItem(), OPEN_REQUEST_MDVIEW_ACTIVE);
+				MemoLocator loc(mmMemoManager.CurrentNote());
+				RequestOpenMemo(&loc, OPEN_REQUEST_MDVIEW_ACTIVE);
 #endif
 			}
 		}
@@ -1384,17 +1385,16 @@ void MainFrame::About()
 ///////////////////////////////////////////////////
 // bSwitchViewがTRUEの場合には詳細ビューに切り替える
 
-void MainFrame::RequestOpenMemo(TreeViewFileItem *pItem, DWORD nSwitchView)
+void MainFrame::RequestOpenMemo(MemoLocator *pLoc, DWORD nSwitchView)
 {
-	MemoNote *pNote = pItem->GetNote();
-
+	MemoNote *pNote = pLoc->GetNote();
 	if (pNote == NULL) return; // フォルダの場合
 	if (((nSwitchView & OPEN_REQUEST_MSVIEW_ACTIVE) == 0) && (pNote->IsEncrypted() && !pmPasswordMgr.IsRememberPassword())) {
 		// bSwitchViewがFALSEで、メモを開くためにパスワードを問い合わせる必要がある場合には
 		// メモは開かない
 		return;
 	}
-	mmMemoManager.SetMemo(pItem);
+	mmMemoManager.SetMemo(pLoc);
 
 #if defined(PLATFORM_WIN32) || defined(PLATFORM_PKTPC)
 	LPCTSTR pPath = pNote->MemoPath();
@@ -1467,11 +1467,11 @@ void MainFrame::ActivateView(BOOL bList)
 		msView.Show(SW_SHOW);
 
 		TreeViewItem *pItem = msView.GetCurrentItem();
-		MemoNote *pNote = NULL;
-		if (pItem && !pItem->HasMultiItem()) {
-			pNote = ((TreeViewFileItem*)pItem)->GetNote();
+		if (pItem == NULL) {
+			mmMemoManager.SelectNote(NULL);
+		} else if (!pItem->HasMultiItem()) {
+			mmMemoManager.SelectNote(((TreeViewFileItem*)pItem)->GetNote());
 		}
-		mmMemoManager.SelectNote(pNote);
 	} else {
 		// CE版(& CEデバグ版 on Win32) ではビューの切り替えを行う
 		// ビューの表示・非表示の切り替え
@@ -1645,7 +1645,7 @@ void MainFrame::OnProperty()
 
 	// メモフォルダの再構成
 	msView.DeleteAllItem();
-	msView.LoadItems();
+	msView.InitTree();
 #if defined(PLATFORM_WIN32) || defined(PLATFORM_PKTPC)
 	if (!g_Property.SwitchWindowTitle()) {
 		SetWindowText(hMainWnd, TOMBO_APP_NAME);
