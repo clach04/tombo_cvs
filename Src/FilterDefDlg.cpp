@@ -435,6 +435,38 @@ BOOL FilterDlgFilterTab::Notify_DblClick(HWND hDlg, LPARAM lParam)
 }
 
 /////////////////////////////////////////
+// ViewType tab
+/////////////////////////////////////////
+#ifdef COMMENT
+class FilterDlgViewTypeTab : public PropertyTab {
+	FilterDefDlg *pDialog;
+public:
+	FilterDlgViewTypeTab(FilterDefDlg *pDlg) : pDialog(pDlg), 
+		PropertyTab(IDD_FILTERDEF_VIEWTYPE, MSG_FILTERDEFPROPTTL_SRC, 
+		(DLGPROC)DefaultPageProc) {}
+
+	void Init(HWND hDlg);
+	BOOL Apply(HWND hDlg);
+};
+
+void FilterDlgViewTypeTab::Init(HWND hDlg)
+{
+	HWND hViewType = GetDlgItem(hDlg, IDC_FILTERDEF_VIEW_TYPE);
+	SendMessage(hViewType, CB_ADDSTRING, 0, (LPARAM)MSG_FILTEDEF_VIEW_TYPE_DEFAULT);
+	SendMessage(hViewType, CB_ADDSTRING, 0, (LPARAM)MSG_FILTEDEF_VIEW_TYPE_PREV);
+	SendMessage(hViewType, CB_ADDSTRING, 0, (LPARAM)MSG_FILTEDEF_VIEW_TYPE_POST);
+	SendMessage(hViewType, CB_SETCURSEL, pDialog->pInfo->nViewType, 0);
+
+}
+
+BOOL FilterDlgViewTypeTab::Apply(HWND hDlg)
+{
+	HWND hViewType = GetDlgItem(hDlg, IDC_FILTERDEF_VIEW_TYPE);
+	pDialog->pInfo->nViewType = SendMessage(hViewType, CB_GETCURSEL, 0, 0);
+	return TRUE;
+}
+#endif
+/////////////////////////////////////////
 // Dialog popup
 /////////////////////////////////////////
 
@@ -443,9 +475,11 @@ DWORD FilterDefDlg::Popup(HINSTANCE hInst, HWND hParent, VFInfo *pi, BOOL bNew)
 	PropertyTab *pages[NUM_TAB_FILTERCTL];
 	FilterDlgSrcTab pgSrc(this);
 	FilterDlgFilterTab pgFilter(this);
+//	FilterDlgViewTypeTab pgViewType(this);
 
 	pages[0] = &pgSrc;
 	pages[1] = &pgFilter;
+//	pages[2] = &pgViewType;
 
 	pInfo = pi;
 
@@ -454,3 +488,4 @@ DWORD FilterDefDlg::Popup(HINSTANCE hInst, HWND hParent, VFInfo *pi, BOOL bNew)
 	DWORD res = pp.Popup(hInst, hParent, pages, NUM_TAB_FILTERCTL, MSG_FILTERDEFDLG_TTL, MAKEINTRESOURCE(IDI_TOMBO), nStartPage);
 	return res;
 }
+

@@ -94,6 +94,8 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "Delete",                      IDM_DELETEITEM
         MENUITEM "Rename",                      IDM_RENAME
+        MENUITEM SEPARATOR
+        MENUITEM "Jump to original",            IDM_TRACELINK
     END
 END
 

@@ -5,13 +5,17 @@ class VFDirectoryGenerator;
 class VFStore;
 class File;
 
+#define VFINFO_VIEWTYPE_DEFAULT 0
+#define VFINFO_VIEWTYPE_PREV	1
+#define VFINFO_VIEWTYPE_POST	2
+
 /////////////////////////////////////////////
 //  Virtual folder definition
 /////////////////////////////////////////////
 
 class VFInfo {
 public:
-	VFInfo() : pName(NULL){}
+	VFInfo() : pName(NULL), nViewType(VFINFO_VIEWTYPE_DEFAULT){}
 
 	void Release();
 	BOOL WriteXML(File *p);
@@ -21,6 +25,8 @@ public:
 	BOOL bPersist;
 	VFDirectoryGenerator *pGenerator;
 	VFStore *pStore;
+
+	DWORD nViewType;
 };
 
 /////////////////////////////////////////////

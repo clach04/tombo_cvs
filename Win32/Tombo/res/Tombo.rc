@@ -94,6 +94,8 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "削除",                        IDM_DELETEITEM
         MENUITEM "名前の変更",                  IDM_RENAME
+        MENUITEM SEPARATOR
+        MENUITEM "リンク元へ移動",              IDM_TRACELINK
     END
 END
 
@@ -453,6 +455,15 @@ BEGIN
     LTEXT           "ソート方法：",IDC_STATIC,5,15,35,8
 END
 
+IDD_FILTERDEF_VIEWTYPE DIALOG DISCARDABLE  0, 0, 156, 130
+STYLE WS_CHILD | WS_BORDER
+FONT 9, "ＭＳ Ｐゴシック"
+BEGIN
+    COMBOBOX        IDC_FILTERDEF_VIEW_TYPE,30,25,100,45,CBS_DROPDOWNLIST | 
+                    CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "パスの表示:",IDC_STATIC,10,10,36,8
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -604,6 +615,14 @@ BEGIN
         RIGHTMARGIN, 152
         TOPMARGIN, 7
         BOTTOMMARGIN, 86
+    END
+
+    IDD_FILTERDEF_VIEWTYPE, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 149
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 123
     END
 END
 #endif    // APSTUDIO_INVOKED

@@ -381,10 +381,13 @@ Return to main trunk.
 * Re-fix #2563,#2564
 
 ////////////////////////////////
-// 
+// B109(Tombo 1.7)
 ////////////////////////////////
 
 * Trim whitespace at the end of the name when creating new folder and updating notes.(#2717,#2718)
+* Add '%f and '%F' format to insert date strings.(#2713)
+* sort by create date for virtual folder(#2750)
+* Add jump to original context menu.
 
 /////////////////////////////////////////////////////////////////////////
 // TODO

@@ -155,13 +155,14 @@
 #define IDM_GREP                        40031
 #define IDM_TOPMOST                     40032
 #define IDM_VFOLDER_DEF                 40033
+#define IDM_TRACELINK                   40034
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        138
-#define _APS_NEXT_COMMAND_VALUE         40034
+#define _APS_NEXT_COMMAND_VALUE         40035
 #define _APS_NEXT_CONTROL_VALUE         1042
 #define _APS_NEXT_SYMED_VALUE           108
 #endif
