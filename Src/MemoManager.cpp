@@ -84,6 +84,7 @@ MemoLocator MemoManager::CurrentLoc()
 // 新規メモの割り当て
 ////////////////////////////////////////////////////////
 
+// TODO: CHECK
 MemoLocator MemoManager::AllocNewMemo(LPCTSTR pText, MemoNote *pTemplate)
 {
 	TString sHeadLine;
@@ -231,7 +232,7 @@ BOOL MemoManager::SaveIfModify(LPDWORD pYNC, BOOL bDupMode)
 		// この時点で新規メモではなくなるのでステータスを変える
 		pMainFrame->SetNewMemoStatus(FALSE);
 	}
-	HTREEITEM hOrigItem = pMemoSelectView->GetTreeItemFromPath(pCurrentNote->MemoPath());
+//	HTREEITEM hOrigItem = pMemoSelectView->GetTreeItemFromPath(pCurrentNote->MemoPath());
 
 	// DEBUG
 //	if (hOrigItem != hCurrentItem) {
