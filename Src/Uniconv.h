@@ -9,6 +9,8 @@
 LPTSTR ConvSJIS2Unicode(const char *p);
 char *ConvUnicode2SJIS(LPCTSTR p);
 
+LPTSTR ConvSJIS2UnicodeWithByte(const char *p, DWORD nByte);
+
 // strdupのUNICODE版。領域はnew [] で確保するため、delete[] で開放すること。
 LPTSTR StringDup(LPCTSTR pStr);
 

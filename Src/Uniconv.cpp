@@ -31,6 +31,25 @@ LPTSTR ConvSJIS2Unicode(const char *p)
 	return pUni;
 }
 
+LPTSTR ConvSJIS2UnicodeWithByte(const char *p, DWORD n)
+{
+	// alloc memory
+	LPTSTR pUni = new TCHAR[n + 1];
+	if (pUni == NULL) {
+		SetLastError(ERROR_NOT_ENOUGH_MEMORY);
+		return NULL;
+	}
+
+#ifdef _WIN32_WCE
+	MultiByteToWideChar(CP_ACP, 0, (LPCSTR)p, n, pUni, n);
+	*(pUni + n) = TEXT('\0');
+#else
+	_tcsncpy(pUni, p, n);
+	*(pUni + n) = '\0';
+#endif
+	return pUni;
+}
+
 ////////////////////////////////////////////////////////////
 // Unicode -> SJIS•ÏŠ·
 ////////////////////////////////////////////////////////////
