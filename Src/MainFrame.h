@@ -34,8 +34,6 @@ class MainFrame {
 
 	HIMAGELIST hSelectViewImgList;
 
-	StatusBar *pStatusBar;
-
 	PLATFORM_TYPE *pPlatform;
 
 	MemoSelectView msView;
@@ -110,6 +108,8 @@ public:
 	void OnMouseMove(WPARAM wParam, LPARAM lParam);
 	void OnLButtonUp(WPARAM wParam, LPARAM lParam);
 
+//	void SetLayout(DWORD nWidth, DWORD nHeight, DWORD nSplit);
+	void SetLayout(DWORD nSplit);
 
 	////////////////////
 	// menu handler

@@ -43,7 +43,7 @@ BOOL MemoSelectView::Create(LPCTSTR pName, RECT &r, HWND hParent, DWORD nID, HIN
 								r.left, r.top, r.right, r.bottom,
 								hParent, (HMENU)nID, hInst, this);
 #else
-	hViewWnd = CreateWindow(WC_TREEVIEW, pName, nWndStyle,
+	hViewWnd = CreateWindow(WC_TREEVIEW, pName, nWndStyle | WS_BORDER,
 							r.left, r.top, r.right, r.bottom, 
 							hParent, (HMENU)nID, hInst, this);
 #endif
@@ -688,6 +688,16 @@ void MemoSelectView::GetSize(LPWORD pWidth, LPWORD pHeight)
 	GetWindowRect(hViewWnd, &r);
 	*pWidth = (WORD)(r.right - r.left);
 	*pHeight = (WORD)(r.bottom - r.top);
+}
+
+void MemoSelectView::GetSize(LPRECT pRect)
+{
+	GetWindowRect(hViewWnd, pRect);
+}
+
+void MemoSelectView::GetClientRect(LPRECT pRect)
+{
+	::GetClientRect(hViewWnd, pRect);
 }
 
 ///////////////////////////////////////////

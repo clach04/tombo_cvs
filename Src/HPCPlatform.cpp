@@ -5,8 +5,10 @@
 #include "resource.h"
 #include "Property.h"
 
+#include "StatusBar.h"
 #include "PlatformLayer.h"
 #include "HPCPlatform.h"
+#include "Property.h"
 
 #define NUM_MY_TOOLBAR_BMPS 0
 #define NUM_IMG_BUTTONS 10
@@ -34,6 +36,15 @@ static TBBUTTON aCmdBarButtons[NUM_CMDBAR_BUTTONS] = {
 	{0,                                  0,              TBSTATE_ENABLED, TBSTYLE_SEP,    0, 0, 0, -1},
 };
 
+HPCPlatform::HPCPlatform() : pStatusBar(NULL)
+{
+}
+
+HPCPlatform::~HPCPlatform()
+{
+	delete pStatusBar;
+}
+
 static HWND GetCommandBar(HWND hBand, UINT uBandID)
 {
 	UINT idx = SendMessage(hBand, RB_IDTOINDEX, uBandID, 0);
@@ -46,6 +57,9 @@ void HPCPlatform::Create(HWND hWnd, HINSTANCE hInst)
 {
 	HWND hBand, hwnd;
 	REBARBANDINFO arbbi[2];
+
+	pStatusBar = new StatusBar();
+	pStatusBar->Create(hWnd, g_Property.IsUseTwoPane());
 
 	// CommandBand¶¬
 	HIMAGELIST himl = ImageList_Create(16,16,ILC_COLOR, 0, 1);
@@ -216,8 +230,17 @@ void HPCPlatform::EnableSearchNext()
 void HPCPlatform::AdjustUserRect(RECT *r)
 {
 	DWORD nHOffset = CommandBands_Height(hMSCmdBar);
+
+	WORD nStatusHeight;
+	if (g_Property.HideStatusBar()) {
+		nStatusHeight = 0;
+	} else {
+		nStatusHeight = GetStatusBarHeight();
+	}
+
 	r->top += nHOffset;
-	r->bottom -= nHOffset;
+	r->bottom -= (nHOffset + nStatusHeight);
+
 }
 
 void HPCPlatform::CheckMenu(UINT uid, BOOL bCheck)
@@ -237,6 +260,32 @@ void HPCPlatform::CheckMenu(UINT uid, BOOL bCheck)
 	// CheckMenuItem is superseeded funcs, but in CE, SetMenuItemInfo can't set values, so use it.
 	CheckMenuItem(hMenu, uid, MF_BYCOMMAND | (bCheck ? MF_CHECKED : MF_UNCHECKED));
 	SendMessage(GetCommandBar(hMSCmdBar, ID_BUTTONBAND), TB_PRESSBUTTON, uid, MAKELONG(bButton, 0));
+}
+
+void HPCPlatform::ShowStatusBar(BOOL bShow)
+{
+	pStatusBar->Show(bShow);
+}
+
+void HPCPlatform::SetStatusIndicator(DWORD nPos, LPCTSTR pText, BOOL bDisp)
+{
+	pStatusBar->SetStatusIndicator(nPos, pText, bDisp);
+}
+
+WORD HPCPlatform::GetStatusBarHeight()
+{
+	return pStatusBar->GetHeight();
+}
+
+void HPCPlatform::ResizeStatusBar(WPARAM wParam, LPARAM lParam)
+{
+	pStatusBar->SendSize(wParam, lParam);
+	pStatusBar->ResizeStatusBar();
+}
+
+void HPCPlatform::GetStatusWindowRect(RECT *pRect)
+{
+	pStatusBar->GetWindowRect(pRect);
 }
 
 #endif // PLATFORM_HPC

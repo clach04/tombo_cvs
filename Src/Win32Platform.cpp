@@ -5,6 +5,8 @@
 #include "resource.h"
 #include "PlatformLayer.h"
 #include "Win32Platform.h"
+#include "StatusBar.h"
+#include "Property.h"
 
 #define NUM_MY_TOOLBAR_BMPS 12
 
@@ -30,6 +32,15 @@ static TBBUTTON aToolbarButtons[NUM_TOOLBAR_BUTTONS] = {
 	{10,                                 IDM_TOPMOST,    TBSTATE_ENABLED, TBSTYLE_BUTTON, 0, 0, 0, -1},
 	{0,                                  0,              TBSTATE_ENABLED, TBSTYLE_SEP,    0, 0, 0, -1},
 };
+
+Win32Platform::Win32Platform() : pStatusBar(NULL)
+{
+}
+
+Win32Platform::~Win32Platform()
+{
+	delete pStatusBar;
+}
 
 static HWND CreateToolBar(HWND hParent, HINSTANCE hInst)
 {
@@ -61,6 +72,9 @@ static HWND CreateToolBar(HWND hParent, HINSTANCE hInst)
 
 void Win32Platform::Create(HWND hWnd, HINSTANCE hInst)
 {
+	pStatusBar = new StatusBar();
+	pStatusBar->Create(hWnd, g_Property.IsUseTwoPane());
+
 	 hRebar = CreateWindowEx(WS_EX_TOOLWINDOW, REBARCLASSNAME, NULL,
 								WS_BORDER | RBS_BANDBORDERS | RBS_AUTOSIZE | 
 								WS_CHILD|WS_VISIBLE|WS_CLIPSIBLINGS| RBS_TOOLTIPS | 
@@ -176,9 +190,24 @@ void Win32Platform::EnableSearchNext()
 	SendMessage(hToolBar, TB_SETSTATE, IDM_SEARCH_NEXT, MAKELONG(TBSTATE_ENABLED, 0)); 
 }
 
-void Win32Platform::AdjustUserRect(RECT *r)
+void Win32Platform::AdjustUserRect(RECT *pRect)
 {
-	/* nop */
+	// get rebar height
+	RECT r;
+	GetWindowRect(hRebar, &r);
+	WORD nRebarH = (WORD)(r.bottom - r.top);
+
+	// get statusbar height
+	WORD nStatusHeight;
+	if (g_Property.HideStatusBar()) {
+		nStatusHeight = 0;
+	} else {
+		nStatusHeight = GetStatusBarHeight();
+	}
+
+	pRect->top = nRebarH;
+	pRect->bottom -= (nRebarH + nStatusHeight);
+
 }
 
 void Win32Platform::CheckMenu(UINT uid, BOOL bCheck)
@@ -199,4 +228,33 @@ void Win32Platform::CheckMenu(UINT uid, BOOL bCheck)
 	CheckMenuItem(hMenu, uid, MF_BYCOMMAND | (bCheck ? MF_CHECKED : MF_UNCHECKED));
 	SendMessage(hToolBar, TB_PRESSBUTTON, uid, MAKELONG(bButton, 0));
 }
+
+void Win32Platform::ShowStatusBar(BOOL bShow)
+{
+	pStatusBar->Show(bShow);
+}
+
+void Win32Platform::SetStatusIndicator(DWORD nPos, LPCTSTR pText, BOOL bDisp)
+{
+	pStatusBar->SetStatusIndicator(nPos, pText, bDisp);
+}
+
+WORD Win32Platform::GetStatusBarHeight()
+{
+	return pStatusBar->GetHeight();
+}
+
+void Win32Platform::ResizeStatusBar(WPARAM wParam, LPARAM lParam)
+{
+	SendMessage(hRebar, WM_SIZE, wParam, lParam);
+
+	pStatusBar->SendSize(wParam, lParam);
+	pStatusBar->ResizeStatusBar();
+}
+
+void Win32Platform::GetStatusWindowRect(RECT *pRect)
+{
+	pStatusBar->GetWindowRect(pRect);
+}
+
 #endif // PLATFORM_WIN32

@@ -596,3 +596,12 @@ Changes
 
 * add SetCurrentNote when saving notes.
 * refactoring around platform dependent routines (especially toolbar, menu etc..)
+
+////////////////////////////////
+// B135
+////////////////////////////////
+// main trunk
+
+* move IDM_TOGGLEPANE to PlatformLayer
+* supporting two-pane layout for PocketPC version.
+

@@ -55,7 +55,7 @@ BOOL SimpleEditor::Create(LPCTSTR pName, RECT &r, HWND hParent, HINSTANCE hInst,
 
 	nWndStyle = WS_CHILD | WS_VSCROLL | ES_MULTILINE | ES_WANTRETURN;
 
-#if defined(PLATFORM_PKTPC) || defined(PLATFORM_PSPC) || defined(PLATFORM_BE500)
+#if defined(PLATFORM_PSPC) || defined(PLATFORM_BE500)
 	nLeftOffset = 3;
 #else
 	nLeftOffset = 0;
@@ -69,10 +69,10 @@ BOOL SimpleEditor::Create(LPCTSTR pName, RECT &r, HWND hParent, HINSTANCE hInst,
 							r.left + nLeftOffset, r.top, r.right - nLeftOffset, r.bottom, 
 							hParent, (HMENU)nID_nf, hInst, this);
 #else
-	hViewWnd_fd = CreateWindow(TEXT("EDIT"), pName, nWndStyle, 
+	hViewWnd_fd = CreateWindow(TEXT("EDIT"), pName, nWndStyle | WS_BORDER, 
 							r.left + nLeftOffset, r.top, r.right - nLeftOffset, r.bottom, 
 							hParent, (HMENU)nID, hInst, NULL);
-	hViewWnd_nf = CreateWindow(TEXT("EDIT"), pName, nWndStyle | ES_AUTOHSCROLL | WS_HSCROLL, 
+	hViewWnd_nf = CreateWindow(TEXT("EDIT"), pName, nWndStyle | ES_AUTOHSCROLL | WS_HSCROLL | WS_BORDER, 
 							r.left + nLeftOffset, r.top, r.right - nLeftOffset, r.bottom, 
 							hParent, (HMENU)nID_nf, hInst, NULL);
 #endif

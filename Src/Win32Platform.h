@@ -4,14 +4,20 @@
 
 #define PLATFORM_TYPE Win32Platform
 
+class StatusBar;
+
 class Win32Platform : public PlatformLayer {
 protected:
 	void ControlMenu(BOOL bTreeActive);
 	void ControlToolbar(BOOL bTreeActive);
 
+	StatusBar *pStatusBar;
 public:
 	HWND hRebar;
 	HWND hToolBar;
+
+	Win32Platform();
+	virtual ~Win32Platform();
 
 	void Create(HWND hWnd, HINSTANCE hInst);
 
@@ -30,6 +36,12 @@ public:
 	void CloseDetailsView();
 
 	void AdjustUserRect(RECT *r);
+
+	void ShowStatusBar(BOOL bShow);
+	void SetStatusIndicator(DWORD nPos, LPCTSTR pText, BOOL bDisp);
+	WORD GetStatusBarHeight();
+	void ResizeStatusBar(WPARAM wParam, LPARAM lParam);
+	void GetStatusWindowRect(RECT *pRect);
 
 	static Win32Platform *PlatformFactory() { return new Win32Platform(); }
 };

@@ -85,6 +85,8 @@ public:
 	void OnPaste();
 
 	void GetSize(LPWORD pWidth, LPWORD pHeight);
+	void GetSize(LPRECT pRect);
+	void GetClientRect(LPRECT pRect);
 
 	void MoveWindow(DWORD x, DWORD y, DWORD nWidth, DWORD nHeight);
 

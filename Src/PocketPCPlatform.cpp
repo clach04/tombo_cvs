@@ -9,6 +9,8 @@
 #include "Message.h"
 #include "PlatformLayer.h"
 #include "PocketPCPlatform.h"
+#include "SipControl.h"
+#include "Property.h"
 
 #define NUM_TOOLBAR_BMP 12
 
@@ -134,11 +136,25 @@ void PocketPCPlatform::EnableSearchNext()
 
 void PocketPCPlatform::AdjustUserRect(RECT *r)
 {
+	// menubar
 	RECT rMenuRect;
 	GetWindowRect(hMSCmdBar, &rMenuRect);
 	DWORD nHOffset = rMenuRect.bottom - rMenuRect.top;
 
 	r->bottom -= nHOffset - 1;
+
+	// SIP
+	BOOL bStat;
+	SipControl sc;
+	if (!sc.Init()) return;
+	if (!sc.GetSipStat(&bStat)) return;
+
+	if (bStat) {
+		RECT rSip = sc.GetRect();
+		DWORD nDelta = g_Property.SipSizeDelta();
+	
+		r->bottom -= (rSip.bottom - rSip.top + nDelta);
+	}
 }
 
 #endif // PLATFORM_PKTPC

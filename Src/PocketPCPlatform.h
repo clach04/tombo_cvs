@@ -28,6 +28,12 @@ public:
 
 	void AdjustUserRect(RECT *r);
 
+	void ShowStatusBar(BOOL bShow) {/* nop */}
+	void SetStatusIndicator(DWORD nPos, LPCTSTR pText, BOOL bDisp) { /* nop */ }
+	WORD GetStatusBarHeight() { return 0; }
+	void ResizeStatusBar(WPARAM wParam, LPARAM lParam) { /* nop */ }
+	void GetStatusWindowRect(RECT *pRect);
+
 	static PocketPCPlatform *PlatformFactory() { return new PocketPCPlatform(); }
 };
 

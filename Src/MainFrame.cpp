@@ -65,7 +65,7 @@ static HIMAGELIST CreateSelectViewImageList(HINSTANCE hInst);
 #if defined(PLATFORM_WIN32)
 #define BORDER_WIDTH 2
 #endif
-#if defined(PLATFORM_HPC)
+#if defined(PLATFORM_HPC) || defined(PLATFORM_PKTPC)
 #define BORDER_WIDTH 5
 #endif
 
@@ -90,7 +90,7 @@ static HWND GetCommandBar(HWND hBand, UINT uBandID);
 // ctor
 ///////////////////////////////////////
 
-MainFrame::MainFrame() : bResizePane(FALSE), bSelectViewActive(FALSE), pBookMark(NULL), pDetailsView(NULL), pStatusBar(NULL), pPlatform(NULL)
+MainFrame::MainFrame() : bResizePane(FALSE), bSelectViewActive(FALSE), pBookMark(NULL), pDetailsView(NULL), pPlatform(NULL)
 {
 }
 
@@ -102,7 +102,6 @@ MainFrame::~MainFrame()
 {
 	delete pDetailsView;
 	delete pBookMark;
-	delete pStatusBar;
 	delete pPlatform;
 }
 
@@ -121,7 +120,7 @@ BOOL MainFrame::RegisterClass(HINSTANCE hInst)
 	wc.cbWndExtra = sizeof(LONG);
 	wc.hInstance = hInst;
 	wc.hIcon = NULL;
-#if defined(PLATFORM_PKTPC) || defined(PLATFORM_PSPC) || defined(PLATFORM_BE500)
+#if defined(PLATFORM_PSPC) || defined(PLATFORM_BE500)
 	wc.hCursor = NULL;
 	wc.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);
 #else
@@ -354,7 +353,7 @@ BOOL MainFrame::Create(LPCTSTR pWndName, HINSTANCE hInst, int nCmdShow)
 	pBookMark = new BookMark();
 	if (!pBookMark || !pBookMark->Init(BOOKMARK_ID_BASE)) return FALSE;
 
-	pStatusBar = new StatusBar();
+//	pStatusBar = new StatusBar();
 
 
 #ifdef _WIN32_WCE
@@ -448,7 +447,6 @@ void MainFrame::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 			return;
 		}
 	}
-
 	// create toolbar
 	pPlatform->Create(hWnd, pcs->hInstance);
 
@@ -456,7 +454,6 @@ void MainFrame::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	pPlatform->AdjustUserRect(&r);
 
 	// Status Bar
-	pStatusBar->Create(hWnd, g_Property.IsUseTwoPane());
 	SetNewMemoStatus(g_Property.IsUseTwoPane());
 	SetModifyStatus(FALSE);
 
@@ -467,7 +464,7 @@ void MainFrame::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		CheckMenuItem(hMenu, IDM_SHOWSTATUSBAR, MF_BYCOMMAND | MF_UNCHECKED);
 	} else {
 		CheckMenuItem(hMenu, IDM_SHOWSTATUSBAR, MF_BYCOMMAND | MF_CHECKED);
-		pStatusBar->Show(TRUE);
+		pPlatform->ShowStatusBar(TRUE);
 	}	
 #endif
 
@@ -549,17 +546,17 @@ static HIMAGELIST CreateSelectViewImageList(HINSTANCE hInst)
 void MainFrame::SetModifyStatus(BOOL bModify)
 {
 	EnableSaveButton(bModify);
-	pStatusBar->SetStatusIndicator(3, MSG_UPDATE, bModify);
+	pPlatform->SetStatusIndicator(3, MSG_UPDATE, bModify);
 }
 
 void MainFrame::SetReadOnlyStatus(BOOL bReadOnly) 
 {
-	pStatusBar->SetStatusIndicator(1, MSG_RONLY, bReadOnly); 
+	pPlatform->SetStatusIndicator(1, MSG_RONLY, bReadOnly); 
 }
 
 void MainFrame::SetNewMemoStatus(BOOL bNew)
 {
-	pStatusBar->SetStatusIndicator(2, MSG_NEW, bNew); 
+	pPlatform->SetStatusIndicator(2, MSG_NEW, bNew); 
 }
 
 ///////////////////////////////////////////////////
@@ -578,7 +575,7 @@ BOOL MainFrame::OnExit()
 	}
 	if (nYNC == IDCANCEL) return FALSE;
 	pmPasswordMgr.ForgetPassword();
-#if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
+#if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC) || defined(PLATFORM_PKTPC)
 	SaveWinSize();
 	g_Property.SaveStatusBarStat();
 #endif
@@ -762,30 +759,16 @@ void MainFrame::OnSettingChange(WPARAM wParam)
 
 void MainFrame::OnSIPResize(BOOL bImeOn, RECT *pSipRect)
 {
-	DWORD nClientBottom = pSipRect->top;
 
-#ifdef _WIN32_WCE
 #if defined(PLATFORM_PKTPC)
-	RECT r, rWinRect;
-
-	DWORD nDelta = g_Property.SipSizeDelta();
-
-	GetClientRect(hMainWnd, &rWinRect);
-	GetWindowRect(pPlatform->hMSCmdBar, &r);
-	RECT rx;
-	GetWindowRect(hMainWnd, &rx);
-
-	if (bImeOn) {
-		msView.MoveWindow(rWinRect.left, rWinRect.top, rWinRect.right, nClientBottom - rx.top - nDelta);
-		pDetailsView->MoveWindow(rWinRect.left, rWinRect.top, rWinRect.right, nClientBottom - rx.top - nDelta);
-	} else {
-		DWORD nBottom = rWinRect.bottom - (r.bottom - r.top); 
-		msView.MoveWindow(rWinRect.left, rWinRect.top, rWinRect.right, nBottom);
-		pDetailsView->MoveWindow(rWinRect.left, rWinRect.top, rWinRect.right, nBottom);
-	}
+	WORD nWidth, nHeight;
+	msView.GetSize(&nWidth, &nHeight);
+	SetLayout(nHeight);
 #endif
+
 #if defined(PLATFORM_PSPC) || defined(PLATFORM_BE500)
 	DWORD nTop, nBottom;
+	DWORD nClientBottom = pSipRect->top;
 
 #if defined(PLATFORM_PSPC)
 	DWORD nHOffset = CommandBar_Height(pPlatform->hMDCmdBar);
@@ -803,7 +786,6 @@ void MainFrame::OnSIPResize(BOOL bImeOn, RECT *pSipRect)
 		msView.MoveWindow(0, nTop, 240, nBottom);
 		pDetailsView->MoveWindow(0, nTop, 240, nBottom);
 	}
-#endif
 #endif
 }
 
@@ -827,53 +809,41 @@ BOOL MainFrame::OnHotKey(WPARAM wParam, LPARAM lParam)
 
 void MainFrame::OnResize(WPARAM wParam, LPARAM lParam)
 {
-#if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
 	WORD fwSizeType = wParam;
 	WORD nWidth = LOWORD(lParam);
 	WORD nHeight = HIWORD(lParam);
 
-#if defined(PLATFORM_WIN32)
-	RECT r;
-	GetWindowRect(pPlatform->hRebar, &r);
-	WORD nRebarH = (WORD)(r.bottom - r.top);
-#endif
-#if defined(PLATFORM_HPC)
-	WORD nRebarH = CommandBands_Height(pPlatform->hMSCmdBar);
-#endif
-
 	WORD wLeftWidth, wHeight;
 	msView.GetSize(&wLeftWidth, &wHeight);
+	SetLayout(wLeftWidth);
+}
 
-	WORD nStatusHeight;
-	if (g_Property.HideStatusBar()) {
-		pStatusBar->Show(FALSE);
-		nStatusHeight = 0;
-	} else {
-		pStatusBar->Show(TRUE);
-		nStatusHeight = pStatusBar->GetHeight();
-	}
+void MainFrame::SetLayout(DWORD nSplit)
+{
+	pPlatform->ShowStatusBar(!g_Property.HideStatusBar());
+
+	// get tree/edit view area
+	RECT r, rc;
+	GetClientRect(hMainWnd, &r);
+	rc = r;
+	pPlatform->AdjustUserRect(&rc);
 
 	if (g_Property.IsUseTwoPane()) {
-		msView.MoveWindow(0, nRebarH , wLeftWidth, nHeight-nRebarH - nStatusHeight);
-		pDetailsView->MoveWindow(wLeftWidth + BORDER_WIDTH, nRebarH, nWidth - wLeftWidth - BORDER_WIDTH, nHeight-nRebarH - nStatusHeight);
-	} else {
-		RECT rc;
-		GetClientRect(hMainWnd, &rc);
-
-		msView.MoveWindow(0, nRebarH, rc.right, rc.bottom - nRebarH - nStatusHeight);
-		pDetailsView->MoveWindow(0, nRebarH, rc.right, rc.bottom - nRebarH - nStatusHeight);
-	}
-
-#endif // PLATFORM_WIN32 || PLATFORM_HPC
-
-#if defined(PLATFORM_WIN32)
-	// Rebar
-	SendMessage(pPlatform->hRebar, WM_SIZE, wParam, lParam);
+#if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
+		// split vertical
+		msView.MoveWindow(rc.left, rc.top , nSplit, rc.bottom);
+		pDetailsView->MoveWindow(nSplit + BORDER_WIDTH, rc.top, rc.right - nSplit - BORDER_WIDTH, rc.bottom);
+#else
+		// split horizontal
+		msView.MoveWindow(rc.left, rc.top , rc.right, nSplit);
+		pDetailsView->MoveWindow(rc.left, nSplit + BORDER_WIDTH, rc.right, rc.bottom - nSplit - BORDER_WIDTH);
 #endif
-
-	// Staus bar
-	pStatusBar->SendSize(wParam, lParam);
-	pStatusBar->ResizeStatusBar();
+	} else {
+		msView.MoveWindow(rc.left, rc.top, rc.right, rc.bottom);
+		pDetailsView->MoveWindow(rc.left, rc.top, rc.right, rc.bottom);
+	}
+	// Staus bar & rebar
+	pPlatform->ResizeStatusBar(0, MAKELPARAM(r.right - r.left, r.bottom - r.top));
 }
 
 ///////////////////////////////////////////////////
@@ -892,7 +862,7 @@ void MainFrame::OnTooltip(WPARAM wParam, LPARAM lParam)
 
 void MainFrame::OnLButtonDown(WPARAM wParam, LPARAM lParam)
 {
-#if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
+#if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC) || defined(PLATFORM_PKTPC)
 	WORD fwKeys = wParam;
 	WORD xPos = LOWORD(lParam);
 
@@ -921,7 +891,7 @@ void MainFrame::OnMouseMove(WPARAM wParam, LPARAM lParam)
 	SHORT yLimit = (SHORT)rClient.bottom;
 	if (!g_Property.HideStatusBar()) {
 		RECT rStatBar;
-		pStatusBar->GetWindowRect(&rStatBar);
+		pPlatform->GetStatusWindowRect(&rStatBar);
 		yLimit -= (SHORT)rStatBar.bottom;
 
 	}
@@ -941,14 +911,15 @@ void MainFrame::OnMouseMove(WPARAM wParam, LPARAM lParam)
 
 void MainFrame::OnLButtonUp(WPARAM wParam, LPARAM lParam)
 {
-#if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
 	WORD fwKeys = wParam;
 	WORD xPos = LOWORD(lParam);
+	WORD yPos = HIWORD(lParam);
 
 	if (!(fwKeys & MK_LBUTTON) && !bResizePane) return;
 	bResizePane = FALSE;
 	ReleaseCapture();
 
+#if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
 	RECT r;
 	GetClientRect(hMainWnd, &r);
 	WORD wTotalWidth = (WORD)(r.right - r.left);
@@ -960,6 +931,18 @@ void MainFrame::OnLButtonUp(WPARAM wParam, LPARAM lParam)
 	}
 	MovePane(xPos);
 #endif 
+#if defined(PLATFORM_PKTPC)
+	RECT r;
+	GetClientRect(hMainWnd, &r);
+	WORD wTotalHeight = (WORD)(r.bottom - r.top);
+	if (yPos < 20) {
+		yPos = 20;
+	}
+	if (yPos > wTotalHeight - 20) {
+		yPos = wTotalHeight - 20;
+	}
+	MovePane(yPos);
+#endif 
 }
 
 ///////////////////////////////////////////////////
@@ -967,27 +950,12 @@ void MainFrame::OnLButtonUp(WPARAM wParam, LPARAM lParam)
 ///////////////////////////////////////////////////
 void MainFrame::MovePane(WORD width)
 {
-#if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
 	if (!g_Property.IsUseTwoPane()) return;
 
-	WORD wLeftWidth, wHeight;
-	msView.GetSize(&wLeftWidth, &wHeight);
-	RECT r;
-	GetClientRect(hMainWnd, &r);
-	WORD wTotalWidth = (WORD)(r.right - r.left);
-
-#if defined(PLATFORM_WIN32)
-	RECT r2;
-	GetWindowRect(pPlatform->hRebar, &r2);
-	WORD nRebarH = (WORD)(r2.bottom - r2.top);
-#endif
-#if defined(PLATFORM_HPC)
-	WORD nRebarH = CommandBands_Height(pPlatform->hMSCmdBar);
-#endif
-	msView.MoveWindow(0, nRebarH, width, wHeight);
-	pDetailsView->MoveWindow(width + BORDER_WIDTH , nRebarH, 
-						wTotalWidth - width - BORDER_WIDTH, wHeight);
-#endif
+//	RECT r;
+//	GetClientRect(hMainWnd, &r);
+//	SetLayout(r.right - r.left, r.bottom - r.top, width);
+	SetLayout(width);
 }
 
 ///////////////////////////////////////////////////
@@ -1176,7 +1144,7 @@ void MainFrame::ActivateView(BOOL bList)
 	bSelectViewActive = bList;
 
 	// menu/toolbar control
-#if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
+#if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC) || defined(PLATFORM_PKTPC)
 	if (bList) {
 		pPlatform->CloseDetailsView();
 	} else {
@@ -1376,11 +1344,11 @@ BOOL MainFrame::EnableApplicationButton(HWND hWnd)
 
 void MainFrame::SaveWinSize()
 {
-#if defined(PLATFORM_HPC) || defined(PLATFORM_WIN32)
+#if defined(PLATFORM_HPC) || defined(PLATFORM_WIN32) || defined(PLATFORM_PKTPC)
 	RECT r;
 	UINT flags, showCmd;
 
-#if defined(PLATFORM_HPC)
+#if defined(PLATFORM_HPC) || defined(PLATFORM_PKTPC)
 	GetWindowRect(hMainWnd,&r);
 	flags = showCmd = 0;
 #else
@@ -1392,18 +1360,27 @@ void MainFrame::SaveWinSize()
 	showCmd = wpl.showCmd;
 #endif
 
-	WORD nWidth;
+	WORD nWidth, nHeight;
+	WORD nPane;
 	if (g_Property.IsUseTwoPane()) {
-		WORD nHeight;
 		msView.GetSize(&nWidth, &nHeight);
+#if defined(PLATFORM_PKTPC)
+		nPane = nHeight;
+#else
+		nPane = nWidth;
+#endif
 	} else {
 		UINT u1, u2;
 		RECT r2;
 		if (!Property::GetWinSize(&u1, &u2, &r2, &nWidth)) {
-			nWidth = (r.right - r.left) / 3;	
+#if defined(PLATFORM_PKTPC)
+			nPane = (r.bottom - r.top) / 3 * 2;
+#else
+			nPane = (r.right - r.left) / 3;	
+#endif
 		}
 	}
-	Property::SaveWinSize(flags, showCmd, &r, nWidth);
+	Property::SaveWinSize(flags, showCmd, &r, nPane);
 #endif
 }
 
@@ -1413,7 +1390,7 @@ void MainFrame::SaveWinSize()
 
 void MainFrame::LoadWinSize(HWND hWnd)
 {
-#if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
+#if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC) || defined(PLATFORM_PKTPC)
 	RECT rMainFrame;
 	WORD nSelectViewWidth;
 	RECT rClientRect;
@@ -1421,12 +1398,19 @@ void MainFrame::LoadWinSize(HWND hWnd)
 
 	UINT u1, u2;
 	if (!Property::GetWinSize(&u1, &u2, &rMainFrame, &nSelectViewWidth)) {
-		nSelectViewWidth = (rClientRect.right - rClientRect.left) / 3;	
+#if defined(PLATFORM_PKTPC)
+		nSelectViewWidth = (rClientRect.right - rClientRect.left) / 3 * 2;
+#else
+		nSelectViewWidth = (rClientRect.right - rClientRect.left) / 3;
+#endif
 	} else {
-#if defined(PLATFORM_HPC)
+#if defined(PLATFORM_PKTPC)
 		rMainFrame = rClientRect;
 #endif
+#if defined(PLATFORM_HPC)
+		rMainFrame = rClientRect;
 		MoveWindow(hWnd, rMainFrame.left, rMainFrame.top, rMainFrame.right, rMainFrame.bottom, TRUE);
+#endif
 	}
 
 	msView.MoveWindow(0, 0, nSelectViewWidth, rClientRect.bottom);
@@ -1491,18 +1475,18 @@ void MainFrame::TogglePane()
 		RECT rr;
 		WORD nWidth;
 		g_Property.GetWinSize(&u1, &u2, &rr, &nWidth);
-		msView.MoveWindow(0, 0, nWidth, rr.bottom - rr.top);
-		OnResize(0, MAKELPARAM(r.right - r.left, r.bottom - r.top));
+//		SetLayout(r.right - r.left, r.bottom - r.top, nWidth);
+		SetLayout(nWidth);
+
 		msView.Show(SW_SHOW);
 		pDetailsView->Show(SW_SHOW);
 	} else {
 		// 2->1Pane
+		OnResize(0, MAKELPARAM(r.right - r.left, r.bottom - r.top));
 		if (bSelectViewActive) {
-			OnResize(0, MAKELPARAM(r.right - r.left, r.bottom - r.top));
 			pDetailsView->Show(SW_HIDE);
 			msView.Show(SW_SHOW);
 		} else {
-			OnResize(0, MAKELPARAM(r.right - r.left, r.bottom - r.top));
 			pDetailsView->Show(SW_SHOW);
 			msView.Show(SW_HIDE);
 		}

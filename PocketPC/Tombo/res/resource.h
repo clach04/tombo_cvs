@@ -202,13 +202,14 @@
 #define IDM_BOOKMARK_ADD                40074
 #define IDM_BOOKMARK_CONFIG             40075
 #define IDM_MS_BOOKMARK                 40077
+#define IDM_TOGGLEPANE                  40078
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        129
-#define _APS_NEXT_COMMAND_VALUE         40078
+#define _APS_NEXT_COMMAND_VALUE         40079
 #define _APS_NEXT_CONTROL_VALUE         1045
 #define _APS_NEXT_SYMED_VALUE           106
 #endif
