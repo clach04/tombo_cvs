@@ -17,7 +17,7 @@ class VFInfo;
 #include "VarBuffer.h"
 
 /////////////////////////////////////////////
-//  TreeViewのアイテムの抽象化
+//  TreeView Node
 /////////////////////////////////////////////
 
 class TreeViewItem {
@@ -25,64 +25,58 @@ class TreeViewItem {
 	HTREEITEM hItem;
 
 public:
+	///////////////////////////////////////////////////////
+	// constants
+
+	enum OpType {
+		OpDelete	= (1 << 0),
+		OpRename	= (1 << 1),
+		OpEncrypt	= (1 << 2),
+		OpDecrypt	= (1 << 3),
+		OpNewMemo	= (1 << 4),
+		OpNewFolder = (1 << 5),
+		OpCut		= (1 << 6),
+		OpCopy		= (1 << 7),
+		OpPaste		= (1 << 8),
+		OpGrep		= (1 << 9),
+		OpLink		= (1 << 10)
+	};
+
+	///////////////////////////////////////////////////////
+	// TreeViewItem specific methods
+
 	TreeViewItem(BOOL bMultiItem);
 	virtual ~TreeViewItem();
 
 	HTREEITEM GetViewItem();
 	void SetViewItem(HTREEITEM h);
 
+	BOOL HasMultiItem() { return bHasMultiItem; }
+
 	///////////////////////////////////////////////////////
-	// Item operator
 
-	// このアイテムと同じデータを現在選択している位置と同列に保存する
+	// is operation enabled?
+	virtual BOOL IsOperationEnabled(MemoSelectView *pView, OpType op);
+
+	//  node operators
 	virtual BOOL Move(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR *ppErr) = 0;
-
-	// このアイテムと同じデータを現在選択している位置と同列にコピーする
 	virtual BOOL Copy(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR *ppErr) = 0;
-
-	// delete node. 
-	// MemoNote object that has TreeViewItem is also deleted.
-	// "this" object is not deleted, so delete manually if return value is TRUE.
-
-	virtual BOOL Delete(MemoManager *pMgr, MemoSelectView *pView) = 0;
-	virtual BOOL CanDelete(MemoSelectView *pView);
-
-	// rename node
 	virtual BOOL Rename(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR pNewName) = 0;
-	virtual BOOL CanRename(MemoSelectView *pView);
-
-
+	virtual BOOL Delete(MemoManager *pMgr, MemoSelectView *pView) = 0;
+		// MemoNote object that has TreeViewItem is also deleted.
+		// "this" object is not deleted, so delete manually if return value is TRUE.
 	virtual BOOL Encrypt(MemoManager *pMgr, MemoSelectView *pView) = 0;
 	virtual BOOL Decrypt(MemoManager *pMgr, MemoSelectView *pView) = 0;
-	virtual BOOL CanEncrypt(MemoSelectView *pView);
-	virtual BOOL CanDecrypt(MemoSelectView *pView);
-	virtual BOOL CanNewMemo(MemoSelectView *pView);
-	virtual BOOL CanNewFolder(MemoSelectView *pView);
-	virtual BOOL CanCut(MemoSelectView *pView);
-	virtual BOOL CanCopy(MemoSelectView *pView);
-	virtual BOOL CanPaste(MemoSelectView *pView);
-	virtual BOOL CanGrep(MemoSelectView *pVIew);
-	virtual BOOL CanLink(MemoSelectView *pView);
 
-	///////////////////////////////////////////////////////
-	// アイコン情報の取得
-
-	virtual DWORD GetIcon(MemoSelectView *pView, DWORD nStatus) = 0;
-
-	///////////////////////////////////////////////////////
-	// アイテム間の比較
+	// Compare item order
 	virtual DWORD ItemOrder() = 0;
-
-	BOOL HasMultiItem() { return bHasMultiItem; }
+	virtual DWORD GetIcon(MemoSelectView *pView, DWORD nStatus) = 0;
 
 	virtual MemoLocator ToLocator();
 
-	///////////////////////////////////////////////////////
 	// Get path information
 	virtual BOOL GetFolderPath(MemoSelectView *pView, TString *pPath) = 0;
-
 	virtual BOOL GetLocationPath(MemoSelectView *pView, TString *pPath) = 0;
-
 	virtual BOOL GetURIItem(MemoSelectView *pView, TString *pItem) = 0;
 };
 
@@ -96,37 +90,31 @@ public:
 	TreeViewFileItem();
 	~TreeViewFileItem();
 
+	////////////////////////////////
+	// class specific methods
+
+	void SetNote(MemoNote *p) { pNote = p; }
+	MemoNote *GetNote() { return pNote; }
+
+	////////////////////////////////
+	// inherited methods
+	BOOL IsOperationEnabled(MemoSelectView *pView, OpType op);
+
 	BOOL Move(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR *ppErr);
 	BOOL Copy(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR *ppErr);
 	BOOL Delete(MemoManager *pMgr, MemoSelectView *pView);
 	BOOL Encrypt(MemoManager *pMgr, MemoSelectView *pView);
 	BOOL Decrypt(MemoManager *pMgr, MemoSelectView *pView);
 	BOOL Rename(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR pNewName);
-	virtual BOOL CanRename(MemoSelectView *pView);
 
 	DWORD GetIcon(MemoSelectView *pView, DWORD nStatus);
-	virtual BOOL CanDelete(MemoSelectView *pView);
-
-	virtual BOOL CanEncrypt(MemoSelectView *pView);
-	virtual BOOL CanDecrypt(MemoSelectView *pView);
-	virtual BOOL CanNewMemo(MemoSelectView *pView);
-	virtual BOOL CanNewFolder(MemoSelectView *pView);
-	virtual BOOL CanCut(MemoSelectView *pView);
-	virtual BOOL CanCopy(MemoSelectView *pView);
-	virtual BOOL CanPaste(MemoSelectView *pView);
-	virtual BOOL CanGrep(MemoSelectView *pVIew);
-
 	DWORD ItemOrder();
 
-	void SetNote(MemoNote *p) { pNote = p; }
-	MemoNote *GetNote() { return pNote; }
-
 	MemoLocator ToLocator();
+
 	BOOL GetFolderPath(MemoSelectView *pView, TString *pPath);
 	BOOL GetLocationPath(MemoSelectView *pView, TString *pPath);
-
 	BOOL GetURIItem(MemoSelectView *pView, TString *pItem);
-
 };
 
 /////////////////////////////////////////////
@@ -137,32 +125,28 @@ class TreeViewFolderItem : public TreeViewItem {
 public:
 	TreeViewFolderItem();
 
+	////////////////////////////////
+	// multi node methods
+
+	virtual BOOL Expand(MemoSelectView *pView);
+
+	////////////////////////////////
+	// inherited methods
+
+	BOOL IsOperationEnabled(MemoSelectView *pView, OpType op);
+
 	BOOL Move(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR *ppErr);
 	BOOL Copy(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR *ppErr);
+	BOOL Rename(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR pNewName);
 	BOOL Delete(MemoManager *pMgr, MemoSelectView *pView);
 	BOOL Encrypt(MemoManager *pMgr, MemoSelectView *pView);
 	BOOL Decrypt(MemoManager *pMgr, MemoSelectView *pView);
 
-	BOOL Rename(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR pNewName);
-	virtual BOOL CanRename(MemoSelectView *pView);
-
-	virtual BOOL CanEncrypt(MemoSelectView *pView);
-	virtual BOOL CanDecrypt(MemoSelectView *pView);
-	virtual BOOL CanNewMemo(MemoSelectView *pView);
-	virtual BOOL CanNewFolder(MemoSelectView *pView);
-	virtual BOOL CanCut(MemoSelectView *pView);
-	virtual BOOL CanCopy(MemoSelectView *pView);
-	virtual BOOL CanPaste(MemoSelectView *pView);
-	virtual BOOL CanGrep(MemoSelectView *pVIew);
-
 	DWORD GetIcon(MemoSelectView *pView, DWORD nStatus);
 	DWORD ItemOrder();
 
-	virtual BOOL CanDelete(MemoSelectView *pView);
-	virtual BOOL Expand(MemoSelectView *pView);
 	BOOL GetFolderPath(MemoSelectView *pView, TString *pPath);
 	BOOL GetLocationPath(MemoSelectView *pView, TString *pPath);
-
 	BOOL GetURIItem(MemoSelectView *pView, TString *pItem);
 };
 
@@ -172,19 +156,12 @@ public:
 /////////////////////////////////////////////
 class TreeViewFileLink : public TreeViewFileItem {
 public:
-	virtual BOOL CanDelete(MemoSelectView *pView);
-	virtual BOOL CanRename(MemoSelectView *pView);
-	virtual BOOL CanEncrypt(MemoSelectView *pView);
-	virtual BOOL CanDecrypt(MemoSelectView *pView);
-	virtual BOOL CanNewMemo(MemoSelectView *pView);
-	virtual BOOL CanNewFolder(MemoSelectView *pView);
-	virtual BOOL CanCut(MemoSelectView *pView);
-	virtual BOOL CanCopy(MemoSelectView *pView);
-	virtual BOOL CanPaste(MemoSelectView *pView);
-	virtual BOOL CanGrep(MemoSelectView *pVIew);
-	virtual BOOL CanLink(MemoSelectView *pView);
+	////////////////////////////////
+	// inherited methods
 
-	virtual BOOL GetFolderPath(MemoSelectView *pView, TString *pPath);
+	BOOL IsOperationEnabled(MemoSelectView *pView, OpType op);
+
+	BOOL GetFolderPath(MemoSelectView *pView, TString *pPath);
 	BOOL GetLocationPath(MemoSelectView *pView, TString *pPath);
 };
 
@@ -199,32 +176,26 @@ public:
 	~TreeViewVirtualFolderRoot();
 	BOOL Init(VFManager *pManager);
 
-	DWORD GetIcon(MemoSelectView *pView, DWORD nStatus);
-
-	BOOL Expand(MemoSelectView *pView);
-
 	////////////////////////////
-	// Virtual folder operator 
+	// class specific methods
+
 	BOOL AddSearchResult(MemoSelectView *pView, const VFInfo *p);
 	BOOL InsertVirtualFolder(MemoSelectView *pView, LPCTSTR pName, VFDirectoryGenerator *pGen, VFStore *pStore);
 
-	////////////////////////////
-	// common methods
+	////////////////////////////////
+	// multi node methods
 
-	BOOL CanDelete(MemoSelectView *pView); 
-	BOOL CanRename(MemoSelectView *pView);
-	virtual BOOL CanEncrypt(MemoSelectView *pView);
-	virtual BOOL CanDecrypt(MemoSelectView *pView);
-	virtual BOOL CanNewMemo(MemoSelectView *pView);
-	virtual BOOL CanNewFolder(MemoSelectView *pView);
-	virtual BOOL CanCut(MemoSelectView *pView);
-	virtual BOOL CanCopy(MemoSelectView *pView);
-	virtual BOOL CanPaste(MemoSelectView *pView);
-	virtual BOOL CanGrep(MemoSelectView *pVIew);
+	BOOL Expand(MemoSelectView *pView);
 
-	virtual BOOL GetFolderPath(MemoSelectView *pView, TString *pPath);
+	////////////////////////////////
+	// inherited methods
+
+	BOOL IsOperationEnabled(MemoSelectView *pView, OpType op);
+
+	DWORD GetIcon(MemoSelectView *pView, DWORD nStatus);
+
+	BOOL GetFolderPath(MemoSelectView *pView, TString *pPath);
 	BOOL GetLocationPath(MemoSelectView *pView, TString *pPath);
-
 	BOOL GetURIItem(MemoSelectView *pView, TString *pItem);
 };
 
@@ -241,22 +212,8 @@ public:
 	TreeViewVirtualFolder();
 	~TreeViewVirtualFolder();
 
-	DWORD GetIcon(MemoSelectView *pView, DWORD nStatus);
-
-	BOOL Expand(MemoSelectView *pView);
-	BOOL CanDelete(MemoSelectView *pView);
-	BOOL CanRename(MemoSelectView *pView);
-	virtual BOOL CanEncrypt(MemoSelectView *pView);
-	virtual BOOL CanDecrypt(MemoSelectView *pView);
-	virtual BOOL CanNewMemo(MemoSelectView *pView);
-	virtual BOOL CanNewFolder(MemoSelectView *pView);
-	virtual BOOL CanCut(MemoSelectView *pView);
-	virtual BOOL CanCopy(MemoSelectView *pView);
-	virtual BOOL CanPaste(MemoSelectView *pView);
-	virtual BOOL CanGrep(MemoSelectView *pVIew);
-
-	virtual BOOL GetFolderPath(MemoSelectView *pView, TString *pPath);
-	BOOL GetLocationPath(MemoSelectView *pView, TString *pPath);
+	////////////////////////////
+	// class specific methods
 
 	// pGen's life scope is control under TreeViewVirtualFolder.
 	// don't delete pGen after calling SetGenerator.
@@ -265,6 +222,21 @@ public:
 	// pStore's  life scope is control under TreeViewVirtualFolder.
 	// don't delete pStore after calling SetStore.
 	BOOL SetStore(VFStore *pStore);
+
+	////////////////////////////////
+	// multi node methods
+
+	BOOL Expand(MemoSelectView *pView);
+
+	////////////////////////////////
+	// inherited methods
+
+	BOOL IsOperationEnabled(MemoSelectView *pView, OpType op);
+
+	DWORD GetIcon(MemoSelectView *pView, DWORD nStatus);
+
+	BOOL GetFolderPath(MemoSelectView *pView, TString *pPath);
+	BOOL GetLocationPath(MemoSelectView *pView, TString *pPath);
 };
 
 
