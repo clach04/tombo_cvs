@@ -52,6 +52,7 @@ class Property {
 #if defined(PLATFORM_WIN32)
 	DWORD nTopMost;
 #endif
+	DWORD nWrapText;
 
 public:
 	Property();
@@ -127,6 +128,8 @@ public:
 	BOOL StayTopMost() { return nTopMost; }
 	void ToggleStayTopMost() { nTopMost = !nTopMost; }
 #endif
+	DWORD WrapText() { return nWrapText; }
+	void SetWrapText(DWORD n) { nWrapText = n; }
 
 	// ウィンドウサイズ関連の保存・復元
 	static BOOL SaveWinSize(LPRECT pWinRect, WORD nSelectViewWidth);
@@ -134,6 +137,7 @@ public:
 
 	BOOL SaveStatusBarStat();
 	BOOL SaveTopMostStat();
+	BOOL SaveWrapTextStat();
 
 	friend class FolderTab;
 	friend class PasswordTab;

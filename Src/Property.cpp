@@ -49,6 +49,7 @@
 #define CODEPAGE_ATTR_NAME TEXT("CodePage")
 #define DISABLEEXTRAACTIONBUTTON_ATTR_NAME TEXT("DisableExtraActionButton")
 
+#define WRAPTEXT_ATTR_NAME TEXT("WrapText")
 // saved each exit time.
 #define HIDESTATUSBAR_ATTR_NAME TEXT("HideStatusBar")
 #define STAYTOPMOST_ATTR_NAME TEXT("StayTopMost")
@@ -1173,7 +1174,9 @@ BOOL Property::Load(BOOL *pStrict)
 #if defined(PLATFORM_WIN32)
 	nTopMost = GetDWORDFromReg(hTomboRoot, STAYTOPMOST_ATTR_NAME, 0);
 #endif
-	
+
+	nWrapText = GetDWORDFromReg(hTomboRoot, WRAPTEXT_ATTR_NAME, 1);
+
 	RegCloseKey(hTomboRoot);
 	return TRUE;
 }
@@ -1709,6 +1712,17 @@ BOOL Property::SaveTopMostStat()
 
 	RegCloseKey(hTomboRoot);
 #endif
+	return TRUE;
+}
+
+BOOL Property::SaveWrapTextStat()
+{
+	HKEY hTomboRoot = GetTomboRootKey();
+	if (!hTomboRoot) return FALSE;
+
+	if (!SetDWORDToReg(hTomboRoot, WRAPTEXT_ATTR_NAME, nWrapText)) return FALSE;
+
+	RegCloseKey(hTomboRoot);
 	return TRUE;
 }
 
