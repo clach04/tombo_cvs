@@ -1607,7 +1607,7 @@ static void ControlMenu(HMENU hMenu, BOOL bSelectViewActive)
 
 	EnableMenuItem(hMenu, IDM_FORGETPASS, uFlg1);
 	EnableMenuItem(hMenu, IDM_PROPERTY, uFlg1);
-	EnableMenuItem(hMenu, IDM_TOGGLEPANE, uFlg1);
+//	EnableMenuItem(hMenu, IDM_TOGGLEPANE, uFlg1);
 
 	EnableMenuItem(hMenu, IDM_INSDATE1, uFlg2);
 	EnableMenuItem(hMenu, IDM_INSDATE2, uFlg2);
@@ -1648,7 +1648,7 @@ static void ControlToolbar(HWND hToolbar, BOOL bSelectViewActive)
 	SendMessage(hToolbar, TB_ENABLEBUTTON, IDM_INSDATE1, MAKELONG(!bSelectViewActive, 0));
 	SendMessage(hToolbar, TB_ENABLEBUTTON, IDM_INSDATE2, MAKELONG(!bSelectViewActive, 0));
 
-	SendMessage(hToolbar, TB_ENABLEBUTTON, IDM_TOGGLEPANE, MAKELONG(bSelectViewActive, 0));
+//	SendMessage(hToolbar, TB_ENABLEBUTTON, IDM_TOGGLEPANE, MAKELONG(bSelectViewActive, 0));
 }
 #endif
 
@@ -2145,9 +2145,15 @@ void MainFrame::TogglePane()
 		mdView.Show(SW_SHOW);
 	} else {
 		// 2->1Pane
-		OnResize(0, MAKELPARAM(r.right - r.left, r.bottom - r.top));
-		mdView.Show(SW_HIDE);
-		msView.Show(SW_SHOW);
+		if (bSelectViewActive) {
+			OnResize(0, MAKELPARAM(r.right - r.left, r.bottom - r.top));
+			mdView.Show(SW_HIDE);
+			msView.Show(SW_SHOW);
+		} else {
+			OnResize(0, MAKELPARAM(r.right - r.left, r.bottom - r.top));
+			mdView.Show(SW_SHOW);
+			msView.Show(SW_HIDE);
+		}
 	}
 #endif
 }
