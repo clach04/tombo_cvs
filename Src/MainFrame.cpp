@@ -2425,13 +2425,7 @@ void MainFrame::DoSearchTree(BOOL bFirst, BOOL bForward)
 	TString sPath, sFullPath;
 	// Get path of selecting on treeview.
 	TreeViewItem *pItem = msView.GetCurrentItem();
-	if (pItem->HasMultiItem()) {
-		// folder
-		if (!msView.GetPathForNewItem(&sPath)) return;
-	} else {
-		// file
-		if (!sPath.Set(((TreeViewFileItem *)pItem)->GetNote()->MemoPath())) return;
-	}
+	if (pItem == NULL || !pItem->GetLocationPath(&msView, &sPath)) return;
 	if (!sFullPath.Join(g_Property.TopDir(), TEXT("\\"), sPath.Get())) return;
 
 	// Create dialog and do search.
