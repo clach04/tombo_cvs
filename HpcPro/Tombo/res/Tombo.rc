@@ -358,6 +358,7 @@ BEGIN
     VK_F3,          IDM_SEARCH_NEXT,        VIRTKEY, NOINVERT
     VK_F3,          IDM_SEARCH_PREV,        VIRTKEY, SHIFT, NOINVERT
     "X",            IDM_CUT,                VIRTKEY, CONTROL, NOINVERT
+    "Z",            IDM_UNDO,               VIRTKEY, CONTROL, NOINVERT
 END
 
 
