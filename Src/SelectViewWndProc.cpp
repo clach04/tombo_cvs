@@ -9,6 +9,10 @@
 #include "Property.h"
 #include "MemoSelectView.h"
 
+#define KEY_CTRL_C 3
+#define KEY_CTRL_V 22
+#define KEY_CTRL_X 24
+
 extern "C" {
 typedef LRESULT (CALLBACK* WNDPROC)(HWND, UINT, WPARAM, LPARAM);
 }
@@ -30,15 +34,31 @@ void SelectViewSetWndProc(WNDPROC wp, HWND hParent, HINSTANCE h, MemoSelectView 
 LRESULT CALLBACK NewSelectViewProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch(msg) {
-	// Focus状態で一般のキーをたたいた際に音が出ないようにイベントを無視する
 	case WM_CHAR:
+		{
+			// ignore events for disabling click beeps when focusing.
+			if (!pView) return 0;
+			HTREEITEM hItem;
+			TreeViewItem *pItem = pView->GetCurrentItem(&hItem);
+			switch(wParam) {
+			case KEY_CTRL_C:
+				pView->OnCopy(pItem);
+				break;
+			case KEY_CTRL_X:
+				pView->OnCut(pItem);
+				break;
+			case KEY_CTRL_V:
+				pView->OnPaste();
+				break;
+			}
 		return 0;
-//	case WM_KEYDOWN:
-//		if (wParam == VK_DELETE) {
-//			SendMessage(hParentWnd, WM_COMMAND, IDM_DELETEITEM, 0);
-//			return 0;
-//		}
-//		break;
+		}
+	case WM_KEYDOWN:
+		if (wParam == VK_DELETE) {
+			SendMessage(hParentWnd, WM_COMMAND, IDM_DELETEITEM, 0);
+			return 0;
+		}
+		break;
 	case WM_SETFOCUS:
 		{
 			if (g_Property.IsUseTwoPane() && pView) {
