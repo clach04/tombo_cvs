@@ -1747,10 +1747,12 @@ DEP_CPP_MAINF=\
 	"..\..\Src\Uniconv.h"\
 	"..\..\Src\VarBuffer.h"\
 	"..\..\Src\VFManager.h"\
-	{$(INCLUDE)}"CSO.h"\
-	{$(INCLUDE)}"CSOBar.h"\
-	{$(INCLUDE)}"CSOButton.h"\
-	{$(INCLUDE)}"CWind.h"\
+	
+NODEP_CPP_MAINF=\
+	".\SO.h"\
+	".\SOBar.h"\
+	".\SOButton.h"\
+	".\Wind.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
@@ -2806,8 +2808,10 @@ DEP_CPP_PROPE=\
 	"..\..\Src\TreeViewItem.h"\
 	"..\..\Src\Uniconv.h"\
 	"..\..\Src\VarBuffer.h"\
-	{$(INCLUDE)}"GetDisk.h"\
-	{$(INCLUDE)}"notify.h"\
+	
+NODEP_CPP_PROPE=\
+	".\etDisk.h"\
+	".\otify.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
@@ -3431,8 +3435,10 @@ DEP_CPP_SIPCO=\
 	"..\..\Src\Logger.h"\
 	"..\..\Src\SipControl.h"\
 	"..\..\Src\Tombo.h"\
-	{$(INCLUDE)}"sip.h"\
-	{$(INCLUDE)}"sipapi.h"\
+	
+NODEP_CPP_SIPCO=\
+	".\ip.h"\
+	".\ipapi.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
@@ -4549,6 +4555,10 @@ SOURCE=.\res\cut.bmp
 # Begin Source File
 
 SOURCE=..\..\Src\image\cut.bmp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\image\delete.bmp
 # End Source File
 # Begin Source File
 

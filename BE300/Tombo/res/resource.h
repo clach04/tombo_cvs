@@ -49,6 +49,7 @@
 #define IDD_GREPTAB_PERSIST             138
 #define IDD_FILTERCTL                   139
 #define IDD_FILTERDEF_ADD_REGEX         140
+#define IDB_DELETE                      140
 #define IDD_FILTERDEF_ADD_LIMIT         141
 #define IDD_FILTERDEF_ADD_TIMESTAMP     142
 #define IDD_FILTERDEF_ADD_SORT          143
@@ -189,7 +190,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        140
+#define _APS_NEXT_RESOURCE_VALUE        141
 #define _APS_NEXT_COMMAND_VALUE         40058
 #define _APS_NEXT_CONTROL_VALUE         1043
 #define _APS_NEXT_SYMED_VALUE           112

@@ -38,6 +38,7 @@ IDB_PASTE               BITMAP  DISCARDABLE     "../../../Src/image/paste.bmp"
 IDB_FINDNEXT            BITMAP  DISCARDABLE     "../../../Src/image/findnext.bmp"
 IDB_FINDPREV            BITMAP  DISCARDABLE     "../../../Src/image/findprev.bmp"
 IDB_FIND                BITMAP  DISCARDABLE     "../../../Src/image/find.bmp"
+IDB_DELETE              BITMAP  DISCARDABLE     "../../../src/image/delete.bmp"
 
 /////////////////////////////////////////////////////////////////////////////
 //

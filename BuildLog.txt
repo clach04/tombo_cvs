@@ -345,23 +345,27 @@ Return to main trunk.
 // B104 (SNAPSHOT_20030603)
 ////////////////////////////////
 
-* FIX: Save memo may be fail if multibyte char is used in folder name.
+* FIX: Save memo may be fail if multibyte char is used in folder name.(#2178,#2179)
 
 ////////////////////////////////
 // B105 (SNAPSHOT_20030605)
 ////////////////////////////////
 
 * Replace macro "iskanji" to IsDBCSLeadByte() for better support of DBCS.
-* Change IDD_FILTERDEF_FILTER's font to "System" on BE-300 version.
-* Add ClearType font support.
+* Change IDD_FILTERDEF_FILTER's font to "System" on BE-300 version.(#2239,#2240)
+* Add ClearType font support.(#2065)
 
 ////////////////////////////////
-// 
+// B106
 ////////////////////////////////
 
-* Rename menu "Grep" to "Quick filter".
+* Rename menu "Grep" to "Quick filter". "Grep" is reserved for future enhancement ;-)
 * Change font size dropdown menu drop list to dropdown. You can set any size what you want.(#2200)
-
+* Add delete button to toolbar.(#2466)
+* FIX:Save failed if headline is empty(#2557,#2558)
+* FIX:No notes are matched when choosing sub folder(#2563,#2564)
+* FIX:Focus of cut/paste from Tap&Hold(#2176,#2177)
+* Popup find dialog when push F3/Shift+F3 at first finding.(#1464)
 
 /////////////////////////////////////////////////////////////////////////
 // TODO

@@ -1123,16 +1123,20 @@ SOURCE=..\..\Src\FilterCtlDlg.cpp
 !IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
 
 DEP_CPP_FILTER=\
+	"..\..\Src\File.h"\
 	"..\..\Src\FilterCtlDlg.h"\
 	"..\..\Src\FilterDefDlg.h"\
+	"..\..\Src\Logger.h"\
 	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoSelectView.h"\
 	"..\..\Src\Message.h"\
+	"..\..\Src\Tombo.h"\
 	"..\..\Src\TreeViewItem.h"\
 	"..\..\Src\TString.h"\
 	"..\..\Src\Uniconv.h"\
 	"..\..\Src\VarBuffer.h"\
 	"..\..\Src\VFManager.h"\
+	"..\..\Src\VFStream.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
@@ -4573,6 +4577,10 @@ SOURCE=.\res\cut.bmp
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\Src\image\delete.bmp
+# End Source File
+# Begin Source File
+
 SOURCE=..\draftimg.bmp
 # End Source File
 # Begin Source File
@@ -4670,6 +4678,10 @@ SOURCE=.\toolbar.bmp
 # Begin Source File
 
 SOURCE=..\..\Src\toolbar.bmp
+# End Source File
+# Begin Source File
+
+SOURCE=.\res\Xdelete.bmp
 # End Source File
 # End Group
 # Begin Source File

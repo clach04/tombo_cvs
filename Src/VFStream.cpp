@@ -122,7 +122,11 @@ void VirtualStreamFolderScanner::Init(LPCTSTR pPath, VFStream *p, BOOL bCe)
 	bCheckEncrypt = bCe;
 
 	LPCTSTR pDir = g_Property.TopDir();
-	wsprintf(buf, TEXT("%s%s"), pDir, pPath);
+	if (*pPath != TEXT('\\')) {
+		wsprintf(buf, TEXT("%s\\%s"), pDir, pPath);
+	} else {
+		wsprintf(buf, TEXT("%s%s"), pDir, pPath);
+	}
 
 	nTopDirLen = _tcslen(pDir);
 

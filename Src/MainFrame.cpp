@@ -26,7 +26,7 @@
 #if defined(PLATFORM_PSPC)
 #include <Aygshell.h>
 extern "C" {
-	// ?? Imm.h消しちゃったのかなぁ??
+	// ?? may be deleted Imm.h ??
 UINT WINAPI ImmGetVirtualKey(HWND);
 };
 #endif
@@ -55,15 +55,15 @@ static HIMAGELIST CreateSelectViewImageList(HINSTANCE hInst);
 #define BORDER_WIDTH 5
 #endif
 
-// IDB_MEMOSELECT_IMAGESに格納されているイメージ1個のサイズ
+// Size of each image in IDB_MEMOSELECT_IMAGES
 #define IMAGE_CX 16
 #define IMAGE_CY 16
 
-// IDB_MEMOSELECT_IMAGESに格納されているイメージ数
+// Number of items in IDB_MEMOSELECT_IMAGES
 #define NUM_MEMOSELECT_BITMAPS 10
 
 ///////////////////////////////////////
-// コマンドバー関連
+// defs about toolbar/commandbar
 ///////////////////////////////////////
 ///////////////////////////////////////
 // Pocket PC
@@ -88,7 +88,7 @@ LPTSTR pMDToolTip[] = {
 #endif
 
 ///////////////////////////////////////
-// PSPC 版
+// PSPC version
 
 #if defined(PLATFORM_PSPC)
 #define NUM_CMDBAR_BUTTONS 6
@@ -119,7 +119,7 @@ static TBBUTTON aMDCmdBarButtons[NUM_MD_CMDBAR_BUTTONS] = {
 #endif
 
 ///////////////////////////////////////
-// H/PC 2Pane版
+// H/PC version
 
 #if defined(PLATFORM_HPC)
 static void ControlMenu(HMENU hMenu, BOOL bSelectViewActive);
@@ -161,7 +161,7 @@ static TBBUTTON aMDCmdBarButtons[NUM_MD_CMDBAR_BUTTONS] = {
 #endif
 
 ///////////////////////////////////////
-// Win32版
+// Win32 version
 
 #if defined(PLATFORM_WIN32)
 static void ControlMenu(HMENU hMenu, BOOL bSelectViewActive);
@@ -194,19 +194,21 @@ static TBBUTTON aToolbarButtons[NUM_TOOLBAR_BUTTONS] = {
 #endif
 
 ///////////////////////////////////////
-// l'agenda版
+// l'agenda version
 #if defined(PLATFORM_BE500)
 
 #define NUM_IMG_BUTTONS 0
 #define NUM_MD_IMG_BUTTONS 0
 
-#define NUM_SV_CMDBAR_BUTTONS 8
+#define NUM_SV_CMDBAR_BUTTONS 10
 CSOBAR_BUTTONINFO	aSVCSOBarButtons[NUM_SV_CMDBAR_BUTTONS] = 
 {
 	IDM_SV_MENU_1,  CSOBAR_BUTTON_SUBMENU_DOWN,  CSO_BUTTON_DISP, (-1),        NULL, MSG_MEMO, NULL,   CSOBAR_CODEPOS_CENTER, 1, (-1), (-1), (-1), (-1), 0, CLR_INVALID, CLR_INVALID, CLR_INVALID, FALSE, FALSE,
 	IDM_SV_MENU_2,  CSOBAR_BUTTON_SUBMENU_DOWN,  CSO_BUTTON_DISP, (-1),        NULL, MSG_TOOL, NULL,   CSOBAR_CODEPOS_CENTER, 1, (-1), (-1), (-1), (-1), 0, CLR_INVALID, CLR_INVALID, CLR_INVALID, FALSE, FALSE,
 	0,              CSOBAR_SEP,                  CSO_BUTTON_DISP, (-1),        NULL, NULL,     NULL,   0,                     1, (-1), (-1), (-1), (-1), 0, CLR_INVALID, CLR_INVALID, CLR_INVALID, FALSE, FALSE,
 	IDM_NEWMEMO,    CSOBAR_BUTTON_NORM,          CSO_BUTTON_DISP, IDB_NEWMEMO, NULL, NULL,     NULL,   CSOBAR_CODEPOS_CENTER, 1, (-1), (-1), (-1), (-1), 0, CLR_INVALID, CLR_INVALID, CLR_INVALID, FALSE, FALSE,
+	0,              CSOBAR_SEP,                  CSO_BUTTON_DISP, (-1),        NULL, NULL,     NULL,   0,                     1, (-1), (-1), (-1), (-1), 0, CLR_INVALID, CLR_INVALID, CLR_INVALID, FALSE, FALSE,
+	IDM_DELETEITEM, CSOBAR_BUTTON_NORM,          CSO_BUTTON_DISP, IDB_DELETE,  NULL, NULL,     NULL,   CSOBAR_CODEPOS_CENTER, 1, (-1), (-1), (-1), (-1), 0, CLR_INVALID, CLR_INVALID, CLR_INVALID, FALSE, FALSE,
 	0,              CSOBAR_SEP,                  CSO_BUTTON_DISP, (-1),        NULL, NULL,     NULL,   0,                     1, (-1), (-1), (-1), (-1), 0, CLR_INVALID, CLR_INVALID, CLR_INVALID, FALSE, FALSE,
 	IDM_SEARCH,     CSOBAR_BUTTON_NORM,         CSO_BUTTON_DISP, IDB_FIND,     NULL, NULL,     NULL,   CSOBAR_CODEPOS_CENTER, 1, (-1), (-1), (-1), (-1), 0, CLR_INVALID, CLR_INVALID, CLR_INVALID, FALSE, FALSE,
 	IDM_SEARCH_PREV,CSOBAR_BUTTON_NORM,         CSO_BUTTON_DISP, IDB_FINDPREV, NULL, NULL,     NULL,   CSOBAR_CODEPOS_CENTER, 1, (-1), (-1), (-1), (-1), 0, CLR_INVALID, CLR_INVALID, CLR_INVALID, FALSE, FALSE,
@@ -1721,6 +1723,13 @@ void MainFrame::EnableDelete(BOOL bEnable)
 		EnableMenuItem(hMenu, IDM_DELETEITEM, MF_BYCOMMAND | MF_GRAYED);
 	}
 #endif
+#if defined(PLATFORM_BE500)
+	if (bEnable) {
+		CSOBar_SetButtonState(hMSCmdBar, TRUE, IDM_DELETEITEM, 1, CSO_BUTTON_DISP);
+	} else {
+		CSOBar_SetButtonState(hMSCmdBar, TRUE, IDM_DELETEITEM, 1, CSO_BUTTON_GRAYED);
+	}
+#endif
 }
 
 void MainFrame::EnableRename(BOOL bEnable)
@@ -2304,7 +2313,10 @@ void MainFrame::DoSearchTree(BOOL bFirst, BOOL bForward)
 
 void MainFrame::OnSearchNext(BOOL bForward)
 {
-	if (mmMemoManager.GetSearchEngine() == NULL) return;
+	if (mmMemoManager.GetSearchEngine() == NULL) {
+		OnSearch();
+		return;
+	}
 
 	if (bSelectViewActive) {
 		DoSearchTree(mmMemoManager.MSSearchFlg(), bForward);

@@ -305,6 +305,10 @@ BOOL MemoNote::Save(PasswordManager *pMgr, LPCTSTR pMemo, TString *pHeadLine)
 	} else {
 		// Get new headline from memo text
 		if (!GetHeadLineFromMemoText(pMemo, &sHeadLine)) return FALSE;
+		if (_tcslen(sHeadLine.Get()) == 0) {
+			// headline is empty
+			if (!sHeadLine.Set(MSG_DEFAULT_HEADLINE)) return FALSE;
+		}
 	}
 
 	// Prepare write file.

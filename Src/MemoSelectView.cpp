@@ -399,7 +399,7 @@ LRESULT MemoSelectView::OnNotify(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		hPopup = GetSubMenu(hX, 1);
 		TrackPopupMenuEx(hPopup, 0, pnmrginfo->ptAction.x, pnmrginfo->ptAction.x, hWnd, NULL);
 		DestroyMenu(hX);
-		return 0;
+		return TRUE;
 	}
 #endif
 
