@@ -534,8 +534,17 @@ BOOL MainFrame::Create(LPCTSTR pWndName, HINSTANCE hInst, int nCmdShow)
 	WINDOWPLACEMENT wpl;
 	wpl.length = sizeof(wpl);
 	WORD nSelectViewWidth;
-	Property::GetWinSize(&(wpl.flags), &(wpl.showCmd), &(wpl.rcNormalPosition), &nSelectViewWidth);
-	if (!SetWindowPlacement(hMainWnd, &wpl)) {
+//	Property::GetWinSize(&(wpl.flags), &(wpl.showCmd), &(wpl.rcNormalPosition), &nSelectViewWidth);
+//	if (!SetWindowPlacement(hMainWnd, &wpl)) {
+//		UpdateWindow(hMainWnd);
+//	}
+
+	if (Property::GetWinSize(&(wpl.flags), &(wpl.showCmd), &(wpl.rcNormalPosition), &nSelectViewWidth)) {
+		if (!SetWindowPlacement(hMainWnd, &wpl)) {
+			UpdateWindow(hMainWnd);
+		}
+	} else {
+		ShowWindow(hMainWnd, nCmdShow);
 		UpdateWindow(hMainWnd);
 	}
 #else
@@ -1321,6 +1330,20 @@ void MainFrame::OnMouseMove(WPARAM wParam, LPARAM lParam)
 #if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
 	WORD fwKeys = wParam;
 	WORD xPos = LOWORD(lParam);
+
+	SHORT yPos = (SHORT)HIWORD(lParam);
+
+	RECT rClient;
+	GetClientRect(hMainWnd, &rClient);
+	SHORT yLimit = (SHORT)rClient.bottom;
+	if (!g_Property.HideStatusBar()) {
+		RECT rStatBar;
+		GetWindowRect(hStatusBar, &rStatBar);
+		yLimit -= (SHORT)rStatBar.bottom;
+
+	}
+
+	if (yPos < 0 || yPos > yLimit) return;
 
 	if (!(fwKeys & MK_LBUTTON) && !bResizePane) return;
 	MovePane(xPos);
