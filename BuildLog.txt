@@ -42,7 +42,7 @@ TOMBO 1.4
 * change version dialog to 1.4
 
 ////////////////////////////
-// B074 CURRENT
+// B074 
 ////////////////////////////
 
 * Move version info string to Tombo.h
@@ -65,6 +65,15 @@ TOMBO 1.4
 * for release 1.5, disable "get HTREEITEM from notes file path for each saving time."
 
 TOMBO 1.5
+
+////////////////////////////////
+// B074(Tombo_DEBUG_20021128)
+////////////////////////////////
+
+2002/11/28
+
+* Delete compile option "/Oxs" for H/PC SH-4. (#798,#799,#756)
+* Addd delete notify to MemoManager.(#753,#754,#792,#793)
 
 /////////////////////////////////////////////////////////////////////////
 // TODO
