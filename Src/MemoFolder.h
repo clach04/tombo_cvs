@@ -4,9 +4,14 @@
 #include "TString.h"
 #include "MemoNote.h"
 
+class PasswordManager;
+
 class MemoFolder {
 	LPTSTR pFullPath;
 	TString sErrorReason;
+
+	BOOL EnDeCrypt(PasswordManager *pMgr, BOOL bEncrypt);
+
 public:
 
 	///////////////////////////////////////////////
@@ -18,8 +23,9 @@ public:
 	BOOL Copy(LPCTSTR pDst);
 	BOOL Move(LPCTSTR pDst);
 	BOOL Delete();
-
 	BOOL Rename(LPCTSTR pNewName);
+	BOOL Encrypt(PasswordManager *pMgr) { return EnDeCrypt(pMgr, TRUE); }
+	BOOL Decrypt(PasswordManager *pMgr) { return EnDeCrypt(pMgr, FALSE); }
 
 	LPCTSTR GetErrorReason() { return sErrorReason.Get(); }
 };

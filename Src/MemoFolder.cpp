@@ -3,10 +3,12 @@
 #include <tchar.h>
 
 #include "Tombo.h"
+#include "Property.h"
 #include "UniConv.h"
 #include "TString.h"
 #include "MemoFolder.h"
 #include "DirectoryScanner.h"
+#include "PasswordManager.h"
 #include "MemoNote.h"
 #include "Message.h"
 
@@ -247,3 +249,103 @@ BOOL MemoFolder::Rename(LPCTSTR pNewName)
 
 	return MoveFile(sCurrent.Get(), sNew.Get());
 }
+
+///////////////////////////////////////////////
+// Encrypt/Decrypt
+///////////////////////////////////////////////
+
+class DSEncrypt: public DirectoryScanner {
+	DWORD nBaseLen;
+	PasswordManager *pPassMgr;
+	BOOL bEncrypt;
+public:
+	DWORD nNotEncrypted;
+	LPCTSTR pErrorReason;
+
+	// If bEncrypt is FALSE, decrypt files.
+	BOOL Init(LPCTSTR pPath, PasswordManager *pMgr, BOOL bEncrypt);
+
+	void InitialScan() {}
+	void AfterScan() {}
+	void PreDirectory(LPCTSTR) {}
+	void PostDirectory(LPCTSTR) {}
+	void File(LPCTSTR);
+};
+
+BOOL DSEncrypt::Init(LPCTSTR pPath, PasswordManager *pMgr, BOOL bEnc) {
+	nBaseLen = _tcslen(g_Property.TopDir());
+	nNotEncrypted = 0;
+	pPassMgr = pMgr;
+	bEncrypt = bEnc;
+	return DirectoryScanner::Init(pPath, 0);
+}
+
+void DSEncrypt::File(LPCTSTR pFile)
+{
+	LPCTSTR pPath = CurrentPath() + nBaseLen;
+	MemoNote *pNote;
+	if (!MemoNote::MemoNoteFactory(TEXT(""), pPath, &pNote)) {
+		nNotEncrypted++;
+		return;
+	}
+	if (pNote == NULL) return;
+	TString s;
+	BOOL b;
+
+	// skip already encrypted/decrypted
+	if (bEncrypt && pNote->IsEncrypted() ||
+		!bEncrypt && !pNote->IsEncrypted()) return;
+
+	MemoNote *pNewNote;
+	if (bEncrypt) {
+		pNewNote = pNote->Encrypt(pPassMgr, &s, &b);
+	} else {
+		pNewNote = pNote->Decrypt(pPassMgr, &s, &b);
+	}
+
+	if (pNewNote) {
+		if (!pNote->DeleteMemoData()) {
+			// delete failed. plain memo exists.
+			if (bEncrypt) {
+				pErrorReason = MSG_PLAIN_TEXT_DEL_FAILED;
+			} else {
+				pErrorReason = MSG_CRYPT_FILE_DEL_FAILED;
+			}
+			nNotEncrypted++;
+		}
+	} else {
+		// encrypt failed.
+		nNotEncrypted++;
+		if (bEncrypt) {
+			pErrorReason = MSG_ENCRYPT_FAILED;
+		} else {
+			pErrorReason = MSG_DECRYPT_FAILED;
+		}
+	}
+
+	delete pNote;
+	delete pNewNote;
+}
+
+BOOL MemoFolder::EnDeCrypt(PasswordManager *pMgr, BOOL bEncrypt)
+{
+	DSEncrypt fc;
+	fc.Init(pFullPath, pMgr, bEncrypt);
+
+	// for cancel, get password before encryption.
+	BOOL bCancel;
+	const char *pPass = pMgr->Password(&bCancel, bEncrypt);
+	if (!pPass) {
+		sErrorReason.Set(MSG_GET_PASS_FAILED);
+		return FALSE;
+	}
+
+	// Scan directory and encrypt files
+	if (!fc.Scan() || fc.nNotEncrypted != 0) {
+		sErrorReason.Set(fc.pErrorReason);
+		return FALSE;
+	}
+
+	return TRUE;
+}
+

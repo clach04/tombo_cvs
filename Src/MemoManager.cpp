@@ -123,8 +123,8 @@ BOOL MemoManager::WipeOutAndDeleteFile(LPCTSTR pFile)
 void MemoManager::SelectNote(MemoNote *pNote)
 {
 	if (pNote == NULL) {
-		pMainFrame->EnableEncrypt(FALSE);
-		pMainFrame->EnableDecrypt(FALSE);
+		pMainFrame->EnableEncrypt(TRUE);
+		pMainFrame->EnableDecrypt(TRUE);
 	} else if (pNote->IsEncrypted()) {
 		pMainFrame->EnableEncrypt(FALSE);
 		pMainFrame->EnableDecrypt(TRUE);

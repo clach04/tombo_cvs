@@ -352,10 +352,8 @@ BOOL TreeViewFolderItem::Delete(MemoManager *pMgr, MemoSelectView *pView)
 	// ツリーのCollapse
 	pView->TreeCollapse(GetViewItem());
 
-	// ファイルの削除
 	MemoFolder mf;
 	mf.Init(sCurrentPath.Get());	
-	// 表示の削除
 	if (mf.Delete()) {
 		return TRUE;
 	} else {
@@ -367,12 +365,50 @@ BOOL TreeViewFolderItem::Delete(MemoManager *pMgr, MemoSelectView *pView)
 
 BOOL TreeViewFolderItem::Encrypt(MemoManager *pMgr, MemoSelectView *pView)
 {
-	return FALSE;
+	TCHAR buf[MAX_PATH];
+	TString sCurrentPath;
+	HTREEITEM hItem = GetViewItem();
+	LPTSTR pCurrentPath = pView->GeneratePath(hItem, buf, MAX_PATH);
+	if (!sCurrentPath.AllocFullPath(pCurrentPath)) return FALSE;
+
+	if (_tcslen(pCurrentPath) == 0 ||
+		TomboMessageBox(NULL, MSG_CONFIRM_ENCRYPT_FOLDER, MSG_CONFIRM_ENCRYPT_FOLDER_TTL, MB_ICONQUESTION | MB_OKCANCEL) != IDOK) return TRUE;
+
+	pMgr->InactiveDetailsView();
+	pView->TreeCollapse(GetViewItem());
+	MemoFolder mf;
+	mf.Init(sCurrentPath.Get());	
+
+	if (!mf.Encrypt(pMgr->GetPasswordManager())) {
+		LPCTSTR pErr = mf.GetErrorReason();
+		MessageBox(NULL, pErr ? pErr : MSG_NOT_ENOUGH_MEMORY, TOMBO_APP_NAME, MB_ICONERROR | MB_OK);
+		return TRUE;
+	}
+	return TRUE;
 }
 
 BOOL TreeViewFolderItem::Decrypt(MemoManager *pMgr, MemoSelectView *pView)
 {
-	return FALSE;
+	TCHAR buf[MAX_PATH];
+	TString sCurrentPath;
+	HTREEITEM hItem = GetViewItem();
+	LPTSTR pCurrentPath = pView->GeneratePath(hItem, buf, MAX_PATH);
+	if (!sCurrentPath.AllocFullPath(pCurrentPath)) return FALSE;
+
+	if (_tcslen(pCurrentPath) == 0 ||
+		TomboMessageBox(NULL, MSG_CONFIRM_DECRYPT_FOLDER, MSG_CONFIRM_DECRYPT_FOLDER_TTL, MB_ICONQUESTION | MB_OKCANCEL) != IDOK) return TRUE;
+
+	pMgr->InactiveDetailsView();
+	pView->TreeCollapse(GetViewItem());
+	MemoFolder mf;
+	mf.Init(sCurrentPath.Get());	
+
+	if (!mf.Decrypt(pMgr->GetPasswordManager())) {
+		LPCTSTR pErr = mf.GetErrorReason();
+		MessageBox(NULL, pErr ? pErr : MSG_NOT_ENOUGH_MEMORY, TOMBO_APP_NAME, MB_ICONERROR | MB_OK);
+		return TRUE;
+	}
+	return TRUE;
 }
 
 DWORD TreeViewFolderItem::GetIcon(MemoSelectView *pView, DWORD nStatus)
