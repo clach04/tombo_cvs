@@ -7,6 +7,34 @@
 
 LPCTSTR GetString(UINT nID);
 
+// from http://sourceforge.jp/forum/message.php?msg_id=11376
+#if defined(_WIN32_WCE) && defined(PLATFORM_PKTPC)
+#include <aygshell.h>
+static
+int CALLBACK PropSheetProc(HWND hDlg, UINT uMsg, LPARAM lParam)
+{
+	if(uMsg == PSCB_INITIALIZED) {
+		// empty menubar
+		SHMENUBARINFO mbi;
+		memset(&mbi, 0, sizeof(SHMENUBARINFO));
+		mbi.cbSize = sizeof(SHMENUBARINFO);
+		mbi.hwndParent = hDlg;
+		mbi.dwFlags	= SHCMBF_EMPTYBAR;
+		SHCreateMenuBar(&mbi);
+
+		// tab-control move to bottom 
+		HWND hTab = GetDlgItem( hDlg, 0x3020);	//TabControl
+		DWORD style = GetWindowLong( hTab, GWL_STYLE ) | TCS_BOTTOM; 
+		SetWindowLong( hTab, GWL_STYLE, style );
+		return 0;
+	}
+	if(uMsg == PSCB_GETVERSION) {
+		return COMCTL32_VERSION;
+	}
+	return 0;
+}
+#endif
+
 /////////////////////////////////////////////////////
 // PropertyPage popup
 /////////////////////////////////////////////////////
@@ -30,7 +58,14 @@ DWORD PropertyPage::Popup(HINSTANCE hInst, HWND hWnd, PPropertyTab *ppPage, DWOR
 	}
 
     psh.dwSize = sizeof(PROPSHEETHEADER);
+
+	// from http://sourceforge.jp/forum/message.php?msg_id=11376
+#if defined(_WIN32_WCE) && defined(PLATFORM_PKTPC)
+	psh.dwFlags = PSH_PROPSHEETPAGE | PSH_MAXIMIZE | PSH_USECALLBACK;
+    psh.pfnCallback = PropSheetProc;
+#else
     psh.dwFlags = PSH_USEICONID | PSH_PROPSHEETPAGE | PSH_NOAPPLYNOW;
+#endif
     psh.hwndParent = hWnd;
     psh.hInstance = hInst;
     psh.pszIcon = pIcon;
