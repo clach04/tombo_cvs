@@ -93,7 +93,7 @@ public:
 	// メモのクリア
 	BOOL ClearMemo();
 
-	void UpdateMenu(TreeViewItem *pItem);
+//	void UpdateMenu(TreeViewItem *pItem);
 
 	BOOL MakeNewFolder(HWND hWnd, TreeViewItem *pItem);	// フォルダの新規作成
 

@@ -131,7 +131,7 @@ BOOL MemoManager::WipeOutAndDeleteFile(LPCTSTR pFile)
 ////////////////////////////////////////////////////////
 // Control menu item
 ////////////////////////////////////////////////////////
-
+#ifdef COMMENT
 void MemoManager::UpdateMenu(TreeViewItem *pItem)
 {
 	if (pItem == NULL) {
@@ -139,7 +139,7 @@ void MemoManager::UpdateMenu(TreeViewItem *pItem)
 		pMainFrame->EnableDecrypt(FALSE);
 		return;
 	}
-
+	return;
 	MemoNote *pNote;
 	if (pItem->HasMultiItem()) {
 		// Encrypt/decrypt menu
@@ -161,6 +161,7 @@ void MemoManager::UpdateMenu(TreeViewItem *pItem)
 	}
 	
 }
+#endif
 
 ////////////////////////////////////////////////////////
 // フォルダの新規作成
