@@ -5,6 +5,8 @@ class MemoNote;
 class SearchEngineA;
 class PasswordManager;
 class VFStore;
+class TString;
+class File;
 #include "VarBuffer.h"
 
 ////////////////////////////////////
@@ -73,8 +75,12 @@ public:
 
 	///////////////////////////
 	// copy method
-
 	virtual VFStream *Clone(VFStore **ppTail) = 0;
+
+	///////////////////////////
+	// generate XML
+	virtual BOOL GenerateXMLOpenTag(File *pFile) = 0;
+	virtual BOOL GenerateXMLCloseTag(File *pFile) = 0;
 };
 
 ////////////////////////////////////
@@ -104,6 +110,9 @@ public:
 	BOOL Init(LPTSTR pDir, BOOL bCheckEncrypt);
 
 	VFStream *Clone(VFStore **ppTail);
+
+	BOOL GenerateXMLOpenTag(File *pFile);
+	BOOL GenerateXMLCloseTag(File *pFile);
 };
 
 ////////////////////////////////////
@@ -132,6 +141,8 @@ public:
 	BOOL Store(VFNote *p);
 	BOOL PostActivate();
 	VFStream *Clone(VFStore **ppTail);
+	BOOL GenerateXMLOpenTag(File *pFile);
+	BOOL GenerateXMLCloseTag(File *pFile);
 
 	DWORD NumItem() { return vNotes.NumItems(); }
 	VFNote *GetNote(DWORD n) { return *vNotes.GetUnit(n); }
@@ -150,7 +161,11 @@ class VFRegexFilter : public VFStream {
 public:
 #endif
 	SearchEngineA *pRegex;
+	TString *pPattern;
+	BOOL bCaseSensitive;
+	BOOL bFileNameOnly;
 	BOOL bNegate;
+
 public:
 	VFRegexFilter();
 	~VFRegexFilter();
@@ -165,6 +180,9 @@ public:
 	// void FreeObject();	inherit to VFStream
 
 	VFStream *Clone(VFStore **ppTail);
+	BOOL GenerateXMLOpenTag(File *pFile);
+	BOOL GenerateXMLCloseTag(File *pFile);
+
 };
 
 ////////////////////////////////////
@@ -186,6 +204,8 @@ public:
 	BOOL Store(VFNote *p);
 
 	VFStream *Clone(VFStore **ppTail);
+	BOOL GenerateXMLOpenTag(File *pFile);
+	BOOL GenerateXMLCloseTag(File *pFile);
 };
 
 ////////////////////////////////////
@@ -197,6 +217,7 @@ class VFTimestampFilter : public VFStream {
 public:
 #endif
 	BOOL bNewer;
+	DWORD nDeltaDays;
 	UINT64 uBase;
 public:
 	VFTimestampFilter();
@@ -207,6 +228,8 @@ public:
 	BOOL Store(VFNote *p);
 
 	VFStream *Clone(VFStore **ppTail);
+	BOOL GenerateXMLOpenTag(File *pFile);
+	BOOL GenerateXMLCloseTag(File *pFile);
 };
 
 ////////////////////////////////////
@@ -237,6 +260,8 @@ public:
 	BOOL PostActivate();
 
 	VFStream *Clone(VFStore **ppTail);
+	BOOL GenerateXMLOpenTag(File *pFile);
+	BOOL GenerateXMLCloseTag(File *pFile);
 };
 
 #endif

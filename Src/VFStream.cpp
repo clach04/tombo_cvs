@@ -1,5 +1,6 @@
 #include <windows.h>
 #include <tchar.h>
+#include <wchar.h>
 #include <commctrl.h>
 #include "Tombo.h"
 #include "UniConv.h"
@@ -209,6 +210,33 @@ VFStream *VFDirectoryGenerator::Clone(VFStore **ppTail)
 	}
 	return p;
 }
+
+BOOL VFDirectoryGenerator::GenerateXMLOpenTag(File *pFile)
+{
+	pNext->GenerateXMLOpenTag(pFile);
+
+	if (!pFile->WriteUnicodeString(L"<src folder=\"")) return FALSE;
+	LPWSTR pDirW = ConvTCharToWChar(pDirPath);
+	if (!pDirW) return FALSE;
+	if (!pFile->WriteUnicodeString(pDirW)) {
+		delete [] pDirW;
+		return FALSE;
+	}
+	delete [] pDirW;
+	if (!pFile->WriteUnicodeString(L"\"")) return FALSE;
+	if (bCheckEncrypt) {
+		if (!pFile->WriteUnicodeString(L" checkencrypt='True'")) return FALSE;
+	}
+	if (!pFile->WriteUnicodeString(L"/>\n")) return FALSE;
+
+	return TRUE;
+}
+
+BOOL VFDirectoryGenerator::GenerateXMLCloseTag(File *pFile)
+{
+	return pNext->GenerateXMLCloseTag(pFile);
+}
+
 ////////////////////////////////////
 // VFStore implimentation
 ////////////////////////////////////
@@ -265,6 +293,16 @@ VFStream *VFStore::Clone(VFStore **ppTail)
 	return p;
 }
 
+BOOL VFStore::GenerateXMLOpenTag(File *pFile)
+{
+	return TRUE;
+}
+
+BOOL VFStore::GenerateXMLCloseTag(File *pFile)
+{
+	return TRUE;
+}
+
 ////////////////////////////////////
 //  VFRegexFilter
 ////////////////////////////////////
@@ -278,13 +316,23 @@ VFRegexFilter::~VFRegexFilter()
 	delete pRegex;
 }
 
-BOOL VFRegexFilter::Init(LPCTSTR pPattern, BOOL bCase, BOOL bEnc, BOOL bFileName, BOOL bNeg, PasswordManager *pPassMgr)
+BOOL VFRegexFilter::Init(LPCTSTR pPat, BOOL bCase, BOOL bEnc, BOOL bFileName, BOOL bNeg, PasswordManager *pPassMgr)
 {
+	pPattern = new TString();
+	if (!pPattern) {
+		SetLastError(ERROR_NOT_ENOUGH_MEMORY);
+		return FALSE;
+	}
+	if (!pPattern->Set(pPat)) return FALSE;
+
+	bCaseSensitive = bCase;
+	bFileNameOnly= bFileName;
 	bNegate = bNeg;
+
 	pRegex = new SearchEngineA();
 	const char *pReason;
 	if (!pRegex || !pRegex->Init(bEnc, bFileName, pPassMgr)) return FALSE;
-	if (!pRegex->Prepare(pPattern, bCase, &pReason)) return FALSE;
+	if (!pRegex->Prepare(pPat, bCase, &pReason)) return FALSE;
 	return TRUE;
 }
 
@@ -319,9 +367,16 @@ VFStream *VFRegexFilter::Clone(VFStore **ppTail)
 	VFRegexFilter *p = new VFRegexFilter();
 	if (p == NULL) return NULL;
 
+	p->pPattern = new TString();
+	p->pPattern->Set(pPattern->Get());
+
 	p->pRegex = pRegex->Clone();
 	p->pNext = pNext->Clone(ppTail);
+
+	p->bCaseSensitive = bCaseSensitive;
+	p->bFileNameOnly = bFileNameOnly;
 	p->bNegate = bNegate;
+
 	if (!p || p->pRegex == NULL || 
 		p->pNext == NULL) {
 		delete p;
@@ -329,6 +384,38 @@ VFStream *VFRegexFilter::Clone(VFStore **ppTail)
 	}
 	return p;
 }
+
+BOOL VFRegexFilter::GenerateXMLOpenTag(File *pFile)
+{
+	if (!pNext->GenerateXMLOpenTag(pFile)) return FALSE;
+
+	if (!pFile->WriteUnicodeString(L"<grep pattern=\"")) return FALSE;
+	WString sPatW;
+	if (!sPatW.Set(pPattern)) return FALSE;
+	if (!pFile->WriteUnicodeString(sPatW.Get())) return FALSE;
+	if (!pFile->WriteUnicodeString(L"\"")) return FALSE;
+
+	if (bCaseSensitive) {
+		if (!pFile->WriteUnicodeString(L" casesensitive='True'")) return FALSE;
+	}
+	if (bFileNameOnly) {
+		if (!pFile->WriteUnicodeString(L" filenameonly='True'")) return FALSE;
+	}
+	if (bNegate) {
+		if (!pFile->WriteUnicodeString(L" not='True'")) return FALSE;
+	}
+	if (!pFile->WriteUnicodeString(L">\n")) return FALSE;
+
+	return TRUE;
+}
+
+BOOL VFRegexFilter::GenerateXMLCloseTag(File *pFile)
+{
+	if (!pFile->WriteUnicodeString(L"</grep>\n")) return FALSE;
+	if (!pNext->GenerateXMLCloseTag(pFile)) return FALSE;
+	return TRUE;
+}
+
 ////////////////////////////////////
 //  VFLimitFilter
 ////////////////////////////////////
@@ -378,6 +465,27 @@ VFStream *VFLimitFilter::Clone(VFStore **ppTail)
 	return p;
 }
 
+
+BOOL VFLimitFilter::GenerateXMLOpenTag(File *pFile)
+{
+	if (!pNext->GenerateXMLOpenTag(pFile)) return FALSE;
+
+	if (!pFile->WriteUnicodeString(L"<limit number=\"")) return FALSE;
+	WCHAR buf[32];
+	swprintf(buf, L"%d", nLimit);
+	if (!pFile->WriteUnicodeString(buf)) return FALSE;
+
+	if (!pFile->WriteUnicodeString(L"\">\n")) return FALSE;
+	return TRUE;
+}
+
+BOOL VFLimitFilter::GenerateXMLCloseTag(File *pFile)
+{
+	if (!pFile->WriteUnicodeString(L"</limit>\n")) return FALSE;
+	if (!pNext->GenerateXMLCloseTag(pFile)) return FALSE;
+	return TRUE;
+}
+
 ////////////////////////////////////
 //  VFTimestampFilter
 ////////////////////////////////////
@@ -396,6 +504,8 @@ BOOL VFTimestampFilter::Init(DWORD nDelta, BOOL bNew)
 	GetLocalTime(&st);
 	FILETIME ft;
 	SystemTimeToFileTime(&st, &ft);
+
+	nDeltaDays = nDelta;
 
 	uBase = ((UINT64)ft.dwHighDateTime << 32) | (UINT64)ft.dwLowDateTime;
 	UINT64 d = 0xc92a69c000;	// 1 day
@@ -429,6 +539,33 @@ VFStream *VFTimestampFilter::Clone(VFStore **ppTail)
 		return NULL;
 	}
 	return p;
+}
+
+BOOL VFTimestampFilter::GenerateXMLOpenTag(File *pFile)
+{
+	if (!pNext->GenerateXMLOpenTag(pFile)) return FALSE;
+
+	if (!pFile->WriteUnicodeString(L"<timestamp days=\"")) return FALSE;
+	WCHAR buf[32];
+	swprintf(buf, L"%d", nDeltaDays);
+	if (!pFile->WriteUnicodeString(buf)) return FALSE;
+	if (!pFile->WriteUnicodeString(L"\"")) return FALSE;
+
+	if (bNewer) {
+		if (!pFile->WriteUnicodeString(L" newer='True'")) return FALSE;
+	} else {
+		if (!pFile->WriteUnicodeString(L" older='True'")) return FALSE;
+	}
+
+	if (!pFile->WriteUnicodeString(L">\n")) return FALSE;
+	return TRUE;
+}
+
+BOOL VFTimestampFilter::GenerateXMLCloseTag(File *pFile)
+{
+	if (!pFile->WriteUnicodeString(L"</timestamp>\n")) return FALSE;
+	if (!pNext->GenerateXMLCloseTag(pFile)) return FALSE;
+	return TRUE;
 }
 
 ////////////////////////////////////
@@ -538,4 +675,39 @@ VFStream *VFSortFilter::Clone(VFStore **ppTail)
 		return NULL;
 	}
 	return p;
+}
+
+BOOL VFSortFilter::GenerateXMLOpenTag(File *pFile)
+{
+	if (!pNext->GenerateXMLOpenTag(pFile)) return FALSE;
+
+	if (!pFile->WriteUnicodeString(L"<sort func=\"")) return FALSE;
+	LPCWSTR pType;
+	switch(sfType) {
+	case SortFunc_FileNameAsc:
+		pType = L"filename_asc";
+		break;
+	case SortFunc_FileNameDsc:
+		pType = L"filename_dsc";
+		break;
+	case SortFunc_LastUpdateAsc:
+		pType = L"lastupdate_asc";
+		break;
+	case SortFunc_LastUpdateDsc:
+		pType = L"lastupdate_dsc";
+		break;
+	default:
+		SetLastError(ERROR_INVALID_DATA);
+		return FALSE;
+	}
+	if (!pFile->WriteUnicodeString(pType)) return FALSE;
+	if (!pFile->WriteUnicodeString(L"\">\n")) return FALSE;
+	return TRUE;
+}
+
+BOOL VFSortFilter::GenerateXMLCloseTag(File *pFile)
+{
+	if (!pFile->WriteUnicodeString(L"</sort>\n")) return FALSE;
+	if (!pNext->GenerateXMLCloseTag(pFile)) return FALSE;
+	return TRUE;
 }

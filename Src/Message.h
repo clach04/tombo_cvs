@@ -104,5 +104,8 @@
 #define MSG_INSERTVFOLDER_FAIL	MSG("仮想フォルダの作成に失敗しました", "Create virtual folder failed.")
 #define MSG_GREP_NONAME_LABEL	MSG("検索結果", "Grep result")
 #define MSG_VFOLDER_NAME_TTL	MSG("仮想フォルダ名", "Virtual folder name")
+#define MSG_CONFIRM_DEL_VFOLDER	MSG("選択した仮想フォルダを削除します。よろしいですか？", "Delete selected virtual folder?")
+#define MSG_DEL_VFOLDER_TTL		MSG("仮想フォルダの削除", "Delete virtual folder")
+
 #endif
 

@@ -297,7 +297,7 @@ BOOL TSVFolderTag::EndElement(ParseInfo *p)
 	LPTSTR pConved = conv.Get();
 #endif
 
-	p->pListener->ProcessStream(pConved, (VFDirectoryGenerator*)pHead, pStore);
+	p->pListener->ProcessStream(pConved, TRUE, (VFDirectoryGenerator*)pHead, pStore);
 
 	return TRUE;
 }

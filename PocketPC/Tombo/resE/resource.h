@@ -33,6 +33,7 @@
 #define IDD_GREPTAB_MAIN                124
 #define IDD_GREPTAB_PERSIST             125
 #define IDD_DIALOG1                     126
+#define IDD_FILTERCTL                   126
 #define IDM_MAIN_MENUITEM1              401
 #define IDM_MAIN_MENUITEM2              402
 #define IDS_MAIN_MENUITEM1              410

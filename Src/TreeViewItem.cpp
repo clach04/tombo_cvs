@@ -829,10 +829,10 @@ class VFExpandListener : public VirtualFolderEnumListener {
 public:
 	VFExpandListener(MemoSelectView *pv, TreeViewVirtualFolderRoot *pr) : pView(pv), pRoot(pr) {}
 
-	BOOL ProcessStream(LPCTSTR pName, VFDirectoryGenerator *pGen, VFStore *pStore);
+	BOOL ProcessStream(LPCTSTR pName, BOOL bPersit, VFDirectoryGenerator *pGen, VFStore *pStore);
 };
 
-BOOL VFExpandListener::ProcessStream(LPCTSTR pName, VFDirectoryGenerator *pGen, VFStore *pStore)
+BOOL VFExpandListener::ProcessStream(LPCTSTR pName, BOOL bPersit, VFDirectoryGenerator *pGen, VFStore *pStore)
 {
 	return pRoot->InsertVirtualFolder(pView, pName, pGen, pStore); 
 }
@@ -912,46 +912,6 @@ BOOL TreeViewVirtualFolderRoot::CanGrep(MemoSelectView *pView)
 BOOL TreeViewVirtualFolderRoot::GetFolderPath(MemoSelectView *pView, TString *pPath)
 {
 	return pPath->Set(TEXT(""));
-}
-
-TreeViewVirtualFolderRoot::ItemIterator *TreeViewVirtualFolderRoot::GetIterator(MemoSelectView *pView)
-{
-	return new ItemIterator(pView, this);
-}
-
-TreeViewVirtualFolderRoot::ItemIterator::ItemIterator(MemoSelectView *pv, TreeViewVirtualFolderRoot *p)
-{
-	pView = pv;
-	pRoot = p;
-	hWnd = pView->GetHWnd();
-}
-
-BOOL TreeViewVirtualFolderRoot::ItemIterator::First()
-{
-	HTREEITEM hItem = pRoot->GetViewItem();
-	hCurrentItem = TreeView_GetChild(hWnd, hItem);
-	return hCurrentItem != NULL;
-}
-
-BOOL TreeViewVirtualFolderRoot::ItemIterator::Next()
-{
-	hCurrentItem = TreeView_GetNextSibling(hWnd, hCurrentItem);
-	return hCurrentItem != NULL;
-}
-
-BOOL TreeViewVirtualFolderRoot::ItemIterator::Get(TString *pLabel)
-{
-	TCHAR buf[MAX_PATH * 2];
-	TV_ITEM ti;
-	ti.mask = TVIF_TEXT;
-	ti.hItem = hCurrentItem;
-	ti.pszText = buf;
-	ti.cchTextMax = MAX_PATH * 2 - 1;
-	TreeView_GetItem(hWnd, &ti);
-	DWORD n = _tcslen(ti.pszText);
-	if (!pLabel->Alloc(n + 1)) return FALSE;
-	_tcscpy(pLabel->Get(), ti.pszText);
-	return TRUE;
 }
 
 /////////////////////////////////////////////

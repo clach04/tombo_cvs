@@ -3,28 +3,20 @@
 
 class VFDirectoryGenerator;
 class VFStore;
+class File;
 
 /////////////////////////////////////////////
 //  Virtual folder definition
 /////////////////////////////////////////////
 
-#define VFINFO_FLG_CASESENSITIVE	1
-#define VFINFO_FLG_CHECKCRYPTED		2
-#define VFINFO_FLG_FILENAMEONLY		4
-#define VFINFO_FLG_PERSISTENT		8
-#define VFINFO_FLG_NEGATE			16
-
 class VFInfo {
 public:
-	VFInfo() : pName(NULL), pPath(NULL), pRegex(NULL) {}
+	VFInfo() : pName(NULL){}
 
 	void Release();
+	BOOL WriteXML(File *p);
 
 	LPTSTR pName;
-	LPTSTR pPath;
-	LPTSTR pRegex;
-	DWORD nFlag;
-
 	BOOL bPersist;
 	VFDirectoryGenerator *pGenerator;
 	VFStore *pStore;
@@ -37,7 +29,9 @@ public:
 class VirtualFolderEnumListener {
 public:
 	virtual ~VirtualFolderEnumListener();
-	virtual BOOL ProcessStream(LPCTSTR pName, VFDirectoryGenerator *pGen, VFStore *pStore) = 0;
+
+	// pGen and pStore is controled under callee. you must release stream.
+	virtual BOOL ProcessStream(LPCTSTR pName, BOOL bPersist, VFDirectoryGenerator *pGen, VFStore *pStore) = 0;
 };
 
 /////////////////////////////////////////////
@@ -47,6 +41,9 @@ public:
 class VFManager {
 	DWORD nGrepCount;
 	TVector<VFInfo> vbInfo;
+protected:
+	void ClearInfo();
+
 public:
 	/////////////////////////////////
 	// ctor & dtor
@@ -54,13 +51,21 @@ public:
 	~VFManager();
 	BOOL Init();
 
+	/////////////////////////////////
+	// factory methods
 	BOOL StreamObjectsFactory(const VFInfo *pInfo, VFDirectoryGenerator **ppGen, VFStore **ppStore);
-
 	const VFInfo *GetGrepVFInfo(LPCTSTR pPath, LPCTSTR pRegex,
 							BOOL bIsCaseSensitive, BOOL bCheckCrypt, BOOL bCheckFileName, BOOL bNegate);
 
+	/////////////////////////////////
+	// enumerators
 	BOOL Enum(VirtualFolderEnumListener *pListener);
 	BOOL RetrieveInfo(const VFInfo *pInfo, VirtualFolderEnumListener *pListener);
+
+	/////////////////////////////////
+	// Update folders
+	BOOL UpdateVirtualFolders(VFInfo **ppInfo, DWORD nNumFolders);
+
 };
 
 #endif

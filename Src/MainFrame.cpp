@@ -2459,7 +2459,7 @@ void MainFrame::SetTopMost()
 void MainFrame::OnVFolderDef()
 {
 	FilterCtlDlg dlg;
-	if (!dlg.Init(&msView)) return;
+	if (!dlg.Init(&msView, pVFManager)) return;
 	
 	dlg.Popup(g_hInstance, hMainWnd, hSelectViewImgList);
 }

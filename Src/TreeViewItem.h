@@ -197,21 +197,6 @@ public:
 	BOOL AddSearchResult(MemoSelectView *pView, const VFInfo *p);
 	BOOL InsertVirtualFolder(MemoSelectView *pView, LPCTSTR pName, VFDirectoryGenerator *pGen, VFStore *pStore);
 
-	class ItemIterator {
-		TreeViewVirtualFolderRoot *pRoot;
-		MemoSelectView *pView;
-		HWND hWnd;
-		HTREEITEM hCurrentItem;
-	public:
-		ItemIterator(MemoSelectView *pView, TreeViewVirtualFolderRoot *p);
-		BOOL First();
-		BOOL Next();
-		BOOL Get(TString *pLabel);
-
-	};
-
-	ItemIterator *GetIterator(MemoSelectView *pView);
-
 	////////////////////////////
 	// common methods
 

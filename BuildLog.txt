@@ -305,6 +305,17 @@ PG: Change copyright dialog for expat.
 
 * Save memo failed(3)." occured when saving new notes to root folder(#1781,#1782).
 
+////////////////////////////////
+// B100
+////////////////////////////////
+
+* Impliment timestamp filter.
+* Impliment sort filter.
+* Impliment filter control dialog
+
+PG: Add ItemIterator
+PG: Add FilterControl dialog. Implimentation is yet.
+PG: Refactoring around VirtualFolderRoot.
 
 /////////////////////////////////////////////////////////////////////////
 // TODO
