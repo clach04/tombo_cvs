@@ -8,6 +8,9 @@
 // It is due to caller.
 
 class VarBufferImpl {
+#ifdef UNIT_TEST
+public:
+#endif
 	LPBYTE pBuf;
 	DWORD nInitBytes;
 	DWORD nDeltaBytes;

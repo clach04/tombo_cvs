@@ -2,7 +2,9 @@
 #include <tchar.h>
 #include "UniConv.h"
 #include "Tombo.h"
+#ifndef UNIT_TEST
 #include "Property.h"
+#endif
 #include "TString.h"
 
 // ヘッドライン除外文字列
@@ -69,6 +71,7 @@ BOOL MyString::Join(LPCTSTR p1, LPCTSTR p2, LPCTSTR p3, LPCTSTR p4)
 	return TRUE;
 }
 
+#ifndef UNIT_TEST
 BOOL TString::AllocFullPath(LPCTSTR pPath)
 {
 	DWORD n = _tcslen(pPath) + _tcslen(g_Property.TopDir()) + 1;
@@ -76,6 +79,7 @@ BOOL TString::AllocFullPath(LPCTSTR pPath)
 	wsprintf(pString, TEXT("%s\\%s"), g_Property.TopDir(), pPath);
 	return TRUE;
 }
+#endif
 
 BOOL TString::GetDirectoryPath(LPCTSTR pFullPath)
 {
