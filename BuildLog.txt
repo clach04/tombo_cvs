@@ -864,3 +864,10 @@ Finding and encrypting to the folder may not work.
 * Support encryption to folder.
 * Add option tab.
 
+////////////////////////////////
+// B168
+////////////////////////////////
+
+* FIX: bookmark is not work
+* FIX: Copy of *.chs file is not work
+

@@ -167,7 +167,14 @@ BOOL TreeViewFileItem::Encrypt(MemoManager *pMgr, MemoSelectView *pView)
 	URIOption opt(NOTE_OPTIONMASK_ENCRYPTED);
 	opt.bEncrypt = TRUE;
 	if (!g_Repository.SetOption(loc.getURI(), &opt)) {
-		MessageBox(NULL, g_mMsgRes.GetMsg(opt.nErrorCode), TEXT("TOMBO"), opt.iLevel | MB_OK);
+		switch(GetLastError()) {
+		case ERROR_TOMBO_W_DELETEOLD_FAILED:
+			MessageBox(NULL, MSG_DELETE_PREV_CRYPT_MEMO_FAILED, TOMBO_APP_NAME, MB_ICONWARNING | MB_OK);
+			break;
+		default:
+			MessageBox(NULL, MSG_ENCRYPT_FAILED, TOMBO_APP_NAME, MB_ICONERROR | MB_OK);
+			break;
+		}
 		return FALSE;
 	}
 	// replace MemoNote that TreeViewItem have
@@ -196,7 +203,14 @@ BOOL TreeViewFileItem::Decrypt(MemoManager *pMgr, MemoSelectView *pView)
 	URIOption opt(NOTE_OPTIONMASK_ENCRYPTED);
 	opt.bEncrypt = FALSE;
 	if (!g_Repository.SetOption(loc.getURI(), &opt)) {
-		MessageBox(NULL, g_mMsgRes.GetMsg(opt.nErrorCode), TEXT("TOMBO"), opt.iLevel | MB_OK);
+		switch(GetLastError()) {
+		case ERROR_TOMBO_W_DELETEOLD_FAILED:
+			MessageBox(NULL, MSG_DEL_PREV_DECRYPT_MEMO_FAILED, TOMBO_APP_NAME, MB_ICONWARNING | MB_OK);
+			break;
+		default:
+			MessageBox(NULL, MSG_DECRYPT_FAILED, TOMBO_APP_NAME, MB_ICONERROR | MB_OK);
+			break;
+		}
 		return FALSE;
 	}
 
@@ -227,12 +241,21 @@ BOOL TreeViewFileItem::Rename(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR 
 {
 	URIOption opt;
 	if (!g_Repository.ChangeHeadLine(loc.getURI(), pNewHeadLine, &opt)) {
-		if (opt.nErrorCode != -1) {
-			TomboMessageBox(NULL, g_mMsgRes.GetMsg(opt.nErrorCode), TOMBO_APP_NAME, opt.iLevel | MB_OK);
-		} else {
-			TCHAR buf[MAX_PATH];
-			wsprintf(buf, MSG_RENAME_FAILED, GetLastError());
-			TomboMessageBox(NULL, buf, TOMBO_APP_NAME, MB_ICONERROR | MB_OK);
+		switch(GetLastError()) {
+		case ERROR_NO_DATA:
+			TomboMessageBox(NULL, MSG_NO_FILENAME, TOMBO_APP_NAME, MB_ICONWARNING | MB_OK);
+			break;
+		case ERROR_ALREADY_EXISTS:
+			TomboMessageBox(NULL, MSG_SAME_FILE, TOMBO_APP_NAME, MB_ICONWARNING | MB_OK);
+			break;
+		case ERROR_TOMBO_I_OPERATION_NOT_PERFORMED:
+			return TRUE;
+		default:
+			{
+				TCHAR buf[MAX_PATH];
+				wsprintf(buf, MSG_RENAME_FAILED, GetLastError());
+				TomboMessageBox(NULL, buf, TOMBO_APP_NAME, MB_ICONERROR | MB_OK);
+			}
 		}
 		return FALSE;
 	}
@@ -468,31 +491,36 @@ BOOL TreeViewFolderItem::Copy(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR 
 
 BOOL TreeViewFolderItem::Delete(MemoManager *pMgr, MemoSelectView *pView)
 {
-	TCHAR buf[MAX_PATH];
-	TString sCurrentPath;
-	HTREEITEM hItem = GetViewItem();
-	LPTSTR pCurrentPath = pView->GeneratePath(hItem, buf, MAX_PATH);
-	if (!sCurrentPath.Join(g_Property.TopDir(), TEXT("\\"), pCurrentPath)) return FALSE;
+	TomboURI sURI;
+	if (!pView->GetURI(&sURI)) return FALSE;
+	if (sURI.IsRoot()) return TRUE;
+	if (TomboMessageBox(NULL, MSG_CONFIRM_DEL_FOLDER, MSG_DEL_FOLDER_TTL, MB_ICONQUESTION | MB_OKCANCEL) != IDOK) return FALSE;
 
-	if (_tcslen(pCurrentPath) == 0 ||
-		TomboMessageBox(NULL, MSG_CONFIRM_DEL_FOLDER, MSG_DEL_FOLDER_TTL, MB_ICONQUESTION | MB_OKCANCEL) != IDOK) return FALSE;
-
-	// 移動しようとしているフォルダに詳細ビューでActiveになっているメモが
-	// 存在するかもしれないので詳細ビューを一旦InActiveにする
+	// inactivate notes
 	pMgr->InactiveDetailsView();
 
-	// ツリーのCollapse
+	// Collapse tree
 	pView->TreeCollapse(GetViewItem());
 
-	MemoFolder mf;
-	mf.Init(g_Property.TopDir(), sCurrentPath.Get());	
-	if (mf.Delete()) {
-		return TRUE;
-	} else {
-		LPCTSTR pErr = mf.GetErrorReason();
-		MessageBox(NULL, pErr ? pErr : MSG_NOT_ENOUGH_MEMORY, TOMBO_APP_NAME, MB_ICONERROR | MB_OK);
+	URIOption opt;
+	if (!g_Repository.Delete(&sURI, &opt)) {
+		switch(GetLastError()) {
+		case ERROR_TOMBO_W_OTHERFILE_EXISTS:
+			MessageBox(NULL, MSG_OTHER_FILE_EXISTS, TOMBO_APP_NAME, MB_ICONWARNING | MB_OK);
+			break;
+		case ERROR_TOMBO_E_RMFILE_FAILED:
+			MessageBox(NULL, MSG_RMFILE_FAILED, TOMBO_APP_NAME, MB_ICONERROR | MB_OK);
+			break;
+		case ERROR_TOMBO_E_RMDIR_FAILED:
+			MessageBox(NULL, MSG_RMDIR_FAILED, TOMBO_APP_NAME, MB_ICONERROR | MB_OK);
+			break;
+		default:
+			MessageBox(NULL, MSG_DELETE_FAILED, TOMBO_APP_NAME, MB_ICONERROR | MB_OK);
+			break;
+		}
 		return FALSE;
 	}
+	return TRUE;
 }
 
 BOOL TreeViewFolderItem::Encrypt(MemoManager *pMgr, MemoSelectView *pView)
@@ -510,8 +538,14 @@ BOOL TreeViewFolderItem::Encrypt(MemoManager *pMgr, MemoSelectView *pView)
 	URIOption opt(NOTE_OPTIONMASK_ENCRYPTED);
 	opt.bEncrypt = TRUE;
 	if (!g_Repository.SetOption(&sURI, &opt)) {
-		MessageBox(NULL, opt.pErrorReason, TOMBO_APP_NAME, opt.iLevel | MB_OK);
-		return TRUE;
+		switch(GetLastError()) {
+		case ERROR_TOMBO_I_GET_PASSWORD_CANCELED:
+			MessageBox(NULL, MSG_GET_PASS_FAILED, TOMBO_APP_NAME, MB_ICONINFORMATION | MB_OK);
+			return TRUE;
+		default:
+			MessageBox(NULL, MSG_ENCRYPT_FAILED, TOMBO_APP_NAME, MB_ICONERROR | MB_OK);
+			return FALSE;
+		}
 	}
 	return TRUE;
 }
@@ -531,8 +565,14 @@ BOOL TreeViewFolderItem::Decrypt(MemoManager *pMgr, MemoSelectView *pView)
 	URIOption opt(NOTE_OPTIONMASK_ENCRYPTED);
 	opt.bEncrypt = FALSE;
 	if (!g_Repository.SetOption(&sURI, &opt)) {
-		MessageBox(NULL, opt.pErrorReason, TOMBO_APP_NAME, opt.iLevel | MB_OK);
-		return TRUE;
+		switch(GetLastError()) {
+		case ERROR_TOMBO_I_GET_PASSWORD_CANCELED:
+			MessageBox(NULL, MSG_GET_PASS_FAILED, TOMBO_APP_NAME, MB_ICONINFORMATION | MB_OK);
+			return TRUE;
+		default:
+			MessageBox(NULL, MSG_DECRYPT_FAILED, TOMBO_APP_NAME, MB_ICONERROR | MB_OK);
+			return FALSE;
+		}	
 	}
 	return TRUE;
 }

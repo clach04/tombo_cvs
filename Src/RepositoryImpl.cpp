@@ -350,6 +350,38 @@ BOOL LocalFileRepository::SetOption(const TomboURI *pCurrentURI, URIOption *pOpt
 }
 
 /////////////////////////////////////////
+// Get safe file name
+/////////////////////////////////////////
+
+BOOL LocalFileRepository::GetSafeFileName(const TString *pBasePath, TString *pNewName)
+{
+	TString s;
+
+	if (!s.Alloc(_tcslen(pBasePath->Get()) + 20 + 1)) return FALSE;
+	_tcscpy(s.Get(), pBasePath->Get());
+	_tcscat(s.Get(), TEXT("0000000000000000.chs"));
+
+	LPTSTR pFileNamePart = s.Get() + _tcslen(pBasePath->Get());
+	int nw;
+	do {
+		// generate 10digit random number
+		nw = rand() % 10000;
+		wsprintf(pFileNamePart, TEXT("%04d"), nw);
+		nw = rand() % 10000;
+		wsprintf(pFileNamePart + 4, TEXT("%04d"), nw);
+		nw = rand() % 10000;
+		wsprintf(pFileNamePart + 8, TEXT("%04d"), nw);
+		nw = rand() % 10000;
+		wsprintf(pFileNamePart + 12, TEXT("%04d"), nw);
+		_tcscpy(pFileNamePart + 16, TEXT(".chs"));
+	} while(IsFileExist(s.Get())); // if same name exists, retry it
+
+	if (!pNewName->Set(pFileNamePart)) return FALSE;
+
+	return TRUE;
+}
+
+/////////////////////////////////////////
 // Decide new allocated filename
 /////////////////////////////////////////
 
@@ -359,22 +391,12 @@ BOOL LocalFileRepository::NegotiateNewName(LPCTSTR pMemoPath, LPCTSTR pText, LPC
 	TString sHeadLine;
 
 	if (pOpt->bSafeFileName) {
-		// decide file name
-		if (!pFullPath->Join(pTopDir, TEXT("\\"), pMemoDir, TEXT("0000000000000000.chs"))) return FALSE;
-		LPTSTR pFileNamePart = pFullPath->Get() + _tcslen(pTopDir) + 1 + _tcslen(pMemoDir);
-		int nw;
-		do {
-			// generate 10digit random number
-			nw = rand() % 10000;
-			wsprintf(pFileNamePart, TEXT("%04d"), nw);
-			nw = rand() % 10000;
-			wsprintf(pFileNamePart + 4, TEXT("%04d"), nw);
-			nw = rand() % 100;
-			wsprintf(pFileNamePart + 8, TEXT("%04d"), nw);
-			nw = rand() % 100;
-			wsprintf(pFileNamePart + 12, TEXT("%04d"), nw);
-			_tcscpy(pFileNamePart + 16, TEXT(".chs"));
-		} while(IsFileExist(pFullPath->Get())); // if same name exists, retry it
+		TString sBase;
+		TString sNewName;
+		if (!sBase.Join(pTopDir, TEXT("\\"), pMemoDir)) return FALSE;
+		if (!GetSafeFileName(&sBase, &sNewName)) return FALSE;
+
+		if (!pFullPath->Join(sBase.Get(), sNewName.Get())) return FALSE;
 
 		*ppNotePath = pFullPath->Get() + _tcslen(pTopDir) + 1;
 		if (!MemoNote::GetHeadLineFromMemoText(pText, pNewHeadLine)) return FALSE;
@@ -448,8 +470,7 @@ BOOL LocalFileRepository::EncryptLeaf(const TomboURI *pPlainURI, URIOption *pOpt
 	if (pOption->pNewURI == NULL) return FALSE;
 
 	if (!pPlain->DeleteMemoData()) {
-		pOption->nErrorCode = MSG_ID_DELETE_PREV_CRYPT_MEMO_FAILED;
-		pOption->iLevel = MB_ICONWARNING;
+		SetLastError(ERROR_TOMBO_W_DELETEOLD_FAILED);
 		return FALSE;
 	}
 
@@ -473,8 +494,7 @@ BOOL LocalFileRepository::DecryptLeaf(const TomboURI *pCurrentURI, URIOption *pO
 	if (!p->GetURI(pOption->pNewURI)) return FALSE;
 
 	if (!pCur->DeleteMemoData()) {
-		pOption->nErrorCode = MSG_ID_DEL_PREV_DECRYPT_MEMO_FAILED;
-		pOption->iLevel = MB_ICONWARNING;
+		SetLastError(ERROR_TOMBO_W_DELETEOLD_FAILED);
 		return FALSE;
 	}
 
@@ -488,35 +508,22 @@ BOOL LocalFileRepository::DecryptLeaf(const TomboURI *pCurrentURI, URIOption *pO
 BOOL LocalFileRepository::EnDecryptFolder(const TomboURI *pCurrentURI, URIOption *pOption)
 {
 	TString sPath;
-	if (!GetPhysicalPath(pCurrentURI, &sPath)) {
-		pOption->iLevel = MB_ICONERROR;
-		pOption->pErrorReason = MSG_NOT_ENOUGH_MEMORY;
-		return FALSE;
-	}
+	if (!GetPhysicalPath(pCurrentURI, &sPath)) return FALSE;
 
 	DSEncrypt fc;
-	if (!fc.Init(pTopDir, sPath.Get(), pCurrentURI->GetFullURI(), pOption->bEncrypt)) {
-		pOption->iLevel = MB_ICONERROR;
-		pOption->pErrorReason = MSG_NOT_ENOUGH_MEMORY;
-		return FALSE;
-	}
+	if (!fc.Init(pTopDir, sPath.Get(), pCurrentURI->GetFullURI(), pOption->bEncrypt)) return FALSE;
 
 	// ask password
 	BOOL bCancel;
 	const char *pPass = g_pPassManager->Password(&bCancel, pOption->bEncrypt);
 	if (pPass == NULL) {
-		pOption->iLevel = MB_ICONINFORMATION;
-		pOption->pErrorReason = MSG_GET_PASS_FAILED;
+		SetLastError(ERROR_TOMBO_I_GET_PASSWORD_CANCELED);
 		return FALSE;
 	}
 
 	// scan and encrypt/decrypt
 	if (!fc.Scan() || fc.nNotEncrypted != 0) {
-		pOption->iLevel = MB_ICONERROR;
-		pOption->pErrorReason = StringDup(fc.pErrorReason);
-		if (pOption->pErrorReason == NULL) {
-			pOption->pErrorReason = MSG_NOT_ENOUGH_MEMORY;
-		}		
+		SetLastError(ERROR_TOMBO_E_SOME_ERROR_OCCURED);
 		return FALSE;
 	}
 	return TRUE;
@@ -535,7 +542,14 @@ BOOL LocalFileRepository::Delete(const TomboURI *pURI, URIOption *pOption)
 
 		return pNote->DeleteMemoData();
 	} else {
-		// TODO : impliment
+		TString sFullPath;
+		if (!GetPhysicalPath(pURI, &sFullPath)) return FALSE;
+		
+		DSFileDelete fd;
+		fd.Init(sFullPath.Get());
+		if (!fd.Scan()) {
+			return FALSE;
+		}
 	}
 	return TRUE;
 }
@@ -573,24 +587,65 @@ BOOL LocalFileRepository::GetPhysicalPath(const TomboURI *pURI, TString *pFullPa
 
 BOOL LocalFileRepository::Copy(const TomboURI *pCopyFrom, const TomboURI *pCopyTo, URIOption *pOption)
 {
-	MemoNote *pNote = MemoNote::MemoNoteFactory(pCopyFrom);
-	if (pNote == NULL) return FALSE;
-	AutoPointer<MemoNote> ap(pNote);
+	URIOption opt1(NOTE_OPTIONMASK_ENCRYPTED | NOTE_OPTIONMASK_SAFEFILE | NOTE_OPTIONMASK_VALID);
+	if (!GetOption(pCopyFrom, &opt1)) return FALSE;
 
-	TString sToPath;
-	if (!GetPhysicalPath(pCopyTo, &sToPath)) return FALSE;
+	URIOption opt2(NOTE_OPTIONMASK_VALID);
+	if (!GetOption(pCopyTo, &opt2)) return FALSE;
 
-	LPCTSTR pMemoPath = sToPath.Get() + _tcslen(pTopDir) + 1;
+	if (!opt1.bValid || !opt2.bValid || !opt2.bFolder) {
+		SetLastError(ERROR_TOMBO_E_INVALIDURI);
+		return FALSE;
+	}
 
-	if ((pOption->pNewHeadLine = new TString()) == NULL) return FALSE;
-	if ((pOption->pNewURI = new TomboURI()) == NULL) return FALSE;
+	if (opt1.bFolder) {
+		// TODO: impliment
+		return FALSE;
+	} else {
+		if ((pOption->pNewHeadLine = new TString()) == NULL) { SetLastError(ERROR_NOT_ENOUGH_MEMORY); return FALSE; }
+		if ((pOption->pNewURI = new TomboURI()) == NULL) { SetLastError(ERROR_NOT_ENOUGH_MEMORY); return FALSE; }
 
-	MemoNote *pNewNote = MemoNote::CopyMemo(pNote, pMemoPath, pOption->pNewHeadLine);
-	if (pNewNote == NULL) return FALSE;
-	AutoPointer<MemoNote> ap2(pNewNote);
+		TString sToPath;
+		if (!GetPhysicalPath(pCopyTo, &sToPath)) return FALSE;
 
-	pNewNote->GetURI(pOption->pNewURI);
-	return TRUE;
+		if (opt1.bSafeFileName) {
+			TString sOrigFull;
+			if (!GetPhysicalPath(pCopyFrom, &sOrigFull)) return FALSE;
+
+			TString sBase;
+			if (!pCopyFrom->GetBaseName(&sBase)) return FALSE;
+			TString sNewPath;
+			if (!sNewPath.Join(sToPath.Get(), sBase.Get())) return FALSE;
+			if (IsFileExist(sNewPath.Get())) {
+				TString sNewBase;
+				if (!GetSafeFileName(&sToPath, &sNewBase)) return FALSE;
+				if (!sNewPath.Join(sToPath.Get(), sNewBase.Get())) return FALSE;
+				if (!sBase.Set(sNewBase.Get())) return FALSE;
+			}
+			if (!CopyFile(sOrigFull.Get(), sNewPath.Get(), TRUE)) return FALSE;
+
+			if (!GetHeadLine(pCopyFrom, pOption->pNewHeadLine)) return FALSE;
+
+			TString sNewURI;
+			if (!sNewURI.Join(pCopyTo->GetFullURI(), sBase.Get())) return FALSE;
+			if (!pOption->pNewURI->Init(sNewURI.Get())) return FALSE;
+
+			return TRUE;
+		} else {
+			MemoNote *pNote = MemoNote::MemoNoteFactory(pCopyFrom);
+			if (pNote == NULL) return FALSE;
+			AutoPointer<MemoNote> ap(pNote);
+
+			LPCTSTR pMemoPath = sToPath.Get() + _tcslen(pTopDir) + 1;
+
+			MemoNote *pNewNote = MemoNote::CopyMemo(pNote, pMemoPath, pOption->pNewHeadLine);
+			if (pNewNote == NULL) return FALSE;
+			AutoPointer<MemoNote> ap2(pNewNote);
+
+			pNewNote->GetURI(pOption->pNewURI);
+			return TRUE;
+		}
+	}
 }
 
 /////////////////////////////////////////
@@ -599,26 +654,22 @@ BOOL LocalFileRepository::Copy(const TomboURI *pCopyFrom, const TomboURI *pCopyT
 
 BOOL LocalFileRepository::ChangeHeadLine(const TomboURI *pURI, LPCTSTR pReqNewHeadLine, URIOption *pOption)
 {
+	URIOption opt(NOTE_OPTIONMASK_ENCRYPTED | NOTE_OPTIONMASK_SAFEFILE | NOTE_OPTIONMASK_VALID);
+	if (!GetOption(pURI, &opt)) return FALSE;
+	if (opt.bValid == FALSE) {
+		SetLastError(ERROR_TOMBO_E_INVALIDURI);
+		return FALSE;
+	}
+	if (opt.bEncrypt && opt.bSafeFileName) {
+		SetLastError(ERROR_TOMBO_I_OPERATION_NOT_PERFORMED);
+		return FALSE;
+	}
+
 	MemoNote *pNote = MemoNote::MemoNoteFactory(pURI);
 	if (pNote == NULL) return FALSE;
 	AutoPointer<MemoNote> ap(pNote);
 
-	if (!pNote->Rename(pReqNewHeadLine)) {
-		switch (GetLastError()) {
-		case ERROR_NO_DATA:
-			pOption->iLevel = MB_ICONWARNING;
-			pOption->nErrorCode = MSG_ID_NO_FILENAME;
-			break;
-		case ERROR_ALREADY_EXISTS:
-			pOption->iLevel = MB_ICONWARNING;
-			pOption->nErrorCode = MSG_ID_SAME_FILE;
-			break;
-		default:
-			pOption->iLevel = MB_ICONERROR;
-			pOption->nErrorCode = -1;
-		}
-		return FALSE;
-	}
+	if (!pNote->Rename(pReqNewHeadLine)) return FALSE;
 
 	TomboURI *p = new TomboURI();
 	if (p == NULL || !pNote->GetURI(p)) {

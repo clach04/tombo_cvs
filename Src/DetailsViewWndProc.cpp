@@ -174,14 +174,10 @@ LRESULT CALLBACK NewDetailsViewProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM l
 			rgi.dwFlags = SHRG_RETURNCMD;
 
 			if (SHRecognizeGesture(&rgi) == GN_CONTEXTMENU) {
-				//IDR_MENUBAR1
+				CallWindowProc(gSuperProc, hwnd, msg, wParam, lParam);
+
 				HMENU hPopup = PocketPCPlatform::LoadDetailsViewPopupMenu();
-//				HMENU hX;
-//				HMENU hPopup;
-//				hX = LoadMenu(g_hInstance, MAKEINTRESOURCE(IDR_MENUBAR1));
-//				hPopup = GetSubMenu(hX, 0);
 				TrackPopupMenuEx(hPopup, 0, rgi.ptDown.x, rgi.ptDown.y, hwnd, NULL);
-//				DestroyMenu(hX);
 				DestroyMenu(hPopup);
 				return 0;
 			}

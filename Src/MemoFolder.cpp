@@ -62,23 +62,8 @@ BOOL MemoFolder::Move(LPCTSTR pDst)
 }
 
 ///////////////////////////////////////////////
-// ディレクトリ削除
+// Delete directory
 ///////////////////////////////////////////////
-
-class DSFileDelete: public DirectoryScanner {
-public:
-	TCHAR aFailPath[MAX_PATH * 2];
-	TCHAR aErrorMsg[1024];
-
-	DSFileDelete();
-
-	BOOL Init(LPCTSTR pPath); 
-	void InitialScan();
-	void AfterScan();
-	void PreDirectory(LPCTSTR);
-	void PostDirectory(LPCTSTR);
-	void File(LPCTSTR);
-};
 
 DSFileDelete::DSFileDelete(){ /* NOP */}
 
@@ -98,8 +83,9 @@ void DSFileDelete::PostDirectory(LPCTSTR)
 		ChopFileSeparator(buf);
 		if (!RemoveDirectory(buf)) {
 			_tcscpy(aFailPath, buf);
-			_tcscpy(aErrorMsg, MSG_RMDIR_FAILED);
+//			_tcscpy(aErrorMsg, MSG_RMDIR_FAILED);
 			StopScan();
+			SetLastError(ERROR_TOMBO_E_RMDIR_FAILED);
 		}
 	}
 }
@@ -111,31 +97,21 @@ void DSFileDelete::AfterScan()
 
 void DSFileDelete::File(LPCTSTR p)
 {
-	// TOMBO管轄以外のファイルがあった場合に誤って消去しないようにチェック
+	// if the file that TOMBO is not treat exists, stop deleting. 
 	if (MemoNote::IsNote(CurrentPath()) == NOTE_TYPE_NO) {
 		_tcscpy(aFailPath, CurrentPath());
-		_tcscpy(aErrorMsg, MSG_OTHER_FILE_EXISTS);
 		StopScan();
+		SetLastError(ERROR_TOMBO_W_OTHERFILE_EXISTS);
 		return;
 	}
 
-	// 削除処理
+	// Delete
 	if (!DeleteFile(CurrentPath())) {
 		_tcscpy(aFailPath, CurrentPath());
-		_tcscpy(aErrorMsg, MSG_RMFILE_FAILED);
+//		_tcscpy(aErrorMsg, MSG_RMFILE_FAILED);
 		StopScan();
+		SetLastError(ERROR_TOMBO_E_RMFILE_FAILED);
 	}
-}
-
-BOOL MemoFolder::Delete()
-{
-	DSFileDelete fd;
-	fd.Init(pFullPath);
-	BOOL bResult = fd.Scan();
-	if (!bResult) {
-		sErrorReason.Join(fd.aErrorMsg, TEXT(" : "), fd.aFailPath);
-	}
-	return bResult;
 }
 
 ///////////////////////////////////////////////
@@ -269,7 +245,6 @@ BOOL DSEncrypt::CheckURIBuffer(LPCTSTR p)
 	if (nCurrentPos + _tcslen(p) > nURIBufSize) {
 		TString *pNewBuf = new TString();
 		if (pNewBuf == NULL || !pNewBuf->Alloc(nURIBufSize + MAX_PATH)) {
-			pErrorReason = MSG_NOT_ENOUGH_MEMORY;
 			StopScan();
 			return FALSE;
 		}
@@ -306,14 +281,12 @@ void DSEncrypt::File(LPCTSTR pFile)
 
 	TomboURI sURI;
 	if (!sURI.Init(pURI->Get())) {
-		pErrorReason = MSG_NOT_ENOUGH_MEMORY;
 		StopScan();
 		return;
 	}
 
 	URIOption gopt(NOTE_OPTIONMASK_VALID | NOTE_OPTIONMASK_ENCRYPTED);
 	if (!g_Repository.GetOption(&sURI, &gopt)) {
-		pErrorReason = gopt.pErrorReason;
 		nNotEncrypted++;
 		return;
 	}
@@ -324,7 +297,6 @@ void DSEncrypt::File(LPCTSTR pFile)
 	URIOption opt(NOTE_OPTIONMASK_ENCRYPTED);
 	opt.bEncrypt = bEncrypt;
 	if (!g_Repository.SetOption(&sURI, &opt)) {
-		pErrorReason = opt.pErrorReason;
 		nNotEncrypted++;
 		return;
 	}

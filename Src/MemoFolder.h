@@ -26,7 +26,6 @@ public:
 
 	BOOL Copy(LPCTSTR pDst);
 	BOOL Move(LPCTSTR pDst);
-	BOOL Delete();
 	BOOL Rename(LPCTSTR pNewName);
 
 	LPCTSTR GetErrorReason() { return sErrorReason.Get(); }
@@ -50,7 +49,6 @@ protected:
 
 public:
 	DWORD nNotEncrypted;
-	LPCTSTR pErrorReason;
 
 	~DSEncrypt();
 	// If bEncrypt is FALSE, decrypt files.
@@ -58,6 +56,25 @@ public:
 
 	void InitialScan() {}
 	void AfterScan() {}
+	void PreDirectory(LPCTSTR);
+	void PostDirectory(LPCTSTR);
+	void File(LPCTSTR);
+};
+
+///////////////////////////////////////////////
+// Delete directory
+///////////////////////////////////////////////
+
+class DSFileDelete: public DirectoryScanner {
+public:
+	TCHAR aFailPath[MAX_PATH * 2];
+	TCHAR aErrorMsg[1024];
+
+	DSFileDelete();
+
+	BOOL Init(LPCTSTR pPath); 
+	void InitialScan();
+	void AfterScan();
 	void PreDirectory(LPCTSTR);
 	void PostDirectory(LPCTSTR);
 	void File(LPCTSTR);

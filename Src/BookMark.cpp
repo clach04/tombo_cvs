@@ -5,7 +5,6 @@
 #include "TomboURI.h"
 #include "UniConv.h"
 #include "BookMark.h"
-#include "MemoNote.h"
 
 #include "Repository.h"
 
@@ -66,8 +65,6 @@ const BookMarkItem *BookMark::Assign(LPCTSTR pPath)
 
 	TomboURI tURI;
 	if (!tURI.Init(pPath)) return NULL;
-//	Repository *pRepo = g_RepositoryFactory.GetRepository(&tURI);
-//	if (pRepo == NULL || !pRepo->GetHeadLine(&tURI, &sTitle)) return NULL;
 	if (!g_Repository.GetHeadLine(&tURI, &sTitle)) return NULL;
 
 	BookMarkItem bi;

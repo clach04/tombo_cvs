@@ -18,6 +18,25 @@ class RepositoryOption;
 //#define NOTE_OPTIONMASK_POSITION  2
 
 /////////////////////////////////////////
+// Custom error code
+/////////////////////////////////////////
+
+#define ERROR_TOMBO_REP_CODE_BASE_ERROR (0x24000000)
+#define ERROR_TOMBO_REP_CODE_BASE_WARN  (0x22000000)
+#define ERROR_TOMBO_REP_CODE_BASE_INFO  (0x21000000)
+
+#define ERROR_TOMBO_E_INVALIDURI         (ERROR_TOMBO_REP_CODE_BASE_ERROR + 1)
+#define ERROR_TOMBO_E_SOME_ERROR_OCCURED (ERROR_TOMBO_REP_CODE_BASE_ERROR + 2)
+#define ERROR_TOMBO_E_RMFILE_FAILED      (ERROR_TOMBO_REP_CODE_BASE_ERROR + 3)
+#define ERROR_TOMBO_E_RMDIR_FAILED       (ERROR_TOMBO_REP_CODE_BASE_ERROR + 4)
+
+#define ERROR_TOMBO_W_DELETEOLD_FAILED   (ERROR_TOMBO_REP_CODE_BASE_WARN + 1)
+#define ERROR_TOMBO_W_OTHERFILE_EXISTS   (ERROR_TOMBO_REP_CODE_BASE_ERROR + 2)
+
+#define ERROR_TOMBO_I_OPERATION_NOT_PERFORMED (ERROR_TOMBO_REP_CODE_BASE_INFO + 1)
+#define ERROR_TOMBO_I_GET_PASSWORD_CANCELED   (ERROR_TOMBO_REP_CODE_BASE_INFO + 2)
+
+/////////////////////////////////////////
 // Repository options
 /////////////////////////////////////////
 
@@ -52,9 +71,25 @@ public:
 
 	BOOL Delete(const TomboURI *pURI, URIOption *pOption);
 	BOOL Copy(const TomboURI *pCopyFrom, const TomboURI *pCopyTo, URIOption *pOption);
+
+	// Rename headline
+	// Repository data is updated if necessary.
 	BOOL ChangeHeadLine(const TomboURI *pURI, LPCTSTR pReqNewHeadLine, URIOption *pOption);
 
+	// get option from URI
+	//
+	// if NOTE_OPTIONMASK_VALID is set by pOption, bValid and bFolder is effective.
+	// if NOTE_OPTIONMASK_ENCRYPTED is set, bEncrypt is effective.
+	// if NOTE_OPTIONMASK_SAFEFILE is set, bSafeFile is effective.
 	BOOL GetOption(const TomboURI *pURI, URIOption *pOption);
+
+	// set option from URI
+	//
+	// if NOTE_OPTIONMASK_ENCRYPTED is set and bEncrypt is TRUE and bSafeFile is FALSE, encrypt to the URI by normal mode.
+	// if NOTE_OPTIONMASK_ENCRYPTED is set and bEncrypt is TRUE and bSafeFile is TRUE, encrypt to the URI by safefile mode.
+	// if NOTE_OPTIONMASK_ENCRYPTED is set and bEncrypt is FALSE, decrypt to the URI.
+	//
+	// In current implimentation, change normal mode <-> safe file mode is not supported.
 	BOOL SetOption(const TomboURI *pCurrentURI, URIOption *pOption);
 
 	// Get real physical path from URI.
@@ -82,7 +117,7 @@ public:
 
 class URIOption {
 public:
-	URIOption(DWORD flg = 0) : nFlg(flg), pNewURI(NULL), pNewHeadLine(NULL), pErrorReason(NULL) {}
+	URIOption(DWORD flg = 0) : nFlg(flg), pNewURI(NULL), pNewHeadLine(NULL) {}
 	~URIOption();
 
 	// request section
@@ -96,11 +131,6 @@ public:
 	// if these value is not set by NULL, delete when NoteOption is deleted.
 	TString *pNewHeadLine;
 	TomboURI *pNewURI;
-
-	// error info section
-	DWORD nErrorCode; // if success, value is 0
-	UINT iLevel; // MB_ICONERROR or MB_ICONWARNING
-	LPCTSTR pErrorReason;
 };
 
 

@@ -27,6 +27,7 @@ public:
 	virtual BOOL Update(TomboURI *pCurrentURI, LPCTSTR pData, TomboURI *pNewURI, TString *pNewHeadLine) = 0;
 	virtual BOOL Delete(const TomboURI *pURI, URIOption *pOption) = 0;
 	virtual BOOL Copy(const TomboURI *pCopyFrom, const TomboURI *pCopyTo, URIOption *pOption) = 0;
+
 	virtual BOOL ChangeHeadLine(const TomboURI *pURI, LPCTSTR pReqNewHeadLine, URIOption *pOption) = 0;
 
 	virtual BOOL GetHeadLine(const TomboURI *pURI, TString *pHeadLine) = 0;
@@ -71,6 +72,11 @@ protected:
 	BOOL NegotiateNewName(LPCTSTR pMemoPath, LPCTSTR pText, 
 							 LPCTSTR pMemoDir,
 							 TString *pFullPath, LPTSTR *ppNotePath, TString *pHeadLine);
+
+	////////////////////////////////////////
+	// others
+	BOOL GetSafeFileName(const TString *pBasePath, TString *pNewName);
+
 public:
 	LocalFileRepository();
 	virtual ~LocalFileRepository();

@@ -50,7 +50,6 @@ UINT WINAPI ImmGetVirtualKey(HWND);
 #endif
 #endif
 
-#include "MemoNote.h"
 #include "AboutDialog.h"
 #include "SearchDlg.h"
 #include "SearchEngine.h"
@@ -1874,7 +1873,7 @@ void MainFrame::OnBookMark(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	const BookMarkItem *pItem = pBookMark->Find(LOWORD(wParam));
 	if (pItem) {
 		TomboURI sURI;
-		if (sURI.Init(pItem->pPath)) return;
+		if (!sURI.Init(pItem->pPath)) return;
 		msView.ShowItemByURI(&sURI);
 	}
 }

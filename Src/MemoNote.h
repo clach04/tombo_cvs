@@ -6,8 +6,6 @@ class TString;
 class TomboURI;
 class Repository;
 
-#include "TreeViewItem.h"
-
 ////////////////////////////////////////
 // Note type definition
 ////////////////////////////////////////
@@ -63,7 +61,6 @@ public:
 	//     if headline string is changed, *pIsModified is set to TURE and
 	//     new headline string is set to buffer.
 
-	virtual MemoNote *Encrypt(PasswordManager *pMgr, TString *pHeadLine, BOOL *pIsModified) const;
 	virtual MemoNote *Decrypt(PasswordManager *pMgr, TString *pHeadLine, BOOL *pIsModified) const;
 
 	//////////////////////////////////
@@ -133,8 +130,6 @@ public:
 	char *GetMemoBodyA(PasswordManager *pMgr) const;
 
 	BOOL SaveData(PasswordManager *pMgr, const char *pMemo, LPCTSTR pWriteFile);
-
-	MemoNote *Encrypt(PasswordManager *pMgr, TString *pHeadLine, BOOL *pIsModified) const;
 };
 
 ////////////////////////////////////////

@@ -18,10 +18,6 @@
 
 #define DEFAULT_HEADLINE MSG_DEFAULT_HEADLINE
 
-// ヘッドライン文字列の取得
-//static BOOL GetHeadLineFromMemoText(LPCTSTR pMemo, TString *pHeadLine);
-//static BOOL GetHeadLineFromFilePath(LPCTSTR pFilePath, TString *pHeadLine);
-
 /////////////////////////////////////////////
 //
 /////////////////////////////////////////////
@@ -260,85 +256,6 @@ BOOL CryptedMemoNote::SaveData(PasswordManager *pMgr, const char *pText, LPCTSTR
 		return FALSE;
 	}
 	return cMgr.EncryptAndStore((LPBYTE)pText, strlen(pText), pWriteFile);
-}
-
-/////////////////////////////////////////////
-// 暗号化
-/////////////////////////////////////////////
-
-MemoNote *MemoNote::Encrypt(PasswordManager *pMgr, TString *pHeadLine, BOOL *pIsModified) const
-{
-	MessageBox(NULL, TEXT("MemoNote::Encrypt called"), TEXT("DEBUG"), MB_OK);
-	return NULL;
-}
-
-MemoNote *PlainMemoNote::Encrypt(PasswordManager *pMgr, TString *pHeadLine, BOOL *pIsModified) const
-{
-	TString sMemoDir;
-	if (!sMemoDir.GetDirectoryPath(pPath)) {
-		MessageBox(NULL, TEXT("GetDirectoryPath failed"), TEXT("DEBUG"), MB_OK);
-		return FALSE;
-	}
-
-	// メモ本文取得
-	LPTSTR pText = GetMemoBody(pMgr);
-	if (pText == NULL) {
-		MessageBox(NULL, TEXT("GetMemoBody failed"), TEXT("DEBUG"), MB_OK);
-		return FALSE;
-	}
-
-	// メモファイル名の確定
-	TString sFullPath;
-	LPTSTR pNotePath;
-	TString sHeadLine;
-
-	// ファイル名のベースネームを決定
-	if (g_Property.KeepTitle()) {
-		// チェックOFF時
-		if (!GetHeadLineFromFilePath(pPath, &sHeadLine)) {
-			MemoNote::WipeOutAndDelete(pText);
-			MessageBox(NULL, TEXT("GetHeadLineFromFilePath failed"), TEXT("DEBUG"), MB_OK);
-			return FALSE;
-		}
-	} else {
-		if (!GetHeadLineFromMemoText(pText, &sHeadLine)) {
-			MemoNote::WipeOutAndDelete(pText);
-			MessageBox(NULL, TEXT("GetHeadLineFromMemoText failed"), TEXT("DEBUG"), MB_OK);
-			return FALSE;
-		}
-	}
-
-	// 新ファイル名を決定
-	if (!GetHeadLinePath(sMemoDir.Get(), sHeadLine.Get(), TEXT(".chi"), &sFullPath, &pNotePath, pHeadLine)) {
-		MessageBox(NULL, TEXT("GetHeadLinePath failed"), TEXT("DEBUG"), MB_OK);
-		MemoNote::WipeOutAndDelete(pText);
-		return FALSE;
-	}
-
-	// 新しいMemoNoteインスタンスを生成
-	CryptedMemoNote *p = new CryptedMemoNote();
-	if (!p->Init(pNotePath)) {
-		MemoManager::WipeOutAndDeleteFile(sFullPath.Get());
-		MemoNote::WipeOutAndDelete(pText);
-		MessageBox(NULL, TEXT("new CryptedMemoNote failed"), TEXT("DEBUG"), MB_OK);
-		return FALSE;
-	}
-
-	char *pTextA = ConvUnicode2SJIS(pText);
-	MemoNote::WipeOutAndDelete(pText);
-	if (pTextA == NULL) {
-		MessageBox(NULL, TEXT("ConvUnicode2SJIS failed"), TEXT("DEBUG"), MB_OK);
-		return FALSE;
-	}
-	// メモ保存
-	if (!p->SaveData(pMgr, pTextA, sFullPath.Get())) {
-		MemoNote::WipeOutAndDelete(pTextA);
-		delete p;
-		MessageBox(NULL, TEXT("SaveData failed"), TEXT("DEBUG"), MB_OK);
-		return FALSE;
-	}
-	MemoNote::WipeOutAndDelete(pTextA);
-	return p;
 }
 
 /////////////////////////////////////////////
