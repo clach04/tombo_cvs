@@ -110,6 +110,7 @@ BOOL CryptManager::EncryptAndStore(const LPBYTE pData, int nSize, LPCTSTR pFileN
 {
 	// —ÌˆæŠm•ÛEˆÃ†‰»
 
+	int i=0;
 	int len = ((nSize >> 3) + 1) * 8;
 	len += 24;
 
@@ -121,7 +122,7 @@ BOOL CryptManager::EncryptAndStore(const LPBYTE pData, int nSize, LPCTSTR pFileN
 	}
 
 	// —”‚Ì–„‚ß‚İ
-	for (int i = 0; i < 8; i++) {
+	for (i = 0; i < 8; i++) {
 		pBuf[i] = (BYTE)(rand() & 0xFF);
 	}
 
@@ -267,3 +268,4 @@ void WipeOutAndDelete(char *p)
 	delete [] p;
 }
 #endif
+

@@ -36,3 +36,4 @@ extern "C" {
 	void getMD5Sum(byte *md5sum, byte *in, int len);
 };
 #endif
+

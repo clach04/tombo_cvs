@@ -40,13 +40,13 @@
 #include "dynload.h"
 #endif
 
-#include "bithelp.h"
-
 #ifdef TOMBO
 #include <windows.h>
 #define u32 DWORD
 #define DIM(v) (sizeof(v)/sizeof((v)[0]))
 #endif
+
+#include "bithelp.h"
 
 
 typedef struct {
