@@ -1311,11 +1311,7 @@ BOOL Property::Load(BOOL *pStrict)
 	siz = sizeof(nUseTwoPane);
 	res = RegQueryValueEx(hTomboRoot, USE_TWO_PANE_ATTR_NAME, NULL, &typ, (LPBYTE)&nUseTwoPane, &siz);
 	if (res != ERROR_SUCCESS) {
-#if defined(PLATFORM_HPC) || defined(PLATFORM_WIN32) || defined(PLATFORM_PKTPC)
 		nUseTwoPane = TRUE;
-#else
-		nUseTwoPane = FALSE;
-#endif
 	}
 
 #if defined(PLATFORM_WIN32) || defined(PLATFORM_PKTPC)
@@ -1694,7 +1690,6 @@ static BOOL MakeFont(HFONT *phFont, LPCTSTR pName, DWORD nSize, BYTE bQuality)
 
 BOOL Property::SaveWinSize(UINT flags, UINT showCmd, LPRECT pWinRect, WORD nSelectViewWidth)
 {
-#if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC) || defined(PLATFORM_PKTPC)
 	TCHAR buf[1024];
 
 	HKEY hTomboRoot = GetTomboRootKey();
@@ -1712,7 +1707,6 @@ BOOL Property::SaveWinSize(UINT flags, UINT showCmd, LPRECT pWinRect, WORD nSele
 	}
 
 	RegCloseKey(hTomboRoot);
-#endif
 	return TRUE;
 }
 
@@ -1722,7 +1716,6 @@ BOOL Property::SaveWinSize(UINT flags, UINT showCmd, LPRECT pWinRect, WORD nSele
 
 BOOL Property::GetWinSize(UINT *pFlags, UINT *pShowCmd, LPRECT pWinRect, LPWORD pSelectViewWidth)
 {
-#if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC) || defined(PLATFORM_PKTPC)
 	HKEY hTomboRoot = GetTomboRootKey();
 	if (!hTomboRoot) return FALSE;
 
@@ -1751,7 +1744,6 @@ BOOL Property::GetWinSize(UINT *pFlags, UINT *pShowCmd, LPRECT pWinRect, LPWORD 
 	if (pWinRect->top < 0) pWinRect->top = 0;
 
 	RegCloseKey(hTomboRoot);
-#endif
 	return TRUE;
 }
 
@@ -1760,8 +1752,7 @@ BOOL Property::GetWinSize(UINT *pFlags, UINT *pShowCmd, LPRECT pWinRect, LPWORD 
 ///////////////////////////////////////////////////
 
 void Property::SetUseTwoPane(BOOL bPane) 
-{ 
-#if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC) || defined(PLATFORM_PKTPC)
+{
 	nUseTwoPane = bPane;
 	
 	HKEY hTomboRoot = GetTomboRootKey();
@@ -1769,7 +1760,6 @@ void Property::SetUseTwoPane(BOOL bPane)
 
 	if (!SetDWORDToReg(hTomboRoot, USE_TWO_PANE_ATTR_NAME, nUseTwoPane)) return;
 	RegCloseKey(hTomboRoot);
-#endif
 }
 
 ///////////////////////////////////////////////////

@@ -7,6 +7,7 @@
 #include "Message.h"
 #include "PlatformLayer.h"
 #include "LagendaPlatform.h"
+#include "SipControl.h"
 
 #define NUM_IMG_BUTTONS 0
 
@@ -155,9 +156,20 @@ void LagendaPlatform::CloseDetailsView()
 
 void LagendaPlatform::AdjustUserRect(RECT *r)
 {
-	nHOffset = CSOBar_Height(hMSCmdBar);
+	DWORD nHOffset = CSOBar_Height(hMSCmdBar);
 	r->top += nHOffset;
 	r->bottom -= nHOffset;
+
+	// SIP
+	BOOL bStat;
+	SipControl sc;
+	if (!sc.Init()) return;
+	if (!sc.GetSipStat(&bStat)) return;
+
+	if (bStat) {
+		RECT rSip = sc.GetRect();	
+		r->bottom -= (rSip.bottom - rSip.top);
+	}
 }
 
 

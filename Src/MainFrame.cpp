@@ -69,7 +69,7 @@ static HIMAGELIST CreateSelectViewImageList(HINSTANCE hInst);
 #if defined(PLATFORM_WIN32)
 #define BORDER_WIDTH 2
 #endif
-#if defined(PLATFORM_HPC) || defined(PLATFORM_PKTPC)
+#if defined(PLATFORM_HPC) || defined(PLATFORM_PKTPC) || defined(PLATFORM_PSPC) || defined(PLATFORM_BE500)
 #define BORDER_WIDTH 5
 #endif
 
@@ -615,10 +615,9 @@ BOOL MainFrame::OnExit()
 	}
 	if (nYNC == IDCANCEL) return FALSE;
 	pmPasswordMgr.ForgetPassword();
-#if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC) || defined(PLATFORM_PKTPC)
+
 	SaveWinSize();
 	g_Property.SaveStatusBarStat();
-#endif
 
 	g_Property.SaveWrapTextStat();
 
@@ -700,11 +699,9 @@ void MainFrame::OnCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		g_Property.SetWrapText(!g_Property.WrapText());
 		SetWrapText(g_Property.WrapText());
 		break;
-#if defined(PLATFORM_HPC) || defined(PLATFORM_WIN32) || defined(PLATFORM_PKTPC)
 	case IDM_TOGGLEPANE:
 		TogglePane();
 		break;
-#endif
 #if defined(PLATFORM_WIN32)
 	case IDM_TOPMOST:
 		g_Property.ToggleStayTopMost();
@@ -802,10 +799,11 @@ void MainFrame::OnSettingChange(WPARAM wParam)
 void MainFrame::OnSIPResize(BOOL bImeOn, RECT *pSipRect)
 {
 
-#if defined(PLATFORM_PKTPC)
+#if defined(PLATFORM_PKTPC) || defined(PLATFORM_BE500)
 	SetLayout();
 #endif
 
+#ifdef COMMENT
 #if defined(PLATFORM_PSPC) || defined(PLATFORM_BE500)
 	DWORD nTop, nBottom;
 	DWORD nClientBottom = pSipRect->top;
@@ -826,6 +824,7 @@ void MainFrame::OnSIPResize(BOOL bImeOn, RECT *pSipRect)
 		msView.MoveWindow(0, nTop, 240, nBottom);
 		pDetailsView->MoveWindow(0, nTop, 240, nBottom);
 	}
+#endif
 #endif
 }
 
@@ -861,14 +860,12 @@ void MainFrame::OnTooltip(WPARAM wParam, LPARAM lParam)
 
 void MainFrame::OnLButtonDown(WPARAM wParam, LPARAM lParam)
 {
-#if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC) || defined(PLATFORM_PKTPC)
 	WORD fwKeys = wParam;
 	WORD xPos = LOWORD(lParam);
 
 	if (!(fwKeys & MK_LBUTTON)) return;
 	bResizePane = TRUE;
 	SetCapture(hMainWnd);
-#endif
 }
 
 ///////////////////////////////////////////////////
@@ -930,7 +927,7 @@ void MainFrame::OnLButtonUp(WPARAM wParam, LPARAM lParam)
 	}
 	MovePane(xPos);
 #endif 
-#if defined(PLATFORM_PKTPC)
+#if defined(PLATFORM_PKTPC) || defined(PLATFORM_PSPC) || defined(PLATFORM_BE500)
 	RECT r;
 	GetClientRect(hMainWnd, &r);
 	WORD wTotalHeight = (WORD)(r.bottom - r.top);
@@ -1212,7 +1209,19 @@ void MainFrame::ActivateView(ViewType vt)
 void MainFrame::SetLayout()
 {
 	if (g_Property.IsUseTwoPane()) {
+#if defined(PLATFORM_HPC) || defined(PLATFORM_WIN32)
 		ChangeLayout(LT_TwoPane);
+#endif
+#if defined(PLATFORM_PKTPC) || defined(PLATFORM_PSPC) || defined(PLATFORM_BE500)
+		switch(vtFocusedView) {
+		case VT_SelectView:
+			ChangeLayout(LT_TwoPane);
+			break;
+		case VT_DetailsView:
+			ChangeLayout(LT_OnePaneDetailsView);
+			break;
+		}
+#endif
 	} else {
 		switch (vtFocusedView) {
 		case VT_SelectView:
@@ -1230,7 +1239,6 @@ void MainFrame::SetLayout()
 ///////////////////////////////////////////////////
 void MainFrame::TogglePane()
 {
-#if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC) || defined(PLATFORM_PKTPC)
 	pPlatform->CheckMenu(IDM_TOGGLEPANE, !g_Property.IsUseTwoPane());
 
 	if (g_Property.IsUseTwoPane()) {
@@ -1241,7 +1249,6 @@ void MainFrame::TogglePane()
 	g_Property.SetUseTwoPane(nPane);
 
 	SetLayout();
-#endif
 }
 
 ///////////////////////////////////////////////////
@@ -1268,7 +1275,7 @@ void MainFrame::ChangeLayout(LayoutType layout)
 #else
 			// split horizontal
 			msView.MoveWindow(rc.left, rc.top , rc.right, nSplitterSize);
-			pDetailsView->MoveWindow(rc.left, nSplitterSize + BORDER_WIDTH, rc.right, rc.bottom - nSplitterSize - BORDER_WIDTH);
+			pDetailsView->MoveWindow(rc.left, rc.top + nSplitterSize + BORDER_WIDTH, rc.right, rc.bottom - nSplitterSize - BORDER_WIDTH + rc.top);
 #endif
 
 			msView.Show(SW_SHOW);
@@ -1477,11 +1484,10 @@ BOOL MainFrame::EnableApplicationButton(HWND hWnd)
 
 void MainFrame::SaveWinSize()
 {
-#if defined(PLATFORM_HPC) || defined(PLATFORM_WIN32) || defined(PLATFORM_PKTPC)
 	RECT r;
 	UINT flags, showCmd;
 
-#if defined(PLATFORM_HPC) || defined(PLATFORM_PKTPC)
+#if defined(PLATFORM_HPC) || defined(PLATFORM_PKTPC) || defined(PLATFORM_PSPC) || defined(PLATFORM_BE500)
 	GetWindowRect(hMainWnd,&r);
 	flags = showCmd = 0;
 #else
@@ -1500,7 +1506,7 @@ void MainFrame::SaveWinSize()
 		UINT u1, u2;
 		RECT r2;
 		if (!Property::GetWinSize(&u1, &u2, &r2, &nPane)) {
-#if defined(PLATFORM_PKTPC)
+#if defined(PLATFORM_PKTPC) || defined(PLATFORM_BE500) || defined(PLATFORM_PSPC)
 			nPane = (r.bottom - r.top) / 3 * 2;
 #else
 			nPane = (r.right - r.left) / 3;	
@@ -1508,7 +1514,6 @@ void MainFrame::SaveWinSize()
 		}
 	}
 	Property::SaveWinSize(flags, showCmd, &r, nPane);
-#endif
 }
 
 ///////////////////////////////////////////////////
@@ -1517,31 +1522,18 @@ void MainFrame::SaveWinSize()
 
 void MainFrame::LoadWinSize(HWND hWnd)
 {
-#if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC) || defined(PLATFORM_PKTPC)
 	RECT rMainFrame;
-//	WORD nSelectViewWidth;
 	RECT rClientRect;
 	GetClientRect(hWnd, &rClientRect);
 
 	UINT u1, u2;
 	if (!Property::GetWinSize(&u1, &u2, &rMainFrame, &nSplitterSize)) {
-#if defined(PLATFORM_PKTPC)
+#if defined(PLATFORM_PKTPC) || defined(PLATFORM_BE500) || defined(PLATFORM_PSPC)
 		nSplitterSize = (rClientRect.right - rClientRect.left) / 3 * 2;
 #else
 		nSplitterSize = (rClientRect.right - rClientRect.left) / 3;
 #endif
-	} else {
-#if defined(PLATFORM_PKTPC)
-//		rMainFrame = rClientRect;
-#endif
-#if defined(PLATFORM_HPC)
-//		rMainFrame = rClientRect;
-//		MoveWindow(hWnd, rMainFrame.left, rMainFrame.top, rMainFrame.right, rMainFrame.bottom, TRUE);
-#endif
 	}
-
-//	nSplitterSize = nSelectViewWidth;
-#endif
 }
 
 ///////////////////////////////////////////////////

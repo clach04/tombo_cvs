@@ -201,13 +201,14 @@
 #define IDM_VFOLDER_DEF                 40057
 #define IDM_BOOKMARK_ADD                40058
 #define IDM_BOOKMARK_CONFIG             40059
+#define IDM_TOGGLEPANE                  40060
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        141
-#define _APS_NEXT_COMMAND_VALUE         40060
+#define _APS_NEXT_COMMAND_VALUE         40061
 #define _APS_NEXT_CONTROL_VALUE         1043
 #define _APS_NEXT_SYMED_VALUE           113
 #endif

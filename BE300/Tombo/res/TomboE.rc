@@ -406,6 +406,8 @@ BEGIN
     BEGIN
         MENUITEM "New folder",                  IDM_NEWFOLDER
         MENUITEM SEPARATOR
+        MENUITEM "Two pane mode",               IDM_TOGGLEPANE
+        MENUITEM SEPARATOR
         MENUITEM "Options",                     IDM_PROPERTY
         MENUITEM "Virtual folder",              IDM_VFOLDER_DEF
         MENUITEM "Erase password",              IDM_FORGETPASS

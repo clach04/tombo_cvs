@@ -404,6 +404,8 @@ BEGIN
     BEGIN
         MENUITEM "新規フォルダ",                IDM_NEWFOLDER
         MENUITEM SEPARATOR
+        MENUITEM "2画面表示",                   IDM_TOGGLEPANE
+        MENUITEM SEPARATOR
         MENUITEM "プロパティ",                  IDM_PROPERTY
         MENUITEM "仮想フォルダ",                IDM_VFOLDER_DEF
         MENUITEM "パスワード消去",              IDM_FORGETPASS

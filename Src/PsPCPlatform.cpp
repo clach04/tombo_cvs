@@ -5,6 +5,7 @@
 #include "resource.h"
 #include "PlatformLayer.h"
 #include "PsPCPlatform.h"
+#include "SipControl.h"
 
 #define NUM_IMG_BUTTONS 12
 
@@ -127,6 +128,17 @@ void PsPCPlatform::AdjustUserRect(RECT *r)
 	DWORD nHOffset = CommandBar_Height(hMSCmdBar);
 	r->top += nHOffset;
 	r->bottom -= nHOffset;
+
+	// SIP
+	BOOL bStat;
+	SipControl sc;
+	if (!sc.Init()) return;
+	if (!sc.GetSipStat(&bStat)) return;
+
+	if (bStat) {
+		RECT rSip = sc.GetRect();	
+		r->bottom -= (rSip.bottom - rSip.top);
+	}
 }
 
 #endif // PLATFORM_PSPC

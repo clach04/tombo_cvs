@@ -99,7 +99,9 @@ BOOL SimpleEditor::Create(LPCTSTR pName, RECT &r, HWND hParent, HINSTANCE hInst,
 	nWndStyle = WS_CHILD | WS_VSCROLL | ES_MULTILINE | ES_WANTRETURN;
 
 #if defined(PLATFORM_PSPC) || defined(PLATFORM_BE500)
-	nLeftOffset = 3;
+//	nLeftOffset = 3;
+	// for draw border, left offset has disabled.
+	nLeftOffset = 0;
 #else
 	nLeftOffset = 0;
 #endif

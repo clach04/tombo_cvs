@@ -630,3 +630,12 @@ Changes
 * move imagelist to MemoSelectView.
 * two pane mode support for PocketPC (yet fully implimented).
 
+////////////////////////////////
+// B139
+////////////////////////////////
+// main trunk
+
+* support two pane and edit view style on PocketPC.
+* support BE-x00
+	PsPC is not yet.
+Not fully tested on both platform, probably it will work.
