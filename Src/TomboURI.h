@@ -28,7 +28,7 @@ public:
 
 	// get path part of URI.
 	// ex. tombo://default/aa/bb/cc.txt -> /aa/bb/cc.txt
-	LPCTSTR GetPath();
+	LPCTSTR GetPath() const;
 
 	// get parent path of URI.
 	// ex. tombo://default/aa/bb/cc.txt -> tombo://default/aa/bb/cc/

@@ -1412,7 +1412,9 @@ HTREEITEM MemoSelectView::ShowItem(LPCTSTR pPath, BOOL bSelChange, BOOL bOpenNot
 			TreeView_Expand(hViewWnd, hTargetItem, TVE_EXPAND);
 		}
 
-		if (bEndFlg && MemoNote::IsNote(pPartPath)) {
+		DWORD nt = MemoNote::IsNote(pPartPath);
+		if (bEndFlg &&
+			(nt != NOTE_TYPE_NO && nt != NOTE_TYPE_TDT)) {
 			*(pPartPath + _tcslen(pPartPath) - 4) = TEXT('\0');
 			bNote = TRUE;
 		}

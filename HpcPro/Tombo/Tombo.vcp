@@ -2484,6 +2484,7 @@ DEP_CPP_MEMON=\
 	"..\..\Src\MsgRes\MsgDef.h"\
 	"..\..\Src\PasswordManager.h"\
 	"..\..\Src\Property.h"\
+	"..\..\Src\Repository.h"\
 	"..\..\Src\Tombo.h"\
 	"..\..\Src\TomboLib\File.h"\
 	"..\..\Src\TomboLib\Logger.h"\
@@ -3293,10 +3294,15 @@ DEP_CPP_REPOS=\
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Sig3"
 
 DEP_CPP_REPOS=\
+	"..\..\Src\MemoInfo.h"\
 	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoNote.h"\
+	"..\..\Src\Message.h"\
+	"..\..\Src\MsgRes\MsgDef.h"\
 	"..\..\Src\PasswordManager.h"\
+	"..\..\Src\Property.h"\
 	"..\..\Src\Repository.h"\
+	"..\..\Src\TomboLib\AutoPtr.h"\
 	"..\..\Src\TomboLib\TString.h"\
 	"..\..\Src\TomboLib\Uniconv.h"\
 	"..\..\Src\TomboLib\VarBuffer.h"\
@@ -4503,6 +4509,10 @@ DEP_CPP_VFSTR=\
 # Begin Source File
 
 SOURCE=..\..\Src\AboutDialog.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\TomboLib\AutoPtr.h
 # End Source File
 # Begin Source File
 

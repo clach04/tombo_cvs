@@ -56,7 +56,8 @@ BOOL DirList::GetList(LPCTSTR pPrefix, LPCTSTR pMatchPath)
 				if (bAllocMemoNotes) {
 					if (!MemoNote::MemoNoteFactory(pPrefix, wfd.cFileName, &pNote) || pNote == NULL) continue;
 				} else {
-					if (MemoNote::IsNote(wfd.cFileName) == NOTE_TYPE_NO) continue;
+					DWORD n = MemoNote::IsNote(wfd.cFileName);
+					if (n == NOTE_TYPE_NO || n == NOTE_TYPE_TDT) continue;
 				}
 				
 				di.bFlg = 0;

@@ -4,6 +4,8 @@
 class TString;
 class TomboURI;
 
+class MemoNote;
+
 /////////////////////////////////////////
 // Notes repository
 /////////////////////////////////////////
@@ -25,6 +27,14 @@ public:
 
 class LocalFileRepository : public Repository {
 	LPTSTR pTopDir;
+protected:
+	BOOL Save(const TomboURI *pCurrentURI, LPCTSTR pMemo, TomboURI *pNewURI, TString *pHeadLine);
+
+	BOOL SaveIfHeadLineIsNotChanged(MemoNote *pNote, const char *pText, LPCTSTR pOrigFile);
+	BOOL SaveIfHeadLineIsChanged(MemoNote *pNote, const char *pText,
+								 LPCTSTR pOrigFile, LPCTSTR pHeadLine, 
+								 TString *pNewHeadLine);
+
 public:
 	LocalFileRepository();
 	virtual ~LocalFileRepository();

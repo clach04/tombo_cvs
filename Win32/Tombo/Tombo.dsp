@@ -320,6 +320,10 @@ SOURCE=..\..\Src\AboutDialog.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\Src\TomboLib\AutoPtr.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\Src\BookMark.h
 # End Source File
 # Begin Source File

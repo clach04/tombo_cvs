@@ -14,6 +14,8 @@
 #include "Message.h"
 #include "TomboURI.h"
 
+#include "Repository.h"
+
 #define DEFAULT_HEADLINE MSG_DEFAULT_HEADLINE
 
 /////////////////////////////////////////////
@@ -35,9 +37,6 @@ static BOOL GetHeadLinePath(LPCTSTR pMemoPath, LPCTSTR pHeadLine, LPCTSTR pExt,
 // ヘッドライン文字列の取得
 static BOOL GetHeadLineFromMemoText(LPCTSTR pMemo, TString *pHeadLine);
 static BOOL GetHeadLineFromFilePath(LPCTSTR pFilePath, TString *pHeadLine);
-
-// ヘッドライン文字列から"(n)"部分を取り除いた長さを返す
-static int ChopFileNumberLen(LPTSTR pHeadLine);
 
 /////////////////////////////////////////////
 //
@@ -238,102 +237,6 @@ LPTSTR CryptedMemoNote::GetMemoBody(PasswordManager *pMgr)
 	}
 
 	return pMemo;
-}
-
-////////////////////////////////////////////////////
-// Save memo data and return new headline string
-////////////////////////////////////////////////////
-//
-// IN : pMgr, pMemo
-// OUT: pHeadLine
-BOOL MemoNote::Save(LPCTSTR pMemo, TString *pHeadLine)
-{
-	TString sOrigFile;
-	if (!sOrigFile.Join(g_Property.TopDir(), TEXT("\\"), pPath)) return FALSE;
-
-	BOOL bResult;
-	TString sHeadLine;
-
-	// get old headline from path
-	if (!GetBaseName(pHeadLine, pPath)) return FALSE;
-
-	if (g_Property.KeepTitle()) {
-		// clone original headline
-		sHeadLine.Set(pHeadLine->Get());
-	} else {
-		// Get new headline from memo text
-		if (!GetHeadLineFromMemoText(pMemo, &sHeadLine)) return FALSE;
-		if (_tcslen(sHeadLine.Get()) == 0) {
-			// headline is empty
-			if (!sHeadLine.Set(MSG_DEFAULT_HEADLINE)) return FALSE;
-		}
-	}
-
-	// Prepare write file.
-	char *pText = ConvUnicode2SJIS(pMemo);
-	if (pText == NULL) return FALSE;
-	SecureBufferA sText(pText);
-
-
-	DWORD nH = ChopFileNumberLen(pHeadLine->Get());
-	DWORD nH2 = ChopFileNumberLen(sHeadLine.Get());
-
-	LPTSTR pNotePath = pPath;
-
-	// check headline has changed.
-	if (nH == nH2 && _tcsncmp(pHeadLine->Get(), sHeadLine.Get(), nH) == 0) {
-		// not changed.
-		// Generate backup file name
-		TString sBackupFile;
-		if (!sBackupFile.Join(sOrigFile.Get(), TEXT(".tmp"))) return FALSE;
-		// Backup(copy) original file
-		//
-		// Because ActiveSync can't treat Move&Write, backup operation uses not move but copy
-		if (!CopyFile(sOrigFile.Get(), sBackupFile.Get(), FALSE)) {
-			// if new file, copy are failed but it is OK.
-			if (GetLastError() != ERROR_FILE_NOT_FOUND) return FALSE;
-		}
-		// Save to file
-		if (!SaveData(g_pPassManager, pText, sOrigFile.Get())) {
-			// When save failed, try to rollback original file.
-			DeleteFile(sOrigFile.Get());
-			MoveFile(sBackupFile.Get(), sOrigFile.Get());
-			return FALSE;
-		}
-		// remove backup file
-		DeleteFile(sBackupFile.Get());
-		bResult = TRUE;
-	} else {
-		// changed.
-		TString sMemoDir;
-		TString sNewFile;
-
-		if (!sMemoDir.GetDirectoryPath(pPath)) return FALSE;
-		if (!GetHeadLinePath(sMemoDir.Get(), sHeadLine.Get(), GetExtension() , &sNewFile, &pNotePath, pHeadLine)) return FALSE;
-
-		bResult = SaveData(g_pPassManager, pText, sNewFile.Get());
-		if (bResult) {
-			// delete original file
-			DeleteFile(sOrigFile.Get());
-
-			// Update note's file path information. 
-			LPTSTR pNewPath = StringDup(pNotePath);
-			if (pNewPath == NULL) return FALSE;
-			delete [] pPath;
-			pPath = pNewPath;
-
-		} else {
-			// delete writing file
-			DeleteFile(sNewFile.Get());
-		}
-
-		// Additionally, rename memo info(*.tdt) file.
-		if (g_Property.KeepCaret()) {
-			MemoInfo mi;
-			mi.RenameInfo(sOrigFile.Get(), sNewFile.Get());
-		}
-	}
-	return bResult;
 }
 
 /////////////////////////////////////////////
@@ -669,27 +572,7 @@ static BOOL GetHeadLinePath(LPCTSTR pMemoPath, LPCTSTR pHeadLine, LPCTSTR pExt,
 	return TRUE;
 }
 
-////////////////////////////////////////////////////////
-// ヘッドライン文字列から"(n)"部分を取り除く
-////////////////////////////////////////////////////////
 
-static int ChopFileNumberLen(LPTSTR pHeadLine)
-{
-	if (*pHeadLine == TEXT('\0')) return 0;
-
-	DWORD n = _tcslen(pHeadLine);
-	LPTSTR p = pHeadLine + n - 1;
-	if (*p != TEXT(')')) return n;
-	p--;
-	while(p >= pHeadLine) {
-		if (*p == TEXT('(')) {
-			return p - pHeadLine;
-		}
-		if (*p < TEXT('0') || *p > TEXT('9')) break;
-		p--;
-	}
-	return n;
-}
 
 ////////////////////////////////////////////////////////
 // ファイルパスからヘッドラインを取得
@@ -849,6 +732,8 @@ DWORD MemoNote::IsNote(LPCTSTR pFile)
 		nType = NOTE_TYPE_PLAIN;
 	} else if (_tcsicmp(p, TEXT(".chi")) == 0) {
 		nType = NOTE_TYPE_CRYPTED;
+	} else if (_tcsicmp(p, TEXT(".tdt")) == 0) {
+		nType = NOTE_TYPE_TDT;
 	} else {
 		nType = NOTE_TYPE_NO;
 	}
@@ -864,7 +749,7 @@ BOOL MemoNote::MemoNoteFactory(LPCTSTR pPrefix, LPCTSTR pFile, MemoNote **ppNote
 	*ppNote = NULL;
 
 	DWORD nType = IsNote(pFile);
-	if (nType == NOTE_TYPE_NO) return TRUE;
+	if (nType == NOTE_TYPE_NO || nType == NOTE_TYPE_TDT) return TRUE;
 	if (nType == NOTE_TYPE_PLAIN) {
 		*ppNote = new PlainMemoNote();
 	} else {
@@ -886,7 +771,7 @@ BOOL MemoNote::MemoNoteFactory(LPCTSTR pPrefix, LPCTSTR pFile, MemoNote **ppNote
 	return TRUE;
 }
 
-MemoNote *MemoNote::MemoNoteFactory(TomboURI *pURI)
+MemoNote *MemoNote::MemoNoteFactory(const TomboURI *pURI)
 {
 	LPCTSTR pURIPath = pURI->GetPath() + 1;
 	LPTSTR pBuf = StringDup(pURIPath);

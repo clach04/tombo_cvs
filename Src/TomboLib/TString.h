@@ -11,7 +11,7 @@ public:
 	TString() : pString(NULL) {}
 	~TString() { if (pString) delete [] pString; }
 
-	LPTSTR Get() { return pString; }
+	LPTSTR Get() const { return pString; }
 
 	BOOL Alloc(DWORD nSize);
 	BOOL Set(LPCTSTR p);
@@ -20,10 +20,6 @@ public:
 	BOOL Join(LPCTSTR p1, LPCTSTR p2);
 	BOOL Join(LPCTSTR p1, LPCTSTR p2, LPCTSTR p3);
 	BOOL Join(LPCTSTR p1, LPCTSTR p2, LPCTSTR p3, LPCTSTR p4);
-
-
-	// TOMBOROOT\\pPath なる文字列を生成
-//	BOOL AllocFullPath(LPCTSTR pPath);
 
 	// pFullPathからディレクトリ部のみを取得
 	// XX\YY\ZZ => XX\YY

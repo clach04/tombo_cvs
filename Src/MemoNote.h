@@ -4,6 +4,7 @@
 class PasswordManager;
 class TString;
 class TomboURI;
+class Repository;
 
 #include "TreeViewItem.h"
 
@@ -14,6 +15,7 @@ class TomboURI;
 #define NOTE_TYPE_NO      0
 #define NOTE_TYPE_PLAIN   1
 #define NOTE_TYPE_CRYPTED 2
+#define NOTE_TYPE_TDT     3
 
 ////////////////////////////////////////
 // represents notes
@@ -52,7 +54,6 @@ public:
 	virtual char *GetMemoBodyA(PasswordManager *pMgr);
 
 	// save memo
-	BOOL Save(LPCTSTR pMemo, TString *pHeadLine);
 	virtual BOOL SaveData(PasswordManager *pMgr, const char *pMemo, LPCTSTR pWriteFile);
 
 	//////////////////////////////////
@@ -104,8 +105,10 @@ public:
 	// if creation failed, return FALSE.
 	// if pFile is not memo, return TRUE and *ppNote sets to NULL.
 	static BOOL MemoNoteFactory(LPCTSTR pPrefix, LPCTSTR pFile, MemoNote **ppNote);
-	static MemoNote *MemoNoteFactory(TomboURI *pURI);
+	static MemoNote *MemoNoteFactory(const TomboURI *pURI);
 	static MemoNote *MemoNoteFactory(LPCTSTR pURI);
+
+	friend class LocalFileRepository;
 };
 
 ////////////////////////////////////////

@@ -807,3 +807,9 @@ Not fully tested on both platform, probably it will work.
 ////////////////////////////////
 
 * DEV:refactoring about extracting headline
+
+////////////////////////////////
+// B161
+////////////////////////////////
+
+* DEV: Move MemoNote::Save to LocalFileRepository::Save

@@ -138,7 +138,9 @@ void VirtualStreamFolderScanner::Init(LPCTSTR pPath, VFStream *p, BOOL bCe)
 void VirtualStreamFolderScanner::File(LPCTSTR p)
 {
 	// if encrypted memo is not search target and the note is encrypted, ignore it
-	if (!bCheckEncrypt && MemoNote::IsNote(p) == NOTE_TYPE_CRYPTED) return;
+	DWORD nt = MemoNote::IsNote(p);
+	if (nt == NOTE_TYPE_NO || nt == NOTE_TYPE_TDT) return;
+	if (!bCheckEncrypt && nt == NOTE_TYPE_CRYPTED) return;
 
 	// create MemoNote object
 	MemoNote *pNote = NULL;

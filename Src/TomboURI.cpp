@@ -117,7 +117,7 @@ BOOL TomboURI::GetRepositoryName(TString *pRepo)
 // get path part
 /////////////////////////////////////////////
 
-LPCTSTR TomboURI::GetPath()
+LPCTSTR TomboURI::GetPath() const
 {
 	LPCTSTR p = Get() + _tcslen(pURIPrefix);
 

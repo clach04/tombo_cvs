@@ -68,7 +68,6 @@ public:
 	TCHAR aFailPath[MAX_PATH * 2];
 	TCHAR aErrorMsg[1024];
 
-
 	DSFileDelete();
 
 	BOOL Init(LPCTSTR pPath); 
@@ -110,19 +109,8 @@ void DSFileDelete::AfterScan()
 
 void DSFileDelete::File(LPCTSTR p)
 {
-	LPCTSTR pExt;
-	DWORD nLen = _tcslen(CurrentPath());
-
-	if (nLen >= 4) {
-		pExt = CurrentPath() + nLen - 4;
-	} else {
-		pExt = NULL;
-	}
 	// TOMBO管轄以外のファイルがあった場合に誤って消去しないようにチェック
-	if (_tcsicmp(pExt, TEXT(".txt")) != 0 &&
-		_tcsicmp(pExt, TEXT(".chi")) != 0 &&
-		_tcsicmp(pExt, TEXT(".tdt")) != 0) {
-
+	if (MemoNote::IsNote(CurrentPath()) == NOTE_TYPE_NO) {
 		_tcscpy(aFailPath, CurrentPath());
 		_tcscpy(aErrorMsg, MSG_OTHER_FILE_EXISTS);
 		StopScan();
