@@ -112,8 +112,6 @@ BEGIN
     END
     POPUP ""
     BEGIN
-        MENUITEM "‚¨‹C‚É“ü‚è‚É’Ç‰Á",            IDM_BOOKMARK_ADD
-        MENUITEM "‚¨‹C‚É“ü‚è‚Ì®—",            IDM_BOOKMARK_CONFIG
         MENUITEM SEPARATOR
     END
     POPUP "Tool"

@@ -277,3 +277,6 @@ MSG_DLG_EXTAPP_CAUTION	注意：\r\n外部アプリがバックアップファ�
 MSG_DLG_EXTAPP_CHOOSE_TTL	外部アプリケーションの選択
 MSG_DLG_EXTAPP_CHOOSE_EXT	exeファイル(*.exe)\0*.exe\0全て(*.*)\0*.*\0\0
 MSG_MENUITEM_BE_T_TWOPANE	2画面モード
+MSG_MENUITEM_B_ADDBM	お気に入りに追加
+MSG_MENUITEM_B_EDITBM	お気に入りの整理
+MSG_DLG_PROPTAB_USE_CLEARTYPE_FONT_CE	クリアタイプフォントを使用

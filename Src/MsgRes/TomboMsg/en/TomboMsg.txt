@@ -4,7 +4,7 @@ Return to list
 Save
 Insert date1
 Insert date2
-Memo
+Root
 Tool
 Edit
 Initialize APP button failed.
@@ -19,21 +19,21 @@ Erase password in memory
 Erase password
 Folding failed.
 Not enough memory.
-Password is not match.
+Password doesn't match.
 Can't get password.
 Set timer failed.
 Remove directory failed.
-There are file that is not memo.
+There are files that aren't memos.
 Remove file failed.
 Create directory failed.
 Copy file failed.
 Memo has been modified. Save changes?
 Confirm
 Can't open memo
-Password is not match. Continue?
-Password is not match.
+Password doesn't match. Continue?
+Password doesn't match.
 Password mismatch
-Directory not exists. Create?
+Directory doesn't exist. Create?
 Create directory
 Choose folder
 Register password.
@@ -63,7 +63,7 @@ No foldername.
 Same folder name exists.
 Rename folder failed(%d).
 Get dateformat failed.
-Can't set memo folder as '\\'
+Can't set root folder as '\\'
 %y\t:Year(2001)\r\n%Y\t:Year(01)\r\n%M\t:Month(01,02,..)\r\n%b\t:Month(Jan,Feb,..)\r\n%d\t:Day(01,02..)\r\n%D\t:Day(1,2,..)\r\n%W\t:WDay(Sun,Mon,..)\r\n%H\t:Hour(12H:00..11)\r\n%I\t:Hour(12H:01..12)\r\n%h\t:Hour(24H)\r\n%a\t:AM,PM\r\n%m\t:Min(01,02,..)\r\n%s\t:Sec(01,02,..)\r\n%%\t:\"%\"\r\n%n\t:newline\r\n%fn\t:file path(n is 0-9)\r\n%Fn\t:file path
 Search result
 Encrypt files under the folder?
@@ -231,7 +231,7 @@ Password
 Top page
 Use selected
 Use blank
-Memo folder:
+Root folder:
 Folder to store Tombo Notes
 Sync file name and title
 Rename file name if headline changed.
@@ -242,12 +242,12 @@ Memo:
 Use ClearType font(XP only)
 Date1:
 Date2:
-Keep caret position
-Remember and restore caret position opening next time.
+Keep cursor position
+Restore last cursor position when re-opening.
 Tab stop:
 Set tab stop width
 Show title
-Show notes title to window title
+Show note title in titlebar.
 Password timeout(min):
 Timeout length(1-60).
 Search
@@ -260,7 +260,7 @@ Button2
 Button3
 Button4
 Button5
-Assigin Appliction button to action button. It is enabled after restarting TOMBO
+Assign application button to action button. It is enabled after restarting TOMBO
 Disable close notes on edit view
 Keep space over the SIP
 Default(English)
@@ -277,3 +277,6 @@ CAUTION:\r\nIf external application creates backup file, TOMBO is \r\n*NOT DELET
 Choose application
 app(*.exe)\0*.exe\0all(*.*)\0*.*\0\0
 Two panes
+Add bookmark
+Edit bookmark
+Use ClearType font

@@ -12,12 +12,14 @@
 
 // version info
 
-#define TOMBO_VERSION_INFO TEXT("Tombo version 1.9")
+#define TOMBO_VERSION_INFO TEXT("Tombo version 1.10")
 //#define TOMBO_VERSION_INFO TEXT("Tombo SNAPSHOT 20040627")
 
 // copyrights and credits
 
 LPCTSTR pCopyright = 
+TOMBO_VERSION_INFO
+TEXT("\r\n")
 TEXT("  Copyright(C) 2000-2003 Tomohisa Hirami\r\n")
 TEXT("  Copyright(C) 2004 TOMBO maintainers\r\n")
 TEXT("\r\n")
@@ -63,6 +65,7 @@ TEXT("\r\n")
 TEXT("--------\r\n")
 TEXT("\r\n")
 TEXT("Thanks To:\r\n")
+TEXT("  Gerry\r\n")
 TEXT("  Kevin Grover\r\n")
 TEXT("  Michael Efimov\r\n")
 TEXT("  Shigeyuki Matsuki\r\n");

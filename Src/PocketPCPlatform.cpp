@@ -45,6 +45,13 @@ static MenuMsgRes aMSToolMenu[] = {
 	{  5, IDM_FORGETPASS,  0, MSG_ID_MENUITEM_TOOL_FORGETPASS},
 };
 
+static MenuMsgRes aMSBookmarkMenu[] = {
+	{  0, IDM_BOOKMARK_ADD,    0, MSG_ID_MENUITEM_B_ADDBM },
+	{  1, IDM_BOOKMARK_CONFIG, 0, MSG_ID_MENUITEM_B_EDITBM },
+	// 2 is not defined
+};
+
+
 static MenuMsgRes aMDEditMenu[] = {
 	{  0, IDM_CUT,         0, MSG_ID_MENUITEM_MAIN_CUT },
 	{  1, IDM_COPY,        0, MSG_ID_MENUITEM_MAIN_COPY },
@@ -127,6 +134,7 @@ void PocketPCPlatform::Create(HWND hWnd, HINSTANCE hInst)
 	// hMenu is not created when default menu item is empty, leave only one separator.
 	OverrideMenuTitle(SHGetSubMenu(hMSCmdBar, IDM_EDIT_MEMO), aMSMemoMenu, sizeof(aMSMemoMenu) / sizeof(MenuMsgRes));
 	OverrideMenuTitle(SHGetSubMenu(hMSCmdBar, IDM_MENUITEM3), aMSToolMenu, sizeof(aMSToolMenu) / sizeof(MenuMsgRes));
+	OverrideMenuTitle(SHGetSubMenu(hMSCmdBar, IDM_MS_BOOKMARK), aMSBookmarkMenu, sizeof(aMSBookmarkMenu) / sizeof(MenuMsgRes));
 
 	////////////////////--
 
@@ -319,4 +327,5 @@ HMENU PocketPCPlatform::LoadDetailsViewPopupMenu()
 	OverrideMenuTitle(hMenu, aMDPopupMenu, sizeof(aMDPopupMenu) / sizeof(MenuMsgRes));
 	return hMenu;
 }
+
 #endif // PLATFORM_PKTPC

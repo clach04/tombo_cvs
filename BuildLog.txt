@@ -731,3 +731,11 @@ Not fully tested on both platform, probably it will work.
 * Rename message generate scripts
 * Realign message files
 * Update release scripts
+
+////////////////////////////////
+// B151(TOMBO 1.10)
+////////////////////////////////
+
+* Replace message file revised by Gerry(Thanks!)
+* FIX: The bookmark menu isn't i18nlized(#5000,#5001)
+* FIX: More than one lines can't be chosen(#4998,#4999)

@@ -127,6 +127,7 @@ BOOL MemoManager::GetCurrentSelectedPath(TString *pPath)
 	}
 
 	TreeViewItem *pItem = pMemoSelectView->GetCurrentItem();
+	if (pItem == NULL) return FALSE;
 	if (!pItem->GetFolderPath(pMemoSelectView, pPath)) return FALSE;
 	ChopFileSeparator(pPath->Get());
 	return TRUE;
