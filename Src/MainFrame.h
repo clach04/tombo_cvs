@@ -81,7 +81,6 @@ protected:
 	void MovePane(WORD nSplit);
 
 	void ChangeLayout(LayoutType layout);
-	void SetWindowTitle(TomboURI *pURI);
 
 public:
 	MainFrame(); // ctor
@@ -192,7 +191,7 @@ public:
 #endif
 
 	// change window title
-	void SetTitle(LPCTSTR pTitle);
+	void SetWindowTitle(TomboURI *pURI);
 
 	////////////////////////////////
 	// bookmark related members

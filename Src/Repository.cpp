@@ -60,3 +60,25 @@ BOOL LocalFileRepository::Update(TomboURI *pCurrentURI, LPCTSTR pData,
 	}
 	return TRUE;
 }
+
+BOOL LocalFileRepository::GetHeadLine(const TomboURI *pURI, TString *pHeadLine)
+{
+	TomboURI *pThis = (TomboURI*)pURI;
+	TomboURIItemIterator itr(pThis);
+	if (!itr.Init()) return FALSE;
+
+	if (!pHeadLine->Alloc(pURI->GetMaxPathItem() + 1)) return FALSE;
+	_tcscpy(pHeadLine->Get(), TEXT("[root]"));
+
+	LPCTSTR p;
+	for (itr.First(); p = itr.Current(); itr.Next()) {
+		_tcscpy(pHeadLine->Get(), p);
+		if (itr.IsLeaf()) {
+			DWORD n = _tcslen(pHeadLine->Get());
+			if (n >= 4) {
+				*(pHeadLine->Get() + n - 4) = TEXT('\0');
+			}
+		}
+	}
+	return TRUE;
+}

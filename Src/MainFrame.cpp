@@ -28,6 +28,7 @@
 #include "PsPCPlatform.h"
 #include "HPCPlatform.h"
 #include "LagendaPlatform.h"
+#include "Repository.h"
 #include "RepositoryFactory.h"
 
 #if defined(PLATFORM_PKTPC)
@@ -1029,11 +1030,17 @@ void MainFrame::SetWindowTitle(TomboURI *pURI)
 {
 #if defined(PLATFORM_WIN32) || defined(PLATFORM_PKTPC)
 	if (g_Property.SwitchWindowTitle()) {
+		if (pURI == NULL) {
+			SetWindowText(hMainWnd, TOMBO_APP_NAME);
+			return;
+		}
+
 		// change window title
 		LPCTSTR pPrefix = TEXT("Tombo - ");
 		LPCTSTR pBase;
 		TString sHeadLine;
-		if (pURI->GetHeadLine(&sHeadLine)) {
+		Repository *pRepo = g_RepositoryFactory.GetRepository(pURI);
+		if (pRepo != NULL && pRepo->GetHeadLine(pURI, &sHeadLine)) {
 			pBase = sHeadLine.Get();
 		} else {
 			pBase = TEXT("");
@@ -1184,7 +1191,7 @@ void MainFrame::LeaveDetailsView(BOOL bAskSave)
 	}
 
 #if defined(PLATFORM_PKTPC)
-	SetTitle(TOMBO_APP_NAME);
+	SetWindowTitle(NULL);
 #endif
 	SetFocus();
 }
@@ -1585,15 +1592,6 @@ void MainFrame::SetWrapText(BOOL bWrap)
 
 	// CheckMenuItem is superseded, but CE don't have SetMenuItemInfo.
 	CheckMenuItem(hMenu, IDM_DETAILS_HSCROLL, MF_BYCOMMAND | uCheckFlg);
-}
-
-///////////////////////////////////////////////////
-// Change window title
-///////////////////////////////////////////////////
-
-void MainFrame::SetTitle(LPCTSTR pTitle) {
-	if (!g_Property.SwitchWindowTitle()) return;
-	SetWindowText(hMainWnd, pTitle);
 }
 
 ///////////////////////////////////////////////////

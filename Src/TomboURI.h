@@ -21,8 +21,7 @@ public:
 	///////////////////////////////
 	// accessor
 
-	BOOL GetRepository(TString *pRepo);
-	BOOL GetHeadLine(TString *pHeadLine);
+	BOOL GetRepositoryName(TString *pRepo);
 
 	// get full path of URI.
 	LPCTSTR GetFullURI() { return Get(); }
@@ -38,7 +37,7 @@ public:
 	//     tombo://default/ -> ""
 	BOOL GetParent(TomboURI *pParent);
 
-	DWORD GetMaxPathItem() { return nMaxPathItem; }
+	DWORD GetMaxPathItem() const { return nMaxPathItem; }
 
 	// Is the URI point to crypted file?
 	// Checking does only to URI string. Not confirm to repository.

@@ -1077,7 +1077,7 @@ HTREEITEM MemoSelectView::GetItemFromURI(LPCTSTR pURI)
 	if (!uri.Init(pURI)) return NULL;
 
 	TString sRep;
-	if (!uri.GetRepository(&sRep)) return NULL;
+	if (!uri.GetRepositoryName(&sRep)) return NULL;
 
 	HTREEITEM hCurrent = GetRootItem(sRep.Get());
 	if (hCurrent == NULL) return NULL;
@@ -1477,7 +1477,7 @@ HTREEITEM MemoSelectView::ShowItemByURI(LPCTSTR pURI, BOOL bSelChange, BOOL bOpe
 
 	// get root node
 	TString sRepo;
-	if (!tURI.GetRepository(&sRepo)) return FALSE;
+	if (!tURI.GetRepositoryName(&sRepo)) return FALSE;
 	hCurrent = GetRootItem(sRepo.Get());
 	if (hCurrent == NULL) return NULL;
 

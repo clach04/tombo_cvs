@@ -12,8 +12,8 @@
 
 // version info
 
-//#define TOMBO_VERSION_INFO TEXT("Tombo version 1.11")
-#define TOMBO_VERSION_INFO TEXT("Tombo SNAPSHOT 20041014")
+#define TOMBO_VERSION_INFO TEXT("Tombo version 1.12")
+//#define TOMBO_VERSION_INFO TEXT("Tombo SNAPSHOT 20041014")
 
 // copyrights and credits
 
@@ -64,9 +64,14 @@ TEXT("Expat\t: http://www.libexpat.org/\r\n")
 TEXT("\r\n")
 TEXT("--------\r\n")
 TEXT("\r\n")
+TEXT("CREDITS:\r\n")
+TEXT("  Program\r\n")
+TEXT("      Tomohisa Hirami\r\n")
+TEXT("  Improve document and convert to DocBook:\r\n")
+TEXT("      Kevin Grover\r\n")
+TEXT("\r\n")
 TEXT("Thanks To:\r\n")
 TEXT("  Gerry Busch\r\n")
-TEXT("  Kevin Grover\r\n")
 TEXT("  Michael Efimov\r\n")
 TEXT("  Shigeyuki Matsuki\r\n");
 

@@ -295,6 +295,7 @@ BOOL MemoManager::SaveIfModify(LPDWORD pYNC, BOOL bDupMode)
 	pMainFrame->SetModifyStatus(FALSE);
 	pMemoDetailsView->SetCurrentNote(sNewURI.GetFullURI());
 
+	pMainFrame->SetWindowTitle(&sNewURI);
 	// save caret position
 	StoreCursorPos();
 
@@ -358,9 +359,7 @@ BOOL MemoManager::NewMemo()
 {
 	ClearMemo();
 	pMainFrame->SetNewMemoStatus(TRUE);
-#if defined(PLATFORM_WIN32)
-	pMainFrame->SetTitle(TOMBO_APP_NAME);
-#endif
+	pMainFrame->SetWindowTitle(NULL);
 	return TRUE;
 }
 

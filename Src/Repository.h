@@ -16,6 +16,7 @@ public:
 //	virtual BOOL Create(LPCTSTR pRequestHeadLine, TomboURI *pTemplate, TString *pRealHeadLine, TomboURI *pRealURI) = 0;
 
 	virtual BOOL Update(TomboURI *pCurrentURI, LPCTSTR pData, TomboURI *pNewURI, TString *pNewHeadLine) = 0;
+	virtual BOOL GetHeadLine(const TomboURI *pURI, TString *pHeadLine) = 0;
 };
 
 ////////////////////////////////////////////////
@@ -34,6 +35,7 @@ public:
 //	BOOL Create(LPCTSTR pRequestHeadLine, TomboURI *pTemplate, TString *pRealHeadLine, TomboURI *pRealURI);
 	BOOL Update(TomboURI *pCurrentURI, LPCTSTR pData, TomboURI *pNewURI, TString *pNewHeadLine);
 
+	BOOL GetHeadLine(const TomboURI *pURI, TString *pHeadLine);
 };
 
 #endif

@@ -57,11 +57,12 @@ BOOL TomboURI::Init(LPCTSTR pURI)
 
 BOOL TomboURI::InitByNotePath(LPCTSTR pNotePath)
 {
+	TString s;
 	LPCTSTR pPrefix = TEXT("tombo://default/");
-	if (!Alloc(_tcslen(pPrefix) + _tcslen(pNotePath) + 1)) return FALSE;
+	if (!s.Alloc(_tcslen(pPrefix) + _tcslen(pNotePath) + 1)) return FALSE;
 
-	_tcscpy(Get(), pPrefix);
-	LPTSTR p = Get() + _tcslen(pPrefix);
+	_tcscpy(s.Get(), pPrefix);
+	LPTSTR p = s.Get() + _tcslen(pPrefix);
 	LPCTSTR q = pNotePath;
 	if (*q == TEXT('\\')) q++;
 
@@ -79,8 +80,7 @@ BOOL TomboURI::InitByNotePath(LPCTSTR pNotePath)
 		*p++ = *q++;
 	}
 	*p = TEXT('\0');
-
-	return TRUE;
+	return Init(s.Get());
 }
 
 /////////////////////////////////////////////
@@ -101,7 +101,7 @@ LPCTSTR TomboURI::GetNextSep(LPCTSTR pPartPath)
 // get repository name
 /////////////////////////////////////////////
 
-BOOL TomboURI::GetRepository(TString *pRepo)
+BOOL TomboURI::GetRepositoryName(TString *pRepo)
 {
 	LPCTSTR p = Get() + 8;
 	LPCTSTR q = GetNextSep(p);
@@ -110,30 +110,6 @@ BOOL TomboURI::GetRepository(TString *pRepo)
 	_tcsncpy(pRepo->Get(), p, q - p);
 	*(pRepo->Get() + (q - p)) = TEXT('\0');
 
-	return TRUE;
-}
-
-/////////////////////////////////////////////
-// get headline
-/////////////////////////////////////////////
-BOOL TomboURI::GetHeadLine(TString *pHeadLine)
-{
-	TomboURIItemIterator itr(this);
-	if (!itr.Init()) return FALSE;
-
-	if (!pHeadLine->Alloc(GetMaxPathItem() + 1)) return FALSE;
-	_tcscpy(pHeadLine->Get(), TEXT("[root]"));
-
-	LPCTSTR p;
-	for (itr.First(); p = itr.Current(); itr.Next()) {
-		_tcscpy(pHeadLine->Get(), p);
-		if (itr.IsLeaf()) {
-			DWORD n = _tcslen(pHeadLine->Get());
-			if (n >= 4) {
-				*(pHeadLine->Get() + n - 4) = TEXT('\0');
-			}
-		}
-	}
 	return TRUE;
 }
 

@@ -802,3 +802,8 @@ Not fully tested on both platform, probably it will work.
 * DEV:remove TreeViewItem::GetFolderPath
 * DEV:Refactoring about update notes.
 
+////////////////////////////////
+// B160 (TOMBO 1.12)
+////////////////////////////////
+
+* DEV:refactoring about extracting headline
