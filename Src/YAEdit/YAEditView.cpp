@@ -697,7 +697,7 @@ void YAEditView::ScrollLeft1P() { SetScrollHorizPos(nColOffset - nHorizPageScrol
 BOOL YAEditView::IsCursorInDocBottom() { return nCursorRow + 1 == GetMaxLine(); }
 BOOL YAEditView::IsCursorInPageBottom() { return nCursorRow - nBaseLineNo == nPageHeight - 1; }
 BOOL YAEditView::IsCursorInPageTop() { return nCursorRow - nBaseLineNo == 0; }
-BOOL YAEditView::IsCursorInDocTop() { return nCursorRow == 0; }
+BOOL YAEditView::IsCursorInDocTop() { return nCursorRow == 0 && nCursorCol == 0; }
 
 BOOL YAEditView::IsCursorInDisplay()
 {
@@ -931,4 +931,9 @@ void YAEditView::GetMaxLineWidth()
 		w = GetLineWidth(0, p, lc.LineLen());
 		if (w > nMaxWidthPixel) nMaxWidthPixel = w;
 	}
+}
+
+void YAEditView::RedrawAllScreen()
+{
+	InvalidateRect(hViewWnd, &rClientRect, TRUE); 
 }

@@ -134,17 +134,16 @@ DWORD YAEditDoc::GetPrevOffset(DWORD n, DWORD nPos)
 
 BOOL YAEditDoc::ReplaceString(const Region *pDelRegion, LPCTSTR pString)
 {
-	Region r = *pDelRegion;
-
-	pView->ClearSelectedRegion();
-
-	DWORD nAffLines;
-	// delete region and insert string
 	DWORD nPhLinesBefore = pPhLineMgr->MaxLine();
-	if (!pPhLineMgr->ReplaceRegion(&r, pString, &nAffLines)) return FALSE;
+
+	// delete region and insert string
+	Region rNewRegion;
+	DWORD nAffLines;
+	if (!pPhLineMgr->ReplaceRegion(pDelRegion, pString, &nAffLines, &rNewRegion)) return FALSE;
+
 	DWORD nPhLinesAfter = pPhLineMgr->MaxLine();
 
-	if (!pView->UpdateNotify(pPhLineMgr, &r, nPhLinesBefore, nPhLinesAfter, nAffLines)) return FALSE;
+	if (!pView->UpdateNotify(pPhLineMgr, pDelRegion, &rNewRegion, nPhLinesBefore, nPhLinesAfter, nAffLines)) return FALSE;
 	SetModify(TRUE);
 
 	return TRUE;

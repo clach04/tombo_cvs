@@ -217,9 +217,6 @@ void YAEdit::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	pView->OnCreate(hWnd, wParam, lParam);
 	pWrapper->SetViewWidth(pView->rClientRect.right - pView->rClientRect.left - pView->nMaxCharWidth);
 
-//	pDoc = new YAEditDoc(); 
-//	if (!pDoc->Init("", this)) return;
-
 	pLineMgr = new LineManager();
 	if (!pLineMgr->Init(this)) return;
 
@@ -334,77 +331,20 @@ BOOL YAEdit::OnKeyDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	if (bShiftDown) {
 		switch (nVertKey) {
 		case VK_RIGHT:
-			{
-				pView->MoveRight();
-
-				Coordinate nSelNow;
-				nSelNow.Set(pView->nCursorCol, pView->nCursorRow);
-				Coordinate nSelOld;
-
-				Region r;
-				SelectRegion(nSelNow, &nSelOld);
-				if (nSelNow < nSelOld) {
-					r.posStart = nSelNow; r.posEnd = nSelOld;
-				} else {
-					r.posStart = nSelOld; r.posEnd = nSelNow;
-				}
-				RequestRedrawRegion(&r);
-
-			}
+			pView->MoveRight();
+			UpdateSelRegion();
 			break;
 		case VK_LEFT:
-			{
-				pView->MoveLeft();
-
-				Coordinate nSelNow;
-				nSelNow.Set(pView->nCursorCol, pView->nCursorRow);
-				Coordinate nSelOld;
-
-				Region r;
-				SelectRegion(nSelNow, &nSelOld);
-				if (nSelNow < nSelOld) {
-					r.posStart = nSelNow; r.posEnd = nSelOld;
-				} else {
-					r.posStart = nSelOld; r.posEnd = nSelNow;
-				}
-				RequestRedrawRegion(&r);
-			}
+			pView->MoveLeft();
+			UpdateSelRegion();
 			break;
 		case VK_UP:
-			{
-				pView->MoveUp();
-
-				Coordinate nSelNow;
-				nSelNow.Set(pView->nCursorCol, pView->nCursorRow);
-				Coordinate nSelOld;
-
-				Region r;
-				SelectRegion(nSelNow, &nSelOld);
-				if (nSelNow < nSelOld) {
-					r.posStart = nSelNow; r.posEnd = nSelOld;
-				} else {
-					r.posStart = nSelOld; r.posEnd = nSelNow;
-				}
-				RequestRedrawRegion(&r);
-			}
+			pView->MoveUp();
+			UpdateSelRegion();
 			break;
 		case VK_DOWN:
-			{
-				pView->MoveDown();
-
-				Coordinate nSelNow;
-				nSelNow.Set(pView->nCursorCol, pView->nCursorRow);
-				Coordinate nSelOld;
-
-				Region r;
-				SelectRegion(nSelNow, &nSelOld);
-				if (nSelNow < nSelOld) {
-					r.posStart = nSelNow; r.posEnd = nSelOld;
-				} else {
-					r.posStart = nSelOld; r.posEnd = nSelNow;
-				}
-				RequestRedrawRegion(&r);
-			}
+			pView->MoveDown();
+			UpdateSelRegion();
 			break;
 		}
 	} else {
@@ -445,6 +385,21 @@ BOOL YAEdit::OnKeyDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	return TRUE;
 }
 
+void YAEdit::UpdateSelRegion()
+{
+	Coordinate nSelNow = pView->GetCaretPosition();
+	Coordinate nSelOld;
+
+	Region r;
+	SelectRegion(nSelNow, &nSelOld);
+	if (nSelNow < nSelOld) {
+		r.posStart = nSelNow; r.posEnd = nSelOld;
+	} else {
+		r.posStart = nSelOld; r.posEnd = nSelNow;
+	}
+	RequestRedrawRegion(&r);
+}
+
 /////////////////////////////////////////////////////////////////////////////
 // WM_CHAR
 /////////////////////////////////////////////////////////////////////////////
@@ -457,13 +412,8 @@ void YAEdit::OnChar(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		return;
 	}
 	if (ch == CHARA_ENTER) {
-		DeleteRegion();
-		InsertLine(TEXT("\n"));
-
-		// check and update vert lines.
+		ReplaceText(SelectedRegion(), TEXT("\n"));
 		pView->ResetScrollbar();
-		MoveRight();
-
 		return;
 	}
 	if (ch == CHARA_CTRL_C) {
@@ -473,10 +423,12 @@ void YAEdit::OnChar(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		return;
 	}
 	if (ch == CHARA_CTRL_X) {
-		if (!CopyToClipboard()) {
-			MessageBox(hWnd, TEXT("Copy to clipboard failed."), TEXT("ERROR"), MB_ICONWARNING | MB_OK);
+		if (IsRegionSelected()) {
+			if (!CopyToClipboard()) {
+				MessageBox(hWnd, TEXT("Copy to clipboard failed."), TEXT("ERROR"), MB_ICONWARNING | MB_OK);
+			}
+			ReplaceText(SelectedRegion(), TEXT(""));
 		}
-		DeleteRegion();
 		return;
 	}
 	if (ch == CHARA_CTRL_V) {
@@ -490,8 +442,7 @@ void YAEdit::OnChar(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	if (aKeyBuffer[0] != '\0') {
 		aKeyBuffer[1] = ch;
 		aKeyBuffer[2] = TEXT('\0');
-		DeleteRegion();
-		InsertLine(aKeyBuffer);
+		ReplaceText(SelectedRegion(), aKeyBuffer);
 		aKeyBuffer[0] = aKeyBuffer[1] = '\0';
 		return;
 	} else {
@@ -501,68 +452,34 @@ void YAEdit::OnChar(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		}
 	}
 #endif
-	DeleteRegion();
 	TCHAR kbuf[2];
 	kbuf[0] = ch; kbuf[1] = TEXT('\0');
-	InsertLine(kbuf);
+	ReplaceText(SelectedRegion(), kbuf);
 }
 
 void YAEdit::KeyBS()
 {
-	if (SelectedRegion().posStart != SelectedRegion().posEnd) {
-		// selection area exists
-
-		Region r;
-		r.posStart = SelectedRegion().posStart;
-
-		DWORD nPreLines = pLineMgr->MaxLine();
-
-		DeleteRegion();
-
-//		if (nPreLines == pLineMgr->MaxLine()) {
-//			GetEndPhysicalPos(SelectedRegion().posEnd.row, &(r.posEnd));
-//		} else {
-//			GetEndPhysicalPos(pLineMgr->MaxLine(), &(r.posEnd));
-//		}
-//		pView->RequestRedrawRegion(&r);
-
-//		pView->SetCaretPosition(Coordinate(r.posStart.col, r.posStart.row));
-
-	} else if (pView->nCursorCol == 0) {
-		// not selected and cursor is top of line
-
-		if (pView->nCursorRow > 0) {
-			LineChunk lc;
-			if (!pDoc->GetLineChunk(pView->nCursorRow - 1, &lc)) return;
-			if (lc.IsContLine()) {
-				MoveLeft();
-				MoveLeft();
-				DeleteKeyDown();
-			} else {
-				// Join to previous line
-				MoveLeft();
-				JoinLine(pView->nCursorRow);
-				pView->ResetScrollbar();
-			}
-		}
+	if (IsRegionSelected()) {
+		ReplaceText(SelectedRegion(), TEXT(""));
 	} else {
-		// other case
+		Region r;
+		r.posEnd = pView->GetCaretPosition();
+		pView->MoveLeft();
+		r.posStart = pView->GetCaretPosition();
+		if (!r.IsEmptyRegion()) ReplaceText(r, TEXT(""));
+	}
+}
 
-		// check if caret places at the end of the line 
-		BOOL bAtTheEOL = FALSE;
-		LineChunk lc;
-		if (!pDoc->GetLineChunk(pView->nCursorRow, &lc)) return;
-		if (pView->nCursorCol == lc.LineLen()) {
-			bAtTheEOL = TRUE;
-		}
-
-		MoveLeft();
-		DeleteKeyDown();
-
-		if (bAtTheEOL && pView->nCursorCol == 0) {
-			MoveLeft();
-		}
-
+void YAEdit::DeleteKeyDown()
+{
+	if (IsRegionSelected()) {
+		ReplaceText(SelectedRegion(), TEXT(""));
+	} else {
+		Region r;
+		r.posStart = pView->GetCaretPosition();
+		pView->MoveRight();
+		r.posEnd = pView->GetCaretPosition();
+		if (!r.IsEmptyRegion()) ReplaceText(r, TEXT(""));
 	}
 }
 
@@ -596,10 +513,7 @@ void YAEdit::OnLButtonDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		pView->SetNearCursorPos(nMouseDrgStartX, nNewRow);
 
 		Region rOldRgn = SelectedRegion();
-		// set new region;
-		Coordinate nSelDown;
-		nSelDown.Set(pView->nCursorCol, pView->nCursorRow);
-		SetMark(nSelDown);
+		rSelRegion.posStart = rSelRegion.posEnd = pView->GetCaretPosition();
 
 		// crear previously selected region
 		RequestRedrawRegion(&rOldRgn);
@@ -637,19 +551,7 @@ void YAEdit::SetSelectionFromPoint(int xPos, int yPos)
 	DWORD nNewRow = pView->DpLinePixelToLgLineNo(yPos);
 	if (nNewRow < pLineMgr->MaxLine()) {
 		pView->SetNearCursorPos(xPos, nNewRow);
-
-		Coordinate nSelNow;
-		nSelNow.Set(pView->nCursorCol, pView->nCursorRow);
-		Coordinate nSelOld;
-
-		Region r;
-		SelectRegion(nSelNow, &nSelOld);
-		if (nSelNow < nSelOld) {
-			r.posStart = nSelNow; r.posEnd = nSelOld;
-		} else {
-			r.posStart = nSelOld; r.posEnd = nSelNow;
-		}
-		RequestRedrawRegion(&r);
+		UpdateSelRegion();
 	}
 }
 
@@ -734,6 +636,8 @@ YAEditDoc *YAEdit::SetDoc(YAEditDoc *pNewDoc)
 	pLineMgr->Reset();
 	pLineMgr->RecalcWrap(pWrapper);
 
+	pView->SetCaretPosition(Coordinate(0, 0));
+
 	pView->ResetScrollbar();
 	pView->RedrawAllScreen();
 	return pOldDoc;
@@ -744,43 +648,6 @@ YAEditDoc *YAEdit::SetDoc(YAEditDoc *pNewDoc)
 /////////////////////////////////////////////////////////////////////////////
 
 DWORD YAEdit::GetLineWidth(DWORD nOffset, LPCTSTR pStr, DWORD nLen) { return pView->GetLineWidth(nOffset, pStr, nLen); }
-
-/////////////////////////////////////////////////////////////////////////////
-// DEL key handler
-/////////////////////////////////////////////////////////////////////////////
-
-void YAEdit::DeleteKeyDown()
-{
-	LineChunk lc;
-	if (!pDoc->GetLineChunk(pView->nCursorRow, &lc)) return;
-	DWORD nLineChar = lc.LineLen();
-
-	if (pView->nCursorCol != nLineChar || lc.IsContLine()) {
-		// delete 1 char
-		DWORD nMax = pLineMgr->MaxLine();
-		////////////////////////////////
-
-		DWORD nDelChar = 1;
-#ifdef PLATFORM_WIN32
-		if (IsDBCSLeadByte(*(lc.GetLineData() + pView->nCursorCol))) {
-			nDelChar = 2;
-		}
-#endif
-		Coordinate c(pView->nCursorCol, pView->nCursorRow);
-		Region rDel;
-		LogicalPosToPhysicalPos(&c, &(rDel.posStart));
-		rDel.posEnd = rDel.posStart;
-		rDel.posEnd.col += nDelChar;	
-		pDoc->ReplaceString(&rDel, TEXT(""));
-
-		if (nMax != pLineMgr->MaxLine()) {
-			pView->ResetScrollbar();
-		}
-	} else {
-		JoinLine(pView->nCursorRow);
-		pView->ResetScrollbar();
-	}
-}
 
 /////////////////////////////////////////////////////////////////////////////
 // Resize window
@@ -795,27 +662,17 @@ void YAEdit::ResizeWindow(int x, int y, int width, int height)
 	pWrapper->SetViewWidth(pView->rClientRect.right - pView->rClientRect.left - pView->nMaxCharWidth);
 
 	// Preserve absolute cursor position before rewrapping.
-	DWORD nPhLineNo, nPhLinePos;
-	LogicalCursorPosToPhysicalCursorPos(pView->nCursorRow, pView->nCursorCol, &nPhLineNo, &nPhLinePos);
+	Coordinate cPhCursorPos;
+	pLineMgr->LogicalPosToPhysicalPos(&(pView->GetCaretPosition()), &cPhCursorPos);
 
 	// Rewrapping. Logical line will be changed.
 	pLineMgr->RecalcWrap(pWrapper);
 	pView->ResetScrollbar();
 
-	DWORD nNewCursorRow, nNewCursorCol;
-
 	// get cursor position after rewrapping.
-	PhysicalCursorPosToLogicalCursorPos(nPhLineNo, nPhLinePos, &nNewCursorRow, &nNewCursorCol);
-
-	// set new cursor position
-	pView->nCursorRow = nNewCursorRow;
-	LineChunk lc;
-	if (!pDoc->GetLineChunk(pView->nCursorRow, &lc)) return;
-	DWORD n = pView->GetLineWidth(0, lc.GetLineData(), nNewCursorCol);
-	pView->nCursorCol = nNewCursorCol;
-	pView->nCursorColPos = n;
-	
-	pView->SetCaretPos();
+	Coordinate cLgCursorPos;
+	pLineMgr->PhysicalPosToLogicalPos(&cPhCursorPos, &cLgCursorPos);
+	pView->SetCaretPosition(cLgCursorPos);
 
 	// redraw screen
 	pView->RedrawAllScreen();
@@ -833,43 +690,28 @@ void YAEdit::SetFocus()
 // Region
 /////////////////////////////////////////////////////////////////////////////
 
-BOOL YAEdit::DeleteRegion()
-{
-	if (!IsRegionSelected()) return TRUE;
-
-	Region rRegion;
-	rRegion.posStart = SelectedRegion().posStart;
-	rRegion.posEnd = SelectedRegion().posEnd;
-
-	Region rDelRgn;
-	LogicalPosToPhysicalPos(&(SelectedRegion().posStart), &(rDelRgn.posStart));
-	LogicalPosToPhysicalPos(&(SelectedRegion().posEnd), &(rDelRgn.posEnd));
-	pDoc->ReplaceString(&rDelRgn, TEXT(""));
-
-
-	ClearSelectedRegion();
-
-	pView->nCursorRow = rRegion.posStart.row;
-	pView->nCursorCol = rRegion.posStart.col;
-	LineChunk lc;
-	pDoc->GetLineChunk(pView->nCursorRow, &lc);
-	pView->nCursorColPos = pView->GetLineWidth(pView->nCursorRow, lc.GetLineData(), pView->nCursorCol);
-	pView->SetCaretPos();
-
-	return TRUE;
-}
-
 void YAEdit::ClearRegion()
 {
-	Region r = SelectedRegion();
-	RequestRedrawRegion(&r);
+	RequestRedrawRegion(&SelectedRegion());
 	ClearSelectedRegion();
 }
 
 void YAEdit::ClearSelectedRegion()
 {
-	rSelRegion.posEnd.Set(pView->nCursorCol, pView->nCursorRow); 
+	rSelRegion.posEnd = pView->GetCaretPosition();
 	rSelRegion.posStart = rSelRegion.posEnd;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// Insert String considering cursor move
+/////////////////////////////////////////////////////////////////////////////
+
+BOOL YAEdit::ReplaceText(const Region &rLg, LPCTSTR pText)
+{
+	Region r;
+	pLineMgr->LogicalPosToPhysicalPos(&(rLg.posStart), &(r.posStart));
+	pLineMgr->LogicalPosToPhysicalPos(&(rLg.posEnd), &(r.posEnd));
+	return pDoc->ReplaceString(&r, pText);
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -907,43 +749,7 @@ BOOL YAEdit::InsertFromClipboard()
 
 	// Insert to buffer
 	// allocation check has finished, so this case is clipboard is empty or unknown format, so return TRUE.
-	if (!InsertLine(pText)) return FALSE;
-
-	return TRUE;
-}
-
-/////////////////////////////////////////////////////////////////////////////
-// Insert String considering cursor move
-/////////////////////////////////////////////////////////////////////////////
-
-BOOL YAEdit::InsertLine(LPCTSTR pText)
-{
-	DWORD nLen = _tcslen(pText);
-
-	Region r;
-	Coordinate cCursor(pView->nCursorCol, pView->nCursorRow);
-	pLineMgr->LogicalPosToPhysicalPos(&cCursor, &(r.posStart));
-	r.posEnd = r.posStart;
-	
-	if (!pDoc->ReplaceString(&r, pText)) return FALSE;
-
-	// Adjust Cursor pos : TODO integrate this logic
-	DWORD i;
-	for (i = 0; i < nLen; i++) {
-		if (pText[i] != TEXT('\r') && pText[i] != TEXT('\n')) {
-			MoveRight();
-		}
-		if (pView->nCursorColPos == 0) {
-			MoveRight();
-		}
-
-#if defined(PLATFORM_WIN32)
-		// MoveRight should call by letters(not bytes), so skip non-lead byte
-		if (IsDBCSLeadByte(*(pText + i))) {
-			i++;
-		}
-#endif
-	}
+	if (!ReplaceText(SelectedRegion(), pText)) return FALSE;
 
 	return TRUE;
 }
@@ -954,7 +760,7 @@ BOOL YAEdit::InsertLine(LPCTSTR pText)
 
 DWORD YAEdit::GetRegionSize()
 {
-	if (rSelRegion.posStart.row == rSelRegion.posEnd.row) {
+	if (IsSelRegionOneLine()) {
 		return rSelRegion.posEnd.col - rSelRegion.posStart.col;
 	} else {
 		DWORD nSize = 0;
@@ -979,7 +785,7 @@ DWORD YAEdit::GetRegionSize()
 
 BOOL YAEdit::GetRegionString(LPTSTR pBuf)
 {
-	if (rSelRegion.posStart.row == rSelRegion.posEnd.row) {
+	if (IsSelRegionOneLine()) {
 		LineChunk lc;
 		if (!pDoc->GetLineChunk(rSelRegion.posStart.row, &lc)) return FALSE;
 		DWORD n = rSelRegion.posEnd.col - rSelRegion.posStart.col;
@@ -1027,14 +833,9 @@ BOOL YAEdit::GetRegionString(LPTSTR pBuf)
 	}
 }
 
-void YAEdit::SetMark(const Coordinate &nStart)
-{
-	rSelRegion.posStart = rSelRegion.posEnd = nStart;
-}
-
 void YAEdit::SelectRegion(const Coordinate &nCurrent, Coordinate *pPrev)
 {
-	if (rSelRegion.posStart == rSelRegion.posEnd) {
+	if (!IsRegionSelected()) {
 		*pPrev = rSelRegion.posStart;
 
 		if (rSelRegion.posStart < nCurrent) {
@@ -1072,72 +873,28 @@ void YAEdit::SelectRegion(const Coordinate &nCurrent, Coordinate *pPrev)
 }
 
 /////////////////////////////////////////////////////////////////////////////
-// Convert logical pos -> physical pos
-/////////////////////////////////////////////////////////////////////////////
-
-void YAEdit::LogicalCursorPosToPhysicalCursorPos(DWORD nLgLineNo, DWORD nLgCursorPosX, LPDWORD pPhLineNo, LPDWORD pPhCursorPos)
-{
-	pLineMgr->LogicalCursorPosToPhysicalCursorPos(nLgLineNo, nLgCursorPosX, pPhLineNo, pPhCursorPos);
-}
-
-void YAEdit::PhysicalCursorPosToLogicalCursorPos(DWORD nPhLineNo, DWORD nPhCursorPosX, LPDWORD pLgLineNo, LPDWORD pLgCursorPos)
-{
-	pLineMgr->PhysicalCursorPosToLogicalCursorPos(nPhLineNo, nPhCursorPosX, pLgLineNo, pLgCursorPos);
-}
-
-void YAEdit::LogicalPosToPhysicalPos(const Coordinate *pLgPos, Coordinate *pPhPos)
-{
-	pLineMgr->LogicalPosToPhysicalPos(pLgPos, pPhPos);
-}
-
-void YAEdit::PhysicalPosToLogicalPos(const Coordinate *pPhPos, Coordinate *pLgPos)
-{
-	pLineMgr->PhysicalPosToLogicalPos(pPhPos, pLgPos);
-}
-
-// get end of 
-void YAEdit::GetEndPhysicalPos(DWORD nLgLineNo, Coordinate *pPos)
-{
-	pLineMgr->GetEndPhysicalPos(nLgLineNo, pPos);
-}
-
-/////////////////////////////////////////////////////////////////////////////
 // Update notify from YAEditDoc
 /////////////////////////////////////////////////////////////////////////////
 
-BOOL YAEdit::UpdateNotify(PhysicalLineManager *pPhMgr, const Region *pOldRegion, DWORD nBefPhLines, DWORD nAftPhLines, DWORD nAffeLines)
+BOOL YAEdit::UpdateNotify(PhysicalLineManager *pPhMgr, const Region *pOldRegion, const Region *pNewRegion, DWORD nBefPhLines, DWORD nAftPhLines, DWORD nAffeLines)
 {
 	DWORD nBefLgLines = pLineMgr->MaxLine();
+
 	Coordinate cLgAfStart;
 	DWORD nAffLgLines;
 	if (!pLineMgr->AdjustLgLines(pPhMgr, pWrapper, *pOldRegion, nBefPhLines, nAftPhLines, nAffeLines, &cLgAfStart, &nAffLgLines)) return FALSE;
+
 	DWORD nAftLgLines = pLineMgr->MaxLine();
 
+	// adjust caret position
+	Coordinate cCaretPos;
+	pLineMgr->PhysicalPosToLogicalPos(&(pNewRegion->posEnd), &cCaretPos);
+	pView->SetCaretPosition(cCaretPos);
+	ClearSelectedRegion();
+
 	// update view
-	// impliment for the present..
+	// what a inefficient logic!!
 	RequestRedraw(cLgAfStart.row, 0, TRUE);
-	ClearRegion();
-
-	return TRUE;
-}
-
-/////////////////////////////////////////////////////////////////////////////
-// Join line
-/////////////////////////////////////////////////////////////////////////////
-
-BOOL YAEdit::JoinLine(DWORD nLgLineNo)
-{
-	LineChunk lc;
-	if (!pDoc->GetLineChunk(nLgLineNo, &lc)) return FALSE;
-
-	Coordinate cLgEnd(lc.LineLen(), nLgLineNo); // end of the line;
-	Coordinate cPhEnd;
-	pLineMgr->LogicalPosToPhysicalPos(&cLgEnd, &cPhEnd);
-
-	Region r;
-	r.posStart = cPhEnd;
-	r.posEnd.Set(0, cPhEnd.row + 1);
-	if (!pDoc->ReplaceString(&r, TEXT(""))) return FALSE;
 
 	return TRUE;
 }

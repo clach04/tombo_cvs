@@ -127,38 +127,29 @@ DWORD LineManager::ConvertToPhysicalLine(DWORD nLgLine)
 
 // (LgLineNo, LgPos) -> (PhLineNo, PhPos)
 
-void LineManager::LogicalCursorPosToPhysicalCursorPos(DWORD nLgLineNo, DWORD nLgCursorPosX, LPDWORD pPhLineNo, LPDWORD pPhCursorPos)
-{
-	*pPhLineNo = ConvertToPhysicalLine(nLgLineNo);
-	LgLineInfo *pLi = aliLine.GetUnit(nLgLineNo);
-	*pPhCursorPos = pLi->nLinePos + nLgCursorPosX;
-}
-
 void LineManager::LogicalPosToPhysicalPos(const Coordinate *pLgPos, Coordinate *pPhPos)
 {
-	LogicalCursorPosToPhysicalCursorPos(pLgPos->row, pLgPos->col, &(pPhPos->row), &(pPhPos->col));
+	DWORD nLgLineNo = pLgPos->row;
+	pPhPos->row = ConvertToPhysicalLine(nLgLineNo);
+	LgLineInfo *pLi = aliLine.GetUnit(nLgLineNo);
+	pPhPos->col = pLi->nLinePos + pLgPos->col;
 }
 
 // (PhLineNo, PhPos) -> (LgLineNo, LgPos)
-
-void LineManager::PhysicalCursorPosToLogicalCursorPos(DWORD nPhLineNo, DWORD nPhCursorPosX, LPDWORD pLgLineNo, LPDWORD pLgCursorPos)
+void LineManager::PhysicalPosToLogicalPos(const Coordinate *pPhPos, Coordinate *pLgPos)
 {
+	DWORD nPhLineNo = pPhPos->row;
 	DWORD nLgLineTop = ConvertPhLineToLgLineTop(nPhLineNo);
 
-	DWORD nPos = nPhCursorPosX;
+	DWORD nPos = pPhPos->col;
 	DWORD i = nLgLineTop;
 	while(i + 1 < aliLine.NumItems()) {
 		LgLineInfo *pLi = aliLine.GetUnit(i + 1);
 		if (pLi->nPhyLineNo != nPhLineNo || pLi->nLinePos > nPos) break;
 		i++;
 	}
-	*pLgLineNo = i;
-	*pLgCursorPos = nPhCursorPosX - aliLine.GetUnit(i)->nLinePos;
-}
-
-void LineManager::PhysicalPosToLogicalPos(const Coordinate *pPhPos, Coordinate *pLgPos)
-{
-	PhysicalCursorPosToLogicalCursorPos(pPhPos->row, pPhPos->col, &(pLgPos->row), &(pLgPos->col));
+	pLgPos->row = i;
+	pLgPos->col = pPhPos->col - aliLine.GetUnit(i)->nLinePos;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -212,30 +203,6 @@ BOOL LineManager::GetLineChunk(DWORD nLgLine, LineChunk *pChunk)
 	return TRUE;
 }
 
-/////////////////////////////////////////////////////////////////////////////
-// 
-/////////////////////////////////////////////////////////////////////////////
-void LineManager::GetEndPhysicalPos(DWORD nLgLineNo, Coordinate *pPos)
-{
-	// get max logical lineno that is same as PhLineNo(nLgLineNo)
-	DWORD nCur;
-	LgLineInfo *p = aliLine.GetUnit(nLgLineNo);
-	DWORD nPhLineNo = p->nPhyLineNo;
-	nCur = nLgLineNo;
-	DWORD n = aliLine.NumItems() - 1;
-	while(nCur < n) {
-		p = aliLine.GetUnit(nCur + 1);
-		if (p->nPhyLineNo != nPhLineNo) break;
-		nCur++;
-	}
-
-	pPos->row = nCur;
-
-	// get last logical col of the nCur
-	LineChunk lc;
-	GetLineChunk(nCur, &lc);
-	pPos->col = lc.LineLen();
-}
 /////////////////////////////////////////////////////////////////////////////
 // 
 /////////////////////////////////////////////////////////////////////////////

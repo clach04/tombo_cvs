@@ -52,7 +52,7 @@ public:
 	BOOL InsertString(DWORD nLineNo, DWORD nStart, LPCTSTR pData, DWORD nLen);
 	BOOL DeleteString(DWORD nLineNo, DWORD nStart, DWORD nLen);
 
-	BOOL ReplaceRegion(const Region *pRegion, LPCTSTR pStr, LPDWORD pAffectedLines);
+	BOOL ReplaceRegion(const Region *pRegion, LPCTSTR pStr, LPDWORD pAffectedLines, Region *pNewRegion);
 
 	friend class PhysicalLineManagerTest;
 };

@@ -518,3 +518,15 @@ Changes
 // 2.0 branch
 
 * Rename some classes
+* Add unit test modules
+
+////////////////////////////////
+// B124
+////////////////////////////////
+// 2.0 branch
+
+* FIX: when select whole lines and hit BS key, YAE hangups.
+* some refactorings.
+	caret positions
+	BS/DEL key handers
+	...

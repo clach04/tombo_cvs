@@ -211,6 +211,14 @@ SOURCE=..\Src\YAEdit\PhysicalLineManager.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\Src\YAEdit\Region.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\Src\YAEdit\Region.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\Src\YAEdit\StringSplitter.cpp
 # End Source File
 # Begin Source File

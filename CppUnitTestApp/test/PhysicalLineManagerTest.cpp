@@ -117,11 +117,11 @@ void PhysicalLineManagerTest::ReplaceRegion1to1Test()
 	LPCTSTR pStr = "0123456789";
 	CPPUNIT_ASSERT(mgr.LoadDoc(pStr));
 
-	Region r;
+	Region r, nr;
 	DWORD nEffeEnd;
 	r.posStart.Set(3, 0);
 	r.posEnd.Set(5, 0);
-	BOOL b = mgr.ReplaceRegion(&r, "abc", &nEffeEnd);
+	BOOL b = mgr.ReplaceRegion(&r, "abc", &nEffeEnd, &nr);
 	CPPUNIT_ASSERT(b);
 
 	// RESULT:
@@ -130,6 +130,11 @@ void PhysicalLineManagerTest::ReplaceRegion1to1Test()
 	CPPUNIT_ASSERT(mgr.aliLine.NumItems() == 1);
 	CPPUNIT_ASSERT(strncmp(mgr.aliLine.GetUnit(0)->pLine->GetDataArea(), "012abc56789", 11) == 0);
 	CPPUNIT_ASSERT(nEffeEnd == 1);
+
+	Region tr;
+	tr.posStart.Set(3, 0);
+	tr.posEnd.Set(6, 0);
+	CPPUNIT_ASSERT(nr == tr);
 }
 
 void PhysicalLineManagerTest::ReplaceRegion1to2Test()
@@ -139,11 +144,11 @@ void PhysicalLineManagerTest::ReplaceRegion1to2Test()
 	LPCTSTR pStr = "0123456789";
 	CPPUNIT_ASSERT(mgr.LoadDoc(pStr));
 
-	Region r;
+	Region r, nr;
 	DWORD nEffeEnd;
 	r.posStart.Set(3, 0);
 	r.posEnd.Set(5, 0);
-	BOOL b = mgr.ReplaceRegion(&r, "abc\ndef", &nEffeEnd);
+	BOOL b = mgr.ReplaceRegion(&r, "abc\ndef", &nEffeEnd, &nr);
 	CPPUNIT_ASSERT(b);
 
 	// RESULT:
@@ -154,6 +159,11 @@ void PhysicalLineManagerTest::ReplaceRegion1to2Test()
 	CPPUNIT_ASSERT(strncmp(mgr.aliLine.GetUnit(0)->pLine->GetDataArea(), "012abc", 6) == 0);
 	CPPUNIT_ASSERT(strncmp(mgr.aliLine.GetUnit(1)->pLine->GetDataArea(), "def56789", 8) == 0);
 	CPPUNIT_ASSERT(nEffeEnd == 2);
+
+	Region tr;
+	tr.posStart.Set(3, 0);
+	tr.posEnd.Set(3, 1);
+	CPPUNIT_ASSERT(nr == tr);
 }
 
 void PhysicalLineManagerTest::ReplaceRegion1to3Test()
@@ -163,11 +173,11 @@ void PhysicalLineManagerTest::ReplaceRegion1to3Test()
 	LPCTSTR pStr = "0123456789";
 	CPPUNIT_ASSERT(mgr.LoadDoc(pStr));
 
-	Region r;
+	Region r, nr;
 	DWORD nEffeEnd;
 	r.posStart.Set(3, 0);
 	r.posEnd.Set(5, 0);
-	BOOL b = mgr.ReplaceRegion(&r, "abc\ndef\nghi", &nEffeEnd);
+	BOOL b = mgr.ReplaceRegion(&r, "abc\ndef\nghi", &nEffeEnd, &nr);
 	CPPUNIT_ASSERT(b);
 
 	// RESULT:
@@ -179,6 +189,11 @@ void PhysicalLineManagerTest::ReplaceRegion1to3Test()
 	CPPUNIT_ASSERT(strncmp(mgr.aliLine.GetUnit(1)->pLine->GetDataArea(), "def", 3) == 0);
 	CPPUNIT_ASSERT(strncmp(mgr.aliLine.GetUnit(2)->pLine->GetDataArea(), "ghi56789", 8) == 0);
 	CPPUNIT_ASSERT(nEffeEnd == 3);
+
+	Region tr;
+	tr.posStart.Set(3, 0);
+	tr.posEnd.Set(3, 2);
+	CPPUNIT_ASSERT(nr == tr);
 }
 
 void PhysicalLineManagerTest::ReplaceRegion2to1Test()
@@ -188,11 +203,11 @@ void PhysicalLineManagerTest::ReplaceRegion2to1Test()
 	LPCTSTR pStr = "01234\n56789";
 	CPPUNIT_ASSERT(mgr.LoadDoc(pStr));
 
-	Region r;
+	Region r, nr;
 	DWORD nEffeEnd;
 	r.posStart.Set(3, 0);
 	r.posEnd.Set(3, 1);
-	BOOL b = mgr.ReplaceRegion(&r, "abc", &nEffeEnd);
+	BOOL b = mgr.ReplaceRegion(&r, "abc", &nEffeEnd, &nr);
 	CPPUNIT_ASSERT(b);
 
 	// RESULT:
@@ -201,6 +216,11 @@ void PhysicalLineManagerTest::ReplaceRegion2to1Test()
 	CPPUNIT_ASSERT(mgr.aliLine.NumItems() == 1);
 	CPPUNIT_ASSERT(strncmp(mgr.aliLine.GetUnit(0)->pLine->GetDataArea(), "012abc89", 8) == 0);
 	CPPUNIT_ASSERT(nEffeEnd == 1);
+
+	Region tr;
+	tr.posStart.Set(3, 0);
+	tr.posEnd.Set(6, 0);
+	CPPUNIT_ASSERT(nr == tr);
 }
 
 void PhysicalLineManagerTest::ReplaceRegion2to2Test() 
@@ -210,11 +230,11 @@ void PhysicalLineManagerTest::ReplaceRegion2to2Test()
 	LPCTSTR pStr = "01234\n56789";
 	CPPUNIT_ASSERT(mgr.LoadDoc(pStr));
 
-	Region r;
+	Region r, nr;
 	DWORD nEffeEnd;
 	r.posStart.Set(3, 0);
 	r.posEnd.Set(3, 1);
-	BOOL b = mgr.ReplaceRegion(&r, "abc\nde", &nEffeEnd);
+	BOOL b = mgr.ReplaceRegion(&r, "abc\nde", &nEffeEnd, &nr);
 	CPPUNIT_ASSERT(b);
 
 	// RESULT:
@@ -225,6 +245,11 @@ void PhysicalLineManagerTest::ReplaceRegion2to2Test()
 	CPPUNIT_ASSERT(strncmp(mgr.aliLine.GetUnit(0)->pLine->GetDataArea(), "012abc", 6) == 0);
 	CPPUNIT_ASSERT(strncmp(mgr.aliLine.GetUnit(1)->pLine->GetDataArea(), "de89", 4) == 0);
 	CPPUNIT_ASSERT(nEffeEnd == 2);
+
+	Region tr;
+	tr.posStart.Set(3, 0);
+	tr.posEnd.Set(2, 1);
+	CPPUNIT_ASSERT(nr == tr);
 }
 
 void PhysicalLineManagerTest::ReplaceRegion2to3Test()
@@ -234,11 +259,11 @@ void PhysicalLineManagerTest::ReplaceRegion2to3Test()
 	LPCTSTR pStr = "01234\n56789";
 	CPPUNIT_ASSERT(mgr.LoadDoc(pStr));
 
-	Region r;
+	Region r, nr;
 	DWORD nEffeEnd;
 	r.posStart.Set(0, 0);
 	r.posEnd.Set(2, 1);
-	BOOL b = mgr.ReplaceRegion(&r, "abc\ndefg\nhij", &nEffeEnd);
+	BOOL b = mgr.ReplaceRegion(&r, "abc\ndefg\nhij", &nEffeEnd, &nr);
 	CPPUNIT_ASSERT(b);
 
 	// RESULT:
@@ -251,6 +276,12 @@ void PhysicalLineManagerTest::ReplaceRegion2to3Test()
 	CPPUNIT_ASSERT(strncmp(mgr.aliLine.GetUnit(1)->pLine->GetDataArea(), "defg", 4) == 0);
 	CPPUNIT_ASSERT(strncmp(mgr.aliLine.GetUnit(2)->pLine->GetDataArea(), "hij789", 6) == 0);
 	CPPUNIT_ASSERT(nEffeEnd == 3);
+
+	Region tr;
+	tr.posStart.Set(0, 0);
+	tr.posEnd.Set(3, 2);
+	CPPUNIT_ASSERT(nr == tr);
+
 }
 
 
@@ -265,11 +296,11 @@ void PhysicalLineManagerTest::ReplaceRegion3to1Test()
 
 	CPPUNIT_ASSERT(mgr.aliLine.NumItems() == 5);
 
-	Region r;
+	Region r, nr;
 	DWORD nEffeEnd;
 	r.posStart.Set(6, 1);
 	r.posEnd.Set(5, 3);
-	b = mgr.ReplaceRegion(&r, "abc", &nEffeEnd);
+	b = mgr.ReplaceRegion(&r, "abc", &nEffeEnd, &nr);
 
 	// RESULT:
 	// line1 ONE
@@ -281,6 +312,11 @@ void PhysicalLineManagerTest::ReplaceRegion3to1Test()
 	CPPUNIT_ASSERT(strncmp(mgr.aliLine.GetUnit(1)->pLine->GetDataArea(), "line2 abc FOUR", 14) == 0);
 	CPPUNIT_ASSERT(strncmp(mgr.aliLine.GetUnit(2)->pLine->GetDataArea(), "line5 FIVE", 10) == 0);
 	CPPUNIT_ASSERT(nEffeEnd == 1);
+
+	Region tr;
+	tr.posStart.Set(6, 1);
+	tr.posEnd.Set(9, 1);
+	CPPUNIT_ASSERT(nr == tr);
 }
 
 void PhysicalLineManagerTest::ReplaceRegion3to2Test()
@@ -294,11 +330,11 @@ void PhysicalLineManagerTest::ReplaceRegion3to2Test()
 
 	CPPUNIT_ASSERT(mgr.aliLine.NumItems() == 5);
 
-	Region r;
+	Region r, nr;
 	DWORD nEffeEnd;
 	r.posStart.Set(6, 1);
 	r.posEnd.Set(5, 3);
-	b = mgr.ReplaceRegion(&r, "abc\ndef", &nEffeEnd);
+	b = mgr.ReplaceRegion(&r, "abc\ndef", &nEffeEnd, &nr);
 
 	// RESULT:
 	// line1 ONE
@@ -312,6 +348,11 @@ void PhysicalLineManagerTest::ReplaceRegion3to2Test()
 	CPPUNIT_ASSERT(strncmp(mgr.aliLine.GetUnit(2)->pLine->GetDataArea(), "def FOUR", 8) == 0);
 	CPPUNIT_ASSERT(strncmp(mgr.aliLine.GetUnit(3)->pLine->GetDataArea(), "line5 FIVE", 10) == 0);
 	CPPUNIT_ASSERT(nEffeEnd == 2);
+
+	Region tr;
+	tr.posStart.Set(6, 1);
+	tr.posEnd.Set(3, 2);
+	CPPUNIT_ASSERT(nr == tr);
 }
 
 void PhysicalLineManagerTest::ReplaceRegion3to3Test()
@@ -325,11 +366,11 @@ void PhysicalLineManagerTest::ReplaceRegion3to3Test()
 
 	CPPUNIT_ASSERT(mgr.aliLine.NumItems() == 5);
 
-	Region r;
+	Region r, nr;
 	DWORD nEffeEnd;
 	r.posStart.Set(6, 1);
 	r.posEnd.Set(5, 3);
-	b = mgr.ReplaceRegion(&r, "abc\ndef\nghi", &nEffeEnd);
+	b = mgr.ReplaceRegion(&r, "abc\ndef\nghi", &nEffeEnd, &nr);
 
 	// RESULT:
 	// line1 ONE
@@ -345,6 +386,11 @@ void PhysicalLineManagerTest::ReplaceRegion3to3Test()
 	CPPUNIT_ASSERT(strncmp(mgr.aliLine.GetUnit(3)->pLine->GetDataArea(), "ghi FOUR", 8) == 0);
 	CPPUNIT_ASSERT(strncmp(mgr.aliLine.GetUnit(4)->pLine->GetDataArea(), "line5 FIVE", 10) == 0);
 	CPPUNIT_ASSERT(nEffeEnd == 3);
+
+	Region tr;
+	tr.posStart.Set(6, 1);
+	tr.posEnd.Set(3, 3);
+	CPPUNIT_ASSERT(nr == tr);
 }
 
 void PhysicalLineManagerTest::ReplaceRegionEmpRgnToStrTest()
@@ -358,11 +404,11 @@ void PhysicalLineManagerTest::ReplaceRegionEmpRgnToStrTest()
 
 	CPPUNIT_ASSERT(mgr.aliLine.NumItems() == 5);
 
-	Region r;
+	Region r, nr;
 	DWORD nEffeEnd;
 	r.posStart.Set(5, 1);
 	r.posEnd.Set(5, 1);
-	b = mgr.ReplaceRegion(&r, "string", &nEffeEnd);
+	b = mgr.ReplaceRegion(&r, "string", &nEffeEnd, &nr);
 
 	CPPUNIT_ASSERT(mgr.aliLine.NumItems() == 5);
 	CPPUNIT_ASSERT(strncmp(mgr.aliLine.GetUnit(0)->pLine->GetDataArea(), "line1 ONE", 9) == 0);
@@ -372,6 +418,10 @@ void PhysicalLineManagerTest::ReplaceRegionEmpRgnToStrTest()
 	CPPUNIT_ASSERT(strncmp(mgr.aliLine.GetUnit(4)->pLine->GetDataArea(), "line5 FIVE", 10) == 0);
 	CPPUNIT_ASSERT(nEffeEnd == 1);
 
+	Region tr;
+	tr.posStart.Set(5, 1);
+	tr.posEnd.Set(11, 1);
+	CPPUNIT_ASSERT(nr == tr);
 }
 
 void PhysicalLineManagerTest::ReplaceRegionRgnToEmpStrTest()
@@ -385,17 +435,22 @@ void PhysicalLineManagerTest::ReplaceRegionRgnToEmpStrTest()
 
 	CPPUNIT_ASSERT(mgr.aliLine.NumItems() == 5);
 
-	Region r;
+	Region r, nr;
 	DWORD nEffeEnd;
 	r.posStart.Set(0, 1);
 	r.posEnd.Set(0, 3);
-	b = mgr.ReplaceRegion(&r, "", &nEffeEnd);
+	b = mgr.ReplaceRegion(&r, "", &nEffeEnd, &nr);
 
 	CPPUNIT_ASSERT(mgr.aliLine.NumItems() == 3);
 	CPPUNIT_ASSERT(strncmp(mgr.aliLine.GetUnit(0)->pLine->GetDataArea(), "line1 ONE", 9) == 0);
 	CPPUNIT_ASSERT(strncmp(mgr.aliLine.GetUnit(1)->pLine->GetDataArea(), "line4 FOUR", 10) == 0);
 	CPPUNIT_ASSERT(strncmp(mgr.aliLine.GetUnit(2)->pLine->GetDataArea(), "line5 FIVE", 10) == 0);
 	CPPUNIT_ASSERT(nEffeEnd == 1);
+
+	Region tr;
+	tr.posStart.Set(0, 1);
+	tr.posEnd.Set(0, 1);
+	CPPUNIT_ASSERT(nr == tr);
 }
 
 void PhysicalLineManagerTest::ReplaceRegionRgnToEmpStr2Test()
@@ -407,13 +462,20 @@ void PhysicalLineManagerTest::ReplaceRegionRgnToEmpStr2Test()
 	BOOL b = mgr.LoadDoc(pStr);
 	CPPUNIT_ASSERT(b);
 
+
 	CPPUNIT_ASSERT(mgr.aliLine.NumItems() == 5);
 
-	Region r;
+	// line1 ONE
+	// line2[ TWO
+	// line3 THREE]
+	// line4 FOUR
+	// line5 FIVE
+
+	Region r, nr;
 	DWORD nEffeEnd;
 	r.posStart.Set(5, 1);
 	r.posEnd.Set(11, 2);
-	b = mgr.ReplaceRegion(&r, "", &nEffeEnd);
+	b = mgr.ReplaceRegion(&r, "", &nEffeEnd, &nr);
 
 	CPPUNIT_ASSERT(mgr.aliLine.NumItems() == 4);
 	CPPUNIT_ASSERT(strncmp(mgr.aliLine.GetUnit(0)->pLine->GetDataArea(), "line1 ONE", 9) == 0);
@@ -421,6 +483,16 @@ void PhysicalLineManagerTest::ReplaceRegionRgnToEmpStr2Test()
 	CPPUNIT_ASSERT(strncmp(mgr.aliLine.GetUnit(2)->pLine->GetDataArea(), "line4 FOUR", 10) == 0);
 	CPPUNIT_ASSERT(strncmp(mgr.aliLine.GetUnit(3)->pLine->GetDataArea(), "line5 FIVE", 10) == 0);
 	CPPUNIT_ASSERT(nEffeEnd == 1);
+
+	// line1 ONE
+	// line2
+	// line4 FOUR
+	// line5 FIVE
+
+	Region tr;
+	tr.posStart.Set(5, 1);
+	tr.posEnd.Set(5, 1);
+	CPPUNIT_ASSERT(nr == tr);
 }
 
 void PhysicalLineManagerTest::ReplaceRegionRgnToEmpStr3Test()
@@ -434,11 +506,11 @@ void PhysicalLineManagerTest::ReplaceRegionRgnToEmpStr3Test()
 
 	CPPUNIT_ASSERT(mgr.aliLine.NumItems() == 5);
 
-	Region r;
+	Region r, nr;
 	DWORD nEffeEnd;
 	r.posStart.Set(0, 2);
 	r.posEnd.Set(5, 3);
-	b = mgr.ReplaceRegion(&r, "", &nEffeEnd);
+	b = mgr.ReplaceRegion(&r, "", &nEffeEnd, &nr);
 
 	CPPUNIT_ASSERT(mgr.aliLine.NumItems() == 4);
 	CPPUNIT_ASSERT(strncmp(mgr.aliLine.GetUnit(0)->pLine->GetDataArea(), "line1 ONE", 9) == 0);
@@ -446,6 +518,11 @@ void PhysicalLineManagerTest::ReplaceRegionRgnToEmpStr3Test()
 	CPPUNIT_ASSERT(strncmp(mgr.aliLine.GetUnit(2)->pLine->GetDataArea(), " FOUR", 5) == 0);
 	CPPUNIT_ASSERT(strncmp(mgr.aliLine.GetUnit(3)->pLine->GetDataArea(), "line5 FIVE", 10) == 0);
 	CPPUNIT_ASSERT(nEffeEnd == 1);
+
+	Region tr;
+	tr.posStart.Set(0, 2);
+	tr.posEnd.Set(0, 2);
+	CPPUNIT_ASSERT(nr == tr);
 }
 
 void PhysicalLineManagerTest::ReplaceRegionRgnToEmpStr4Test()
@@ -465,11 +542,11 @@ void PhysicalLineManagerTest::ReplaceRegionRgnToEmpStr4Test()
 	// line4 FOUR
 	// line5 FIVE
 
-	Region r;
+	Region r, nr;
 	DWORD nEffeEnd;
 	r.posStart.Set(0, 2);
 	r.posEnd.Set(11, 2);
-	b = mgr.ReplaceRegion(&r, "", &nEffeEnd);
+	b = mgr.ReplaceRegion(&r, "", &nEffeEnd, &nr);
 
 	CPPUNIT_ASSERT(mgr.aliLine.NumItems() == 5);
 	CPPUNIT_ASSERT(strncmp(mgr.aliLine.GetUnit(0)->pLine->GetDataArea(), "line1 ONE", 9) == 0);
@@ -479,6 +556,11 @@ void PhysicalLineManagerTest::ReplaceRegionRgnToEmpStr4Test()
 	CPPUNIT_ASSERT(strncmp(mgr.aliLine.GetUnit(4)->pLine->GetDataArea(), "line5 FIVE", 10) == 0);
 
 	CPPUNIT_ASSERT(nEffeEnd == 1);
+
+	Region tr;
+	tr.posStart.Set(0, 2);
+	tr.posEnd.Set(0, 2);
+	CPPUNIT_ASSERT(nr == tr);
 }
 
 void PhysicalLineManagerTest::ReplaceRegionRgnToEmpStr5Test()
@@ -498,11 +580,11 @@ void PhysicalLineManagerTest::ReplaceRegionRgnToEmpStr5Test()
 	// ]line4 FOUR
 	// line5 FIVE
 
-	Region r;
+	Region r, nr;
 	DWORD nEffeEnd;
 	r.posStart.Set(0, 2);
 	r.posEnd.Set(0, 3);
-	b = mgr.ReplaceRegion(&r, "", &nEffeEnd);
+	b = mgr.ReplaceRegion(&r, "", &nEffeEnd, &nr);
 
 	CPPUNIT_ASSERT(mgr.aliLine.NumItems() == 4);
 	CPPUNIT_ASSERT(strncmp(mgr.aliLine.GetUnit(0)->pLine->GetDataArea(), "line1 ONE", 9) == 0);
@@ -511,6 +593,11 @@ void PhysicalLineManagerTest::ReplaceRegionRgnToEmpStr5Test()
 	CPPUNIT_ASSERT(strncmp(mgr.aliLine.GetUnit(3)->pLine->GetDataArea(), "line5 FIVE", 10) == 0);
 
 	CPPUNIT_ASSERT(nEffeEnd == 1);
+
+	Region tr;
+	tr.posStart.Set(0, 2);
+	tr.posEnd.Set(0, 2);
+	CPPUNIT_ASSERT(nr == tr);
 }
 
 void PhysicalLineManagerTest::ReplaceRegionRgnToEmpStr6Test()
@@ -529,11 +616,11 @@ void PhysicalLineManagerTest::ReplaceRegionRgnToEmpStr6Test()
 	// line4 FOUR]
 	// line5 FIVE
 
-	Region r;
+	Region r, nr;
 	DWORD nEffeEnd;
 	r.posStart.Set(9, 1);
 	r.posEnd.Set(10, 3);
-	b = mgr.ReplaceRegion(&r, "", &nEffeEnd);
+	b = mgr.ReplaceRegion(&r, "", &nEffeEnd, &nr);
 
 	CPPUNIT_ASSERT(mgr.aliLine.NumItems() == 3);
 	CPPUNIT_ASSERT(strncmp(mgr.aliLine.GetUnit(0)->pLine->GetDataArea(), "line1 ONE", 9) == 0);
@@ -545,4 +632,9 @@ void PhysicalLineManagerTest::ReplaceRegionRgnToEmpStr6Test()
 	// line5 FIVE
 
 	CPPUNIT_ASSERT(nEffeEnd == 1);
+
+	Region tr;
+	tr.posStart.Set(9, 1);
+	tr.posEnd.Set(9, 1);
+	CPPUNIT_ASSERT(nr == tr);
 }

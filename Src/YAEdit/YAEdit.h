@@ -42,12 +42,11 @@ protected:
 	FixedPixelLineWrapper *pWrapper;
 	BOOL bWrapText;		// TRUE if wrap text
 
-
 	BOOL bScrollTimerOn;
 	POINT ptMousePos;
 	BOOL bMouseDown;
 
-	// value is by char, 
+	// value is by logical coordinate, 
 	// (nSelStartCol, nSelStartRow) < (nSelEndCol, nSelEndRow) is always TRUE.
 	Region rSelRegion;
 	BOOL bForwardDrag;
@@ -60,11 +59,19 @@ protected:
 	///////////////////////////////////////
 	// select region
 	void SetSelectionFromPoint(int xPos, int yPos);
+	void UpdateSelRegion();
 
 	////////////////////////////////////////////////////
 	// line operation helper
-	BOOL JoinLine(DWORD nLgLineNo);
-	BOOL InsertLine(LPCTSTR pText);
+	BOOL ReplaceText(const Region &r, LPCTSTR pText);
+
+	////////////////////////////////////////////////////
+	// Region related members
+	BOOL GetRegionString(LPTSTR pBuf);
+	DWORD GetRegionSize();
+
+	void ClearRegion();
+	void ClearSelectedRegion();
 
 public:
 
@@ -132,8 +139,6 @@ public:
 	void RequestRedraw(DWORD nLineNo, WORD nLeftPos, BOOL bToBottom);
 	void RequestRedrawRegion(const Region *pRegion);
 
-	void ChangeLinesNotify(int nDelta);
-
 	/////////////////////////////////
 	// Line wrapping 
 	FixedPixelLineWrapper *GetWrapper() { return pWrapper; }
@@ -143,11 +148,6 @@ public:
 	// Clipboard
 	BOOL CopyToClipboard();
 	BOOL InsertFromClipboard();
-
-	/////////////////////////////////
-	// region
-	BOOL DeleteRegion();
-	void ClearRegion();
 
 	/////////////////////////////////
 	// forcus window
@@ -160,27 +160,12 @@ public:
 	BOOL IsRegionSelected() { return rSelRegion.posStart != rSelRegion.posEnd; }
 	BOOL IsSelRegionOneLine() { return rSelRegion.posStart.row == rSelRegion.posEnd.row; }
 	const Region& SelectedRegion() { return rSelRegion; }
-	void ClearSelectedRegion();
 
-	BOOL GetRegionString(LPTSTR pBuf);
-	DWORD GetRegionSize();
-
-	void SetMark(const Coordinate& nStart);
 	void SelectRegion(const Coordinate &nCurrent, Coordinate *pPrev);
 
 	////////////////////////////////////////////////////
-	// coordinate conversion
-
-	void LogicalCursorPosToPhysicalCursorPos(DWORD nLgLineNo, DWORD nLgCursorPosX, LPDWORD pPhLineNo, LPDWORD pPhCursorPos);
-	void PhysicalCursorPosToLogicalCursorPos(DWORD nPhLineNo, DWORD nPhCursorPosX, LPDWORD pLgLineNo, LPDWORD pLgCursorPos);
-	void LogicalPosToPhysicalPos(const Coordinate *pLgPos, Coordinate *pPhPos);
-	void PhysicalPosToLogicalPos(const Coordinate *pPhPos, Coordinate *pLgPos);
-
-	void GetEndPhysicalPos(DWORD nLgLineNo, Coordinate *pPos);
-
-	////////////////////////////////////////////////////
 	// callback from Document
-	BOOL UpdateNotify(PhysicalLineManager *pPhMgr, const Region *pOldRegion, DWORD nBefPhLines, DWORD nAftPhLines, DWORD nAffeLines);
+	BOOL UpdateNotify(PhysicalLineManager *pPhMgr, const Region *pOldRegion, const Region *pNewRegion, DWORD nBefPhLines, DWORD nAftPhLines, DWORD nAffeLines);
 };
 
 //////////////////////////////////////////////////

@@ -117,14 +117,9 @@ public:
 	////////////////////////////////////////////////////
 	// logical position <-> physical position conversion
 
-	void LogicalCursorPosToPhysicalCursorPos(DWORD nLgLineNo, DWORD nLgCursorPosX, LPDWORD pPhLineNo, LPDWORD pPhCursorPos);
 	void LogicalPosToPhysicalPos(const Coordinate *pLgPos, Coordinate *pPhPos);
-
-	void PhysicalCursorPosToLogicalCursorPos(DWORD nPhLineNo, DWORD nPhCursorPosX, LPDWORD pLgLineNo, LPDWORD pLgCursorPos);
 	void PhysicalPosToLogicalPos(const Coordinate *pPhPos, Coordinate *pLgPos);
 		// In current implimentation, Ph->Lg conversion is more heavy than Lg->Ph conversions.
-
-	void GetEndPhysicalPos(DWORD nLgLineNo, Coordinate *pPos);
 
 	////////////////////////////////////////////////////
 	// corresponds to physical line changes

@@ -24,10 +24,20 @@ protected:
 	DWORD nBaseLineNo;	// top page position
 
 	DWORD nHorizPageScrollDelta;
+	DWORD nColOffset;	// offset of horiz scroll
 
 	DWORD nTabWidth;	// tab width(pixels)
 
 	FontWidthCache *pFontCache;
+
+	///////////////////////////////////////
+	// cursor(caret) related members
+
+	DWORD nCursorColPos;// cursor col position (by pixel)
+	DWORD nCursorRow;	// cursor row position(line no of the document)
+	DWORD nCursorCol;	// cursor col position (by char)
+						// in DBCS coding, nCusorCol points bytes.
+						// in UCS-2 coding, nCursorCol points number of the letters.
 
 	///////////////////////////////////////
 	// Drawing
@@ -39,26 +49,10 @@ protected:
 
 public:
 	HWND hViewWnd;
+	RECT rClientRect;
 
 	LONG nMaxCharWidth;
 	DWORD nMaxWidthPixel; // max line width(pixels) in the document
-	DWORD nColOffset;	// offset of horiz scroll
-
-
-	///////////////////////////////////////
-	// cursor(caret) related members
-
-	DWORD nCursorRow;	// cursor row position(line no of the document)
-	DWORD nCursorCol;	// cursor col position (by char)
-						// in DBCS coding, nCusorCol points bytes.
-						// in UCS-2 coding, nCursorCol points number of the letters.
-	DWORD nCursorColPos;// cursor col position (by pixel)
-
-	RECT rClientRect;
-
-
-	///////////////////////////////////////
-	///////////////////////////////////////
 
 	///////////////////////////////////////
 	// initializing
@@ -89,6 +83,8 @@ public:
 	void SetNearCursorPos(WORD xPos, DWORD nYLines);
 
 	void SetCaretPosition(const Coordinate& pos);
+	Coordinate GetCaretPosition() { return Coordinate(nCursorCol, nCursorRow); }
+
 	/////////////////////////////////
 	// Redrawing
 
@@ -96,7 +92,7 @@ public:
 	void RequestRedraw(DWORD nLineNo, WORD nLeftPos, BOOL bToBottom);
 	void RequestRedrawWithLine(DWORD nLineNo, DWORD nNumLine);
 	void RequestRedrawRegion(const Region *pRegion);
-	void RedrawAllScreen() { InvalidateRect(hViewWnd, &rClientRect, TRUE); }
+	void RedrawAllScreen();
 
 	///////////////////////////////////////
 	// Coordinate conversion

@@ -110,7 +110,7 @@ void LineManagerTest::CheckAdjustLgLines(
 	DWORD nPhLinesBefore = mgr.MaxLine();
 
 	DWORD nNewEnd;
-	b = mgr.ReplaceRegion(pRegion, pRepl, &nNewEnd);
+	b = mgr.ReplaceRegion(pRegion, pRepl, &nNewEnd, NULL);
 	CPPUNIT_ASSERT(b);
 	CPPUNIT_ASSERT_MESSAGE("invalid nAffeLines", nNewEnd == nAffeLines);
 
@@ -225,7 +225,7 @@ void LineManagerTest::GetDeletedLgLinesTest1()
 	Region r;
 	r.posStart.Set(1, 1);
 	r.posEnd.Set(2, 1);
-	b = mgr.ReplaceRegion(&r, "abc\ndef", &nNewEnd);
+	b = mgr.ReplaceRegion(&r, "abc\ndef", &nNewEnd, NULL);
 	CPPUNIT_ASSERT(b);
 	CPPUNIT_ASSERT(nNewEnd == 2);
 
@@ -281,7 +281,7 @@ void LineManagerTest::GetDeletedLgLinesTest2()
 	Region r;
 	r.posStart.Set(5, 1);
 	r.posEnd.Set(1, 2);
-	b = mgr.ReplaceRegion(&r, "ABC\nDEF", &nNewEnd);
+	b = mgr.ReplaceRegion(&r, "ABC\nDEF", &nNewEnd, NULL);
 	CPPUNIT_ASSERT(b);
 	CPPUNIT_ASSERT(nNewEnd == 2);
 

@@ -112,7 +112,7 @@ BOOL PhysicalLineManager::DeleteLine(DWORD nLineNo, DWORD nLines)
 BOOL PhysicalLineManager::DeleteRegion(const Region *pRegion)
 {
 	DWORD nNewEnd;
-	return ReplaceRegion(pRegion, TEXT(""), &nNewEnd);
+	return ReplaceRegion(pRegion, TEXT(""), &nNewEnd, NULL);
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -247,7 +247,7 @@ char *PhysicalLineManager::GetDocumentData(LPDWORD pLen)
 // Replace string
 /////////////////////////////////////////////////////////////////////////////
 
-BOOL PhysicalLineManager::ReplaceRegion(const Region *pRegion, LPCTSTR pString, LPDWORD pAffectedLines)
+BOOL PhysicalLineManager::ReplaceRegion(const Region *pRegion, LPCTSTR pString, LPDWORD pAffectedLines, Region *pNewRegion)
 {
 	// parse and split replase string
 	StringSplitter ss;
@@ -323,6 +323,18 @@ BOOL PhysicalLineManager::ReplaceRegion(const Region *pRegion, LPCTSTR pString, 
 	// free old memblocks
 	pMemMgr->Free(pFirstLine);
 	if (pLastLine) pMemMgr->Free(pLastLine);
+
+	// set pNewRegion
+	if (pNewRegion) {
+		pNewRegion->posStart = pRegion->posStart;
+		pNewRegion->posEnd.row = pRegion->posStart.row + ss.MaxLine() - 1;
+
+		if (ss.MaxLine() == 1) {
+			pNewRegion->posEnd.col = pRegion->posStart.col + ss.GetEnd(ss.MaxLine() - 1);
+		} else {
+			pNewRegion->posEnd.col = ss.GetEnd(ss.MaxLine() - 1) - ss.GetBegin(ss.MaxLine() - 1);
+		}
+	}
 
 	return TRUE;
 }
