@@ -60,4 +60,8 @@ extern BOOL bDisableHotKey;
 #define APPBUTTON_ACTION_DISABLE 0
 #define APPBUTTON_ACTION_ENABLE  1
 
+// Virtual folder definition file name
+// path is defind by user(Property).
+#define TOMBO_VFOLDER_DEF_FILE TEXT("#vfolder.txt")
+
 #endif
