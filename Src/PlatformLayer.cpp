@@ -10,6 +10,7 @@
 #include "resource.h"
 
 #include "PlatformLayer.h"
+#include "Property.h"
 
 ///////////////////////////////////////////////////
 // ctor & dtor
@@ -65,3 +66,72 @@ void OverrideMenuTitle(HMENU hMenu, MenuMsgRes *pRes, int nNumRes)
 	}
 }
 
+///////////////////////////////////////////////////
+// 
+///////////////////////////////////////////////////
+#if defined(PLATFORM_HPC) || defined(PLATFORM_WIN32)
+
+static MenuMsgRes aContextMenu[] = {
+	{  0, IDM_CUT,        0, MSG_ID_MENUITEM_MAIN_CUT },
+	{  1, IDM_COPY,       0, MSG_ID_MENUITEM_MAIN_COPY },
+	{  2, IDM_PASTE,      0, MSG_ID_MENUITEM_MAIN_PASTE },
+	{  3, -1,             0, 0 },
+
+	{  4, IDM_ENCRYPT,    0, MSG_ID_MENUITEM_MAIN_ENCRYPT },
+	{  5, IDM_DECRYPT,    0, MSG_ID_MENUITEM_MAIN_DECRYPT },
+	{  6, -1,             0, 0 },
+	{  7, IDM_SEARCH,     0, MSG_ID_MENUITEM_MAIN_FIND },
+	{  8, -1,             0, 0 },
+	{  9, IDM_NEWFOLDER,  0, MSG_ID_MENUITEM_MAIN_NEWFOLDER },
+	{ 10, -1,             0, 0 },
+	{ 11, IDM_DELETEITEM, 0, MSG_ID_MENUITEM_MAIN_DELETE },
+	{ 12, IDM_RENAME,     0, MSG_ID_MENUITEM_MAIN_RENAME },
+	{ 13, -1,             0, 0 },
+	{ 14, IDM_TRACELINK,  0, MSG_ID_MENUITEM_CTX_TRACELINK},
+};
+
+static MenuMsgRes aDirectoryContextMenu[] = {
+	{  4, IDM_ASSOC,      0, MSG_ID_MENUITEM_EXPLORER },
+	{  5, -1,             0, 0 },
+};
+
+HMENU PlatformLayer::LoadContextMenu(DWORD nFlg)
+{
+	HMENU hMenu = CreatePopupMenu();
+	OverrideMenuTitle(hMenu, aContextMenu, sizeof(aContextMenu)/sizeof(MenuMsgRes));
+	if (nFlg & CTXMENU_DIR) {
+		OverrideMenuTitle(hMenu, aDirectoryContextMenu, sizeof(aDirectoryContextMenu)/sizeof(MenuMsgRes));
+	} else if ((nFlg & CTXMENU_FILE) && (nFlg & CTXMENU_ENABLEEXTAPP)) {
+		DWORD nPos = 4;
+		if (nFlg & CTXMENU_USEASSOC) {
+			MenuMsgRes aAssocMenu[] = {
+				{  nPos, IDM_ASSOC,      0, MSG_ID_MENUITEM_ASSOCIATION },
+			};
+			OverrideMenuTitle(hMenu, aAssocMenu, sizeof(aAssocMenu)/sizeof(MenuMsgRes));
+			nPos++;
+		}
+		if (g_Property.GetExtApp1() && _tcslen(g_Property.GetExtApp1()) > 0) {
+			MenuMsgRes aExtMenu1[] = {
+				{  nPos, IDM_EXTAPP1,    0, MSG_ID_DLG_EXTAPP_LBL_APP1 },
+			};
+			OverrideMenuTitle(hMenu, aExtMenu1, sizeof(aExtMenu1)/sizeof(MenuMsgRes));
+			nPos++;
+		}
+		if (g_Property.GetExtApp2() && _tcslen(g_Property.GetExtApp2()) > 0) {
+			MenuMsgRes aExtMenu2[] = {
+				{  nPos, IDM_EXTAPP2,    0, MSG_ID_DLG_EXTAPP_LBL_APP2 },
+			};
+			OverrideMenuTitle(hMenu, aExtMenu2, sizeof(aExtMenu2)/sizeof(MenuMsgRes));
+			nPos++;
+		}
+		if (nPos > 4) {
+			MenuMsgRes aSep[] = {
+				{  nPos, -1,    0, 0 },
+			};
+			OverrideMenuTitle(hMenu, aSep, sizeof(aSep)/sizeof(MenuMsgRes));
+		}
+	}
+	return hMenu;
+}
+
+#endif

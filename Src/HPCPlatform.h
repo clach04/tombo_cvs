@@ -45,7 +45,7 @@ public:
 	static HPCPlatform *PlatformFactory() { return new HPCPlatform(); }
 
 	static HMENU LoadMainMenu();
-	static HMENU LoadContextMenu();
+//	static HMENU LoadContextMenu(DWORD nFlg);
 };
 
 #endif // PLATFORM_HPC

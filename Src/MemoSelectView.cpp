@@ -504,8 +504,7 @@ LRESULT MemoSelectView::OnNotify(HWND hWnd, WPARAM wParam, LPARAM lParam)
 			POINT pt, pth;
 			GetCursorPos(&pt);
 			pth = pt;
-			ScreenToClient(hWnd, &pth);
-			OnNotify_RClick(pth);
+			OnNotify_RClick(pt);
 			break;
 		}
 #endif
@@ -519,18 +518,27 @@ LRESULT MemoSelectView::OnNotify(HWND hWnd, WPARAM wParam, LPARAM lParam)
 void MemoSelectView::OnNotify_RClick(POINT pt)
 {
 	TV_HITTESTINFO hti;
-	hti.pt = pt;
+	POINT cpt = pt;
+	ScreenToClient(hViewWnd, &cpt);
+
+	hti.pt = cpt;
 	HTREEITEM hX = TreeView_HitTest(hViewWnd, &hti);
+
 
 	if (hti.hItem == NULL) return;
 	TreeViewItem *pItem = GetTVItem(hti.hItem);
 
-#if defined(PLATFORM_WIN32)
-	HMENU hMenu = Win32Platform::LoadContextMenu();
-#endif
-#if defined(PLATFORM_HPC)
-	HMENU hMenu = HPCPlatform::LoadContextMenu();
-#endif
+	DWORD nFlg;
+	if (pItem->HasMultiItem()) {
+		nFlg = CTXMENU_DIR;
+	} else {
+		nFlg = CTXMENU_FILE | (g_Property.UseAssociation() ? CTXMENU_USEASSOC : 0);
+		if (!((TreeViewFileItem*)pItem)->IsEncrypted()) {
+			nFlg |= CTXMENU_ENABLEEXTAPP;
+		}
+	}
+
+	HMENU hMenu = PlatformLayer::LoadContextMenu(nFlg);
 
 	ControlSubMenu(hMenu, IDM_ENCRYPT, pItem->IsOperationEnabled(this, TreeViewItem::OpEncrypt));
 	ControlSubMenu(hMenu, IDM_DECRYPT, pItem->IsOperationEnabled(this, TreeViewItem::OpDecrypt));
@@ -576,8 +584,22 @@ void MemoSelectView::OnNotify_RClick(POINT pt)
 		pMemoMgr->GetMainFrame()->OnSearch();
 		break;
 	case IDM_TRACELINK:
-		TreeViewFileLink *p = (TreeViewFileLink*)pItem;
-		ShowItem(p->GetNote()->MemoPath(), TRUE, FALSE);
+		{
+			TreeViewFileLink *p = (TreeViewFileLink*)pItem;
+			ShowItem(p->GetNote()->MemoPath(), TRUE, FALSE);
+		}
+		break;
+	case IDM_ASSOC:
+		TreeView_SelectItem(hViewWnd, hti.hItem);
+		pItem->ExecApp(pMemoMgr, this, TreeViewItem::ExecType_Assoc);
+		break;
+	case IDM_EXTAPP1:
+		TreeView_SelectItem(hViewWnd, hti.hItem);
+		pItem->ExecApp(pMemoMgr, this, TreeViewItem::ExecType_ExtApp1);
+		break;
+	case IDM_EXTAPP2:
+		TreeView_SelectItem(hViewWnd, hti.hItem);
+		pItem->ExecApp(pMemoMgr, this, TreeViewItem::ExecType_ExtApp2);
 		break;
 	}
 }

@@ -44,6 +44,12 @@ public:
 		OpLink		= (1 << 10)
 	};
 
+	enum ExeAppType {
+		ExecType_Assoc,
+		ExecType_ExtApp1,
+		ExecType_ExtApp2,
+	};
+
 	///////////////////////////////////////////////////////
 	// TreeViewItem specific methods
 
@@ -69,6 +75,8 @@ public:
 		// "this" object is not deleted, so delete manually if return value is TRUE.
 	virtual BOOL Encrypt(MemoManager *pMgr, MemoSelectView *pView) = 0;
 	virtual BOOL Decrypt(MemoManager *pMgr, MemoSelectView *pView) = 0;
+
+	virtual BOOL ExecApp(MemoManager *pMgr, MemoSelectView *pView, ExeAppType nType) = 0;
 
 	// Compare item order
 	virtual DWORD ItemOrder() = 0;
@@ -110,6 +118,7 @@ public:
 	BOOL Encrypt(MemoManager *pMgr, MemoSelectView *pView);
 	BOOL Decrypt(MemoManager *pMgr, MemoSelectView *pView);
 	BOOL Rename(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR pNewName);
+	BOOL ExecApp(MemoManager *pMgr, MemoSelectView *pView, ExeAppType nType);
 
 	DWORD GetIcon(MemoSelectView *pView, DWORD nStatus);
 	DWORD ItemOrder();
@@ -122,6 +131,7 @@ public:
 	BOOL LoadMemo(MemoSelectView *pView, BOOL bAskPass);
 
 	BOOL IsUseDetailsView();
+	BOOL IsEncrypted() { return bIsEncrypted; }
 };
 
 /////////////////////////////////////////////
@@ -148,6 +158,7 @@ public:
 	BOOL Delete(MemoManager *pMgr, MemoSelectView *pView);
 	BOOL Encrypt(MemoManager *pMgr, MemoSelectView *pView);
 	BOOL Decrypt(MemoManager *pMgr, MemoSelectView *pView);
+	BOOL ExecApp(MemoManager *pMgr, MemoSelectView *pView, ExeAppType nType);
 
 	DWORD GetIcon(MemoSelectView *pView, DWORD nStatus);
 	DWORD ItemOrder();

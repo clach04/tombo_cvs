@@ -4,6 +4,7 @@
 
 #define PLATFORM_TYPE Win32Platform
 
+
 class StatusBar;
 
 class Win32Platform : public PlatformLayer {
@@ -46,7 +47,7 @@ public:
 	static Win32Platform *PlatformFactory() { return new Win32Platform(); }
 
 	static HMENU LoadMainMenu();
-	static HMENU LoadContextMenu();
+	static HMENU LoadContextMenu(DWORD nFlg);
 };
 
 #endif // PLATFORM_WIN32

@@ -65,6 +65,10 @@ class Property {
 
 	DWORD nDisableSaveDlg;
 
+	TCHAR aExtApp1[MAX_PATH];
+	TCHAR aExtApp2[MAX_PATH];
+	DWORD nUseAssoc;
+
 public:
 	Property();
 	~Property();
@@ -172,6 +176,10 @@ public:
 	LPCTSTR GetDefaultNote() { return aDefaultNote; }
 	DWORD DisableSaveDlg() { return nDisableSaveDlg; }
 
+	DWORD UseAssociation() { return nUseAssoc; }
+	LPCTSTR GetExtApp1() { return aExtApp1; }
+	LPCTSTR GetExtApp2() { return aExtApp2; }
+
 	friend class FolderTab;
 	friend class PasswordTab;
 	friend class PassTimeoutTab;
@@ -183,6 +191,7 @@ public:
 	friend class CodepageTab;
 	friend class SipTab;
 	friend class DefaultNoteTab;
+	friend class ExtAppTab;
 };
 
 ////////////////////////////////////

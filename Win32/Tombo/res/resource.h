@@ -30,8 +30,11 @@
 #define IDC_STATUS                      106
 #define IDD_ABOUTBOX                    107
 #define IDC_MEMODETAILSVIEW_NF          107
+#define IDM_EXTAPP1                     108
 #define IDI_TOMBO                       109
+#define IDM_ASSOC                       109
 #define IDB_ARTICLEBOX                  110
+#define IDM_EXTAPP2                     110
 #define IDD_PROPTAB                     111
 #define IDD_FILESELECT                  112
 #define IDC_TOPFOLDER                   113
@@ -65,6 +68,7 @@
 #define IDD_FILTERDEF_VIEWTYPE          144
 #define IDD_PROPTAB_DEFNOTE             146
 #define IDD_BOOKMARK_EDIT               147
+#define IDD_PROPTAB_EXTAPP              148
 #define IDC_PASS                        1000
 #define IDC_PROP_PASSWORD_DESC          1001
 #define IDC_PASS_TIMEOUT                1002
@@ -161,6 +165,14 @@
 #define IDC_PROPTAB_PASS_TIMEOUT_HELP   1088
 #define IDC_SEARCH_FIND_LABEL           1089
 #define IDC_SEARCH_DIRECT_LABEL         1090
+#define IDC_PROP_EXTAPP_PATH_EXTAPP1    1091
+#define IDC_PROP_EXTAPP_TTL_EXTAPP1     1092
+#define IDC_PROP_EXTAPP_PATH_EXTAPP2    1093
+#define IDC_PROP_EXTAPP_TTL_EXTAPP2     1094
+#define IDC_PROP_EXTAPP_USEASSOC        1095
+#define IDC_PROP_EXTAPP_CAUTION         1097
+#define IDC_PROPTAB_EXTAPP_CHOOSE1      1098
+#define IDC_PROPTAB_EXTAPP_CHOOSE2      1099
 #define IDM_EXIT                        40001
 #define IDM_NEWMEMO                     40002
 #define IDM_RETURNLIST                  40003
@@ -202,9 +214,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        148
+#define _APS_NEXT_RESOURCE_VALUE        149
 #define _APS_NEXT_COMMAND_VALUE         40039
-#define _APS_NEXT_CONTROL_VALUE         1091
-#define _APS_NEXT_SYMED_VALUE           108
+#define _APS_NEXT_CONTROL_VALUE         1099
+#define _APS_NEXT_SYMED_VALUE           111
 #endif
 #endif

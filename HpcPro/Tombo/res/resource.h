@@ -26,7 +26,10 @@
 #define IDD_PROPTAB_PASS_TIMEOUT        111
 #define ID_MENUBAND                     111
 #define ID_BUTTONBAND                   112
+#define IDM_EXTAPP1                     113
+#define IDM_ASSOC                       114
 #define IDB_TOOLBAR                     115
+#define IDM_EXTAPP2                     115
 #define IDB_TOOLBAR_DETAILS             116
 #define IDD_PROPTAB_FONT                117
 #define IDD_PROPTAB_INSDATE             118
@@ -43,6 +46,7 @@
 #define IDD_FILTERCTL                   132
 #define IDR_CONTEXTMENU                 133
 #define IDD_BOOKMARK_EDIT               134
+#define IDD_PROPTAB_EXTAPP              135
 #define IDD_FILTERDEF_SRC               138
 #define IDD_FILTERDEF_FILTER            139
 #define IDD_FILTERDEF_ADD_REGEX         140
@@ -84,7 +88,9 @@
 #define IDC_EDIT1                       1025
 #define IDC_COPYRIGHT                   1025
 #define IDC_DATEFORMAT_DESC             1025
+#define IDC_PROP_EXTAPP_PATH_EXTAPP1    1025
 #define IDC_FILENAMEONLY                1026
+#define IDC_PROP_EXTAPP_PATH_EXTAPP2    1026
 #define IDC_VERSIONINFO                 1028
 #define IDC_SEARCH_DIRECTION_UP         1029
 #define IDC_SEARCH_DIRECTION_DOWN       1030
@@ -151,6 +157,12 @@
 #define IDC_PROPTAB_DEFNOTE_LABEL       1061
 #define IDC_SEARCH_FIND_LABEL           1062
 #define IDC_SEARCH_DIRECT_LABEL         1063
+#define IDC_PROP_EXTAPP_USEASSOC        1064
+#define IDC_PROP_EXTAPP_TTL_EXTAPP1     1065
+#define IDC_PROP_EXTAPP_TTL_EXTAPP2     1066
+#define IDC_PROPTAB_EXTAPP_CHOOSE1      1067
+#define IDC_PROPTAB_EXTAPP_CHOOSE2      1068
+#define IDC_PROP_EXTAPP_CAUTION         1069
 #define IDM_ACTIONBUTTON                30001
 #define IDM_FILE_EXIT                   40002
 #define IDM_HELP_ABOUT                  40003
@@ -218,9 +230,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        135
+#define _APS_NEXT_RESOURCE_VALUE        136
 #define _APS_NEXT_COMMAND_VALUE         40063
-#define _APS_NEXT_CONTROL_VALUE         1064
-#define _APS_NEXT_SYMED_VALUE           113
+#define _APS_NEXT_CONTROL_VALUE         1070
+#define _APS_NEXT_SYMED_VALUE           116
 #endif
 #endif

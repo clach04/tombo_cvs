@@ -265,3 +265,13 @@ Keep space over the SIP
 Default(English)
 Greek
 &Search
+Ext tool1
+Open by Explorer
+Open by association
+External Apps
+Use file association
+Application1:
+Application2:
+CAUTION:\r\nIf external application creates backup file, TOMBO is \r\n*NOT DELETE* it. Please check yourself before encryption whether backup file exists or not.
+Choose application
+app(*.exe)\0*.exe\0all(*.*)\0*.*\0\0

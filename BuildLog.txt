@@ -706,3 +706,11 @@ Not fully tested on both platform, probably it will work.
 * Update Japanese message in *.rc file to English
 * i18nize on HPC platform.
 * Add context menu(HPC)
+
+////////////////////////////////
+// B148
+////////////////////////////////
+
+* External editor linking (HPC,Win32)
+	Other platform is yet, and can't compile
+

@@ -1,9 +1,17 @@
 #ifndef PLATFORMLAYER_H
 #define PLATFORMLAYER_H
 
+///////////////////////////////////////////////////
+// constants
+///////////////////////////////////////////////////
 
 #define BOOKMARK_MENU_POS 2
 #define NUM_BOOKMARK_SUBMENU_DEFAULT 3
+
+#define CTXMENU_DIR          1
+#define CTXMENU_FILE         2
+#define CTXMENU_USEASSOC     4
+#define CTXMENU_ENABLEEXTAPP 8
 
 ///////////////////////////////////////////////////
 // Platform abstruction
@@ -19,6 +27,8 @@ public:
 	BOOL Init(HWND h);
 
 	virtual void Create(HWND hWnd, HINSTANCE hInst) = 0;
+
+	static HMENU LoadContextMenu(DWORD nFlg);
 };
 
 ///////////////////////////////////////////////////

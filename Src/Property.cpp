@@ -18,9 +18,10 @@
 #include "PasswordManager.h"
 #include "Message.h"
 #include "DialogTemplate.h"
+#include "TString.h"
 
 //////////////////////////////////////////
-// 定義
+// Attribute definitions
 //////////////////////////////////////////
 #define RESMSG(x) (GetString(x))
 
@@ -57,6 +58,11 @@
 #define DEFAULTNOTE_ATTR_NAME TEXT("DefaultNote")
 #define DISABLESAVEDLG_ATTR_NAME TEXT("DisableSaveDlg")
 
+#define USEASSOC_ATTR_NAME TEXT("UseSoftwareAssoc")
+#define EXTAPP1_ATTR_NAME TEXT("ExtApp1")
+#define EXTAPP2_ATTR_NAME TEXT("ExtApp2")
+
+
 // saved each exit time.
 #define HIDESTATUSBAR_ATTR_NAME TEXT("HideStatusBar")
 #define STAYTOPMOST_ATTR_NAME TEXT("StayTopMost")
@@ -68,12 +74,12 @@
 
 #if defined(PLATFORM_PKTPC) || (defined(PLATFORM_BE500) && defined(TOMBO_LANG_ENGLISH))
 #if defined(PLATFORM_PKTPC)
-#define PROPTAB_PAGES 8
+#define PROPTAB_PAGES 9
 #else
-#define PROPTAB_PAGES 7
+#define PROPTAB_PAGES 8
 #endif
 #else
-#define PROPTAB_PAGES 6
+#define PROPTAB_PAGES 7
 #endif
 
 #define MAX_PASSWORD_LEN 1024
@@ -85,7 +91,7 @@
 
 #define CLEARTYPE_QUALITY 5
 
-// デフォルトのディレクトリ
+// Default dirs
 #if defined(PLATFORM_WIN32)
 #define MEMO_TOP_DIR TEXT("c:\\My Documents\\Pocket_PC My Documents\\TomboRoot")
 #else
@@ -594,7 +600,7 @@ int CALLBACK PropEnumFonts(ENUMLOGFONT FAR *pFont, NEWTEXTMETRIC FAR *pMetric, i
 	HWND hWnd = (HWND)lParam;
 
 	LPTSTR pFace = pFont->elfLogFont.lfFaceName;
-	if (*pFace == TEXT('@')) return TRUE; // 縦書きフォントには未対応
+	if (*pFace == TEXT('@')) return TRUE; // disable font for vertical
 	// if (pMetric->tmPitchAndFamily & 0x1) return TRUE;
 
 	SendMessage(hWnd, CB_ADDSTRING, 0, (LPARAM)pFace);
@@ -602,7 +608,7 @@ int CALLBACK PropEnumFonts(ENUMLOGFONT FAR *pFont, NEWTEXTMETRIC FAR *pMetric, i
 }
 
 //////////////////////////////////////////
-// 日付フォーマットタブ
+// Date format
 //////////////////////////////////////////
 
 class DateFormatTab : public TomboPropertyTab {
@@ -644,7 +650,7 @@ BOOL DateFormatTab::Apply(HWND hDlg)
 }
 
 //////////////////////////////////////////
-// カーソル位置設定タブ
+// Caret setting tab
 //////////////////////////////////////////
 
 class KeepCaretTab : public TomboPropertyTab {
@@ -680,7 +686,7 @@ void KeepCaretTab::Init(HWND hDlg)
 		SendMessage(hWnd, BM_SETCHECK, BST_UNCHECKED, 0);
 	}
 
-	// タブストップ
+	// tab stop
 	HWND hTabWnd = GetDlgItem(hDlg, IDC_PROP_TABSTOP);
 	TCHAR buf[30];
 	wsprintf(buf, TEXT("%d"), pProperty->Tabstop());
@@ -705,7 +711,7 @@ BOOL KeepCaretTab::Apply(HWND hDlg)
 		pProperty->nKeepCaret = FALSE;
 	}
 
-	// タブストップ
+	// tab stop
 	HWND hTabWnd = GetDlgItem(hDlg, IDC_PROP_TABSTOP);
 	TCHAR buf[30];
 	int n;
@@ -731,7 +737,7 @@ BOOL KeepCaretTab::Apply(HWND hDlg)
 }
 
 //////////////////////////////////////////
-// アクションボタン設定
+// Action buttons
 //////////////////////////////////////////
 
 #if defined(PLATFORM_PKTPC)
@@ -996,6 +1002,114 @@ void DefaultNoteTab::SetCurrent(HWND hDlg)
 }
 
 //////////////////////////////////////////
+// External application tab
+//////////////////////////////////////////
+
+class ExtAppTab : public TomboPropertyTab {
+	DWORD nUseAssoc;
+	TCHAR aExtApp1[MAX_PATH];
+	TCHAR aExtApp2[MAX_PATH];
+protected:
+	void Choose1(HWND hDlg);
+	void Choose2(HWND hDlg);
+
+public:
+	ExtAppTab(Property *p) :
+	  TomboPropertyTab(p, IDD_PROPTAB_EXTAPP, (DLGPROC)DefaultPageProc, MSG_PROPTAB_EXTAPP) {}
+	~ExtAppTab() {}
+
+	void Init(HWND hDlg);
+	BOOL Apply(HWND hDlg);
+	BOOL OnCommand(HWND hDlg, WPARAM wParam, LPARAM lParam);
+};
+
+static DlgMsgRes aExtApp[] = {
+	{ IDC_PROP_EXTAPP_USEASSOC,    MSG_ID_DLG_EXTAPP_USEASSOC },
+	{ IDC_PROP_EXTAPP_TTL_EXTAPP1, MSG_ID_DLG_EXTAPP_LBL_APP1 },
+	{ IDC_PROP_EXTAPP_TTL_EXTAPP2, MSG_ID_DLG_EXTAPP_LBL_APP2 },
+	{ IDC_PROP_EXTAPP_CAUTION,     MSG_ID_DLG_EXTAPP_CAUTION },
+};
+
+void ExtAppTab::Init(HWND hDlg)
+{
+	OverrideDlgMsg(hDlg, -1, aExtApp, sizeof(aExtApp)/sizeof(DlgMsgRes));
+
+	HWND hUseAssoc = GetDlgItem(hDlg, IDC_PROP_EXTAPP_USEASSOC);
+	if (pProperty->UseAssociation()) {
+		SendMessage(hUseAssoc, BM_SETCHECK, BST_CHECKED, 0);
+	} else {
+		SendMessage(hUseAssoc, BM_SETCHECK, BST_UNCHECKED, 0);
+	}
+
+	SetWindowText(GetDlgItem(hDlg, IDC_PROP_EXTAPP_PATH_EXTAPP1), pProperty->aExtApp1);
+	SetWindowText(GetDlgItem(hDlg, IDC_PROP_EXTAPP_PATH_EXTAPP2), pProperty->aExtApp2);
+}
+
+BOOL ExtAppTab::Apply(HWND hDlg)
+{
+	HWND hWnd = GetDlgItem(hDlg, IDC_PROP_EXTAPP_USEASSOC);
+	if (SendMessage(hWnd, BM_GETCHECK, 0, 0) == BST_CHECKED) {
+		pProperty->nUseAssoc = TRUE;
+	} else {
+		pProperty->nUseAssoc = FALSE;
+	}
+	HWND hAp1 = GetDlgItem(hDlg, IDC_PROP_EXTAPP_PATH_EXTAPP1);
+	HWND hAp2 = GetDlgItem(hDlg, IDC_PROP_EXTAPP_PATH_EXTAPP2);
+	DWORD n1 = GetWindowTextLength(hAp1);
+	DWORD n2 = GetWindowTextLength(hAp2);
+	DWORD n = (n1 > n2 ? n1 : n2) + 1;
+	TString s;
+	if (!s.Alloc(n)) return FALSE;
+	GetWindowText(hAp1, s.Get(), n);
+	_tcsncpy(pProperty->aExtApp1, s.Get(), MAX_PATH);
+	GetWindowText(hAp2, s.Get(), n);
+	_tcsncpy(pProperty->aExtApp2, s.Get(), MAX_PATH);
+	return TRUE;
+}
+
+BOOL ExtAppTab::OnCommand(HWND hDlg, WPARAM wParam, LPARAM lParam)
+{
+	switch(LOWORD(wParam)) {
+	case IDC_PROPTAB_EXTAPP_CHOOSE1:
+		Choose1(hDlg);
+		break;
+	case IDC_PROPTAB_EXTAPP_CHOOSE2:
+		Choose2(hDlg);
+		break;
+	}
+	return TRUE;
+}
+
+void ExtAppTab::Choose1(HWND hDlg)
+{
+	FileSelector sel;
+#if defined(PLATFORM_WIN32)
+	LPCTSTR pExt = MSG_DLG_EXTAPP_CHOOSE_EXT;
+#else
+	LPCTSTR pExt = TEXT("*.exe");
+#endif
+	if (sel.Popup(g_hInstance, hDlg, MSG_DLG_EXTAPP_CHOOSE_TTL, pExt) == IDOK) {
+		HWND hWnd = GetDlgItem(hDlg, IDC_PROP_EXTAPP_PATH_EXTAPP1);
+		SetWindowText(hWnd, sel.SelectedPath());
+	}
+}
+
+void ExtAppTab::Choose2(HWND hDlg)
+{
+	FileSelector sel;
+#if defined(PLATFORM_WIN32)
+	LPCTSTR pExt = MSG_DLG_EXTAPP_CHOOSE_EXT;
+#else
+	LPCTSTR pExt = TEXT(".exe");
+#endif
+
+	if (sel.Popup(g_hInstance, hDlg, MSG_DLG_EXTAPP_CHOOSE_TTL, pExt) == IDOK) {
+		HWND hWnd = GetDlgItem(hDlg, IDC_PROP_EXTAPP_PATH_EXTAPP2);
+		SetWindowText(hWnd, sel.SelectedPath());
+	}
+}
+
+//////////////////////////////////////////
 // Popup property dialog
 //////////////////////////////////////////
 
@@ -1019,19 +1133,23 @@ DWORD Property::Popup(HINSTANCE hInst, HWND hWnd, LPCTSTR pSelPath)
 #if defined(PLATFORM_BE500) && defined(TOMBO_LANG_ENGLISH)
 	CodepageTab pgCodepage(this);
 #endif
+	ExtAppTab pgExtApp(this);
+
 	pages[0] = &pgFolder;
 	pages[1] = &pgDefNote;
 	pages[2] = &pgTimeout;
 	pages[3] = &pgFont;
 	pages[4] = &pgDate;
 	pages[5] = &pgKeepCaret;
+	pages[6] = &pgExtApp;
 #if defined(PLATFORM_PKTPC)
-	pages[6] = &pgAppButton;
-	pages[7] = &pgSip;
+	pages[7] = &pgAppButton;
+	pages[8] = &pgSip;
 #endif
 #if defined(PLATFORM_BE500) && defined(TOMBO_LANG_ENGLISH)
-	pages[6] = &pgCodepage;
+	pages[7] = &pgCodepage;
 #endif
+
 	PropertyPage pp;
 	if (pp.Popup(hInst, hWnd, pages, PROPTAB_PAGES, MSG_PROPTAB_TITLE, MAKEINTRESOURCE(IDI_TOMBO)) == IDOK) {
 		if (!Save()) {
@@ -1266,6 +1384,19 @@ BOOL Property::Load(BOOL *pStrict)
 
 	nDisableSaveDlg = GetDWORDFromReg(hTomboRoot, DISABLESAVEDLG_ATTR_NAME, FALSE);
 
+	// external applications
+	nUseAssoc = GetDWORDFromReg(hTomboRoot, USEASSOC_ATTR_NAME, FALSE);
+	siz = sizeof(aExtApp1);
+	res = RegQueryValueEx(hTomboRoot, EXTAPP1_ATTR_NAME, NULL, &typ, (LPBYTE)aExtApp1, &siz);
+	if (res != ERROR_SUCCESS) {
+		aExtApp1[0] = TEXT('\0');
+	}
+	siz = sizeof(aExtApp2);
+	res = RegQueryValueEx(hTomboRoot, EXTAPP2_ATTR_NAME, NULL, &typ, (LPBYTE)aExtApp2, &siz);
+	if (res != ERROR_SUCCESS) {
+		aExtApp2[0] = TEXT('\0');
+	}
+
 	RegCloseKey(hTomboRoot);
 	return TRUE;
 }
@@ -1366,6 +1497,11 @@ BOOL Property::Save()
 
 	if (!SetSZToReg(hTomboRoot, DEFAULTNOTE_ATTR_NAME, aDefaultNote)) return FALSE;
 	if (!SetDWORDToReg(hTomboRoot, DISABLESAVEDLG_ATTR_NAME, nDisableSaveDlg)) return FALSE;
+
+	if (!SetDWORDToReg(hTomboRoot, USEASSOC_ATTR_NAME, nUseAssoc)) return FALSE;
+	if (!SetSZToReg(hTomboRoot, EXTAPP1_ATTR_NAME, aExtApp1)) return FALSE;
+	if (!SetSZToReg(hTomboRoot, EXTAPP2_ATTR_NAME, aExtApp2)) return FALSE;
+	
 
 #if defined(PLATFORM_BE500)
 	CGDFlushRegistry();

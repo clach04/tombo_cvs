@@ -329,23 +329,6 @@ static MenuMsgRes aHelpMenu[] = {
 	{ 0, IDM_ABOUT, 0, MSG_ID_MENUITEM_W32_H_ABOUT },
 };
 
-static MenuMsgRes aContextMenu[] = {
-	{  0, IDM_CUT,        0, MSG_ID_MENUITEM_MAIN_CUT },
-	{  1, IDM_COPY,       0, MSG_ID_MENUITEM_MAIN_COPY },
-	{  2, IDM_PASTE,      0, MSG_ID_MENUITEM_MAIN_PASTE },
-	{  3, -1,             0, 0 },
-	{  4, IDM_ENCRYPT,    0, MSG_ID_MENUITEM_MAIN_ENCRYPT },
-	{  5, IDM_DECRYPT,    0, MSG_ID_MENUITEM_MAIN_DECRYPT },
-	{  6, -1,             0, 0 },
-	{  7, IDM_SEARCH,     0, MSG_ID_MENUITEM_MAIN_FIND },
-	{  8, -1,             0, 0 },
-	{  9, IDM_NEWFOLDER,  0, MSG_ID_MENUITEM_MAIN_NEWFOLDER },
-	{ 10, -1,             0, 0 },
-	{ 11, IDM_DELETEITEM, 0, MSG_ID_MENUITEM_MAIN_DELETE },
-	{ 12, IDM_RENAME,     0, MSG_ID_MENUITEM_MAIN_RENAME },
-	{ 13, -1,             0, 0 },
-	{ 14, IDM_TRACELINK,  0, MSG_ID_MENUITEM_CTX_TRACELINK},
-};
 
 HMENU Win32Platform::LoadMainMenu()
 {
@@ -363,13 +346,6 @@ HMENU Win32Platform::LoadMainMenu()
 	OverrideMenuTitle(hSub = CreateMenu(), aHelpMenu, sizeof(aHelpMenu)/sizeof(MenuMsgRes));
 	InsertBaseMenu(hMainM, 1, MSG_MENUITEM_W32B_HELP, hSub);
 	return hMainM;
-}
-
-HMENU Win32Platform::LoadContextMenu()
-{
-	HMENU hMenu = CreatePopupMenu();
-	OverrideMenuTitle(hMenu, aContextMenu, sizeof(aContextMenu)/sizeof(MenuMsgRes));
-	return hMenu;
 }
 
 #endif // PLATFORM_WIN32

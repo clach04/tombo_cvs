@@ -163,6 +163,10 @@ static void ReplaceSpecialChar(LPTSTR pSrc)
 				*q++ = TEXT('\t');
 				p+= 2;
 				break;
+			case TEXT('0'):
+				*q++ = TEXT('\0');
+				p+= 2;
+				break;
 			default:
 				*q++ = *p++;
 			}

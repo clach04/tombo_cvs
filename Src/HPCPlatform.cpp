@@ -391,12 +391,16 @@ static MenuMsgRes aContextMenu[] = {
 	{ 12, IDM_RENAME,     0, MSG_ID_MENUITEM_MAIN_RENAME },
 	{ 13, -1,             0, 0 },
 	{ 14, IDM_TRACELINK,  0, MSG_ID_MENUITEM_CTX_TRACELINK},
+	{ 15, -1,             0, 0 },
+	{ 16, IDM_EXTAPP1,    0, MSG_ID_MENUITEM_EXTAPP1 },
 };
 
-HMENU HPCPlatform::LoadContextMenu()
+#ifdef COMMENT
+HMENU HPCPlatform::LoadContextMenu(DWORD nFlg)
 {
 	HMENU hMenu = CreatePopupMenu();
 	OverrideMenuTitle(hMenu, aContextMenu, sizeof(aContextMenu)/sizeof(MenuMsgRes));
 	return hMenu;
 }
+#endif
 #endif // PLATFORM_HPC

@@ -10,7 +10,7 @@
 #if defined(PLATFORM_WIN32)
 ////////////////////////////////////////////////////
 ////////////////////////////////////////////////////
-// Win32用ファイル選択ダイアログ
+// File selection(win32)
 ////////////////////////////////////////////////////
 ////////////////////////////////////////////////////
 
@@ -19,31 +19,49 @@
 DWORD FileSelector::Popup(HINSTANCE hInst, HWND hWnd, LPCTSTR pTitle, LPCTSTR pExt)
 {
 	if (pExt != NULL) {
-		MessageBox(hWnd, TEXT("Not Implimented Yet"), TEXT("ERROR"), MB_ICONERROR|MB_OK);
-		return IDCANCEL;
+		OPENFILENAME ofn;
+		TCHAR fname[MAX_PATH];
+
+		fname[0] = aPath[0] = TEXT('\0');
+
+		memset(&ofn, 0, sizeof(ofn));
+		ofn.lStructSize = sizeof(ofn);
+		ofn.hwndOwner = hWnd;
+		ofn.lpstrFilter = pExt;
+		ofn.lpstrFile = aPath;
+		ofn.nMaxFile = MAX_PATH;
+		ofn.lpstrFileTitle = fname;
+		ofn.nMaxFileTitle = MAX_PATH;
+		ofn.lpstrTitle = pTitle;
+		ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
+		if (GetOpenFileName(&ofn)) {
+			return IDOK;
+		} else {
+			return IDCANCEL;
+		}
+	} else {
+		LPITEMIDLIST pIdList;
+		TCHAR buf[MAX_PATH];
+		BROWSEINFO bi;
+		ZeroMemory(&bi, sizeof(bi));
+		bi.hwndOwner = hWnd;
+		bi.pszDisplayName = buf;
+		bi.lpszTitle = pTitle;
+		bi.ulFlags = BIF_RETURNONLYFSDIRS;
+
+		pIdList = SHBrowseForFolder(&bi);
+		if (pIdList == NULL) return IDCANCEL;
+
+		SHGetPathFromIDList(pIdList, aPath); 
+		CoTaskMemFree(pIdList);
+		return IDOK;
 	}
-
-	LPITEMIDLIST pIdList;
-	TCHAR buf[MAX_PATH];
-	BROWSEINFO bi;
-	ZeroMemory(&bi, sizeof(bi));
-	bi.hwndOwner = hWnd;
-	bi.pszDisplayName = buf;
-	bi.lpszTitle = pTitle;
-	bi.ulFlags = BIF_RETURNONLYFSDIRS;
-
-	pIdList = SHBrowseForFolder(&bi);
-	if (pIdList == NULL) return IDCANCEL;
-
-	SHGetPathFromIDList(pIdList, aPath); 
-	CoTaskMemFree(pIdList);
-	return IDOK;
 }
 
 #else // PLATFORM_WIN32
 ////////////////////////////////////////////////////
 ////////////////////////////////////////////////////
-// CE用ファイル選択ダイアログ
+// File selection (CE)
 ////////////////////////////////////////////////////
 ////////////////////////////////////////////////////
 
