@@ -67,7 +67,6 @@ HMENU PocketPCPlatform::GetMDToolMenu() { return SHGetSubMenu(hMDCmdBar, IDM_DET
 HMENU PocketPCPlatform::GetMSEditMenu() { return SHGetSubMenu(hMSCmdBar, IDM_EDIT_MEMO); }
 HMENU PocketPCPlatform::GetMSBookMarkMenu() { return SHGetSubMenu(hMSCmdBar, IDM_MS_BOOKMARK); }
 
-
 void PocketPCPlatform::EnableMenu(UINT uid, BOOL bEnable)
 {
 	BOOL bSBS = FALSE;
@@ -111,6 +110,25 @@ void PocketPCPlatform::EnableMenu(UINT uid, BOOL bEnable)
 
 	if (bSBS) {
 		SendMessage(hTB, TB_ENABLEBUTTON, uid, MAKELONG(bEnable, 0));
+	}
+}
+
+void PocketPCPlatform::CheckMenu(UINT uid, BOOL bCheck)
+{
+	HWND hTB;
+	BOOL bCBS = FALSE;
+	switch(uid) {
+	case IDM_TOGGLEPANE:
+		bCBS = TRUE;
+		hTB = hMSCmdBar;
+		bCheck = !bCheck;
+		break;
+	default:
+		return;
+	}
+
+	if (bCBS) {
+		SendMessage(hTB, TB_CHECKBUTTON, uid, MAKELONG(bCheck, 0));
 	}
 }
 

@@ -605,3 +605,9 @@ Changes
 * move IDM_TOGGLEPANE to PlatformLayer
 * supporting two-pane layout for PocketPC version.
 
+////////////////////////////////
+// B136
+////////////////////////////////
+// main trunk
+
+* impliment IDM_TOGGLEPANE (PocketPC version)

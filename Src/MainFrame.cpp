@@ -657,7 +657,7 @@ void MainFrame::OnCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		g_Property.SetWrapText(!g_Property.WrapText());
 		SetWrapText(g_Property.WrapText());
 		break;
-#if defined(PLATFORM_HPC) || defined(PLATFORM_WIN32)
+#if defined(PLATFORM_HPC) || defined(PLATFORM_WIN32) || defined(PLATFORM_PKTPC)
 	case IDM_TOGGLEPANE:
 		TogglePane();
 		break;
@@ -1457,7 +1457,7 @@ void MainFrame::SetWrapText(BOOL bWrap)
 
 void MainFrame::TogglePane()
 {
-#if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
+#if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC) || defined(PLATFORM_PKTPC)
 	pPlatform->CheckMenu(IDM_TOGGLEPANE, !g_Property.IsUseTwoPane());
 
 	if (g_Property.IsUseTwoPane()) {
@@ -1475,7 +1475,6 @@ void MainFrame::TogglePane()
 		RECT rr;
 		WORD nWidth;
 		g_Property.GetWinSize(&u1, &u2, &rr, &nWidth);
-//		SetLayout(r.right - r.left, r.bottom - r.top, nWidth);
 		SetLayout(nWidth);
 
 		msView.Show(SW_SHOW);
