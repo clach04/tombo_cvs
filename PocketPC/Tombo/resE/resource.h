@@ -81,6 +81,7 @@
 #define IDC_GREPTAB_MAIN_ENCRYPTNOTE    1040
 #define IDC_GREPTAB_MAIN_FILENAME       1041
 #define IDC_GREPTAB_MAIN_STARTDIR       1042
+#define IDC_PROP_READONLY               1043
 #define IDM_ACTIONBUTTON                30001
 #define IDM_FILE_EXIT                   40002
 #define IDM_HELP_ABOUT                  40003
@@ -153,7 +154,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        126
 #define _APS_NEXT_COMMAND_VALUE         40069
-#define _APS_NEXT_CONTROL_VALUE         1043
+#define _APS_NEXT_CONTROL_VALUE         1044
 #define _APS_NEXT_SYMED_VALUE           106
 #endif
 #endif

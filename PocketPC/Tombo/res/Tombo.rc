@@ -209,9 +209,11 @@ BEGIN
     CONTROL         "メモファイル名とメモタイトルを連動",IDC_KEEPTITLE,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,50,120,10
     LTEXT           "保存時にメモの一行目が変更されていたらファイル名を自動的に変更します。",
-                    IDC_STATIC,10,70,115,25
+                    IDC_STATIC,10,70,115,20
     COMBOBOX        IDC_TOPFOLDER,5,20,90,85,CBS_DROPDOWN | CBS_AUTOHSCROLL | 
                     WS_VSCROLL | WS_TABSTOP
+    CONTROL         "デフォルトを書きこみ禁止にする",IDC_PROP_READONLY,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,95,99,10
 END
 
 IDD_FILESELECT DIALOG DISCARDABLE  0, 0, 134, 89

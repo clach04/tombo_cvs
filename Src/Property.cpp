@@ -48,8 +48,9 @@
 #define PROP_FOLDER_ATTR_NAME TEXT("PropertyDir")
 #define CODEPAGE_ATTR_NAME TEXT("CodePage")
 #define DISABLEEXTRAACTIONBUTTON_ATTR_NAME TEXT("DisableExtraActionButton")
-
 #define WRAPTEXT_ATTR_NAME TEXT("WrapText")
+#define OPENREADONLY_ATTR_NAME TEXT("OpenReadOnly")
+
 // saved each exit time.
 #define HIDESTATUSBAR_ATTR_NAME TEXT("HideStatusBar")
 #define STAYTOPMOST_ATTR_NAME TEXT("StayTopMost")
@@ -192,6 +193,13 @@ void FolderTab::Init(HWND hDlg)
 	} else {
 		SendMessage(hKeepTitle, BM_SETCHECK, BST_CHECKED, 0);
 	}
+
+	HWND hOpenReadOnly = GetDlgItem(hDlg, IDC_PROP_READONLY);
+	if (pProperty->OpenReadOnly()) {
+		SendMessage(hOpenReadOnly, BM_SETCHECK, BST_CHECKED, 0);
+	} else {
+		SendMessage(hOpenReadOnly, BM_SETCHECK, BST_UNCHECKED, 0);
+	}
 }
 
 BOOL FolderTab::Apply(HWND hDlg)
@@ -266,6 +274,13 @@ BOOL FolderTab::Apply(HWND hDlg)
 
 	// —š—ð‚Ì•Û‘¶
 	RetrieveAndSaveHistory(hTopPath, TOMBO_TOPDIRHIST_ATTR_NAME, p, MEMO_TOP_DIR_NUM_HISTORY);
+
+	HWND hReadOnly = GetDlgItem(hDlg, IDC_PROP_READONLY);
+	if (SendMessage(hReadOnly, BM_GETCHECK, 0, 0) == BST_CHECKED) {
+		pProperty->bOpenReadOnly = TRUE;
+	} else {
+		pProperty->bOpenReadOnly = FALSE;
+	}
 
 	_tcscpy(pProperty->aTopDir, p);
 	return TRUE;
@@ -1185,6 +1200,7 @@ BOOL Property::Load(BOOL *pStrict)
 #endif
 
 	nWrapText = GetDWORDFromReg(hTomboRoot, WRAPTEXT_ATTR_NAME, 1);
+	bOpenReadOnly = GetDWORDFromReg(hTomboRoot, OPENREADONLY_ATTR_NAME, FALSE);
 
 	RegCloseKey(hTomboRoot);
 	return TRUE;
@@ -1278,6 +1294,7 @@ BOOL Property::Save()
 	if (!SetDWORDToReg(hTomboRoot, HIDESTATUSBAR_ATTR_NAME, nHideStatusBar)) return FALSE;
 #endif
 
+	if (!SetDWORDToReg(hTomboRoot, OPENREADONLY_ATTR_NAME, bOpenReadOnly)) return FALSE;
 
 #if defined(PLATFORM_BE500)
 	CGDFlushRegistry();

@@ -278,8 +278,11 @@ BOOL MemoManager::SetMemo(MemoLocator *pLoc)
 		if (!mi.ReadInfo(pNote->MemoPath(), &nPos)) nPos = 0;
 	}
 	BOOL bReadOnly;
-	if (!pNote->IsReadOnly(&bReadOnly)) return FALSE;
-
+	if (!g_Property.OpenReadOnly()) {
+		if (!pNote->IsReadOnly(&bReadOnly)) return FALSE;
+	} else {
+		bReadOnly = TRUE;
+	}
 	pMemoDetailsView->SetMemo(p, nPos, bReadOnly);
 	MemoNote::WipeOutAndDelete(p);
 	SetCurrentNote(pLoc);

@@ -55,6 +55,7 @@ class Property {
 	DWORD nTopMost;
 #endif
 	DWORD nWrapText;
+	BOOL bOpenReadOnly;
 
 public:
 	Property();
@@ -142,6 +143,8 @@ public:
 #endif
 	DWORD WrapText() { return nWrapText; }
 	void SetWrapText(DWORD n) { nWrapText = n; }
+
+	BOOL OpenReadOnly() { return bOpenReadOnly; }
 
 	// ウィンドウサイズ関連の保存・復元
 	static BOOL SaveWinSize(LPRECT pWinRect, WORD nSelectViewWidth);

@@ -89,6 +89,7 @@
 #define IDC_GREPTAB_MAIN_FILENAME       1034
 #define IDC_GREPTAB_PERSIST_NAME        1035
 #define IDC_PROPTAB_PERSIST_SELECTPERSIST 1036
+#define IDC_PROP_READONLY               1037
 #define IDM_EXIT                        40001
 #define IDM_NEWMEMO                     40002
 #define IDM_RETURNLIST                  40003
@@ -128,7 +129,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        137
 #define _APS_NEXT_COMMAND_VALUE         40033
-#define _APS_NEXT_CONTROL_VALUE         1037
+#define _APS_NEXT_CONTROL_VALUE         1038
 #define _APS_NEXT_SYMED_VALUE           108
 #endif
 #endif
