@@ -852,11 +852,13 @@ void MainFrame::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		// 初期表示時の詳細ビューは新規メモと同様の扱いとする
 		mmMemoManager.NewMemo();
 	}
-
 #if defined(PLATFORM_WIN32)
 	SetTopMost();
 #endif
 	ActivateView(TRUE);
+
+	// Raize window for some PocketPC devices.
+	SetForegroundWindow(hMainWnd);
 }
 
 #if defined(PLATFORM_WIN32)
