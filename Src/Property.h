@@ -12,6 +12,8 @@
 class Property {
 	TCHAR aTopDir[MAX_PATH];
 
+	LPTSTR pDefaultTopDir;
+
 	BOOL bValidSum;
 	BYTE aPasswordSum[33];
 	DWORD nPassTimeOut;
@@ -56,6 +58,16 @@ class Property {
 
 public:
 	Property();
+	~Property();
+
+	/////////////////////////////////
+	// set default props
+
+	BOOL SetDefaultROMode(BOOL) {return TRUE; }
+	BOOL SetDefaultTomboRoot(LPCTSTR p, DWORD nLen);
+
+	/////////////////////////////////
+	// accessor
 
 	LPCTSTR TopDir() { return aTopDir; }
 	const LPBYTE FingerPrint() { return bValidSum ? aPasswordSum : NULL; }

@@ -123,9 +123,14 @@ LPCTSTR GetString(UINT nID)
 // ctor
 //////////////////////////////////////////
 
-Property::Property()
+Property::Property() : pDefaultTopDir(NULL)
 {
 	_tcscpy(aTopDir, TEXT(""));
+}
+
+Property::~Property()
+{
+	delete [] pDefaultTopDir;
 }
 
 //////////////////////////////////////////
@@ -990,18 +995,22 @@ BOOL Property::Load(BOOL *pStrict)
 	*pStrict = TRUE;
 
 	// メモトップフォルダパス
-	siz = sizeof(aTopDir);
-	res = RegQueryValueEx(hTomboRoot, TOPDIR_ATTR_NAME, NULL, &typ, (LPBYTE)aTopDir, &siz);
-	if (res != ERROR_SUCCESS) {
+	if (pDefaultTopDir) {
+		_tcscpy(aTopDir, pDefaultTopDir);
+	} else {
+		siz = sizeof(aTopDir);
+		res = RegQueryValueEx(hTomboRoot, TOPDIR_ATTR_NAME, NULL, &typ, (LPBYTE)aTopDir, &siz);
+		if (res != ERROR_SUCCESS) {
 #if defined(PLATFORM_BE500)
-		GetUserDiskName(g_hInstance, aTopDir, MAX_PATH);
-		if (_tcslen(aTopDir) + _tcslen(TOMBO_ROOT_SUFFIX) < MAX_PATH - 1) {
-			_tcscat(aTopDir, TOMBO_ROOT_SUFFIX);
-		}
+			GetUserDiskName(g_hInstance, aTopDir, MAX_PATH);
+			if (_tcslen(aTopDir) + _tcslen(TOMBO_ROOT_SUFFIX) < MAX_PATH - 1) {
+				_tcscat(aTopDir, TOMBO_ROOT_SUFFIX);
+			}
 #else
-		_tcscpy(aTopDir, MEMO_TOP_DIR);
+			_tcscpy(aTopDir, MEMO_TOP_DIR);
 #endif
-		*pStrict = FALSE;
+			*pStrict = FALSE;
+		}
 	}
 
 	// パスワードFingerPrint
@@ -1770,5 +1779,14 @@ BOOL GetCommandbarInfo(LPCOMMANDBANDSRESTOREINFO p, DWORD n)
 	}
 }
 
-
 #endif
+
+BOOL Property::SetDefaultTomboRoot(LPCTSTR p, DWORD nLen)
+{
+	pDefaultTopDir = new TCHAR[nLen + 1];
+	if (!pDefaultTopDir) return FALSE;
+	_tcsncpy(pDefaultTopDir, p, nLen);
+	pDefaultTopDir[nLen] = TEXT('\0');
+	ChopFileSeparator(pDefaultTopDir);
+	return TRUE;
+}

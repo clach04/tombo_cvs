@@ -14,7 +14,7 @@
 #include "PasswordManager.h"
 
 //////////////////////////////////////
-// グローバル変数
+// Global variables
 //////////////////////////////////////
 
 Property g_Property;
@@ -27,10 +27,11 @@ BOOL bDisableHotKey;
 PasswordManager *g_pPasswordManager = NULL;
 
 //////////////////////////////////////
-// プロトタイプ
+// Declarations
 //////////////////////////////////////
 
 BOOL CheckAndRaiseAnotherTombo();
+BOOL ParseCmdLine(LPTSTR pCmdLine);
 
 extern "C" {
 	const char *CheckBlowFish();
@@ -40,17 +41,14 @@ extern "C" {
 // WinMain
 //////////////////////////////////////
 
-#ifdef _WIN32_WCE
 int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPTSTR pCmdLine, int nCmdShow)
-#else
-int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPSTR pCmdLine, int nCmdShow)
-#endif
 {
-	// 二重起動チェック
+	// Check other Tombo.exe is executed
 	if (CheckAndRaiseAnotherTombo()) {
 		return 0;
 	}
 
+	// Check BLOWFISH library
 	const char *p = CheckBlowFish();
 	if (p != NULL) {
 		TCHAR buf[1024];
@@ -64,9 +62,12 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPSTR pCmdLine, int nCmdSho
 		delete [] pMsg;
 	}
 
-	// Loggerの初期化
+	// Check command line strings
+	ParseCmdLine(pCmdLine);
+
+	// initialize logger
 	g_pLogger = &g_Logger;
-	// ログ出力時には以下の2行をコメントアウトすること
+	// if write debug log, comment out two lines:
 //	g_Logger.Init(TEXT("\\My Documents\\Tombo.log"));
 //	TomboMessageBox(NULL, TEXT("Log mode is ON"), TEXT("DEBUG"), MB_OK);
 
@@ -76,7 +77,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPSTR pCmdLine, int nCmdSho
 	InitCommonControls();
 #endif
 #if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
-	// Rebarの初期化
+	// initialize rebar control
    INITCOMMONCONTROLSEX icex;
    icex.dwSize = sizeof(INITCOMMONCONTROLSEX);
    icex.dwICC   = ICC_COOL_CLASSES|ICC_BAR_CLASSES;
@@ -87,14 +88,14 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPSTR pCmdLine, int nCmdSho
 	SHInitExtraControls();
 #endif
 
+	// create MainFrame instance
 	MainFrame frmMain;
 	MainFrame::RegisterClass(hInst);
-
 
 	g_hInstance = hInst;
 	frmMain.Create(TOMBO_APP_NAME, hInst, nCmdShow);
 
-
+	// go message loop
 	int res = frmMain.MainLoop();
 
 	g_Logger.Close();
@@ -142,4 +143,72 @@ int TomboMessageBox(HWND hWnd, LPCTSTR pText, LPCTSTR pCaption, UINT uType)
 	int nResult = MessageBox(hWnd, pText, pCaption, uType);
 	bDisableHotKey = bPrev;
 	return nResult;
+}
+
+//////////////////////////////////////
+// Parse command line string
+//////////////////////////////////////
+BOOL GetDefaultFolder(LPTSTR pCmdLine, LPDWORD pStart, LPDWORD pEnd, LPTSTR *ppNext);
+
+BOOL ParseCmdLine(LPTSTR pCmdLine)
+{
+	LPTSTR p = pCmdLine;
+	while (*p) {
+		if (*p == TEXT('-')) {
+			if (_tcsnicmp(p+1, TEXT("root="), 5) == 0) {
+				DWORD nStart, nEnd;
+				LPTSTR pNext;
+				if (GetDefaultFolder(p + 6, &nStart, &nEnd, &pNext)) {
+					g_Property.SetDefaultTomboRoot(p + 6 + nStart, nEnd - nStart);
+				}
+				p = pNext;
+//			} else if (_tcsnicmp(p+1, TEXT("ro"), 2) == 0) {
+//				g_Property.SetDefaultROMode(TRUE);
+			}
+		}
+		p = CharNext(p);
+	}
+	return TRUE;
+}
+
+BOOL GetDefaultFolder(LPTSTR pCmdLine, LPDWORD pStart, LPDWORD pEnd, LPTSTR *ppNext)
+{
+	LPTSTR p = pCmdLine;
+	BOOL bQuoted = FALSE;
+
+	// Is quoted?
+	if (*p == TEXT('"')) {
+		bQuoted = TRUE;
+		p++;
+	}
+	*pStart = p - pCmdLine;
+
+	BOOL bBreak = FALSE;
+	while(*p) {
+		if (!bQuoted && *p == TEXT(' ')) {
+			bBreak = TRUE;
+			break;
+		}
+		if (bQuoted && *p == TEXT('"')) {
+			bBreak = TRUE;
+			break;
+		}
+		p = CharNext(p);
+	}
+	if (bQuoted) {
+		if (*p != TEXT('"')) {
+			*ppNext = p; // may be EOL
+			return FALSE;
+		}
+		*ppNext = p + 1;
+		*pEnd = p - pCmdLine;
+		return TRUE;
+	} else {
+		*ppNext = p;
+		*pEnd = p - pCmdLine;
+		return TRUE;
+	}
+
+
+	return TRUE;
 }
