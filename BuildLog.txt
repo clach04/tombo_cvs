@@ -769,3 +769,14 @@ Not fully tested on both platform, probably it will work.
 
 * FIX: Shift+ESC is not worked.
 
+////////////////////////////////
+// B156
+////////////////////////////////
+
+* PocketPC style property page supprot
+* VGA support
+	* Create project for VGA mode.
+	* VGA resolution support.
+	* Change bitmap size 16x16 -> 24x24 for VGA mode.
+	* Landscape mode support.
+

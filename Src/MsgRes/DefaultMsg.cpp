@@ -283,4 +283,5 @@ static LPCTSTR defaultMsg[] = {
 	TEXT("Edit bookmark"),
 	TEXT("Use ClearType font"),
 	TEXT("Disable save daialog"),
+	TEXT("Toolbar"),
 };

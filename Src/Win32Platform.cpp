@@ -80,7 +80,7 @@ void Win32Platform::Create(HWND hWnd, HINSTANCE hInst)
 
 	 hRebar = CreateWindowEx(WS_EX_TOOLWINDOW, REBARCLASSNAME, NULL,
 								WS_BORDER | RBS_BANDBORDERS | RBS_AUTOSIZE | 
-								WS_CHILD|WS_VISIBLE|WS_CLIPSIBLINGS| RBS_TOOLTIPS | 
+								WS_CHILD | WS_CLIPSIBLINGS| RBS_TOOLTIPS | 
 								WS_CLIPCHILDREN|RBS_VARHEIGHT,
 								0, 0, 0, 0,
 								hWnd, NULL, hInst, NULL);
@@ -195,9 +195,15 @@ void Win32Platform::EnableSearchNext()
 void Win32Platform::AdjustUserRect(RECT *pRect)
 {
 	// get rebar height
-	RECT r;
-	GetWindowRect(hRebar, &r);
-	WORD nRebarH = (WORD)(r.bottom - r.top);
+	WORD nRebarH;
+
+	if (g_Property.HideRebar()) {
+		nRebarH = 0;
+	} else {
+		RECT r;
+		GetWindowRect(hRebar, &r);
+		nRebarH = (WORD)(r.bottom - r.top);
+	}
 
 	// get statusbar height
 	WORD nStatusHeight;
@@ -234,6 +240,15 @@ void Win32Platform::CheckMenu(UINT uid, BOOL bCheck)
 void Win32Platform::ShowStatusBar(BOOL bShow)
 {
 	pStatusBar->Show(bShow);
+}
+
+void Win32Platform::ShowRebar(BOOL bShow)
+{
+	if (bShow) {
+		ShowWindow(hRebar, SW_SHOW);
+	} else {
+		ShowWindow(hRebar, SW_HIDE);
+	}
 }
 
 void Win32Platform::SetStatusIndicator(DWORD nPos, LPCTSTR pText, BOOL bDisp)
@@ -313,16 +328,17 @@ static MenuMsgRes aBookMarkMenu[] = {
 static MenuMsgRes aToolMenu[] = {
 	{  0, IDM_DETAILS_HSCROLL, MF_CHECKED | MF_GRAYED, MSG_ID_MENUITEM_W32_T_WRAPTEXT },
 	{  1, IDM_TOGGLEPANE,      MF_CHECKED,             MSG_ID_MENUITEM_W32_T_TWOPANE },
-	{  2, IDM_SHOWSTATUSBAR,   MF_CHECKED,             MSG_ID_MENUITEM_W32_T_STATUSBAR },
-	{  3, IDM_TOPMOST,         0,                      MSG_ID_MENUITEM_W32_T_STAYTOPMOST },
-	{  4, -1,                  0,                      0 },
-	{  5, IDM_ENCRYPT,         MF_GRAYED,              MSG_ID_MENUITEM_W32_T_ENCRYPT },
-	{  6, IDM_DECRYPT,         MF_GRAYED,              MSG_ID_MENUITEM_W32_T_DECRYPT },
-	{  7, -1,                  0,                      0 },
-	{  8, IDM_FORGETPASS,      0,                      MSG_ID_MENUITEM_W32_T_ERASEPASS },
-	{  9, -1,                  0,                      0 },
-	{ 10, IDM_VFOLDER_DEF,     0,                      MSG_ID_MENUITEM_W32_T_VIRTUALFOLDER },
-	{ 11, IDM_PROPERTY,        0,                      MSG_ID_MENUITEM_W32_T_OPTIONS },
+	{  2, IDM_SHOWREBAR,       MF_CHECKED,             MSG_ID_MENUITEM_W32_T_REBAR },
+	{  3, IDM_SHOWSTATUSBAR,   MF_CHECKED,             MSG_ID_MENUITEM_W32_T_STATUSBAR },
+	{  4, IDM_TOPMOST,         0,                      MSG_ID_MENUITEM_W32_T_STAYTOPMOST },
+	{  5, -1,                  0,                      0 },
+	{  6, IDM_ENCRYPT,         MF_GRAYED,              MSG_ID_MENUITEM_W32_T_ENCRYPT },
+	{  7, IDM_DECRYPT,         MF_GRAYED,              MSG_ID_MENUITEM_W32_T_DECRYPT },
+	{  8, -1,                  0,                      0 },
+	{  9, IDM_FORGETPASS,      0,                      MSG_ID_MENUITEM_W32_T_ERASEPASS },
+	{ 10, -1,                  0,                      0 },
+	{ 11, IDM_VFOLDER_DEF,     0,                      MSG_ID_MENUITEM_W32_T_VIRTUALFOLDER },
+	{ 12, IDM_PROPERTY,        0,                      MSG_ID_MENUITEM_W32_T_OPTIONS },
 };
 
 static MenuMsgRes aHelpMenu[] = {

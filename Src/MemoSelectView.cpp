@@ -25,8 +25,13 @@
 /////////////////////////////////////////
 
 // Size of each image in IDB_MEMOSELECT_IMAGES
+#if defined(FOR_VGA)
+#define IMAGE_CX 24
+#define IMAGE_CY 24
+#else
 #define IMAGE_CX 16
 #define IMAGE_CY 16
+#endif
 
 // Number of items in IDB_MEMOSELECT_IMAGES
 #define NUM_MEMOSELECT_BITMAPS 10
@@ -511,7 +516,7 @@ void MemoSelectView::OnNotify_RClick(POINT pt)
 {
 	TV_HITTESTINFO hti;
 	POINT cpt = pt;
-#if !defined(PLATFORM_HPC)
+#if defined(PLATFORM_WIN32) || defined(PLATFORM_PKTPC)
 	ScreenToClient(hViewWnd, &cpt);
 #endif
 	hti.pt = cpt;
@@ -1602,8 +1607,11 @@ static HIMAGELIST CreateSelectViewImageList(HINSTANCE hInst)
 	HIMAGELIST hImageList;
 	// Create Imagelist.
 	if ((hImageList = ImageList_Create(IMAGE_CX, IMAGE_CY, ILC_MASK, NUM_MEMOSELECT_BITMAPS, 0)) == NULL) return NULL;
+#if defined(FOR_VGA)
+	HBITMAP hBmp = LoadBitmap(hInst, MAKEINTRESOURCE(IDB_MEMOSELECT_IMAGES24));
+#else
 	HBITMAP hBmp = LoadBitmap(hInst, MAKEINTRESOURCE(IDB_MEMOSELECT_IMAGES));
-
+#endif
 	// Transparent color is GREEN
 	COLORREF rgbTransparent = RGB(0,255,0);
 	ImageList_AddMasked(hImageList, hBmp, rgbTransparent);

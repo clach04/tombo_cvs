@@ -70,7 +70,11 @@ static HIMAGELIST CreateSelectViewImageList(HINSTANCE hInst);
 #define BORDER_WIDTH 2
 #endif
 #if defined(PLATFORM_HPC) || defined(PLATFORM_PKTPC) || defined(PLATFORM_PSPC) || defined(PLATFORM_BE500)
+#if defined(FOR_VGA)
+#define BORDER_WIDTH 10
+#else
 #define BORDER_WIDTH 5
+#endif
 #endif
 
 // Bookmark menu ID base value
@@ -506,6 +510,10 @@ void MainFrame::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	// create toolbar
 	pPlatform->Create(hWnd, pcs->hInstance);
 
+#if defined(PLATFORM_WIN32)
+	pPlatform->ShowRebar(!g_Property.HideRebar());
+#endif
+
 	// adjust client area to remove toolbar area
 	pPlatform->AdjustUserRect(&r);
 
@@ -722,6 +730,11 @@ void MainFrame::OnCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		ToggleShowStatusBar();
 		break;
 #endif
+#if defined(PLATFORM_WIN32)
+	case IDM_SHOWREBAR:
+		ToggleShowRebar();
+		break;
+#endif
 	case IDM_GREP:
 		OnGrep();
 		break;
@@ -798,33 +811,8 @@ void MainFrame::OnSettingChange(WPARAM wParam)
 
 void MainFrame::OnSIPResize(BOOL bImeOn, RECT *pSipRect)
 {
-
 #if defined(PLATFORM_PKTPC) || defined(PLATFORM_BE500)
 	SetLayout();
-#endif
-
-#ifdef COMMENT
-#if defined(PLATFORM_PSPC) || defined(PLATFORM_BE500)
-	DWORD nTop, nBottom;
-	DWORD nClientBottom = pSipRect->top;
-
-#if defined(PLATFORM_PSPC)
-	DWORD nHOffset = CommandBar_Height(pPlatform->hMDCmdBar);
-#else
-	DWORD nHOffset = CSOBar_Height(pPlatform->hMDCmdBar);
-#endif
-	nTop = nHOffset;
-	nBottom = 320 - nHOffset * 2;
-	if (bImeOn) {
-		RECT rx;
-		GetWindowRect(hMainWnd, &rx);
-		msView.MoveWindow(0, nTop, 240, nClientBottom - rx.top - nTop);
-		pDetailsView->MoveWindow(0, nTop, 240, nClientBottom - rx.top - nTop);
-	} else {
-		msView.MoveWindow(0, nTop, 240, nBottom);
-		pDetailsView->MoveWindow(0, nTop, 240, nBottom);
-	}
-#endif
 #endif
 }
 
@@ -1260,6 +1248,9 @@ void MainFrame::TogglePane()
 void MainFrame::ChangeLayout(LayoutType layout)
 {
 	pPlatform->ShowStatusBar(!g_Property.HideStatusBar());
+#if defined(PLATFORM_WIN32)
+	pPlatform->ShowRebar(!g_Property.HideRebar());
+#endif
 
 	// get tree/edit view area
 	RECT r, rc;
@@ -1274,13 +1265,30 @@ void MainFrame::ChangeLayout(LayoutType layout)
 			// split vertical
 			msView.MoveWindow(rc.left, rc.top , nSplitterSize, rc.bottom);
 			pDetailsView->MoveWindow(nSplitterSize + BORDER_WIDTH, rc.top, rc.right - nSplitterSize - BORDER_WIDTH, rc.bottom);
-#else
+#endif
+#if defined(PLATFORM_BE500) || (defined(PLATFORM_PKTPC) && !defined(FOR_VGA))
 			// split horizontal
 			msView.MoveWindow(rc.left, rc.top , rc.right, nSplitterSize);
-//			pDetailsView->MoveWindow(rc.left, rc.top + nSplitterSize + BORDER_WIDTH, rc.right, rc.bottom - nSplitterSize - BORDER_WIDTH - rc.top);
 			pDetailsView->MoveWindow(
 				rc.left, rc.top + nSplitterSize + BORDER_WIDTH, 
 				rc.right, rc.bottom - nSplitterSize - BORDER_WIDTH);
+#endif
+#if defined(PLATFORM_PKTPC) && defined(FOR_VGA)
+			if (r.bottom - r.top > r.right - r.left) {
+				// portrait mode
+
+				// split horizontal
+				msView.MoveWindow(rc.left, rc.top , rc.right, nSplitterSize);
+				pDetailsView->MoveWindow(
+					rc.left, rc.top + nSplitterSize + BORDER_WIDTH, 
+					rc.right, rc.bottom - nSplitterSize - BORDER_WIDTH);
+			} else {
+				// landscape mode
+
+				// split vertical
+				msView.MoveWindow(rc.left, rc.top , nSplitterSize, rc.bottom);
+				pDetailsView->MoveWindow(nSplitterSize + BORDER_WIDTH, rc.top, rc.right - nSplitterSize - BORDER_WIDTH, rc.bottom);
+			}
 #endif
 
 			msView.Show(SW_SHOW);
@@ -1703,6 +1711,31 @@ void MainFrame::ToggleShowStatusBar()
 
 	RECT r;
 	GetClientRect(hMainWnd, &r);
+	OnResize(0, MAKELPARAM(r.right - r.left, r.bottom - r.top));
+}
+#endif
+
+///////////////////////////////////////////////////
+// show/hide rebar
+///////////////////////////////////////////////////
+
+#if defined(PLATFORM_WIN32)
+void MainFrame::ToggleShowRebar()
+{
+	g_Property.ToggleShowRebar();
+	HMENU hMenu = pPlatform->GetMainMenu();
+
+	RECT r;
+	GetClientRect(hMainWnd, &r);
+
+	pPlatform->ShowRebar(!g_Property.HideRebar());
+	if (g_Property.HideRebar()) {
+		CheckMenuItem(hMenu, IDM_SHOWREBAR, MF_BYCOMMAND | MF_UNCHECKED);
+	} else {
+		InvalidateRect(hMainWnd, &r, TRUE);
+		CheckMenuItem(hMenu, IDM_SHOWREBAR, MF_BYCOMMAND | MF_CHECKED);
+	}
+
 	OnResize(0, MAKELPARAM(r.right - r.left, r.bottom - r.top));
 }
 #endif

@@ -281,3 +281,4 @@ Add bookmark
 Edit bookmark
 Use ClearType font
 Disable save daialog
+Toolbar

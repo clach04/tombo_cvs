@@ -187,6 +187,9 @@ public:
 #if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
 	void ToggleShowStatusBar();
 #endif
+#if defined(PLATFORM_WIN32)
+	void ToggleShowRebar();
+#endif
 
 	// change window title
 	void SetTitle(LPCTSTR pTitle);

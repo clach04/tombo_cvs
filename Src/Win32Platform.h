@@ -39,6 +39,8 @@ public:
 	void AdjustUserRect(RECT *r);
 
 	void ShowStatusBar(BOOL bShow);
+	void ShowRebar(BOOL bShow);
+
 	void SetStatusIndicator(DWORD nPos, LPCTSTR pText, BOOL bDisp);
 	WORD GetStatusBarHeight();
 	void ResizeStatusBar(WPARAM wParam, LPARAM lParam);

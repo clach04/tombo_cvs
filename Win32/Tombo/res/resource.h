@@ -37,6 +37,7 @@
 #define IDM_EXTAPP2                     110
 #define IDD_PROPTAB                     111
 #define IDD_FILESELECT                  112
+#define IDM_SHOWREBAR                   112
 #define IDC_TOPFOLDER                   113
 #define IDC_FOLDERSEL                   114
 #define IDC_FILESELECT_TREE             115
@@ -220,6 +221,6 @@
 #define _APS_NEXT_RESOURCE_VALUE        150
 #define _APS_NEXT_COMMAND_VALUE         40039
 #define _APS_NEXT_CONTROL_VALUE         1101
-#define _APS_NEXT_SYMED_VALUE           112
+#define _APS_NEXT_SYMED_VALUE           113
 #endif
 #endif

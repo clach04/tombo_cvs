@@ -56,6 +56,7 @@ class Property {
 #endif
 #if defined(PLATFORM_WIN32)
 	DWORD nTopMost;
+	DWORD nHideRebar;
 #endif
 	DWORD nWrapText;
 	BOOL bOpenReadOnly;
@@ -159,6 +160,8 @@ public:
 #if defined(PLATFORM_WIN32)
 	BOOL StayTopMost() { return nTopMost; }
 	void ToggleStayTopMost() { nTopMost = !nTopMost; }
+	BOOL HideRebar() { return nHideRebar; }
+	void ToggleShowRebar() { nHideRebar = !nHideRebar; }
 #endif
 	DWORD WrapText() { return nWrapText; }
 	void SetWrapText(DWORD n) { nWrapText = n; }

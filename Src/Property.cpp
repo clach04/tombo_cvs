@@ -69,8 +69,10 @@
 #define TOMBO_WINSIZE_ATTR_NAME TEXT("WinSize")
 #define TOMBO_WINSIZE_ATTR_NAME2 TEXT("WinSize2")
 #define TOMBO_REBARHIST_ATTR_NAME TEXT("RebarPos")
+#define HIDEREBAR_ATTR_NAME TEXT("HideRebar")
 
 #define BOOKMARK_ATTR_NAME TEXT("BookMark")
+
 
 #if defined(PLATFORM_PKTPC) || (defined(PLATFORM_BE500) && defined(TOMBO_LANG_ENGLISH))
 #if defined(PLATFORM_PKTPC)
@@ -1237,7 +1239,6 @@ BOOL Property::Load(BOOL *pStrict)
 	if (res != ERROR_SUCCESS) {
 		memset(aPasswordSum, 0, sizeof(aPasswordSum));
 		bValidSum = FALSE;
-//		*pStrict = FALSE;
 	}
 
 	// パスワードタイムアウト
@@ -1400,6 +1401,7 @@ BOOL Property::Load(BOOL *pStrict)
 
 #if defined(PLATFORM_WIN32)
 	nTopMost = GetDWORDFromReg(hTomboRoot, STAYTOPMOST_ATTR_NAME, 0);
+	nHideRebar = GetDWORDFromReg(hTomboRoot, HIDEREBAR_ATTR_NAME, 0);
 #endif
 
 	nWrapText = GetDWORDFromReg(hTomboRoot, WRAPTEXT_ATTR_NAME, 1);
@@ -1520,6 +1522,9 @@ BOOL Property::Save()
 #endif
 #if defined(PLATFORM_HPC) || defined(PLATFORM_WIN32)
 	if (!SetDWORDToReg(hTomboRoot, HIDESTATUSBAR_ATTR_NAME, nHideStatusBar)) return FALSE;
+#endif
+#if defined(PLATFORM_WIN32)
+	if (!SetDWORDToReg(hTomboRoot, HIDEREBAR_ATTR_NAME, nHideRebar)) return FALSE;
 #endif
 
 	if (!SetDWORDToReg(hTomboRoot, OPENREADONLY_ATTR_NAME, bOpenReadOnly)) return FALSE;
