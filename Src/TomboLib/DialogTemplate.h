@@ -30,4 +30,15 @@ public:
 
 } // end namespace
 
+////////////////////////////////////////////////////////////////
+// Dialog message i18n definition
+////////////////////////////////////////////////////////////////
+
+struct DlgMsgRes {
+	int iCtlID;
+	int iMsgID;
+};
+
+void OverrideDlgMsg(HWND hDlg, int nTitleMsg, DlgMsgRes aMsgRes[], int nMsgRes);
+
 #endif

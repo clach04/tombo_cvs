@@ -133,3 +133,124 @@ CodePage
 Memo
 Tool
 Edit
+NewFolder
+Cut
+Copy
+Paste
+Rename
+Delete
+Find
+Find Next
+Find Prev
+Quick filter
+Encrypt
+Decrypt
+Select All
+Exit
+About
+Options
+Virtual folder
+ForgetPass
+Wrap Text
+&File
+New &Memo\tCtrl+N
+New folder
+&Rename file
+&Delete\tDEL
+&Save\tCtrl+S
+E&xit
+&Edit
+Cu&t\tCtrl+X
+&Copy\tCtrl+C
+&Paste\tCtrl+V
+Select &All\tCtrl+A
+&Find\tCtrl+F
+Find Prev\tF3
+Find Next\tShift+F3
+Quick filter\tCtrl+G
+Insert Date1\tCtrl+1
+Insert Date2\tCtrl+2
+&BookMark
+&Add bookmark
+&Edit bookmark
+&Tools
+Wrap Text
+Two panes
+Status bar
+Stay topmost
+&Encrypt\tCtrl+E
+Decry&pt\tCtrl+P
+Erase password
+Virtual folder
+&Options
+&Help
+&About TOMBO
+Jump to original
+OK
+Cancel
+Edit bookmark
+UP
+DN
+Delete
+Select File
+Virtual folder settings
+Up
+Dn
+Save
+New
+Ren
+Del
+Number filter
+Num Items:
+Find filter
+Search str:
+Case sensitive
+Include encrypted memo
+Find to file name
+Invert match
+Sort filter
+Sort Type:
+Timestamp filter
+days before
+Newer
+Older
+Up
+Dn
+Del
+Find
+Num
+Date
+Sort
+Target:
+Search:
+Save
+Name:
+New folder
+Password
+Top page
+Use selected
+Use blank
+Memo folder:
+Folder to store Tombo Notes
+Sync file name and title
+Rename file name if headline changed.
+Open notes read-only mode
+Tree:
+Use default font
+Memo:
+Use ClearType font(XP only)
+Date1:
+Date2:
+Keep caret position
+Remember and restore caret position opening next time.
+Tab stop:
+Set tab stop width
+Show title
+Show notes title to window title
+Password timeout(min):
+Timeout length(1-60).
+Search
+Search str:
+Direction
+Up
+Down

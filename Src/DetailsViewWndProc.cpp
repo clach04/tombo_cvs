@@ -8,6 +8,11 @@
 #include "MemoDetailsView.h"
 #include "MemoManager.h"
 
+#if defined(PLATFORM_PKTPC)
+#include "PlatformLayer.h"
+#include "PocketPCPlatform.h"
+#endif
+
 #define PLATFORM_SIG3
 
 #include "Property.h"
@@ -166,12 +171,14 @@ LRESULT CALLBACK NewDetailsViewProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM l
 
 			if (SHRecognizeGesture(&rgi) == GN_CONTEXTMENU) {
 				//IDR_MENUBAR1
-				HMENU hX;
-				HMENU hPopup;
-				hX = LoadMenu(g_hInstance, MAKEINTRESOURCE(IDR_MENUBAR1));
-				hPopup = GetSubMenu(hX, 0);
+				HMENU hPopup = PocketPCPlatform::LoadDetailsViewPopupMenu();
+//				HMENU hX;
+//				HMENU hPopup;
+//				hX = LoadMenu(g_hInstance, MAKEINTRESOURCE(IDR_MENUBAR1));
+//				hPopup = GetSubMenu(hX, 0);
 				TrackPopupMenuEx(hPopup, 0, rgi.ptDown.x, rgi.ptDown.y, hwnd, NULL);
-				DestroyMenu(hX);
+//				DestroyMenu(hX);
+				DestroyMenu(hPopup);
 				return 0;
 			}
 			break;

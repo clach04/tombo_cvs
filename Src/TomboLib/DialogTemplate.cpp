@@ -1,6 +1,7 @@
 #include <windows.h>
 #include <tchar.h>
 #include "DialogTemplate.h"
+#include "Message.h"
 
 namespace Tombo_Lib {
 
@@ -90,3 +91,20 @@ DWORD DialogTemplate::Popup(HINSTANCE hInst, WORD nID, HWND hParent)
 }
 
 } // end namespace
+
+////////////////////////////////////////////////////////////////
+// i18n
+////////////////////////////////////////////////////////////////
+
+void OverrideDlgMsg(HWND hDlg, int nTitleMsg, DlgMsgRes aMsgRes[], int nMsgRes)
+{
+	if (nTitleMsg != -1) {
+		SetWindowText(hDlg, g_mMsgRes.GetMsg(nTitleMsg));
+	}
+
+	HWND h;
+	for (int i = 0; i < nMsgRes; i++) {
+		h = GetDlgItem(hDlg, aMsgRes[i].iCtlID);
+		SetWindowText(h, g_mMsgRes.GetMsg(aMsgRes[i].iMsgID));
+	}
+}

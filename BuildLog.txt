@@ -676,3 +676,11 @@ Not fully tested on both platform, probably it will work.
 // main trunk
 
 * Arranges resource data.
+
+////////////////////////////////
+//B144
+////////////////////////////////
+// main trunk
+
+* i18nized dialog messages(win32).
+* Change dialog font to Tahoma(win32).

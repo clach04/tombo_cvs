@@ -382,12 +382,9 @@ LRESULT MemoSelectView::OnNotify(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		TreeView_HitTest(hWnd, &hti);
 		TreeView_SelectItem(hWnd, hti.hItem);
 
-		HMENU hX;
-		HMENU hPopup;
-		hX = LoadMenu(g_hInstance, MAKEINTRESOURCE(IDR_MENUBAR1));
-		hPopup = GetSubMenu(hX, 1);
+		HMENU hPopup = PocketPCPlatform::LoadSelectViewPopupMenu();
 		TrackPopupMenuEx(hPopup, 0, pnmrginfo->ptAction.x, pnmrginfo->ptAction.x, hWnd, NULL);
-		DestroyMenu(hX);
+		DestroyMenu(hPopup);
 		return TRUE;
 	}
 #endif
@@ -527,8 +524,7 @@ void MemoSelectView::OnNotify_RClick()
 
 	TreeViewItem *pItem = GetTVItem(hti.hItem);
 
-	HMENU hContextMenu = LoadMenu(g_hInstance, MAKEINTRESOURCE(IDR_CONTEXTMENU));
-	HMENU hMenu = GetSubMenu(hContextMenu, 0);
+	HMENU hMenu = Win32Platform::LoadContextMenu();
 
 	ControlSubMenu(hMenu, IDM_ENCRYPT, pItem->IsOperationEnabled(this, TreeViewItem::OpEncrypt));
 	ControlSubMenu(hMenu, IDM_DECRYPT, pItem->IsOperationEnabled(this, TreeViewItem::OpDecrypt));
@@ -542,7 +538,7 @@ void MemoSelectView::OnNotify_RClick()
 	ControlSubMenu(hMenu, IDM_TRACELINK, pItem->IsOperationEnabled(this, TreeViewItem::OpLink));
 
 	DWORD id = TrackPopupMenuEx(hMenu, TPM_RETURNCMD, pt.x, pt.y, hViewWnd, NULL);
-	DestroyMenu(hContextMenu);
+	DestroyMenu(hMenu);
 
 	switch(id) {
 	case IDM_CUT:

@@ -61,9 +61,9 @@ LPCTSTR MainFrame::pClassName = TOMBO_MAIN_FRAME_WINDOW_CLSS;
 static LRESULT CALLBACK MainFrameWndProc(HWND, UINT, WPARAM, LPARAM);
 static HIMAGELIST CreateSelectViewImageList(HINSTANCE hInst);
 
-#define SHGetMenu(hWndMB)  (HMENU)SendMessage((hWndMB), SHCMBM_GETMENU, (WPARAM)0, (LPARAM)0);
-#define SHGetSubMenu(hWndMB,ID_MENU) (HMENU)SendMessage((hWndMB), SHCMBM_GETSUBMENU, (WPARAM)0, (LPARAM)ID_MENU);
-#define SHSetSubMenu(hWndMB,ID_MENU) (HMENU)SendMessage((hWndMB), SHCMBM_SETSUBMENU, (WPARAM)0, (LPARAM)ID_MENU);
+#define SHGetMenu(hWndMB)  (HMENU)SendMessage((hWndMB), SHCMBM_GETMENU, (WPARAM)0, (LPARAM)0)
+#define SHGetSubMenu(hWndMB,ID_MENU) (HMENU)SendMessage((hWndMB), SHCMBM_GETSUBMENU, (WPARAM)0, (LPARAM)ID_MENU)
+#define SHSetSubMenu(hWndMB,ID_MENU) (HMENU)SendMessage((hWndMB), SHCMBM_SETSUBMENU, (WPARAM)0, (LPARAM)ID_MENU)
 
 // splitter width
 #if defined(PLATFORM_WIN32)
@@ -432,7 +432,7 @@ BOOL MainFrame::Create(LPCTSTR pWndName, HINSTANCE hInst, int nCmdShow)
 						640,
 						320,
 						NULL,
-						LoadMenu(hInst, MAKEINTRESOURCE(IDR_MENU_MAIN)), 
+						Win32Platform::LoadMainMenu(),
 						hInst,
 						this);
 #else 

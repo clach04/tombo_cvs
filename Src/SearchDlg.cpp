@@ -9,10 +9,8 @@
 #include "UniConv.h"
 #include "SipControl.h"
 
-////////////////////////////////////////////////////////////////
-//
-////////////////////////////////////////////////////////////////
-
+#include "DialogTemplate.h"
+#include "Message.h"
 
 ////////////////////////////////////////////////////////////////
 // ctor & dtor
@@ -25,7 +23,7 @@ SearchDialog::~SearchDialog()
 
 
 ////////////////////////////////////////////////////////////////
-// ダイアログプロシージャ
+// Dialog proc
 ////////////////////////////////////////////////////////////////
 
 static BOOL APIENTRY DlgProc(HWND hDlg, UINT nMessage, WPARAM wParam, LPARAM lParam)
@@ -61,11 +59,24 @@ static BOOL APIENTRY DlgProc(HWND hDlg, UINT nMessage, WPARAM wParam, LPARAM lPa
 }
 
 ////////////////////////////////////////////////////////////////
-// ダイアログ初期化
+// init
 ////////////////////////////////////////////////////////////////
+
+static DlgMsgRes aMsgRes[] = {
+	{ IDC_SEARCH_FIND_LABEL,     MSG_ID_DLG_SEARCH_FIND_LABEL },
+	{ IDC_SEARCH_DIRECT_LABEL,   MSG_ID_DLG_SEARCH_DIRECTION_LABEL },
+	{ IDC_SEARCH_DIRECTION_UP,   MSG_ID_DLG_SEARCH_DIRECTION_UP },
+	{ IDC_SEARCH_DIRECTION_DOWN, MSG_ID_DLG_SEARCH_DIRECTION_DOWN },
+	{ IDC_SEARCH_CASESENSITIVE,  MSG_ID_DLG_FILTERDEF_ADD_REGEX_CASESENSITIVE },
+	{ IDC_SEARCH_ENCRYPTMEMO,    MSG_ID_DLG_FILTERDEF_ADD_REGEX_INCLUDECRYPTED },
+	{ IDC_FILENAMEONLY,          MSG_ID_DLG_FILTERDEF_ADD_REGEX_FORFILENAME },
+	{ IDOK,                      MSG_ID_DLG_CMN_OK },
+	{ IDCANCEL,                  MSG_ID_DLG_CMN_CANCEL },
+};
 
 void SearchDialog::InitDialog(HWND hDlg)
 {
+	OverrideDlgMsg(hDlg, MSG_ID_DLG_SEARCH_TITLE, aMsgRes, sizeof(aMsgRes)/sizeof(DlgMsgRes));
 	hDialog = hDlg;
 
 	HWND hCombo = GetDlgItem(hDlg, IDC_SEARCH_STRING);
@@ -85,7 +96,7 @@ void SearchDialog::InitDialog(HWND hDlg)
 }
 
 ////////////////////////////////////////////////////////////////
-// ポップアップ
+// popup
 ////////////////////////////////////////////////////////////////
 
 DWORD SearchDialog::Popup(HINSTANCE hInst, HWND hParent, BOOL bCE)
@@ -114,11 +125,11 @@ DWORD SearchDialog::Popup(HINSTANCE hInst, HWND hParent, BOOL bCE)
 
 BOOL SearchDialog::OnOK()
 {
-	// 暗号化メモを対象とする
+	// find encrypted notes
 	HWND hCheckEncrypt = GetDlgItem(hDialog, IDC_SEARCH_ENCRYPTMEMO);
 	bCheckEncrypt = (SendMessage(hCheckEncrypt, BM_GETCHECK, 0, 0) == BST_CHECKED);
 	
-	// 大文字小文字を区別
+	// case sensitive
 	HWND hCaseSensitive = GetDlgItem(hDialog, IDC_SEARCH_CASESENSITIVE);
 	bCaseSensitive = (SendMessage(hCaseSensitive, BM_GETCHECK, 0, 0) == BST_CHECKED);
 
@@ -129,7 +140,7 @@ BOOL SearchDialog::OnOK()
 	HWND hSearchDirectionUp = GetDlgItem(hDialog, IDC_SEARCH_DIRECTION_UP);
 	bSearchDirectionUp = (SendMessage(hSearchDirectionUp, BM_GETCHECK, 0, 0) == BST_CHECKED);
 
-	// 検索文字列
+	// find string
 	HWND hSearchWord = GetDlgItem(hDialog, IDC_SEARCH_STRING);
 	int n = GetWindowTextLength(hSearchWord);
 

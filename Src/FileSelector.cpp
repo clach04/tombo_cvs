@@ -103,12 +103,12 @@ static BOOL APIENTRY DlgProc(HWND hDlg, UINT nMessage, WPARAM wParam, LPARAM lPa
 }
 
 //////////////////////////////////////////////////
-// ポップアップ
+// Popup
 //////////////////////////////////////////////////
 
 DWORD FileSelector::Popup(HINSTANCE hInst, HWND hWnd, LPCTSTR pt, LPCTSTR pExt)
 {
-	// イメージリスト生成
+	// Create image list
 	if (hImg == NULL) {
 	    if ((hImg = ImageList_Create(IMAGE_CX, IMAGE_CY, ILC_MASK, NUM_BITMAPS, 0)) == NULL) return IDCANCEL;
 	     HBITMAP hBmp = LoadBitmap(hInst, MAKEINTRESOURCE(IDB_ARTICLEBOX)); 
@@ -127,11 +127,18 @@ DWORD FileSelector::Popup(HINSTANCE hInst, HWND hWnd, LPCTSTR pt, LPCTSTR pExt)
 }
 
 //////////////////////////////////////////////////
-// ダイアログ初期化
+// Initialize dialog
 //////////////////////////////////////////////////
+
+static DlgMsgRes aMsgRes[] = {
+	{ IDOK,     MSG_DLG_CMN_OK},
+	{ IDCANCEL, MSG_DLG_CMN_CANCEL},
+};
 
 void FileSelector::InitDialog(HWND hWnd)
 {
+	OverrideDlgMsg(hWnd, MSG_DLG_FILESELECT_TITLE, aMsgRes, sizeof(aMsgRes)/sizeof(DlgMsgRes));
+
 	HWND hTree = GetDlgItem(hWnd, IDC_FILESELECT_TREE);
 
     TreeView_SetImageList(hTree, hImg, TVSIL_NORMAL); 

@@ -43,8 +43,20 @@ BOOL RegexFilterAddDlg::Init(LPCTSTR pMatch, BOOL bCS, BOOL bCE, BOOL bFile, BOO
 	return TRUE;
 }
 
+static DlgMsgRes aRegexRes[] = {
+	{ IDC_FILTERDEF_ADD_REGEX_LABEL,     MSG_ID_DLG_FILTERDEF_ADD_REGEX_FINDSTR },
+	{ IDC_FILTERDEF_REGEX_CASESENSITIVE, MSG_ID_DLG_FILTERDEF_ADD_REGEX_CASESENSITIVE },
+	{ IDC_FILTERDEF_REGEX_CRYPTMEMO,     MSG_ID_DLG_FILTERDEF_ADD_REGEX_INCLUDECRYPTED },
+	{ IDC_FILTERDEF_REGEX_FILENAME,      MSG_ID_DLG_FILTERDEF_ADD_REGEX_FORFILENAME },
+	{ IDC_FILTERDEF_REGEX_NEGATE,        MSG_ID_DLG_FILTERDEF_ADD_REGEX_EXCLUDE },
+	{ IDOK,                              MSG_ID_DLG_CMN_OK },
+	{ IDCANCEL,                          MSG_ID_DLG_CMN_CANCEL },
+};
+
 void RegexFilterAddDlg::InitDialog(HWND hDlg)
 {
+	OverrideDlgMsg(hDlg, MSG_ID_DLG_FILTERDEF_ADD_REGEX_TITLE, aRegexRes, sizeof(aRegexRes) / sizeof(DlgMsgRes));
+
 	HWND hSearchStr = GetDlgItem(hDlg, IDC_FILTERDEF_REGEX_SEARCHSTR);
 	LoadHistory(hSearchStr, TOMBO_SEARCHHIST_ATTR_NAME);
 
@@ -91,8 +103,15 @@ BOOL RegexFilterAddDlg::OnOK()
 ////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////
 
+static DlgMsgRes aLimitRes[] = {
+	{ IDC_FILTERDEF_ADD_LIMIT_ITEMS, MSG_ID_DLG_FILTERDEF_ADD_LIMIT_ITEMS },
+	{ IDOK,                          MSG_ID_DLG_CMN_OK },
+	{ IDCANCEL,                      MSG_ID_DLG_CMN_CANCEL },
+};
+
 void LimitFilterAddDlg::InitDialog(HWND hDlg)
 {
+	OverrideDlgMsg(hDlg, MSG_ID_DLG_FILTERDEF_ADD_LIMIT_TITLE, aLimitRes, sizeof(aLimitRes) / sizeof(DlgMsgRes));
 	if (nLimit != 0) {
 		TCHAR buf[32];
 		HWND hNumLimit = GetDlgItem(hDlg, IDC_FILTERDEF_LIMIT_NUMLIMIT);
@@ -128,8 +147,18 @@ BOOL TimestampFilterAddDlg::Init(DWORD nD, BOOL b)
 	return TRUE;
 }
 
+static DlgMsgRes aTimestampRes[] = {
+	{ IDC_FILTERDEF_ADD_TIMESTAMP_BASEPOINT, MSG_ID_DLG_FILTERDEF_ADD_TIMESTAMP_BASETIME },
+	{ IDC_FILTERDEF_TS_NEWER,                MSG_ID_DLG_FILTERDEF_ADD_TIMESTAMP_NEWER },
+	{ IDC_FILTERDEF_TS_OLDER,                MSG_ID_DLG_FILTERDEF_ADD_TIMESTAMP_OLDER },
+	{ IDOK,                                  MSG_ID_DLG_CMN_OK },
+	{ IDCANCEL,                              MSG_ID_DLG_CMN_CANCEL },
+};
+
 void TimestampFilterAddDlg::InitDialog(HWND hDlg)
 {
+	OverrideDlgMsg(hDlg, MSG_ID_DLG_FILTERDEF_ADD_TIMESTAMP_TITLE, aTimestampRes, sizeof(aTimestampRes)/sizeof(DlgMsgRes));
+
 	HWND hNewer = GetDlgItem(hDlg, IDC_FILTERDEF_TS_NEWER);
 
 	if (nDeltaDays == 0) {
@@ -174,8 +203,16 @@ BOOL TimestampFilterAddDlg::OnOK()
 ////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////
 
+static DlgMsgRes aSortRes[] = {
+	{ IDC_FILTERDEF_ADD_SORT_LABEL, MSG_ID_DLG_FILTERDEF_ADD_SORT_METHOD },
+	{ IDOK,                         MSG_ID_DLG_CMN_OK },
+	{ IDCANCEL,                     MSG_ID_DLG_CMN_CANCEL },
+};
+
 void SortFilterAddDlg::InitDialog(HWND hDlg)
 {
+	OverrideDlgMsg(hDlg, MSG_ID_DLG_FILTERDEF_ADD_SORT_TITLE, aSortRes, sizeof(aSortRes)/sizeof(DlgMsgRes));
+
 	HWND hSortType = GetDlgItem(hDlg, IDC_FILTERDEF_SORT_TYPE);
 	SendMessage(hSortType, CB_ADDSTRING, 0, (LPARAM)MSG_STREAM_VALUE_SORT_FNAME_ASC);
 	SendMessage(hSortType, CB_ADDSTRING, 0, (LPARAM)MSG_STREAM_VALUE_SORT_FNAME_DSC);

@@ -49,15 +49,15 @@ BEGIN
     IDM_MAIN_MENU, 10,
     2, 40019, TBSTATE_ENABLED, TBSTYLE_AUTOSIZE, 60178, 0, 0,
     I_IMAGENONE, IDM_EDIT_MEMO, TBSTATE_ENABLED, 
-    TBSTYLE_DROPDOWN | TBSTYLE_AUTOSIZE, IDS_MENUITEM40005, 0, 0,
+    TBSTYLE_DROPDOWN | TBSTYLE_AUTOSIZE, IDS_MENUITEM40081, 0, 0,
     11, IDM_MS_BOOKMARK, TBSTATE_ENABLED, 
     TBSTYLE_DROPDOWN | TBSTYLE_AUTOSIZE, 63664, 0, 1,
     I_IMAGENONE, IDM_MENUITEM3, TBSTATE_ENABLED, 
-    TBSTYLE_DROPDOWN | TBSTYLE_AUTOSIZE, IDS_MENUITEM40014, 0, 2,
+    TBSTYLE_DROPDOWN | TBSTYLE_AUTOSIZE, IDS_MENUITEM40083, 0, 2,
     I_IMAGENONE, 0, TBSTATE_ENABLED, TBSTYLE_SEP, 0, 0, NOMENU,
-    9, IDM_SEARCH, TBSTATE_ENABLED, TBSTYLE_AUTOSIZE, 0, 0, 3,
-    7, IDM_SEARCH_PREV, 0, TBSTYLE_AUTOSIZE, 0, 0, 3,
-    8, IDM_SEARCH_NEXT, 0, TBSTYLE_AUTOSIZE, 0, 0, 3,
+    9, 40062, TBSTATE_ENABLED, TBSTYLE_AUTOSIZE, 0, 0, 3,
+    7, 40064, 0, TBSTYLE_AUTOSIZE, 0, 0, 3,
+    8, 40063, 0, TBSTYLE_AUTOSIZE, 0, 0, 3,
     I_IMAGENONE, 0, TBSTATE_ENABLED, TBSTYLE_SEP, 0, 0, NOMENU,
     6, 40078, TBSTATE_ENABLED, TBSTYLE_AUTOSIZE, 0, 0, 3,
 END
@@ -75,18 +75,9 @@ BEGIN
     3, 40053, TBSTATE_ENABLED, TBSTYLE_AUTOSIZE, 0, 0, 2,
     4, 40054, TBSTATE_ENABLED, TBSTYLE_AUTOSIZE, 0, 0, 2,
     I_IMAGENONE, 0, TBSTATE_ENABLED, TBSTYLE_SEP, 0, 0, NOMENU,
-    7, IDM_SEARCH_PREV, 0, TBSTYLE_AUTOSIZE, 0, 0, 2,
-    8, IDM_SEARCH_NEXT, 0, TBSTYLE_AUTOSIZE, 0, 0, 2,
+    7, 40064, 0, TBSTYLE_AUTOSIZE, 0, 0, 2,
+    8, 40063, 0, TBSTYLE_AUTOSIZE, 0, 0, 2,
     I_IMAGENONE, 0, TBSTATE_ENABLED, TBSTYLE_SEP, 0, 0, NOMENU,
-END
-
-IDR_POPUP SHMENUBAR DISCARDABLE 
-BEGIN
-    IDR_POPUP, 2,
-    I_IMAGENONE, ID_MENUITEM40050, TBSTATE_ENABLED, 
-    TBSTYLE_DROPDOWN | TBSTYLE_AUTOSIZE, IDS_MENUITEM40051, 0, 0,
-    I_IMAGENONE, ID_MENUITEM40055, TBSTATE_ENABLED, 
-    TBSTYLE_DROPDOWN | TBSTYLE_AUTOSIZE, IDS_MENUITEM40056, 0, 1,
 END
 
 IDM_DETAILSDLG_MENU SHMENUBAR DISCARDABLE 
@@ -115,24 +106,9 @@ END
 
 IDM_MAIN_MENU MENU DISCARDABLE 
 BEGIN
-    POPUP "メモ"
+    POPUP "Memo"
     BEGIN
-        MENUITEM "新規フォルダ",                IDM_NEWFOLDER
-        MENUITEM "切り取り",                    IDM_CUT
-        MENUITEM "コピー",                      IDM_COPY
-        MENUITEM "貼り付け",                    IDM_PASTE
         MENUITEM SEPARATOR
-        MENUITEM "ファイル名の変更",            IDM_RENAME
-        MENUITEM "削除",                        IDM_DELETEITEM
-        MENUITEM SEPARATOR
-        MENUITEM "検索",                        IDM_SEARCH
-        MENUITEM "次を検索",                    IDM_SEARCH_NEXT
-        MENUITEM "前を検索",                    IDM_SEARCH_PREV
-        MENUITEM SEPARATOR
-        MENUITEM "クイックフィルタ",            IDM_GREP
-        MENUITEM SEPARATOR
-        MENUITEM "暗号化",                      IDM_ENCRYPT, GRAYED
-        MENUITEM "復号化",                      IDM_DECRYPT, GRAYED
     END
     POPUP ""
     BEGIN
@@ -140,14 +116,9 @@ BEGIN
         MENUITEM "お気に入りの整理",            IDM_BOOKMARK_CONFIG
         MENUITEM SEPARATOR
     END
-    POPUP "ツール"
+    POPUP "Tool"
     BEGIN
-        MENUITEM "終了",                        IDM_EXIT
         MENUITEM SEPARATOR
-        MENUITEM "バージョン情報",              IDM_ABOUT
-        MENUITEM "プロパティ",                  IDM_PROPERTY
-        MENUITEM "仮想フォルダ",                IDM_VFOLDER_DEF
-        MENUITEM "パスワード消去",              IDM_FORGETPASS
     END
 END
 
@@ -155,44 +126,11 @@ IDM_DETAILS_MENU MENU DISCARDABLE
 BEGIN
     POPUP "編集"
     BEGIN
-        MENUITEM "切り取り",                    IDM_CUT
-        MENUITEM "コピー",                      IDM_COPY
-        MENUITEM "貼り付け",                    IDM_PASTE
         MENUITEM SEPARATOR
-        MENUITEM "全選択",                      IDM_SELALL
-        MENUITEM SEPARATOR
-        MENUITEM "検索",                        IDM_SEARCH
-        MENUITEM "次を検索",                    IDM_SEARCH_NEXT
-        MENUITEM "前を検索",                    IDM_SEARCH_PREV
     END
     POPUP "ツール"
     BEGIN
-        MENUITEM "折り返して表示",              IDM_DETAILS_HSCROLL, CHECKED
         MENUITEM SEPARATOR
-        MENUITEM "バージョン情報",              IDM_ABOUT
-        MENUITEM "終了",                        IDM_EXIT
-    END
-END
-
-IDR_POPUP MENU DISCARDABLE 
-BEGIN
-    POPUP "DV_POPUP"
-    BEGIN
-        MENUITEM "切り取り",                    IDM_CUT
-        MENUITEM "コピー",                      IDM_COPY
-        MENUITEM "貼り付け",                    IDM_PASTE
-        MENUITEM SEPARATOR
-        MENUITEM "日付の挿入1",                 IDM_INSDATE1
-        MENUITEM "日付の挿入2",                 IDM_INSDATE2
-    END
-    POPUP "SV_POPUP"
-    BEGIN
-        MENUITEM "切り取り",                    IDM_CUT
-        MENUITEM "コピー",                      IDM_COPY
-        MENUITEM "貼り付け",                    IDM_PASTE
-        MENUITEM SEPARATOR
-        MENUITEM "削除",                        IDM_DELETEITEM
-        MENUITEM "ファイル名の変更",            IDM_RENAME
     END
 END
 
@@ -834,8 +772,8 @@ END
 
 STRINGTABLE DISCARDABLE 
 BEGIN
-    IDS_MENUITEM40005       "メモ"
-    IDS_MENUITEM40014       "ツール"
+    IDS_MENUITEM40005       "メ"
+    IDS_MENUITEM40014       "Tool"
 END
 
 STRINGTABLE DISCARDABLE 
@@ -864,6 +802,13 @@ END
 STRINGTABLE DISCARDABLE 
 BEGIN
     IDS_MENUITEM40072       "お気に入り"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_MENUITEM40079       "Memo"
+    IDS_MENUITEM40081       "Memo"
+    IDS_MENUITEM40083       "Tool"
 END
 
 #endif    // Japanese resources

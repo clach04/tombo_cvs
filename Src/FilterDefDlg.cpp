@@ -24,6 +24,7 @@ BOOL FilterDefDlg::Init()
 // Src tab
 /////////////////////////////////////////
 
+
 class FilterDlgSrcTab : public PropertyTab {
 	FilterDefDlg *pDialog;
 public:
@@ -85,8 +86,20 @@ public:
 	BOOL Command_Delete(HWND hDlg);
 };
 
+static DlgMsgRes aFilterRes[] = {
+	{ IDC_FILTERDEF_FILTER_UP,        MSG_ID_DLG_FILTERDEF_FILTER_UP },
+	{ IDC_FILTERDEF_FILTER_DOWN,      MSG_ID_DLG_FILTERDEF_FILTER_DOWN },
+	{ IDC_FILTERDEF_FILTER_DELETE,    MSG_ID_DLG_FILTERDEF_FILTER_DELETE },
+	{ IDC_FILTERDEF_FILTER_REGEX,     MSG_ID_DLG_FILTERDEF_FILTER_FIND },
+	{ IDC_FILTERDEF_FILTER_LIMIT,     MSG_ID_DLG_FILTERDEF_FILTER_NUMBER },
+	{ IDC_FILTERDEF_FILTER_TIMESTAMP, MSG_ID_DLG_FILTERDEF_FILTER_TIMESTAMP },
+	{ IDC_FILTERDEF_FILTER_SORT,      MSG_ID_DLG_FILTERDEF_FILTER_SORT },
+};
+
 void FilterDlgFilterTab::Init(HWND hDlg)
 {
+	OverrideDlgMsg(hDlg, -1, aFilterRes, sizeof(aFilterRes)/sizeof(DlgMsgRes));
+
 	HWND hList = GetDlgItem(hDlg, IDC_FILTERDEF_FILTER_LIST);
 	/////////////////////////////////////////
 	// Insert column headers
@@ -483,7 +496,8 @@ DWORD FilterDefDlg::Popup(HINSTANCE hInst, HWND hParent, VFInfo *pi, BOOL bNew)
 
 	pInfo = pi;
 
-	DWORD nStartPage = bNew ? 0 : 1;
+//	DWORD nStartPage = bNew ? 0 : 1;
+	DWORD nStartPage = 1;
 	PropertyPage pp;
 	DWORD res = pp.Popup(hInst, hParent, pages, NUM_TAB_FILTERCTL, MSG_FILTERDEFDLG_TTL, MAKEINTRESOURCE(IDI_TOMBO), nStartPage);
 	return res;

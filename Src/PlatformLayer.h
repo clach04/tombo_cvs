@@ -29,4 +29,17 @@ public:
 
 void SetAppIcon(HINSTANCE hInst, HWND hWnd);
 
+///////////////////////////////////////////////////
+// menu related
+///////////////////////////////////////////////////
+
+struct MenuMsgRes {
+	int iPos;
+	int iMenuID;
+	int iExtOpt;
+	int iMsgID;
+};
+
+void OverrideMenuTitle(HMENU hMenu, MenuMsgRes *pRes, int nNumRes);
+
 #endif

@@ -44,6 +44,9 @@ public:
 	void GetStatusWindowRect(RECT *pRect);
 
 	static Win32Platform *PlatformFactory() { return new Win32Platform(); }
+
+	static HMENU LoadMainMenu();
+	static HMENU LoadContextMenu();
 };
 
 #endif // PLATFORM_WIN32

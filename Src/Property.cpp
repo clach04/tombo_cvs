@@ -17,6 +17,7 @@
 #include "MemoNote.h"
 #include "PasswordManager.h"
 #include "Message.h"
+#include "DialogTemplate.h"
 
 //////////////////////////////////////////
 // ’è‹`
@@ -194,8 +195,18 @@ public:
 	BOOL OnCommand(HWND hDlg, WPARAM wParam, LPARAM lParam);
 };
 
+static DlgMsgRes aFolderRes[] = {
+	{ IDC_PROPTAB_FOLDER_LABEL, MSG_ID_DLG_PROPTAB_FOLDER_LABEL },
+	{ IDC_PROPTAB_FOLDER_HELP1, MSG_ID_DLG_PROPTAB_FOLDER_HELP1 },
+	{ IDC_KEEPTITLE,            MSG_ID_DLG_PROPTAB_FOLDER_SYNCTITLE },
+	{ IDC_PROPTAB_FOLDER_HELP2, MSG_ID_DLG_PROPTAB_FOLDER_HELP2 },
+	{ IDC_PROP_READONLY,        MSG_ID_DLG_PROPTAB_FOLDER_READONLY },
+};
+
 void FolderTab::Init(HWND hDlg)
 {
+	OverrideDlgMsg(hDlg, -1, aFolderRes, sizeof(aFolderRes)/sizeof(DlgMsgRes));
+
 	HWND hFolder = GetDlgItem(hDlg, IDC_TOPFOLDER);
 	LoadHistory(hFolder, TOMBO_TOPDIRHIST_ATTR_NAME);
 	if (GetWindowTextLength(hFolder) == 0) {
@@ -332,8 +343,14 @@ public:
 	BOOL Apply(HWND hDlg);
 };
 
+static DlgMsgRes aPassTimeout[] = {
+	{ IDC_PROPTAB_PASS_TIMEOUT_LABEL,MSG_ID_DLG_PROPTAB_PASSTO_LABEL },
+	{ IDC_PROPTAB_PASS_TIMEOUT_HELP, MSG_ID_DLG_PROPTAB_PASSTO_HELP },
+};
+
 void PassTimeoutTab::Init(HWND hDlg)
 {
+	OverrideDlgMsg(hDlg, -1, aPassTimeout, sizeof(aPassTimeout)/sizeof(DlgMsgRes));
 	HWND hTimeout = GetDlgItem(hDlg, IDC_PASS_TIMEOUT);
 	TCHAR buf[64];
 	wsprintf(buf, TEXT("%d"), pProperty->nPassTimeOut);
@@ -434,8 +451,19 @@ static void InitFontControls(HDC hDC, HWND hName, HWND hSize, HWND hDefault, HWN
 	}
 }
 
+static DlgMsgRes aFontRes[] = {
+	{ IDC_PROPTAB_FONT_TREE_LABEL, MSG_ID_DLG_PROPTAB_FONT_TREE_LABEL },
+	{ IDC_FONT_SELECT_USEDEFAULT,  MSG_ID_DLG_PROPTAB_FONT_USE_DEFAULT },
+	{ IDC_FONT_SELECT_CLEARTYPE,   MSG_ID_DLG_PROPTAB_USE_CLEARTYPE_FONT },
+	{ IDC_PROPTAB_FONT_EDIT_LABEL, MSG_ID_DLG_PROPTAB_FONT_EDIT_LABEL },
+	{ IDC_FONT_DETAILS_USEDEFAULT, MSG_ID_DLG_PROPTAB_FONT_USE_DEFAULT },
+	{ IDC_FONT_DETAILS_CLEARTYPE,  MSG_ID_DLG_PROPTAB_USE_CLEARTYPE_FONT },
+};
+
 void FontTab::Init(HWND hDlg)
 {
+	OverrideDlgMsg(hDlg, -1, aFontRes, sizeof(aFontRes)/sizeof(DlgMsgRes));
+
 	HWND hSelectUseDefault = GetDlgItem(hDlg, IDC_FONT_SELECT_USEDEFAULT);
 	HWND hSelectName = GetDlgItem(hDlg, IDC_FONT_SELECT_NAME);
 	HWND hSelectSize = GetDlgItem(hDlg, IDC_FONT_SELECT_SIZE);
@@ -585,8 +613,15 @@ public:
 	BOOL Apply(HWND hDlg);
 };
 
+static DlgMsgRes aDateRes[] = {
+	{ IDC_PROPTAB_INSDATE_DATE1, MSG_ID_DLG_PROPTAB_DATE_INSDATE1 },
+	{ IDC_PROPTAB_INSDATE_DATE2, MSG_ID_DLG_PROPTAB_DATE_INSDATE2 },
+};
+
 void DateFormatTab::Init(HWND hDlg)
 {
+	OverrideDlgMsg(hDlg, -1, aDateRes, sizeof(aDateRes)/sizeof(DlgMsgRes));
+
 	HWND hFormat1 = GetDlgItem(hDlg, IDC_PROP_DATEFORMAT1);
 	HWND hFormat2 = GetDlgItem(hDlg, IDC_PROP_DATEFORMAT2);
 	HWND hDesc = GetDlgItem(hDlg, IDC_DATEFORMAT_DESC);
@@ -620,8 +655,19 @@ public:
 	BOOL Apply(HWND hDlg);
 };
 
+static DlgMsgRes aKeepCaretRes[] = {
+	{ IDC_PROP_KEEPCARET,          MSG_ID_DLG_PROPTAB_KEEPCARET_KEEPCARET },
+	{ IDC_PROPTAB_KEEPCARET_HELP1, MSG_ID_DLG_PROPTAB_KEEPCARET_HELP1 },
+	{ IDC_PROPTAB_KEEPCARET_LABEL, MSG_ID_DLG_PROPTAB_KEEPCARET_LABEL },
+	{ IDC_PROPTAB_KEEPCARET_HELP2, MSG_ID_DLG_PROPTAB_KEEPCARET_HELP2 },
+	{ IDC_PROP_SWITCHTITLE,        MSG_ID_DLG_PROPTAB_KEEPCARET_SYNCTITLE },
+	{ IDC_PROPTAB_KEEPCARET_HELP3, MSG_ID_DLG_PROPTAB_KEEPCARET_HELP3 },
+};
+
 void KeepCaretTab::Init(HWND hDlg)
 {
+	OverrideDlgMsg(hDlg, -1, aKeepCaretRes, sizeof(aKeepCaretRes)/sizeof(DlgMsgRes));
+
 	HWND hWnd = GetDlgItem(hDlg, IDC_PROP_KEEPCARET);
 	if (pProperty->KeepCaret()) {
 		SendMessage(hWnd, BM_SETCHECK, BST_CHECKED, 0);
@@ -877,8 +923,15 @@ protected:
 	void SetCurrent(HWND hDlg);
 };
 
+static DlgMsgRes aDefNote[] = {
+	{ IDC_PROPTAB_DEFNOTE_LABEL,      MSG_ID_DLG_PROPTAB_DEFNOTE_LABEL },
+	{ IDC_PROPTAB_DEFNOTE_SETCURRENT, MSG_ID_DLG_PROPTAB_DEFNOTE_CURRENT },
+	{ IDC_PROPTAB_DEFNOTE_SETBLANK,   MSG_ID_DLG_PROPTAB_BLANK },
+};
+
 void DefaultNoteTab::Init(HWND hDlg)
 {
+	OverrideDlgMsg(hDlg, -1, aDefNote, sizeof(aDefNote)/sizeof(DlgMsgRes));
 	HWND hPath = GetDlgItem(hDlg, IDC_PROPTAB_DEFNOTE_PATH);
 	SetWindowText(hPath, g_Property.GetDefaultNote());
 }

@@ -6,6 +6,7 @@
 #include "GrepDialog.h"
 #include "Property.h"
 #include "PropertyPage.h"
+#include "DialogTemplate.h"
 
 #define NUM_GREP_PROP_PAGES 1
 
@@ -34,8 +35,18 @@ public:
 	BOOL OnCommand(HWND hDlg, WPARAM wParam, LPARAM lParam);
 };
 
+static DlgMsgRes aGrepMain[] = {
+	{ IDC_GREPTAB_MAIN_POSLABEL,      MSG_ID_DLG_GREPTAB_MAIN_POSLABEL },
+	{ IDC_GREPTAB_MAIN_STRLABEL,      MSG_ID_DLG_GREPTAB_MAIN_STRLABEL },
+	{ IDC_GREPTAB_MAIN_CASESENSITIVE, MSG_ID_DLG_FILTERDEF_ADD_REGEX_CASESENSITIVE },
+	{ IDC_GREPTAB_MAIN_ENCRYPTNOTE,   MSG_ID_DLG_FILTERDEF_ADD_REGEX_INCLUDECRYPTED },
+	{ IDC_GREPTAB_MAIN_FILENAME,      MSG_ID_DLG_FILTERDEF_ADD_REGEX_FORFILENAME },
+};
+
 void GrepMainTab::Init(HWND hDlg)
 {
+	OverrideDlgMsg(hDlg, -1, aGrepMain, sizeof(aGrepMain)/sizeof(DlgMsgRes));
+
 	HWND hCombo = GetDlgItem(hDlg, IDC_GREPTAB_MAIN_SEARCHSTRING);
 	HWND hPath = GetDlgItem(hDlg, IDC_GREPTAB_MAIN_STARTDIR);
 
@@ -84,8 +95,14 @@ public:
 	BOOL OnCommand(HWND hDlg, WPARAM wParam, LPARAM lParam);
 };
 
+static DlgMsgRes aPersist[] = {
+	{ IDC_PROPTAB_PERSIST_SELECTPERSIST, MSG_ID_DLG_GREPTAB_PERSIST_KEEP },
+	{ IDC_GREPTAB_PERSIST_LABEL, MSG_ID_DLG_GREPTAB_PERSIST_LABEL },
+};
+
 void GrepPersistTab::Init(HWND hDlg)
 {
+	OverrideDlgMsg(hDlg, -1, aPersist, sizeof(aPersist)/sizeof(DlgMsgRes));
 }
 
 BOOL GrepPersistTab::Apply(HWND hDlg)

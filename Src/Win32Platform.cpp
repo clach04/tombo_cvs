@@ -1,12 +1,15 @@
 #if defined(PLATFORM_WIN32)
 #include <windows.h>
 #include <commctrl.h>
+#include <tchar.h>
 
+#include "Tombo.h"
 #include "resource.h"
 #include "PlatformLayer.h"
 #include "Win32Platform.h"
 #include "StatusBar.h"
 #include "Property.h"
+#include "Message.h"
 
 #define NUM_MY_TOOLBAR_BMPS 12
 
@@ -113,7 +116,6 @@ void Win32Platform::EnableMenu(UINT uId, BOOL bEnable)
 
 	switch (uId) {
 	case IDM_DELETEITEM:
-		Sleep(1);
 	case IDM_NEWMEMO:
 	case IDM_CUT:
 	case IDM_COPY:
@@ -255,6 +257,119 @@ void Win32Platform::ResizeStatusBar(WPARAM wParam, LPARAM lParam)
 void Win32Platform::GetStatusWindowRect(RECT *pRect)
 {
 	pStatusBar->GetWindowRect(pRect);
+}
+
+///////////////////////////////////////////////////
+// Load i18nized menu
+///////////////////////////////////////////////////
+
+static void InsertBaseMenu(HMENU hMain, int pos, LPCTSTR pText, HMENU hSub)
+{
+	MENUITEMINFO mii;
+	memset(&mii, 0, sizeof(mii));
+	mii.cbSize = sizeof(mii);
+
+	mii.fMask = MIIM_DATA | MIIM_TYPE | MIIM_SUBMENU;
+	mii.fType = MFT_STRING;
+	mii.dwTypeData = (LPTSTR)pText;
+	mii.cch = _tcslen(pText);
+	mii.hSubMenu = hSub;
+	InsertMenuItem(hMain, pos, FALSE, &mii);
+}
+
+static MenuMsgRes aFileMenu[] = {
+	{  0, IDM_NEWMEMO,    0, MSG_ID_MENUITEM_W32_F_NEWMEMO },
+	{  1, IDM_NEWFOLDER,  0, MSG_ID_MENUITEM_W32_F_NEWFOLDER },
+	{  2, IDM_RENAME,     0, MSG_ID_MENUITEM_W32_F_RENAME },
+	{  3, IDM_DELETEITEM, 0, MSG_ID_MENUITEM_W32_F_DEL },
+	{  4, -1,             0, 0},
+	{  5, IDM_SAVE,       0, MSG_ID_MENUITEM_W32_F_SAVE },
+	{  6, IDM_EXIT,       0, MSG_ID_MENUITEM_W32_F_EXIT},
+};
+
+static MenuMsgRes aEditMenu[] = {
+	{  0, IDM_CUT,         0,         MSG_ID_MENUITEM_W32_E_CUT },
+	{  1, IDM_COPY,        0,         MSG_ID_MENUITEM_W32_E_COPY },
+	{  2, IDM_PASTE,       0,         MSG_ID_MENUITEM_W32_E_PASTE },
+	{  3, -1,              0,         0 },
+	{  4, IDM_SELALL,      0,         MSG_ID_MENUITEM_W32_E_SELALL },
+	{  5, -1,              0,         0 },
+	{  6, IDM_SEARCH,      0,         MSG_ID_MENUITEM_W32_E_FIND },
+	{  7, IDM_SEARCH_NEXT, 0,         MSG_ID_MENUITEM_W32_E_FINDNEXT },
+	{  8, IDM_SEARCH_PREV, 0,         MSG_ID_MENUITEM_W32_E_FINDPREV },
+	{  9, -1,              0,         0 },
+	{ 10, IDM_GREP,        0,         MSG_ID_MENUITEM_W32_E_QFILTER },
+	{ 11, -1,              0,         0 },
+	{ 12, IDM_INSDATE1,    MF_GRAYED, MSG_ID_MENUITEM_W32_E_DATE1 },
+	{ 13, IDM_INSDATE2,    MF_GRAYED, MSG_ID_MENUITEM_W32_E_DATE2 },
+};
+
+static MenuMsgRes aBookMarkMenu[] = {
+	{ 0, IDM_BOOKMARK_ADD,    0, MSG_ID_MENUITEM_W32_B_ADDBM },
+	{ 1, IDM_BOOKMARK_CONFIG, 0, MSG_ID_MENUITEM_W32_B_EDITBM },
+	{ 2, -1,                  0, 0 },
+};
+
+static MenuMsgRes aToolMenu[] = {
+	{  0, IDM_DETAILS_HSCROLL, MF_CHECKED | MF_GRAYED, MSG_ID_MENUITEM_W32_T_WRAPTEXT },
+	{  1, IDM_TOGGLEPANE,      MF_CHECKED,             MSG_ID_MENUITEM_W32_T_TWOPANE },
+	{  2, IDM_SHOWSTATUSBAR,   MF_CHECKED,             MSG_ID_MENUITEM_W32_T_STATUSBAR },
+	{  3, IDM_TOPMOST,         0,                      MSG_ID_MENUITEM_W32_T_STAYTOPMOST },
+	{  4, -1,                  0,                      0 },
+	{  5, IDM_ENCRYPT,         MF_GRAYED,              MSG_ID_MENUITEM_W32_T_ENCRYPT },
+	{  6, IDM_DECRYPT,         MF_GRAYED,              MSG_ID_MENUITEM_W32_T_DECRYPT },
+	{  7, -1,                  0,                      0 },
+	{  8, IDM_FORGETPASS,      0,                      MSG_ID_MENUITEM_W32_T_ERASEPASS },
+	{  9, -1,                  0,                      0 },
+	{ 10, IDM_VFOLDER_DEF,     0,                      MSG_ID_MENUITEM_W32_T_VIRTUALFOLDER },
+	{ 11, IDM_PROPERTY,        0,                      MSG_ID_MENUITEM_W32_T_OPTIONS },
+};
+
+static MenuMsgRes aHelpMenu[] = {
+	{ 0, IDM_ABOUT, 0, MSG_ID_MENUITEM_W32_H_ABOUT },
+};
+
+static MenuMsgRes aContextMenu[] = {
+	{  0, IDM_CUT,        0, MSG_ID_MENUITEM_MAIN_CUT },
+	{  1, IDM_COPY,       0, MSG_ID_MENUITEM_MAIN_COPY },
+	{  2, IDM_PASTE,      0, MSG_ID_MENUITEM_MAIN_PASTE },
+	{  3, -1,             0, 0 },
+	{  4, IDM_ENCRYPT,    0, MSG_ID_MENUITEM_MAIN_ENCRYPT },
+	{  5, IDM_DECRYPT,    0, MSG_ID_MENUITEM_MAIN_DECRYPT },
+	{  6, -1,             0, 0 },
+	{  7, IDM_SEARCH,     0, MSG_ID_MENUITEM_MAIN_FIND },
+	{  8, -1,             0, 0 },
+	{  9, IDM_NEWFOLDER,  0, MSG_ID_MENUITEM_MAIN_NEWFOLDER },
+	{ 10, -1,             0, 0 },
+	{ 11, IDM_DELETEITEM, 0, MSG_ID_MENUITEM_MAIN_DELETE },
+	{ 12, IDM_RENAME,     0, MSG_ID_MENUITEM_MAIN_RENAME },
+	{ 13, -1,             0, 0 },
+	{ 14, IDM_TRACELINK,  0, MSG_ID_MENUITEM_CTX_TRACELINK},
+};
+
+HMENU Win32Platform::LoadMainMenu()
+{
+	HMENU hMainM = CreateMenu();
+
+	HMENU hSub;
+	OverrideMenuTitle(hSub = CreateMenu(), aFileMenu, sizeof(aFileMenu)/sizeof(MenuMsgRes));
+	InsertBaseMenu(hMainM, 0, MSG_MENUITEM_W32B_FILE, hSub);
+	OverrideMenuTitle(hSub = CreateMenu(), aEditMenu, sizeof(aEditMenu)/sizeof(MenuMsgRes));
+	InsertBaseMenu(hMainM, 1, MSG_MENUITEM_W32B_EDIT, hSub);
+	OverrideMenuTitle(hSub = CreateMenu(), aBookMarkMenu, sizeof(aBookMarkMenu)/sizeof(MenuMsgRes));
+	InsertBaseMenu(hMainM, 1, MSG_MENUITEM_W32B_BOOKMARK, hSub);
+	OverrideMenuTitle(hSub = CreateMenu(), aToolMenu, sizeof(aToolMenu)/sizeof(MenuMsgRes));
+	InsertBaseMenu(hMainM, 1, MSG_MENUITEM_W32B_TOOL, hSub);
+	OverrideMenuTitle(hSub = CreateMenu(), aHelpMenu, sizeof(aHelpMenu)/sizeof(MenuMsgRes));
+	InsertBaseMenu(hMainM, 1, MSG_MENUITEM_W32B_HELP, hSub);
+	return hMainM;
+}
+
+HMENU Win32Platform::LoadContextMenu()
+{
+	HMENU hMenu = CreatePopupMenu();
+	OverrideMenuTitle(hMenu, aContextMenu, sizeof(aContextMenu)/sizeof(MenuMsgRes));
+	return hMenu;
 }
 
 #endif // PLATFORM_WIN32

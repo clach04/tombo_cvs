@@ -10,15 +10,17 @@
 #include "SipControl.h"
 #include "Message.h"
 
+#include "DialogTemplate.h"
+
 //////////////////////////////////////////////////////////
-// デストラクタ
+// dtor
 //////////////////////////////////////////////////////////
 
 PasswordDialog::~PasswordDialog()
 {
 	if (pPassword != NULL) {
 		char *p = pPassword;
-		// パスワードエリアの初期化
+		// clear password area
 		while(*p) {
 			*p++ = '\0';
 		}
@@ -26,7 +28,7 @@ PasswordDialog::~PasswordDialog()
 }
 
 //////////////////////////////////////////////////////////
-// ダイアログプロシージャ
+// Dlg proc
 //////////////////////////////////////////////////////////
 
 static BOOL APIENTRY DlgProc(HWND hDlg, UINT nMessage, WPARAM wParam, LPARAM lParam)
@@ -63,7 +65,7 @@ static BOOL APIENTRY DlgProc(HWND hDlg, UINT nMessage, WPARAM wParam, LPARAM lPa
 }
 
 //////////////////////////////////////////////////////////
-// ポップアップ
+// popup
 //////////////////////////////////////////////////////////
 
 DWORD PasswordDialog::Popup(HINSTANCE hInst, HWND hParent, BOOL b)
@@ -86,11 +88,18 @@ DWORD PasswordDialog::Popup(HINSTANCE hInst, HWND hParent, BOOL b)
 }
 
 //////////////////////////////////////////////////////////
-// ダイアログ初期化
+// initialize
 //////////////////////////////////////////////////////////
+
+static DlgMsgRes aDlgMsg[] = {
+	{ IDOK,     MSG_ID_DLG_CMN_OK },
+	{ IDCANCEL, MSG_ID_DLG_CMN_CANCEL },
+};
 
 void PasswordDialog::InitDialog(HWND hDlg)
 {
+	OverrideDlgMsg(hDlg, MSG_ID_DLG_PASSWORD_TITLE, aDlgMsg, sizeof(aDlgMsg)/sizeof(DlgMsgRes));
+
 	ClearPassword(hDlg);
 	HWND hEdit2 = GetDlgItem(hDlg, IDC_PASS2);
 	EnableWindow(hEdit2, bVerify);
@@ -98,10 +107,8 @@ void PasswordDialog::InitDialog(HWND hDlg)
 }
 
 //////////////////////////////////////////////////////////
-// パスワード入力EDITBOXのクリア
+// Clear edit box
 //////////////////////////////////////////////////////////
-// GetWindowText()でのパスワード横取りを阻止する
-// これで本当にメモリから情報が消去されるかは不明。
 
 void PasswordDialog::ClearPassword(HWND hDlg)
 {
@@ -112,7 +119,7 @@ void PasswordDialog::ClearPassword(HWND hDlg)
 }
 
 //////////////////////////////////////////////////////////
-// OKボタン
+// OK
 //////////////////////////////////////////////////////////
 
 static LPTSTR GetPass(HWND hEdit)

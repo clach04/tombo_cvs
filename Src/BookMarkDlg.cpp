@@ -22,12 +22,22 @@ BOOL BookMarkDlg::Init(BookMark *p)
 	return TRUE;
 }
 
+static DlgMsgRes aMsgRes[] = {
+	{ IDC_BMEDIT_UP,     MSG_ID_DLG_BMEDIT_UP },
+	{ IDC_BMEDIT_DOWN,   MSG_ID_DLG_BMEDIT_DOWN },
+	{ IDC_BMEDIT_DELETE, MSG_ID_DLG_BMEDIT_DELETE },
+	{ IDOK,              MSG_ID_DLG_CMN_OK },
+	{ IDCANCEL,          MSG_ID_DLG_CMN_CANCEL },
+};
+
 ////////////////////////////////////////////////////////////////
 // Initialize dialog
 ////////////////////////////////////////////////////////////////
 
 void BookMarkDlg::InitDialog(HWND hDlg)
 {
+	OverrideDlgMsg(hDlg, MSG_ID_DLG_BMEDIT_TITLE, aMsgRes, sizeof(aMsgRes) / sizeof(DlgMsgRes));
+
 	HWND hList = GetDlgItem(hDlg, IDC_BMEDIT_LIST);
 
 	// init listview

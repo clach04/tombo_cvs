@@ -13,6 +13,7 @@
 #include "VFManager.h"
 #include "VFStream.h"
 #include "FilterDefDlg.h"
+#include "DialogTemplate.h"
 
 extern HINSTANCE g_hInstance;
 
@@ -83,9 +84,21 @@ BOOL FilterAddListener::ProcessStream(LPCTSTR pName, BOOL bPersist, VFDirectoryG
 	return TRUE;
 }
 
+static DlgMsgRes aDlgMsgRes[] = {
+	{ IDC_FILTERCTL_UP,     MSG_ID_DLG_FILTERCTL_UP },
+	{ IDC_FILTERCTL_DOWN,   MSG_ID_DLG_FILTERCTL_DOWN },
+	{ IDC_FILTERCTL_KEEP,   MSG_ID_DLG_FILTERCTL_KEEP },
+	{ IDC_FILTERCTL_NEW,    MSG_ID_DLG_FILTERCTL_NEW },
+	{ IDC_FILTERCTL_RENAME, MSG_ID_DLG_FILTERCTL_RENAME },
+	{ IDC_FILTERCTL_DELETE, MSG_ID_DLG_FILTERCTL_DELETE },
+	{ IDOK,                 MSG_ID_DLG_CMN_OK },
+	{ IDCANCEL,             MSG_ID_DLG_CMN_CANCEL },
+};
 
 void FilterCtlDlg::InitDialog(HWND hDlg)
 {
+	OverrideDlgMsg(hDlg, MSG_ID_DLG_FILTERCTL_TITLE, aDlgMsgRes, sizeof(aDlgMsgRes)/sizeof(DlgMsgRes));
+
 	HWND hList = GetDlgItem(hDlg, IDC_FILTERCTL_LIST);
 
 	ListView_SetImageList(hList, hImageList, LVSIL_SMALL);

@@ -8,6 +8,7 @@
 #include "DirList.h"
 #include "MemoNote.h"
 #include "TString.h"
+#include "DialogTemplate.h"
 #include "Message.h"
 
 static DWORD FindList(DirList *pDl, LPCTSTR pString);
@@ -90,8 +91,14 @@ void SearchTree::Popup(HINSTANCE hInst, HWND hParent)
 // Initialize
 /////////////////////////////////////////
 
+static DlgMsgRes aDlgMsgRes[] = {
+	{ IDCANCEL, MSG_ID_DLG_CMN_CANCEL}, 
+};
+
 void SearchTree::InitDialog(HWND hDlg)
 {
+	OverrideDlgMsg(hDlg, -1, aDlgMsgRes, sizeof(aDlgMsgRes)/sizeof(DlgMsgRes));
+
 	DWORD nThreadId;
 
 	hDlgWnd = hDlg;

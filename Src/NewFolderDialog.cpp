@@ -4,9 +4,11 @@
 #include "NewFolderDialog.h"
 #include "resource.h"
 #include "SipControl.h"
+#include "Message.h"
+#include "DialogTemplate.h"
 
 //////////////////////////////////////////////////////////
-// ダイアログプロシージャ
+// Dialog procedure
 //////////////////////////////////////////////////////////
 
 static BOOL APIENTRY DlgProc(HWND hDlg, UINT nMessage, WPARAM wParam, LPARAM lParam)
@@ -41,7 +43,7 @@ static BOOL APIENTRY DlgProc(HWND hDlg, UINT nMessage, WPARAM wParam, LPARAM lPa
 }
 
 //////////////////////////////////////////////////////////
-// ポップアップ
+// popup dialog
 //////////////////////////////////////////////////////////
 
 DWORD NewFolderDialog::Popup(HINSTANCE hInst, HWND hParent)
@@ -64,17 +66,24 @@ DWORD NewFolderDialog::Popup(HINSTANCE hInst, HWND hParent)
 }
 
 //////////////////////////////////////////////////////////
-// ダイアログ初期化
+// Initialize
 //////////////////////////////////////////////////////////
+
+static DlgMsgRes aDlgRes[] = {
+	{ IDOK,     MSG_ID_DLG_CMN_OK },
+	{ IDCANCEL, MSG_ID_DLG_CMN_CANCEL },
+};
 
 void NewFolderDialog::InitDialog(HWND hDlg)
 {
+	OverrideDlgMsg(hDlg, MSG_ID_DLG_NEWFOLDER_TITLE, aDlgRes, sizeof(aDlgRes)/sizeof(DlgMsgRes));
+
 	HWND hEdit = GetDlgItem(hDlg, IDC_NEWFOLDER_NAME);
 	SetWindowText(hEdit, TEXT(""));
 }
 
 //////////////////////////////////////////////////////////
-// OKボタン
+// OK
 //////////////////////////////////////////////////////////
 
 BOOL NewFolderDialog::OnOK(HWND hDlg)

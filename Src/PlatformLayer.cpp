@@ -6,6 +6,7 @@
 #endif
 
 #include "Tombo.h"
+#include "Message.h"
 #include "resource.h"
 
 #include "PlatformLayer.h"
@@ -49,5 +50,18 @@ void SetAppIcon(HINSTANCE hInst, HWND hWnd)
 #endif
 }
 
+///////////////////////////////////////////////////
+// menu helper
+///////////////////////////////////////////////////
 
+void OverrideMenuTitle(HMENU hMenu, MenuMsgRes *pRes, int nNumRes)
+{
+	for (int i = 0; i < nNumRes; i++) {
+		if (pRes[i].iMenuID == -1) {
+			InsertMenu(hMenu,  pRes[i].iPos, MF_BYPOSITION | MF_SEPARATOR, 0, NULL);
+		} else {
+			InsertMenu(hMenu,  pRes[i].iPos, MF_BYPOSITION | MF_STRING | pRes[i].iExtOpt, pRes[i].iMenuID, g_mMsgRes.GetMsg(pRes[i].iMsgID));
+		}
+	}
+}
 

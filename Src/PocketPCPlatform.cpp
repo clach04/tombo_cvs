@@ -5,12 +5,68 @@
 #include <commctrl.h>
 #include <aygshell.h>
 
+#include "Tombo.h"
 #include "resource.h"
 #include "Message.h"
 #include "PlatformLayer.h"
 #include "PocketPCPlatform.h"
 #include "SipControl.h"
 #include "Property.h"
+
+///////////////////////////////////////////////////////
+// Menu label definitions
+///////////////////////////////////////////////////////
+
+static MenuMsgRes aMSMemoMenu[] = {
+	{  0, IDM_NEWFOLDER,   0, MSG_ID_MENUITEM_MAIN_NEWFOLDER },
+	{  1, IDM_CUT,         0, MSG_ID_MENUITEM_MAIN_CUT },
+	{  2, IDM_COPY,        0, MSG_ID_MENUITEM_MAIN_COPY },
+	{  3, IDM_PASTE,       0, MSG_ID_MENUITEM_MAIN_PASTE },
+	{  4, -1,              0, 0 },
+	{  5, IDM_RENAME,      0, MSG_ID_MENUITEM_MAIN_RENAME },
+	{  6, IDM_DELETEITEM,  0, MSG_ID_MENUITEM_MAIN_DELETE },
+	{  7, -1,              0, 0 },
+	{  8, IDM_SEARCH,      0, MSG_ID_MENUITEM_MAIN_FIND },
+	{  9, IDM_SEARCH_NEXT, 0, MSG_ID_MENUITEM_MAIN_FIND_NEXT },
+	{ 10, IDM_SEARCH_PREV, 0, MSG_ID_MENUITEM_MAIN_FIND_PREV },
+	{ 11, -1,              0, 0 },
+	{ 12, IDM_GREP,        0, MSG_ID_MENUITEM_MAIN_QUICKFILTER },
+	// 13 is used by default separator
+	{ 14, IDM_ENCRYPT,     0, MSG_ID_MENUITEM_MAIN_ENCRYPT },
+	{ 15, IDM_DECRYPT,     0, MSG_ID_MENUITEM_MAIN_DECRYPT },
+};
+
+static MenuMsgRes aMSToolMenu[] = {
+	{  0, IDM_EXIT,        0, MSG_ID_MENUITEM_TOOL_EXIT },
+	// 1 is not defined
+	{  2, IDM_ABOUT,       0, MSG_ID_MENUITEM_TOOL_ABOUT },
+	{  3, IDM_PROPERTY,    0, MSG_ID_MENUITEM_TOOL_PROPERTY},
+	{  4, IDM_VFOLDER_DEF, 0, MSG_ID_MENUITEM_TOOL_VFOLDER_DEF},
+	{  5, IDM_FORGETPASS,  0, MSG_ID_MENUITEM_TOOL_FORGETPASS},
+};
+
+static MenuMsgRes aMDEditMenu[] = {
+	{  0, IDM_CUT,         0, MSG_ID_MENUITEM_MAIN_CUT },
+	{  1, IDM_COPY,        0, MSG_ID_MENUITEM_MAIN_COPY },
+	{  2, IDM_PASTE,       0, MSG_ID_MENUITEM_MAIN_PASTE },
+	{  3, -1,              0, 0 },
+	{  4, IDM_SELALL,      0, MSG_ID_MENUITEM_DETAILS_SELALL },
+	// 5 is not defined
+	{  6, IDM_SEARCH,      0, MSG_ID_MENUITEM_MAIN_FIND },
+	{  7, IDM_SEARCH_NEXT, 0, MSG_ID_MENUITEM_MAIN_FIND_NEXT },
+	{  8, IDM_SEARCH_PREV, 0, MSG_ID_MENUITEM_MAIN_FIND_PREV },
+};
+
+static MenuMsgRes aMDToolMenu[] = {
+	{  0, IDM_DETAILS_HSCROLL, MF_CHECKED, MSG_ID_MENUITEM_TOOL_WRAP },
+	// 1 is not defined
+	{  2, IDM_ABOUT,           0,          MSG_ID_MENUITEM_TOOL_ABOUT },
+	{  3, IDM_EXIT,            0,          MSG_ID_MENUITEM_TOOL_EXIT },
+};
+
+///////////////////////////////////////////////////////
+// Toolbar definitions
+///////////////////////////////////////////////////////
 
 #define NUM_TOOLBAR_BMP 12
 
@@ -28,6 +84,10 @@ LPTSTR pMDToolTip[] = {
 	NULL, // MSG_TOOLTIPS_INSDATE1,
 	NULL, // MSG_TOOLTIPS_INSDATE2,
 };
+
+///////////////////////////////////////////////////////
+// methods
+///////////////////////////////////////////////////////
 
 void PocketPCPlatform::Create(HWND hWnd, HINSTANCE hInst)
 {
@@ -61,10 +121,12 @@ void PocketPCPlatform::Create(HWND hWnd, HINSTANCE hInst)
 	pMSToolTip[0] = (LPTSTR)MSG_TOOLTIPS_NEWMEMO;
 	SendMessage(hMSCmdBar, TB_SETTOOLTIPS, (WPARAM)NUM_MS_TOOLTIP, (LPARAM)pMSToolTip);
 
-	////////////////////--
-//	HMENU hM = SHGetSubMenu(hMSCmdBar, IDM_EDIT_MEMO);
+	//////////////////////////
+	// create menu items
 
-//	InsertMenu(hM, 0, MF_BYPOSITION | MF_STRING, IDM_EXIT, TEXT("EXIT"));
+	// hMenu is not created when default menu item is empty, leave only one separator.
+	OverrideMenuTitle(SHGetSubMenu(hMSCmdBar, IDM_EDIT_MEMO), aMSMemoMenu, sizeof(aMSMemoMenu) / sizeof(MenuMsgRes));
+	OverrideMenuTitle(SHGetSubMenu(hMSCmdBar, IDM_MENUITEM3), aMSToolMenu, sizeof(aMSToolMenu) / sizeof(MenuMsgRes));
 
 	////////////////////--
 
@@ -86,6 +148,9 @@ void PocketPCPlatform::Create(HWND hWnd, HINSTANCE hInst)
 	pMDToolTip[4] = (LPTSTR)MSG_TOOLTIPS_INSDATE1;
 	pMDToolTip[5] = (LPTSTR)MSG_TOOLTIPS_INSDATE2;
 	SendMessage(hMDCmdBar, TB_SETTOOLTIPS, (WPARAM)NUM_MD_TOOLTIP, (LPARAM)pMDToolTip);
+
+	OverrideMenuTitle(SHGetSubMenu(hMDCmdBar, IDM_EDIT_MEMO), aMDEditMenu, sizeof(aMDEditMenu) / sizeof(MenuMsgRes));
+	OverrideMenuTitle(SHGetSubMenu(hMDCmdBar, IDM_DETAILS_TOOL), aMDToolMenu, sizeof(aMDToolMenu) / sizeof(MenuMsgRes));
 
 	ShowWindow(hMDCmdBar, SW_HIDE);
 }
@@ -216,4 +281,38 @@ void PocketPCPlatform::AdjustUserRect(RECT *r)
 	}
 }
 
+///////////////////////////////////////////////////////
+//
+///////////////////////////////////////////////////////
+static MenuMsgRes aMSPopupMenu[] = {
+	{ 0, IDM_CUT,        0, MSG_ID_MENUITEM_MAIN_CUT },
+	{ 1, IDM_COPY,       0, MSG_ID_MENUITEM_MAIN_COPY },
+	{ 2, IDM_PASTE,      0, MSG_ID_MENUITEM_MAIN_PASTE },
+	{ 3, -1, 0, 0},
+	{ 4, IDM_DELETEITEM, 0, MSG_ID_MENUITEM_MAIN_DELETE },
+	{ 5, IDM_RENAME,     0, MSG_ID_MENUITEM_MAIN_RENAME },
+};
+
+HMENU PocketPCPlatform::LoadSelectViewPopupMenu()
+{
+	HMENU hMenu = CreatePopupMenu();
+	OverrideMenuTitle(hMenu, aMSPopupMenu, sizeof(aMSPopupMenu) / sizeof(MenuMsgRes));
+	return hMenu;
+}
+
+static MenuMsgRes aMDPopupMenu[] = {
+	{ 0, IDM_CUT,      0, MSG_ID_MENUITEM_MAIN_CUT },
+	{ 1, IDM_COPY,     0, MSG_ID_MENUITEM_MAIN_COPY },
+	{ 2, IDM_PASTE,    0, MSG_ID_MENUITEM_MAIN_PASTE },
+	{ 3, -1, 0, 0},
+	{ 4, IDM_INSDATE1, 0, MSG_ID_TOOLTIPS_INSDATE1 },
+	{ 5, IDM_INSDATE2, 0, MSG_ID_TOOLTIPS_INSDATE2 },
+};
+
+HMENU PocketPCPlatform::LoadDetailsViewPopupMenu()
+{
+	HMENU hMenu = CreatePopupMenu();
+	OverrideMenuTitle(hMenu, aMDPopupMenu, sizeof(aMDPopupMenu) / sizeof(MenuMsgRes));
+	return hMenu;
+}
 #endif // PLATFORM_PKTPC
