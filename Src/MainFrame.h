@@ -34,6 +34,7 @@ class MainFrame {
 
 #if defined(PLATFORM_BE500)
 	HMENU hMSMemoMenu;
+	HMENU hMSToolMenu;
 	HMENU hMDEditMenu;
 #endif
 
@@ -72,6 +73,10 @@ protected:
 #endif
 	HMENU GetMDToolMenu();
 	HMENU GetMSEditMenu();
+
+#if defined(PLATFORM_BE500)
+	HMENU GetMSToolMenu();
+#endif
 
 	void EnableMenu(UINT uId, BOOL bEnable);
 
