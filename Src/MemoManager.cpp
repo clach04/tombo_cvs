@@ -209,8 +209,12 @@ BOOL MemoManager::SaveIfModify(LPDWORD pYNC, BOOL bDupMode)
 	}
 
 	if (pYNC) {
-		*pYNC = pMainFrame->MessageBox(MSG_MEMO_EDITED, MSG_CONFIRM_SAVE, MB_ICONQUESTION | MB_YESNOCANCEL | MB_APPLMODAL);
-		if (*pYNC == IDNO || *pYNC == IDCANCEL) return TRUE;
+		if (!g_Property.DisableSaveDlg()) {
+			*pYNC = pMainFrame->MessageBox(MSG_MEMO_EDITED, MSG_CONFIRM_SAVE, MB_ICONQUESTION | MB_YESNOCANCEL | MB_APPLMODAL);
+			if (*pYNC == IDNO || *pYNC == IDCANCEL) return TRUE;
+		} else {
+			*pYNC = IDOK;
+		}
 	}
 
 	// get memo data

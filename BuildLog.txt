@@ -699,3 +699,10 @@ Not fully tested on both platform, probably it will work.
 * i18nized on BE-x00 platform.(finished)
 * i18nized on HPC platform.(menu is not yet)
 
+////////////////////////////////
+// B147
+////////////////////////////////
+
+* Update Japanese message in *.rc file to English
+* i18nize on HPC platform.
+* Add context menu(HPC)

@@ -55,6 +55,7 @@
 #define WRAPTEXT_ATTR_NAME TEXT("WrapText")
 #define OPENREADONLY_ATTR_NAME TEXT("OpenReadOnly")
 #define DEFAULTNOTE_ATTR_NAME TEXT("DefaultNote")
+#define DISABLESAVEDLG_ATTR_NAME TEXT("DisableSaveDlg")
 
 // saved each exit time.
 #define HIDESTATUSBAR_ATTR_NAME TEXT("HideStatusBar")
@@ -1263,6 +1264,8 @@ BOOL Property::Load(BOOL *pStrict)
 		aDefaultNote[0] = TEXT('\0');
 	}
 
+	nDisableSaveDlg = GetDWORDFromReg(hTomboRoot, DISABLESAVEDLG_ATTR_NAME, FALSE);
+
 	RegCloseKey(hTomboRoot);
 	return TRUE;
 }
@@ -1362,6 +1365,7 @@ BOOL Property::Save()
 	if (!SetDWORDToReg(hTomboRoot, OPENREADONLY_ATTR_NAME, bOpenReadOnly)) return FALSE;
 
 	if (!SetSZToReg(hTomboRoot, DEFAULTNOTE_ATTR_NAME, aDefaultNote)) return FALSE;
+	if (!SetDWORDToReg(hTomboRoot, DISABLESAVEDLG_ATTR_NAME, nDisableSaveDlg)) return FALSE;
 
 #if defined(PLATFORM_BE500)
 	CGDFlushRegistry();

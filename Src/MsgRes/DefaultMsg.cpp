@@ -266,4 +266,5 @@ static LPCTSTR defaultMsg[] = {
 	TEXT("Keep space over the SIP"),
 	TEXT("Default(English)"),
 	TEXT("Greek"),
+	TEXT("&Search"),
 };

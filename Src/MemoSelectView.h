@@ -68,8 +68,8 @@ public:
 
 	LRESULT OnNotify(HWND hWnd, WPARAM wParam, LPARAM lParam);
 
-#if defined(PLATFORM_WIN32)
-	void OnNotify_RClick();
+#if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
+	void OnNotify_RClick(POINT pt);
 #endif
 	BOOL OnCommand(HWND hWnd, WPARAM wParam, LPARAM lParam);
 
@@ -142,9 +142,6 @@ public:
 	HTREEITEM GetPathForNewItem(TString *pPath, TreeViewItem *pItem = NULL);
 
 	HTREEITEM GetParentItem(HTREEITEM hItem) { return TreeView_GetParent(hViewWnd, hItem); }
-
-	// node selection
-	void SelectNote(MemoNote *pNote);
 
 	BOOL CreateNewFolder(HTREEITEM hItem, LPCTSTR pFolder);
 	BOOL GetHeadLine(MemoNote *pNote, LPTSTR pHeadLine, DWORD nLen);

@@ -43,6 +43,9 @@ public:
 	void GetStatusWindowRect(RECT *pRect);
 
 	static HPCPlatform *PlatformFactory() { return new HPCPlatform(); }
+
+	static HMENU LoadMainMenu();
+	static HMENU LoadContextMenu();
 };
 
 #endif // PLATFORM_HPC

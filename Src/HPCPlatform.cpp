@@ -4,6 +4,8 @@
 
 #include "resource.h"
 #include "Property.h"
+#include "Tombo.h"
+#include "Message.h"
 
 #include "StatusBar.h"
 #include "PlatformLayer.h"
@@ -35,6 +37,10 @@ static TBBUTTON aCmdBarButtons[NUM_CMDBAR_BUTTONS] = {
 	{23,                                 IDM_SEARCH_NEXT,              0, TBSTYLE_BUTTON, 0, 0, 0, -1},
 	{0,                                  0,              TBSTATE_ENABLED, TBSTYLE_SEP,    0, 0, 0, -1},
 };
+
+///////////////////////////////////////
+// methods implimentation
+///////////////////////////////////////
 
 HPCPlatform::HPCPlatform() : pStatusBar(NULL)
 {
@@ -96,11 +102,13 @@ void HPCPlatform::Create(HWND hWnd, HINSTANCE hInst)
 	}
 
 	CommandBands_AddBands(hBand, hInst, 2, arbbi);
-	// 0番目のバンド(メニュー)の設定
-	hwnd = GetCommandBar(hBand, ID_CMDBAR_MAIN);
-	CommandBar_InsertMenubar(hwnd, hInst, IDR_MENU_MAIN, 0);
+	// set first band(menu)
 
-	// 1番目のバンド(ボタン)の設定
+	HMENU h = LoadMainMenu();
+	hwnd = GetCommandBar(hBand, ID_CMDBAR_MAIN);
+	CommandBar_InsertMenubarEx(hwnd, NULL, (LPTSTR)h, 0);
+
+	// set next band(buttons)
 	hwnd = GetCommandBar(hBand, ID_BUTTONBAND);
 
 	CommandBar_AddBitmap(hwnd, HINST_COMMCTRL, IDB_STD_SMALL_COLOR, 15, 0, 0);
@@ -288,4 +296,107 @@ void HPCPlatform::GetStatusWindowRect(RECT *pRect)
 	pStatusBar->GetWindowRect(pRect);
 }
 
+///////////////////////////////////////////////////
+// Load i18nized menu
+///////////////////////////////////////////////////
+
+static void InsertBaseMenu(HMENU hMain, int pos, LPCTSTR pText, HMENU hSub)
+{
+	InsertMenu(hMain, pos, MF_BYPOSITION | MF_POPUP | MF_STRING , (UINT)hSub, pText);
+}
+
+static MenuMsgRes aFileMenu[] = {
+	{  0, IDM_NEWMEMO,    0, MSG_ID_MENUITEM_W32_F_NEWMEMO },
+	{  1, IDM_NEWFOLDER,  0, MSG_ID_MENUITEM_W32_F_NEWFOLDER },
+	{  2, IDM_RENAME,     0, MSG_ID_MENUITEM_W32_F_RENAME },
+	{  3, IDM_DELETEITEM, 0, MSG_ID_MENUITEM_W32_F_DEL },
+	{  4, -1,             0, 0 },
+	{  5, IDM_SAVE,       0, MSG_ID_MENUITEM_W32_F_SAVE },
+	{  6, -1,             0, 0 },
+	{  7, IDM_ABOUT,      0, MSG_ID_MENUITEM_W32_H_ABOUT },
+	{  8, IDM_EXIT,       0, MSG_ID_MENUITEM_W32_F_EXIT },
+};
+
+static MenuMsgRes aEditMenu[] = {
+	{  0, IDM_CUT,      0, MSG_ID_MENUITEM_W32_E_CUT },
+	{  1, IDM_COPY,     0, MSG_ID_MENUITEM_W32_E_COPY },
+	{  2, IDM_PASTE,    0, MSG_ID_MENUITEM_W32_E_PASTE },
+	{  3, -1,           0, 0 },
+	{  4, IDM_SELALL,   0, MSG_ID_MENUITEM_W32_E_SELALL },
+	{  5, -1,           0, 0 },
+	{  6, IDM_INSDATE1, 0, MSG_ID_MENUITEM_W32_E_DATE1 },
+	{  7, IDM_INSDATE2, 0, MSG_ID_MENUITEM_W32_E_DATE2 },
+};
+
+static MenuMsgRes aBookMarkMenu[] = {
+	{  0, IDM_BOOKMARK_ADD,    0, MSG_ID_MENUITEM_W32_B_ADDBM },
+	{  1, IDM_BOOKMARK_CONFIG, 0, MSG_ID_MENUITEM_W32_B_EDITBM },
+	{  2, -1,                  0, 0 },
+};
+
+static MenuMsgRes aFindMenu[] = {
+	{  0, IDM_SEARCH,      0, MSG_ID_MENUITEM_W32_E_FIND },
+	{  1, IDM_SEARCH_NEXT, 0, MSG_ID_MENUITEM_W32_E_FINDNEXT },
+	{  2, IDM_SEARCH_PREV, 0, MSG_ID_MENUITEM_W32_E_FINDPREV },
+	{  3, -1,              0, 0 },
+	{  4, IDM_GREP,        0, MSG_ID_MENUITEM_W32_E_QFILTER },
+	{  5, IDM_VFOLDER_DEF, 0, MSG_ID_MENUITEM_W32_T_VIRTUALFOLDER },
+};
+
+static MenuMsgRes aToolMenu[] = {
+	{  0, IDM_DETAILS_HSCROLL, MF_CHECKED, MSG_ID_MENUITEM_W32_T_WRAPTEXT },
+	{  1, IDM_TOGGLEPANE,      MF_CHECKED, MSG_ID_MENUITEM_W32_T_TWOPANE },
+	{  2, IDM_SHOWSTATUSBAR,   MF_CHECKED, MSG_ID_MENUITEM_W32_T_STATUSBAR },
+	{  3, -1,                  0,          0 },
+	{  4, IDM_ENCRYPT,         0,          MSG_ID_MENUITEM_W32_T_ENCRYPT },
+	{  5, IDM_DECRYPT,         0,          MSG_ID_MENUITEM_W32_T_DECRYPT },
+	{  6, -1,                  0,          0 },
+	{  7, IDM_FORGETPASS,      0,          MSG_ID_MENUITEM_W32_T_ERASEPASS },
+	{  8, -1,                  0,          0 },
+	{  9, IDM_PROPERTY,        0,          MSG_ID_MENUITEM_W32_T_OPTIONS },
+};
+
+
+HMENU HPCPlatform::LoadMainMenu()
+{
+	HMENU hMain = CreateMenu();
+	HMENU hSub;
+	OverrideMenuTitle(hSub = CreatePopupMenu(), aFileMenu, sizeof(aFileMenu)/sizeof(MenuMsgRes));
+	InsertBaseMenu(hMain, 0, MSG_MENUITEM_W32B_FILE, hSub);
+	OverrideMenuTitle(hSub = CreatePopupMenu(), aEditMenu, sizeof(aEditMenu)/sizeof(MenuMsgRes));
+	InsertBaseMenu(hMain, 1, MSG_MENUITEM_W32B_EDIT, hSub);
+	OverrideMenuTitle(hSub = CreatePopupMenu(), aBookMarkMenu, sizeof(aBookMarkMenu)/sizeof(MenuMsgRes));
+	InsertBaseMenu(hMain, 2, MSG_MENUITEM_W32B_BOOKMARK, hSub);
+	OverrideMenuTitle(hSub = CreatePopupMenu(), aFindMenu, sizeof(aFindMenu)/sizeof(MenuMsgRes));
+	InsertBaseMenu(hMain, 3, MSG_MENUITEM_FIND, hSub);
+	OverrideMenuTitle(hSub = CreatePopupMenu(), aToolMenu, sizeof(aToolMenu)/sizeof(MenuMsgRes));
+	InsertBaseMenu(hMain, 4, MSG_MENUITEM_W32B_TOOL, hSub);
+
+	return hMain;
+}
+
+static MenuMsgRes aContextMenu[] = {
+	{  0, IDM_CUT,        0, MSG_ID_MENUITEM_MAIN_CUT },
+	{  1, IDM_COPY,       0, MSG_ID_MENUITEM_MAIN_COPY },
+	{  2, IDM_PASTE,      0, MSG_ID_MENUITEM_MAIN_PASTE },
+	{  3, -1,             0, 0 },
+	{  4, IDM_ENCRYPT,    0, MSG_ID_MENUITEM_MAIN_ENCRYPT },
+	{  5, IDM_DECRYPT,    0, MSG_ID_MENUITEM_MAIN_DECRYPT },
+	{  6, -1,             0, 0 },
+	{  7, IDM_SEARCH,     0, MSG_ID_MENUITEM_MAIN_FIND },
+	{  8, -1,             0, 0 },
+	{  9, IDM_NEWFOLDER,  0, MSG_ID_MENUITEM_MAIN_NEWFOLDER },
+	{ 10, -1,             0, 0 },
+	{ 11, IDM_DELETEITEM, 0, MSG_ID_MENUITEM_MAIN_DELETE },
+	{ 12, IDM_RENAME,     0, MSG_ID_MENUITEM_MAIN_RENAME },
+	{ 13, -1,             0, 0 },
+	{ 14, IDM_TRACELINK,  0, MSG_ID_MENUITEM_CTX_TRACELINK},
+};
+
+HMENU HPCPlatform::LoadContextMenu()
+{
+	HMENU hMenu = CreatePopupMenu();
+	OverrideMenuTitle(hMenu, aContextMenu, sizeof(aContextMenu)/sizeof(MenuMsgRes));
+	return hMenu;
+}
 #endif // PLATFORM_HPC

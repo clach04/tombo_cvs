@@ -185,7 +185,7 @@ BEGIN
                     IDC_PROPTAB_KEEPCARET_HELP2,20,70,105,10
 END
 
-IDD_SEARCH DIALOGEX 0, 0, 163, 89
+IDD_SEARCH DIALOG DISCARDABLE  0, 0, 163, 89
 STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE 0x80000000L
 CAPTION "検索"
@@ -370,87 +370,6 @@ END
 //
 // Menu
 //
-
-IDR_MENU_MAIN MENU DISCARDABLE 
-BEGIN
-    POPUP "ファイル(&F)"
-    BEGIN
-        MENUITEM "新規メモ(&N)\tCtrl+N",        IDM_NEWMEMO
-        MENUITEM "新規フォルダ(&F)",            IDM_NEWFOLDER
-        MENUITEM "名前の変更",                  IDM_RENAME
-        MENUITEM "削除(&D)\tDEL",               IDM_DELETEITEM
-        MENUITEM SEPARATOR
-        MENUITEM "保存(&S)\tCtrl+S",            IDM_SAVE
-        MENUITEM SEPARATOR
-        MENUITEM "バージョン情報(&A)",          IDM_ABOUT
-        MENUITEM "終了(&X)",                    IDM_EXIT
-    END
-    POPUP "編集(&E)"
-    BEGIN
-        MENUITEM "切り取り(&T)\tCtrl+X",        IDM_CUT
-        MENUITEM "コピー(&C)\tCtrl+C",          IDM_COPY
-        MENUITEM "貼り付け(&P)\tCtrl+V",        IDM_PASTE
-        MENUITEM SEPARATOR
-        MENUITEM "全選択(&A)\tCtrl+A",          IDM_SELALL
-        MENUITEM SEPARATOR
-        MENUITEM "日付1\tCtrl+1",               IDM_INSDATE1
-        MENUITEM "日付2\tCtrl+2",               IDM_INSDATE2
-    END
-    POPUP "お気に入り(&B)"
-    BEGIN
-        MENUITEM "お気に入りに追加(&A)",        IDM_BOOKMARK_ADD
-        MENUITEM "お気に入りの整理(&E)",        IDM_BOOKMARK_CONFIG
-        MENUITEM SEPARATOR
-    END
-    POPUP "検索(&S)"
-    BEGIN
-        MENUITEM "検索(&F)\tCtrl+F",            IDM_SEARCH
-        MENUITEM "次を検索\tF3",                IDM_SEARCH_NEXT
-        MENUITEM "前を検索\tShift+F3",          IDM_SEARCH_PREV
-        MENUITEM SEPARATOR
-        MENUITEM "クイックフィルタ\tCtrl+G",    IDM_GREP
-        MENUITEM "仮想フォルダ",                IDM_VFOLDER_DEF
-    END
-    POPUP "ツール(&T)"
-    BEGIN
-        MENUITEM "折り返し表示(&L)",            IDM_DETAILS_HSCROLL, CHECKED
-        MENUITEM "2画面表示(P)",                IDM_TOGGLEPANE, CHECKED
-        MENUITEM "ステータスバー",              IDM_SHOWSTATUSBAR, CHECKED
-        MENUITEM SEPARATOR
-        MENUITEM "暗号化(&E)\tCtrl+E",          IDM_ENCRYPT
-        MENUITEM "復号化(&D)\tCtrl+P",          IDM_DECRYPT
-        MENUITEM SEPARATOR
-        MENUITEM "パスワード消去(&F)",          IDM_FORGETPASS
-        MENUITEM SEPARATOR
-        MENUITEM "プロパティ(&O)",              IDM_PROPERTY
-    END
-END
-
-IDR_MENU_DETAILS MENU DISCARDABLE 
-BEGIN
-    POPUP "ファイル(&F)"
-    BEGIN
-        MENUITEM "一覧(&L)",                    IDM_RETURNLIST
-        MENUITEM "保存(&S)\tCtrl+S",            IDM_SAVE
-        MENUITEM SEPARATOR
-        MENUITEM "バージョン情報(&A)",          IDM_ABOUT
-        MENUITEM SEPARATOR
-        MENUITEM "終了(&X)",                    IDM_EXIT
-    END
-    POPUP "編集(&E)"
-    BEGIN
-        MENUITEM "切り取り(&T)\tCtrl+X",        IDM_CUT
-        MENUITEM "コピー(&C)\tCtrl+C",          IDM_COPY
-        MENUITEM "貼り付け(&P)\tCtrl+V",        IDM_PASTE
-        MENUITEM SEPARATOR
-        MENUITEM "全選択\tCtrl+A",              IDM_SELALL
-        MENUITEM SEPARATOR
-        MENUITEM "日付の挿入&1\tCtrl+1",        IDM_INSDATE1
-        MENUITEM "日付の挿入&2\tCtrl+2",        IDM_INSDATE2
-        MENUITEM SEPARATOR
-        MENUITEM "折り返し表示(&F)",            IDM_DETAILS_HSCROLL, CHECKED
-    END
-END
 
 IDR_CONTEXTMENU MENU DISCARDABLE 
 BEGIN

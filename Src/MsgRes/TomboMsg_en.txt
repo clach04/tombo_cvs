@@ -264,3 +264,4 @@ Disable close notes on edit view
 Keep space over the SIP
 Default(English)
 Greek
+&Search

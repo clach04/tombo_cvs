@@ -500,8 +500,14 @@ LRESULT MemoSelectView::OnNotify(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		return EditLabel(&(((LPNMTVDISPINFO)lParam)->item));
 #if defined(PLATFORM_WIN32)
 	case NM_RCLICK:
-		OnNotify_RClick();
-		break;
+		{
+			POINT pt, pth;
+			GetCursorPos(&pt);
+			pth = pt;
+			ScreenToClient(hWnd, &pth);
+			OnNotify_RClick(pth);
+			break;
+		}
 #endif
 
 	}
@@ -509,22 +515,22 @@ LRESULT MemoSelectView::OnNotify(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	return 0xFFFFFFFF;
 }
 
-#if defined(PLATFORM_WIN32)
-void MemoSelectView::OnNotify_RClick()
+#if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
+void MemoSelectView::OnNotify_RClick(POINT pt)
 {
-	POINT pt, pth;
-	GetCursorPos(&pt);
-	pth = pt;
-	ScreenToClient(hViewWnd, &pth);
 	TV_HITTESTINFO hti;
-	hti.pt = pth;
+	hti.pt = pt;
 	HTREEITEM hX = TreeView_HitTest(hViewWnd, &hti);
 
 	if (hti.hItem == NULL) return;
-
 	TreeViewItem *pItem = GetTVItem(hti.hItem);
 
+#if defined(PLATFORM_WIN32)
 	HMENU hMenu = Win32Platform::LoadContextMenu();
+#endif
+#if defined(PLATFORM_HPC)
+	HMENU hMenu = HPCPlatform::LoadContextMenu();
+#endif
 
 	ControlSubMenu(hMenu, IDM_ENCRYPT, pItem->IsOperationEnabled(this, TreeViewItem::OpEncrypt));
 	ControlSubMenu(hMenu, IDM_DECRYPT, pItem->IsOperationEnabled(this, TreeViewItem::OpDecrypt));
@@ -537,7 +543,7 @@ void MemoSelectView::OnNotify_RClick()
 	ControlSubMenu(hMenu, IDM_SEARCH, pItem->IsOperationEnabled(this, TreeViewItem::OpGrep));
 	ControlSubMenu(hMenu, IDM_TRACELINK, pItem->IsOperationEnabled(this, TreeViewItem::OpLink));
 
-	DWORD id = TrackPopupMenuEx(hMenu, TPM_RETURNCMD, pt.x, pt.y, hViewWnd, NULL);
+	DWORD id = TrackPopupMenuEx(hMenu, TPM_RETURNCMD | TPM_TOPALIGN | TPM_LEFTALIGN, pt.x, pt.y, hViewWnd, NULL);
 	DestroyMenu(hMenu);
 
 	switch(id) {

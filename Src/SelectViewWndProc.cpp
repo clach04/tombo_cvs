@@ -34,6 +34,36 @@ void SelectViewSetWndProc(SUPER_WND_PROC wp, HWND hParent, HINSTANCE h, MemoSele
 LRESULT CALLBACK NewSelectViewProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch(msg) {
+#if defined(PLATFORM_HPC)
+	case WM_LBUTTONDOWN:
+		{
+			BOOL bAltButton = (GetKeyState(VK_MENU) & 0x8000) != 0;
+			if (bAltButton) {
+				POINT pt;
+				pt.x = LOWORD(lParam); pt.y = HIWORD(lParam);
+				TV_HITTESTINFO hti;
+
+				hti.pt = pt;
+				HTREEITEM hX = TreeView_HitTest(hwnd, &hti);
+				if (hX) {
+					TreeView_SelectItem(hwnd, hX);
+				}
+				return 0;
+			}
+			break;
+		}
+	case WM_LBUTTONUP:
+		{
+			BOOL bAltButton = (GetKeyState(VK_MENU) & 0x8000) != 0;
+			if (bAltButton) {
+				POINT pt;
+				pt.x = LOWORD(lParam); pt.y = HIWORD(lParam);
+				pView->OnNotify_RClick(pt);
+				return 0;
+			}
+			break;
+		}
+#endif
 	case WM_CHAR:
 		{
 			// ignore events for disabling click beeps when focusing.

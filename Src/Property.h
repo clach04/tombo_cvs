@@ -63,6 +63,8 @@ class Property {
 	TCHAR aDefaultNote[MAX_PATH];
 	LPTSTR pBookMark;
 
+	DWORD nDisableSaveDlg;
+
 public:
 	Property();
 	~Property();
@@ -168,6 +170,7 @@ public:
 	BOOL SaveWrapTextStat();
 
 	LPCTSTR GetDefaultNote() { return aDefaultNote; }
+	DWORD DisableSaveDlg() { return nDisableSaveDlg; }
 
 	friend class FolderTab;
 	friend class PasswordTab;
