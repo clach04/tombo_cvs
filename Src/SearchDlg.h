@@ -16,12 +16,13 @@ class SearchDialog {
 	BOOL bCheckEncrypt;
 	BOOL bFileNameOnly;
 	BOOL bSearchDirectionUp;
+	BOOL bEnableDirection;
 public:
 
 	////////////////////////////////
 	// ctor & dtor
 
-	SearchDialog() : hDialog(NULL), hInstance(NULL), pSearchStr(NULL), bCaseSensitive(FALSE), bFileNameOnly(FALSE), bSearchDirectionUp(FALSE) {}
+	SearchDialog() : hDialog(NULL), hInstance(NULL), pSearchStr(NULL), bCaseSensitive(FALSE), bFileNameOnly(FALSE), bSearchDirectionUp(FALSE), bEnableDirection(FALSE) {}
 	~SearchDialog();
 
 	////////////////////////////////

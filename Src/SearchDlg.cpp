@@ -77,6 +77,11 @@ void SearchDialog::InitDialog(HWND hDlg)
 	HWND hFileNameOnly = GetDlgItem(hDlg, IDC_FILENAMEONLY);
 	EnableWindow(hFileNameOnly, bFileNameOnly);
 	
+	HWND hSearchDirectionUp = GetDlgItem(hDlg, IDC_SEARCH_DIRECTION_UP);
+	HWND hSearchDirectionDown = GetDlgItem(hDlg, IDC_SEARCH_DIRECTION_DOWN);
+	EnableWindow(hSearchDirectionUp, bEnableDirection);
+	EnableWindow(hSearchDirectionDown, bEnableDirection);
+
 	CheckRadioButton(hDlg, IDC_SEARCH_DIRECTION_UP, IDC_SEARCH_DIRECTION_DOWN, IDC_SEARCH_DIRECTION_DOWN);
 }
 
@@ -89,6 +94,7 @@ DWORD SearchDialog::Popup(HINSTANCE hInst, HWND hParent, BOOL bCE)
 	hInstance = hInst;
 
 	bCheckEncrypt = bFileNameOnly = bCE;
+	bEnableDirection = bCE;
 
 	SipControl sc;
 	BOOL bSipStat, bResult;
