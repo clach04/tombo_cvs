@@ -163,6 +163,7 @@
 #define IDC_PROPTAB_EXTAPP_CHOOSE1      1067
 #define IDC_PROPTAB_EXTAPP_CHOOSE2      1068
 #define IDC_PROP_EXTAPP_CAUTION         1069
+#define IDC_PROPTAB_DISABLESAVEDLG      1070
 #define IDM_ACTIONBUTTON                30001
 #define IDM_FILE_EXIT                   40002
 #define IDM_HELP_ABOUT                  40003
@@ -232,7 +233,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        136
 #define _APS_NEXT_COMMAND_VALUE         40063
-#define _APS_NEXT_CONTROL_VALUE         1070
+#define _APS_NEXT_CONTROL_VALUE         1071
 #define _APS_NEXT_SYMED_VALUE           116
 #endif
 #endif

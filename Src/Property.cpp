@@ -677,6 +677,7 @@ static DlgMsgRes aKeepCaretRes[] = {
 	{ IDC_PROP_SWITCHTITLE,        MSG_ID_DLG_PROPTAB_KEEPCARET_SYNCTITLE },
 	{ IDC_PROPTAB_KEEPCARET_HELP3, MSG_ID_DLG_PROPTAB_KEEPCARET_HELP3 },
 #endif
+	{ IDC_PROPTAB_DISABLESAVEDLG,  MSG_ID_DLG_PROPTAB_DISABLESAVEDLG },
 #endif
 };
 
@@ -705,6 +706,14 @@ void KeepCaretTab::Init(HWND hDlg)
 		SendMessage(hSwitchTitleWnd, BM_SETCHECK, BST_UNCHECKED, 0);
 	}
 #endif
+
+	HWND hDisableSaveDlg = GetDlgItem(hDlg, IDC_PROPTAB_DISABLESAVEDLG);
+	if (pProperty->nDisableSaveDlg) {
+		SendMessage(hDisableSaveDlg, BM_SETCHECK, BST_CHECKED, 0);
+	} else {
+		SendMessage(hDisableSaveDlg, BM_SETCHECK, BST_UNCHECKED, 0);
+	}
+
 }
 
 BOOL KeepCaretTab::Apply(HWND hDlg)
@@ -737,6 +746,13 @@ BOOL KeepCaretTab::Apply(HWND hDlg)
 		pProperty->nSwitchWindowTitle = FALSE;
 	}
 #endif
+
+	HWND hDisableSaveDlg = GetDlgItem(hDlg, IDC_PROPTAB_DISABLESAVEDLG);
+	if (SendMessage(hDisableSaveDlg, BM_GETCHECK, 0, 0) == BST_CHECKED) {
+		pProperty->nDisableSaveDlg = TRUE;
+	} else {
+		pProperty->nDisableSaveDlg = FALSE;
+	}
 
 	return TRUE;
 }
