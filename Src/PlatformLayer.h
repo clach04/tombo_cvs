@@ -1,0 +1,32 @@
+#ifndef PLATFORMLAYER_H
+#define PLATFORMLAYER_H
+
+
+#define BOOKMARK_MENU_POS 2
+#define NUM_BOOKMARK_SUBMENU_DEFAULT 3
+
+///////////////////////////////////////////////////
+// Platform abstruction
+///////////////////////////////////////////////////
+
+class PlatformLayer {
+protected:
+	HWND hMainWnd;
+public:
+	PlatformLayer();
+	virtual ~PlatformLayer();
+
+	BOOL Init(HWND h);
+
+	virtual void Create(HWND hWnd, HINSTANCE hInst) = 0;
+};
+
+///////////////////////////////////////////////////
+///////////////////////////////////////////////////
+// helper function/classes
+///////////////////////////////////////////////////
+///////////////////////////////////////////////////
+
+void SetAppIcon(HINSTANCE hInst, HWND hWnd);
+
+#endif

@@ -3274,6 +3274,125 @@ NODEP_CPP_GREPD=\
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\Src\HPCPlatform.cpp
+
+!IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
+
+DEP_CPP_HPCPL=\
+	"..\..\Src\HPCPlatform.h"\
+	"..\..\Src\PlatformLayer.h"\
+	"..\..\Src\Property.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
+
+DEP_CPP_HPCPL=\
+	"..\..\Src\HPCPlatform.h"\
+	"..\..\Src\PlatformLayer.h"\
+	"..\..\Src\Property.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Release"
+
+DEP_CPP_HPCPL=\
+	"..\..\Src\HPCPlatform.h"\
+	"..\..\Src\PlatformLayer.h"\
+	"..\..\Src\Property.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Debug"
+
+DEP_CPP_HPCPL=\
+	"..\..\Src\HPCPlatform.h"\
+	"..\..\Src\PlatformLayer.h"\
+	"..\..\Src\Property.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Release"
+
+DEP_CPP_HPCPL=\
+	"..\..\Src\HPCPlatform.h"\
+	"..\..\Src\PlatformLayer.h"\
+	"..\..\Src\Property.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Debug"
+
+DEP_CPP_HPCPL=\
+	"..\..\Src\HPCPlatform.h"\
+	"..\..\Src\PlatformLayer.h"\
+	"..\..\Src\Property.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Release"
+
+DEP_CPP_HPCPL=\
+	"..\..\Src\HPCPlatform.h"\
+	"..\..\Src\PlatformLayer.h"\
+	"..\..\Src\Property.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Debug"
+
+DEP_CPP_HPCPL=\
+	"..\..\Src\HPCPlatform.h"\
+	"..\..\Src\PlatformLayer.h"\
+	"..\..\Src\Property.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE x86em) Release"
+
+DEP_CPP_HPCPL=\
+	"..\..\Src\HPCPlatform.h"\
+	"..\..\Src\PlatformLayer.h"\
+	"..\..\Src\Property.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE x86em) Debug"
+
+DEP_CPP_HPCPL=\
+	"..\..\Src\HPCPlatform.h"\
+	"..\..\Src\PlatformLayer.h"\
+	"..\..\Src\Property.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) ReleaseE"
+
+DEP_CPP_HPCPL=\
+	"..\..\Src\HPCPlatform.h"\
+	"..\..\Src\PlatformLayer.h"\
+	"..\..\Src\Property.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) ReleaseE"
+
+DEP_CPP_HPCPL=\
+	"..\..\Src\HPCPlatform.h"\
+	"..\..\Src\PlatformLayer.h"\
+	"..\..\Src\Property.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) ReleaseE"
+
+DEP_CPP_HPCPL=\
+	"..\..\Src\HPCPlatform.h"\
+	"..\..\Src\PlatformLayer.h"\
+	"..\..\Src\Property.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) ReleaseE"
+
+DEP_CPP_HPCPL=\
+	"..\..\Src\HPCPlatform.h"\
+	"..\..\Src\PlatformLayer.h"\
+	"..\..\Src\Property.h"\
+	
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\Src\TomboLib\List.cpp
 
 !IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
@@ -3833,6 +3952,7 @@ DEP_CPP_MAINF=\
 	"..\..\Src\BookMarkDlg.h"\
 	"..\..\Src\FilterCtlDlg.h"\
 	"..\..\Src\GrepDialog.h"\
+	"..\..\Src\HPCPlatform.h"\
 	"..\..\Src\MainFrame.h"\
 	"..\..\Src\MemoDetailsView.h"\
 	"..\..\Src\MemoManager.h"\
@@ -3840,10 +3960,14 @@ DEP_CPP_MAINF=\
 	"..\..\Src\MemoSelectView.h"\
 	"..\..\Src\Message.h"\
 	"..\..\Src\PasswordManager.h"\
+	"..\..\Src\PlatformLayer.h"\
+	"..\..\Src\PocketPCPlatform.h"\
 	"..\..\Src\Property.h"\
+	"..\..\Src\PsPCPlatform.h"\
 	"..\..\Src\SearchDlg.h"\
 	"..\..\Src\SearchEngine.h"\
 	"..\..\Src\SearchTree.h"\
+	"..\..\Src\StatusBar.h"\
 	"..\..\Src\Tombo.h"\
 	"..\..\Src\TomboLib\DialogTemplate.h"\
 	"..\..\Src\TomboLib\File.h"\
@@ -3852,8 +3976,10 @@ DEP_CPP_MAINF=\
 	"..\..\Src\TomboLib\TString.h"\
 	"..\..\Src\TomboLib\Uniconv.h"\
 	"..\..\Src\TomboLib\VarBuffer.h"\
+	"..\..\Src\TomboURI.h"\
 	"..\..\Src\TreeViewItem.h"\
 	"..\..\Src\VFManager.h"\
+	"..\..\Src\Win32Platform.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Debug"
@@ -5001,6 +5127,7 @@ DEP_CPP_MEMOM=\
 	"..\..\Src\TomboLib\TString.h"\
 	"..\..\Src\TomboLib\Uniconv.h"\
 	"..\..\Src\TomboLib\VarBuffer.h"\
+	"..\..\Src\TomboURI.h"\
 	"..\..\Src\TreeViewItem.h"\
 	
 
@@ -5304,6 +5431,7 @@ DEP_CPP_MEMON=\
 	"..\..\Src\TomboLib\TString.h"\
 	"..\..\Src\TomboLib\Uniconv.h"\
 	"..\..\Src\TomboLib\VarBuffer.h"\
+	"..\..\Src\TomboURI.h"\
 	"..\..\Src\TreeViewItem.h"\
 	
 
@@ -6266,6 +6394,139 @@ DEP_CPP_PASSWO=\
 	
 NODEP_CPP_PASSWO=\
 	"..\..\Src\Logger.h"\
+	
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\PlatformLayer.cpp
+
+!IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
+
+DEP_CPP_PLATF=\
+	"..\..\Src\PlatformLayer.h"\
+	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboLib\File.h"\
+	"..\..\Src\TomboLib\Logger.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
+
+DEP_CPP_PLATF=\
+	"..\..\Src\PlatformLayer.h"\
+	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboLib\File.h"\
+	"..\..\Src\TomboLib\Logger.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Release"
+
+DEP_CPP_PLATF=\
+	"..\..\Src\PlatformLayer.h"\
+	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboLib\File.h"\
+	"..\..\Src\TomboLib\Logger.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Debug"
+
+DEP_CPP_PLATF=\
+	"..\..\Src\PlatformLayer.h"\
+	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboLib\File.h"\
+	"..\..\Src\TomboLib\Logger.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Release"
+
+DEP_CPP_PLATF=\
+	"..\..\Src\PlatformLayer.h"\
+	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboLib\File.h"\
+	"..\..\Src\TomboLib\Logger.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Debug"
+
+DEP_CPP_PLATF=\
+	"..\..\Src\PlatformLayer.h"\
+	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboLib\File.h"\
+	"..\..\Src\TomboLib\Logger.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Release"
+
+DEP_CPP_PLATF=\
+	"..\..\Src\PlatformLayer.h"\
+	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboLib\File.h"\
+	"..\..\Src\TomboLib\Logger.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Debug"
+
+DEP_CPP_PLATF=\
+	"..\..\Src\PlatformLayer.h"\
+	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboLib\File.h"\
+	"..\..\Src\TomboLib\Logger.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE x86em) Release"
+
+DEP_CPP_PLATF=\
+	"..\..\Src\PlatformLayer.h"\
+	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboLib\File.h"\
+	"..\..\Src\TomboLib\Logger.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE x86em) Debug"
+
+DEP_CPP_PLATF=\
+	"..\..\Src\PlatformLayer.h"\
+	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboLib\File.h"\
+	"..\..\Src\TomboLib\Logger.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) ReleaseE"
+
+DEP_CPP_PLATF=\
+	"..\..\Src\PlatformLayer.h"\
+	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboLib\File.h"\
+	"..\..\Src\TomboLib\Logger.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) ReleaseE"
+
+DEP_CPP_PLATF=\
+	"..\..\Src\PlatformLayer.h"\
+	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboLib\File.h"\
+	"..\..\Src\TomboLib\Logger.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) ReleaseE"
+
+DEP_CPP_PLATF=\
+	"..\..\Src\PlatformLayer.h"\
+	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboLib\File.h"\
+	"..\..\Src\TomboLib\Logger.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) ReleaseE"
+
+DEP_CPP_PLATF=\
+	"..\..\Src\PlatformLayer.h"\
+	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboLib\File.h"\
+	"..\..\Src\TomboLib\Logger.h"\
 	
 
 !ENDIF 
@@ -7607,6 +7868,97 @@ NODEP_CPP_SIPCO=\
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\Src\StatusBar.cpp
+
+!IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
+
+DEP_CPP_STATU=\
+	"..\..\Src\StatusBar.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
+
+DEP_CPP_STATU=\
+	"..\..\Src\StatusBar.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Release"
+
+DEP_CPP_STATU=\
+	"..\..\Src\StatusBar.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Debug"
+
+DEP_CPP_STATU=\
+	"..\..\Src\StatusBar.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Release"
+
+DEP_CPP_STATU=\
+	"..\..\Src\StatusBar.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Debug"
+
+DEP_CPP_STATU=\
+	"..\..\Src\StatusBar.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Release"
+
+DEP_CPP_STATU=\
+	"..\..\Src\StatusBar.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Debug"
+
+DEP_CPP_STATU=\
+	"..\..\Src\StatusBar.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE x86em) Release"
+
+DEP_CPP_STATU=\
+	"..\..\Src\StatusBar.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE x86em) Debug"
+
+DEP_CPP_STATU=\
+	"..\..\Src\StatusBar.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) ReleaseE"
+
+DEP_CPP_STATU=\
+	"..\..\Src\StatusBar.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) ReleaseE"
+
+DEP_CPP_STATU=\
+	"..\..\Src\StatusBar.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) ReleaseE"
+
+DEP_CPP_STATU=\
+	"..\..\Src\StatusBar.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) ReleaseE"
+
+DEP_CPP_STATU=\
+	"..\..\Src\StatusBar.h"\
+	
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
 SOURCE=.\res\Tombo.rc
 
 !IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
@@ -7951,6 +8303,8 @@ NODEP_CPP_TREEV=\
 
 DEP_CPP_TREEV=\
 	"..\..\Src\DirList.h"\
+	"..\..\Src\MainFrame.h"\
+	"..\..\Src\MemoDetailsView.h"\
 	"..\..\Src\MemoFolder.h"\
 	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoNote.h"\
@@ -9462,6 +9816,10 @@ SOURCE=..\..\Src\GrepDialog.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\Src\HPCPlatform.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\Src\TomboLib\List.h
 # End Source File
 # Begin Source File
@@ -9514,6 +9872,10 @@ SOURCE=..\..\Src\PasswordManager.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\Src\PlatformLayer.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\Src\Property.h
 # End Source File
 # Begin Source File
@@ -9547,6 +9909,10 @@ SOURCE=..\..\Src\SearchTree.h
 # Begin Source File
 
 SOURCE=..\..\Src\TomboLib\SipControl.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\StatusBar.h
 # End Source File
 # Begin Source File
 

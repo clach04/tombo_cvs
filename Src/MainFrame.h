@@ -13,6 +13,15 @@ class VFManager;
 class BookMark;
 struct BookMarkItem;
 
+class StatusBar;
+
+#include "PlatformLayer.h"
+#include "Win32Platform.h"
+#include "PocketPCPlatform.h"
+#include "PsPCPlatform.h"
+#include "HPCPlatform.h"
+#include "LagendaPlatform.h"
+
 ///////////////////////////////////////
 // Main frame window
 ///////////////////////////////////////
@@ -23,26 +32,11 @@ class MainFrame {
 	HWND hMainWnd;
 	HINSTANCE hInstance;
 
-	HWND hMSCmdBar;			// command bar handle
-	HWND hMDCmdBar;
-
 	HIMAGELIST hSelectViewImgList;
 
-#if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
-	HWND hRebar;
-	HWND hToolBar;
-#endif
-#if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
-	HWND hStatusBar;
-	void ResizeStatusBar();
-#endif
+	StatusBar *pStatusBar;
 
-#if defined(PLATFORM_BE500)
-	HMENU hMSMemoMenu;
-	HMENU hMSToolMenu;
-	HMENU hMSBookMarkMenu;
-	HMENU hMDEditMenu;
-#endif
+	PLATFORM_TYPE *pPlatform;
 
 	MemoSelectView msView;
 	MemoDetailsView *pDetailsView;
@@ -71,27 +65,6 @@ protected:
 
 	// move pane splitter
 	void MovePane(WORD width);
-
-	void SetStatusIndicator(DWORD nPos, LPCTSTR pText, BOOL bDisp);
-
-#if defined(PLATFORM_WIN32)
-	HMENU GetMainMenu() { return GetMenu(hMainWnd); }
-	HWND GetMainToolBar() { return hToolBar; }
-#endif
-#if defined(PLATFORM_HPC)
-	HMENU GetMainMenu();
-	HWND GetMainToolBar();
-#endif
-	HMENU GetMDToolMenu();
-	HMENU GetMSEditMenu();
-
-	HMENU GetMSBookMarkMenu();
-
-#if defined(PLATFORM_BE500)
-	HMENU GetMSToolMenu();
-#endif
-
-	void EnableMenu(UINT uId, BOOL bEnable);
 
 public:
 	MainFrame(); // ctor
@@ -186,8 +159,8 @@ public:
 	////////////////////////////////
 	// Control status indicator
 
-	void SetReadOnlyStatus(BOOL bReadOnly) { SetStatusIndicator(1, MSG_RONLY, bReadOnly); }
-	void SetNewMemoStatus(BOOL bNew) { SetStatusIndicator(2, MSG_NEW, bNew); }
+	void SetReadOnlyStatus(BOOL bReadOnly);
+	void SetNewMemoStatus(BOOL bNew);
 	void SetModifyStatus(BOOL bModify);
 
 #if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)

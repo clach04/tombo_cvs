@@ -582,3 +582,17 @@ Changes
 
 * remove MemoManager::pCurrentNote
 
+////////////////////////////////
+// B131
+////////////////////////////////
+// 2.0 branch
+
+* merge from B130
+
+////////////////////////////////
+// B134
+////////////////////////////////
+// main trunk
+
+* add SetCurrentNote when saving notes.
+* refactoring around platform dependent routines (especially toolbar, menu etc..)

@@ -245,6 +245,10 @@ SOURCE=..\..\Src\PasswordManager.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\Src\PlatformLayer.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\Src\Property.cpp
 # End Source File
 # Begin Source File
@@ -274,6 +278,10 @@ SOURCE=..\..\Src\SelectViewWndProc.cpp
 # Begin Source File
 
 SOURCE=..\..\Src\TomboLib\SipControl.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\StatusBar.cpp
 # End Source File
 # Begin Source File
 
@@ -342,6 +350,10 @@ SOURCE=..\..\Src\VFManager.cpp
 # Begin Source File
 
 SOURCE=..\..\Src\VFStream.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\Win32Platform.cpp
 # End Source File
 # End Group
 # Begin Group "Header Files"
@@ -473,6 +485,10 @@ SOURCE=..\..\Src\PasswordManager.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\Src\PlatformLayer.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\Src\Property.h
 # End Source File
 # Begin Source File
@@ -531,6 +547,10 @@ SOURCE=..\..\Src\TomboLib\SipControl.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\Src\StatusBar.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\Src\Tombo.h
 # End Source File
 # Begin Source File
@@ -564,6 +584,10 @@ SOURCE=..\..\Src\VFManager.h
 # Begin Source File
 
 SOURCE=..\..\Src\VFStream.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\Win32Platform.h
 # End Source File
 # End Group
 # Begin Group "Resource Files"
