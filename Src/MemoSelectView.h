@@ -5,7 +5,7 @@ class MemoManager;
 class MemoNote;
 class TString;
 class TreeViewItem;
-class TreeViewFileItem;
+class MemoLocator;
 
 class MemoSelectView {
 	HWND hViewWnd;
@@ -22,6 +22,8 @@ class MemoSelectView {
 	BOOL bSingleClickMode;
 
 	void SetShareArea();
+
+	void DeleteOneItem(HTREEITEM hItem);
 	void DeleteItemsRec(HTREEITEM hFirst);
 
 	// ツリーの開閉
@@ -60,6 +62,7 @@ public:
 	void OnActionButton(HWND hWnd);
 	BOOL OnHotKey(HWND hWnd, WPARAM wParam);
 	void OnGetFocus();
+	void OnDelete(HTREEITEM hItem, TreeViewItem *pItem);
 
 	// クリップボード(もどき)操作用
 	void OnCut(HWND hWnd);
@@ -89,38 +92,37 @@ public:
 	/////////////////////////////
 	// ビューアイテム操作関連
 
-	BOOL LoadItems();
+	BOOL InitTree();
 	BOOL DeleteAllItem();
 
 	void TreeExpand(HTREEITEM hItem);
 	void TreeCollapse(HTREEITEM hItem);
 
 	// 新規メモ生成時処理
-	TreeViewFileItem *NewMemoCreated(MemoNote *pNote, LPCTSTR pHeadLine, HTREEITEM hItem);
+	HTREEITEM NewMemoCreated(MemoNote *pNote, LPCTSTR pHeadLine, HTREEITEM hItem);
 
 	BOOL InsertFile(HTREEITEM hParent, LPCTSTR pPrefix, LPCTSTR pFile);
-	BOOL InsertFileToLast(HTREEITEM hParent, MemoNote *pNote, LPCTSTR pTitle);
+	BOOL InsertFile(HTREEITEM hParent, MemoNote *pNote, LPCTSTR pTitle, BOOL bInsertLast);
 
-	HTREEITEM InsertFolder(HTREEITEM hParent, LPCTSTR pName, TreeViewItem *tvi);
-	HTREEITEM InsertFolderToLast(HTREEITEM hParent, LPCTSTR pName, TreeViewItem *tvi);
+	// if bInsertLast is TRUE, Insert folder without sorting.
+	HTREEITEM InsertFolder(HTREEITEM hParent, LPCTSTR pName, TreeViewItem *tvi, BOOL bInsertLast);
 
 	// TreeViewItemの状態が変わったことによるビューへの変更依頼
-	BOOL UpdateItemStatus(TreeViewItem *pItem, LPCTSTR pNewHeadLine);
-
-	// pNoteを画面から削除
-	BOOL DeleteItem(TreeViewItem *pItem);
+	BOOL UpdateItemStatusNotify(TreeViewItem *pItem, LPCTSTR pNewHeadLine);
 
 	// 現在選択しているアイテムのパスを取得する。
 	// 選択しているアイテムがフォルダの場合、自身までのパスを含む
 	HTREEITEM GetPathForNewItem(TString *pPath);
 
-	// メモ/フォルダの削除
-	void DeleteNode(HWND hWnd, HTREEITEM hItem, TreeViewItem *pItem);
+
+	// ノードの選択
+	void SelectNote(MemoNote *pNote);
 
 	BOOL CreateNewFolder(HTREEITEM hItem, LPCTSTR pFolder);
+	BOOL GetHeadLine(MemoNote *pNote, LPTSTR pHeadLine, DWORD nLen);
 
 	// ヘッドライン文字列の書き換え
-	BOOL UpdateHeadLine(TreeViewFileItem *pItem, LPCTSTR pHeadLine);
+	BOOL UpdateHeadLine(MemoLocator *pLoc, LPCTSTR pHeadLine);
 
 	// 現在選択されているアイテムと関連付けられているMemoNoteを返す。
 	// pItemが指定されている場合にはHTREEITEMも返す。
