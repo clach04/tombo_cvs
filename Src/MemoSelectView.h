@@ -21,7 +21,7 @@ class MemoSelectView {
 	BOOL bAutoLoadMode;
 	BOOL bSingleClickMode;
 
-	void SetShareArea();
+	void SetShareArea(TreeViewItem *pItem);
 
 	void DeleteOneItem(HTREEITEM hItem);
 	void DeleteItemsRec(HTREEITEM hFirst);
@@ -44,7 +44,7 @@ class MemoSelectView {
 
 public:
 	/////////////////////////////
-	// 初期化関連関数
+	// Initialize functions
 
 	MemoSelectView() : hViewWnd(NULL), pMemoMgr(NULL), bAutoLoadMode(FALSE), bSingleClickMode(FALSE) {}
 	BOOL Init(MemoManager *p) { pMemoMgr = p; bCut = FALSE; pClipItem = NULL; return TRUE; }
@@ -59,16 +59,19 @@ public:
 
 	LRESULT OnNotify(HWND hWnd, WPARAM wParam, LPARAM lParam);
 	BOOL OnCommand(HWND hWnd, WPARAM wParam, LPARAM lParam);
+
 	void OnActionButton(HWND hWnd);
 	BOOL OnHotKey(HWND hWnd, WPARAM wParam);
 	void OnGetFocus();
 	void OnDelete(HTREEITEM hItem, TreeViewItem *pItem);
+	void OnEncrypt(TreeViewItem *pItem);
+	void OnDecrypt(TreeViewItem *pItem);
+	void OnEditLabel(HTREEITEM hItem);
 
 	// クリップボード(もどき)操作用
-	void OnCut(HWND hWnd);
-	void OnCopy(HWND hWnd);
-	void OnPaste(HWND hWnd);
-	void CheckResetClipboard(TreeViewItem *pItem) { if (pItem == pClipItem) pClipItem = NULL; }
+	void OnCut(TreeViewItem *pItem);
+	void OnCopy(TreeViewItem *pItem);
+	void OnPaste();
 
 	// ウィンドウサイズ取得
 	void GetSize(LPWORD pWidth, LPWORD pHeight);
@@ -137,7 +140,6 @@ public:
 
 	LPTSTR GeneratePath(HTREEITEM hItem, LPTSTR pBuf, DWORD nSiz);
 
-	BOOL OnEditLabel();
 };
 
 /////////////////////////////////////////

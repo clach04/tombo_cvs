@@ -73,6 +73,21 @@ BEGIN
     END
 END
 
+IDR_CONTEXTMENU MENU DISCARDABLE 
+BEGIN
+    POPUP "Menu"
+    BEGIN
+        MENUITEM "Cut",                         IDM_CUT
+        MENUITEM "Copy",                        IDM_COPY
+        MENUITEM SEPARATOR
+        MENUITEM "Encrypt",                     IDM_ENCRYPT
+        MENUITEM "Decrypt",                     IDM_DECRYPT
+        MENUITEM SEPARATOR
+        MENUITEM "Delete",                      IDM_DELETEITEM
+        MENUITEM "Rename",                      IDM_RENAME
+    END
+END
+
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////

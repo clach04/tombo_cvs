@@ -533,6 +533,64 @@ LRESULT MemoSelectView::OnNotify(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 	case TVN_ENDLABELEDIT:
 		return EditLabel(&(((LPNMTVDISPINFO)lParam)->item));
+
+#if defined(PLATFORM_WIN32)
+	case NM_RCLICK:
+		{
+			POINT pt, pth;
+			GetCursorPos(&pt);
+			pth = pt;
+			ScreenToClient(hViewWnd, &pth);
+			TV_HITTESTINFO hti;
+			hti.pt = pth;
+			TreeView_HitTest(hViewWnd, &hti);
+
+			if (hti.hItem == NULL) break;
+
+			TreeViewItem *pItem = GetTVItem(hti.hItem);
+
+			HMENU hContextMenu = LoadMenu(g_hInstance, MAKEINTRESOURCE(IDR_CONTEXTMENU));
+			HMENU hMenu = GetSubMenu(hContextMenu, 0);
+			if (!pItem->HasMultiItem()) {
+				if (((TreeViewFileItem*)pItem)->GetNote()->IsEncrypted()) {
+					EnableMenuItem(hMenu, IDM_ENCRYPT, MF_BYCOMMAND | MF_GRAYED);
+					EnableMenuItem(hMenu, IDM_DECRYPT, MF_BYCOMMAND | MF_ENABLED);
+				} else {
+					EnableMenuItem(hMenu, IDM_ENCRYPT, MF_BYCOMMAND | MF_ENABLED);
+					EnableMenuItem(hMenu, IDM_DECRYPT, MF_BYCOMMAND | MF_GRAYED);
+				}
+			}
+
+			DWORD id = TrackPopupMenuEx(hMenu, TPM_RETURNCMD, pt.x, pt.y, hWnd, NULL);
+			DestroyMenu(hContextMenu);
+
+			switch(id) {
+			case IDM_CUT:
+				OnCut(pItem);
+				break;
+			case IDM_COPY:
+				OnCopy(pItem);
+				break;
+//			case IDM_PASTE:
+//				OnPaste();
+//				break;
+			case IDM_ENCRYPT:
+				OnEncrypt(pItem);
+				break;
+			case IDM_DECRYPT:
+				OnDecrypt(pItem);
+				break;
+			case IDM_RENAME:
+				OnEditLabel(hti.hItem);
+				break;
+			case IDM_DELETEITEM:
+				OnDelete(hti.hItem, pItem);
+				break;
+			}
+			break;
+		}
+#endif
+
 	}
 	// WM_NOTIFYの返答になるため、必要ない場合以外は各Notifyでreturnすること
 	return 0xFFFFFFFF;
@@ -549,14 +607,10 @@ BOOL MemoSelectView::OnCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 	switch(LOWORD(wParam)) {
 	case IDM_ENCRYPT:
-		if (!pItem->Encrypt(pMemoMgr, this)) {
-			TomboMessageBox(hWnd, MSG_ENCRYPTION_FAILED, TEXT("ERROR"), MB_ICONSTOP | MB_OK);
-		}
+		OnEncrypt(pItem);
 		return TRUE;
 	case IDM_DECRYPT:
-		if (!pItem->Decrypt(pMemoMgr, this)) {
-			TomboMessageBox(hWnd, MSG_DECRYPTION_FAILED, TEXT("ERROR"), MB_ICONSTOP | MB_OK);
-		}
+		OnDecrypt(pItem);
 		return TRUE;
 	case IDM_DELETEITEM:
 		OnDelete(hItem, pItem);
@@ -565,16 +619,16 @@ BOOL MemoSelectView::OnCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		OnActionButton(hWnd);
 		return TRUE;
 	case IDM_CUT:
-		OnCut(hWnd);
+		OnCut(pItem);
 		return TRUE;
 	case IDM_COPY:
-		OnCopy(hWnd);
+		OnCopy(pItem);
 		return TRUE;
 	case IDM_PASTE:
-		OnPaste(hWnd);
+		OnPaste();
 		return TRUE;
 	case IDM_RENAME:
-		OnEditLabel();
+		OnEditLabel(hItem);
 		return TRUE;
 	}
 	return FALSE;
@@ -600,6 +654,51 @@ BOOL MemoSelectView::OnHotKey(HWND hWnd, WPARAM wParam)
 		return TRUE;
 	default:
 		return FALSE;
+	}
+}
+
+///////////////////////////////////////////
+// Encrypt
+///////////////////////////////////////////
+
+void MemoSelectView::OnEncrypt(TreeViewItem *pItem)
+{
+	if (!pItem->Encrypt(pMemoMgr, this)) {
+		TomboMessageBox(hViewWnd, MSG_ENCRYPTION_FAILED, TEXT("ERROR"), MB_ICONSTOP | MB_OK);
+	}
+}
+
+///////////////////////////////////////////
+// Decrypt
+///////////////////////////////////////////
+
+void MemoSelectView::OnDecrypt(TreeViewItem *pItem)
+{
+	if (!pItem->Decrypt(pMemoMgr, this)) {
+		TomboMessageBox(hViewWnd, MSG_DECRYPTION_FAILED, TEXT("ERROR"), MB_ICONSTOP | MB_OK);
+	}
+}
+
+/////////////////////////////////////////////
+// Rename
+/////////////////////////////////////////////
+
+void MemoSelectView::OnEditLabel(HTREEITEM hItem)
+{
+	if (hItem == NULL) return;
+	TreeView_EditLabel(hViewWnd, hItem);
+	return;
+}
+
+///////////////////////////////////////////
+// delete
+///////////////////////////////////////////
+
+void MemoSelectView::OnDelete(HTREEITEM hItem, TreeViewItem *pItem)
+{
+	if (hItem == NULL) return;
+	if (pItem->Delete(pMemoMgr, this)) {
+		DeleteOneItem(hItem);
 	}
 }
 
@@ -822,18 +921,6 @@ HTREEITEM MemoSelectView::GetPathForNewItem(TString *pPath)
 }
 
 ///////////////////////////////////////////
-// メモ・フォルダの削除
-///////////////////////////////////////////
-
-void MemoSelectView::OnDelete(HTREEITEM hItem, TreeViewItem *pItem)
-{
-	if (hItem == NULL) return;
-	if (pItem->Delete(pMemoMgr, this)) {
-		DeleteOneItem(hItem);
-	}
-}
-
-///////////////////////////////////////////
 // フォルダの挿入
 ///////////////////////////////////////////
 
@@ -853,7 +940,6 @@ BOOL MemoSelectView::CreateNewFolder(HTREEITEM hItem, LPCTSTR pFolder)
 	}
 	return TRUE;
 }
-
 
 /////////////////////////////////////////
 // ヘッドライン文字列の変更
@@ -926,12 +1012,8 @@ void MemoSelectView::SetIcon(TreeViewItem *ptv, DWORD nStatus)
 // 擬似クリップボードへの設定
 /////////////////////////////////////////
 
-void MemoSelectView::SetShareArea()
+void MemoSelectView::SetShareArea(TreeViewItem *pItem)
 {
-	HTREEITEM hItem;
-	TreeViewItem *pItem;
-	if ((pItem = GetCurrentItem(&hItem)) == NULL) return;
-
 	if (pClipItem) {
 		SetIcon(pClipItem, MEMO_VIEW_STATE_CLIPED_CLEAR);
 	}
@@ -945,9 +1027,9 @@ void MemoSelectView::SetShareArea()
 // 移動するメモの選択
 /////////////////////////////////////////
 
-void MemoSelectView::OnCut(HWND hWnd)
+void MemoSelectView::OnCut(TreeViewItem *pItem)
 {
-	SetShareArea();
+	SetShareArea(pItem);
 	bCut = TRUE;
 }
 
@@ -955,9 +1037,9 @@ void MemoSelectView::OnCut(HWND hWnd)
 // コピーするメモの選択
 /////////////////////////////////////////
 
-void MemoSelectView::OnCopy(HWND hWnd)
+void MemoSelectView::OnCopy(TreeViewItem *pItem)
 {
-	SetShareArea();
+	SetShareArea(pItem);
 	bCut = FALSE;
 }
 
@@ -965,7 +1047,7 @@ void MemoSelectView::OnCopy(HWND hWnd)
 // 移動・コピーの実行
 /////////////////////////////////////////
 
-void MemoSelectView::OnPaste(HWND hWnd)
+void MemoSelectView::OnPaste()
 {
 	if (pClipItem == NULL) return;
 
@@ -1297,18 +1379,3 @@ BOOL MemoSelectView::SearchItems(HTREEITEM hTreeItem, BOOL bSearchEncryptedMemo,
 	}
 	return bResult;
 }
-
-/////////////////////////////////////////////
-// ラベルの編集
-/////////////////////////////////////////////
-
-BOOL MemoSelectView::OnEditLabel()
-{
-	HTREEITEM hItem = TreeView_GetSelection(hViewWnd);
-	if (hItem == NULL) return FALSE;
-
-	TreeView_EditLabel(hViewWnd, hItem);
-
-	return TRUE;
-}
-
