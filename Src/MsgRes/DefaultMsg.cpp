@@ -284,4 +284,5 @@ static LPCTSTR defaultMsg[] = {
 	TEXT("Use ClearType font"),
 	TEXT("Disable save daialog"),
 	TEXT("Toolbar"),
+	TEXT("Save options failed. Change may not be reflected."),
 };

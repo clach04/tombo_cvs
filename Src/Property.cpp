@@ -1739,8 +1739,6 @@ static BOOL MakeFont(HFONT *phFont, LPCTSTR pName, DWORD nSize, BYTE bQuality)
 	lf.lfOutPrecision = OUT_DEFAULT_PRECIS;
 	lf.lfClipPrecision = CLIP_DEFAULT_PRECIS;
 	lf.lfQuality = bQuality;
-//	lf.lfQuality = DEFAULT_QUALITY;
-//	lf.lfQuality = 5;
 	lf.lfPitchAndFamily = DEFAULT_PITCH;
 	_tcscpy(lf.lfFaceName, pName);
 	*phFont = CreateFontIndirect(&lf);

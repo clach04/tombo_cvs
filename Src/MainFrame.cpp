@@ -646,6 +646,11 @@ BOOL MainFrame::OnExit()
 	StoreBookMarkToReg(pBM);
 	delete [] pBM;
 
+	// save properties
+	if (!g_Property.Save()) {
+		MessageBox(MSG_DLG_SAVEPROP_FAILED, TEXT("ERROR"), MB_ICONERROR | MB_OK);
+	}
+
 	PostQuitMessage(0);
 	return TRUE;
 }

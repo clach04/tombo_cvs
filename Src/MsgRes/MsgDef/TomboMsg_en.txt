@@ -282,3 +282,4 @@ MSG_MENUITEM_B_EDITBM	Edit bookmark
 MSG_DLG_PROPTAB_USE_CLEARTYPE_FONT_CE	Use ClearType font
 MSG_DLG_PROPTAB_DISABLESAVEDLG	Disable save daialog
 MSG_MENUITEM_W32_T_REBAR	Toolbar
+MSG_DLG_SAVEPROP_FAILED	Save options failed. Change may not be reflected.

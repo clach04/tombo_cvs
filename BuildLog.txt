@@ -780,3 +780,8 @@ Not fully tested on both platform, probably it will work.
 	* Change bitmap size 16x16 -> 24x24 for VGA mode.
 	* Landscape mode support.
 
+////////////////////////////////
+// B157
+////////////////////////////////
+
+* Save properties when exit.
