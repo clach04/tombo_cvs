@@ -55,7 +55,9 @@ UINT WINAPI ImmGetVirtualKey(HWND);
 #include "SearchEngine.h"
 #include "SearchTree.h"
 
-//#include "YAEditor.h"
+#include "Region.h"
+#include "YAEdit.h"
+#include "YAEditor.h"
 
 LPCTSTR MainFrame::pClassName = TOMBO_MAIN_FRAME_WINDOW_CLSS;
 
@@ -395,20 +397,30 @@ BOOL MainFrame::Create(LPCTSTR pWndName, HINSTANCE hInst, int nCmdShow)
 {
 	hInstance = hInst;
 
-	SimpleEditor::RegisterClass(hInst);
-
 	MFDetailsViewCallback *pCb = new MFDetailsViewCallback(this);
-	SimpleEditor *pSe = new SimpleEditor(pCb);
-	pDetailsView = pSe;
 
-//	YAEditor *pYAE = new YAEditor();
-//	pDetailsView = pYAE;
+	YAEditor *pYAE;
+	SimpleEditor *pSe;
+	if (g_Property.UseYAEdit()) {
+		YAEdit::RegisterClass(hInst);
+
+		pYAE = new YAEditor(pCb);
+		pDetailsView = pYAE;
+	} else {
+		SimpleEditor::RegisterClass(hInst);
+
+		pSe = new SimpleEditor(pCb);
+		pDetailsView = pSe;
+	}
 
 	mmMemoManager.Init(this, pDetailsView, &msView);
 	msView.Init(&mmMemoManager);
 
-	pSe->Init(&mmMemoManager, IDC_MEMODETAILSVIEW, IDC_MEMODETAILSVIEW_NF);
-//	pYAE->Init(&mmMemoManager, IDC_TOMBOEDIT);
+	if (g_Property.UseYAEdit()) {
+		pYAE->Init(&mmMemoManager, IDC_TOMBOEDIT);
+	} else {
+		pSe->Init(&mmMemoManager, IDC_MEMODETAILSVIEW, IDC_MEMODETAILSVIEW_NF);
+	}
 
 	pVFManager = new VFManager();
 	if (!pVFManager || !pVFManager->Init()) return FALSE;

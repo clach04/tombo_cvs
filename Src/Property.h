@@ -72,6 +72,8 @@ class Property {
 
 	DWORD nSafeFileName;
 
+	DWORD nUseYAEdit;
+
 public:
 	Property();
 	~Property();
@@ -187,6 +189,8 @@ public:
 	LPCTSTR GetExtApp2() { return aExtApp2; }
 
 	DWORD UseSafeFileName() { return nSafeFileName; }
+
+	BOOL UseYAEdit() { return nUseYAEdit; }
 
 	friend class FolderTab;
 	friend class PasswordTab;

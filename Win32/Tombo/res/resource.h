@@ -40,7 +40,9 @@
 #define IDM_SHOWREBAR                   112
 #define IDC_TOPFOLDER                   113
 #define IDC_FOLDERSEL                   114
+#define IDT_SELSCROLL                   114
 #define IDC_FILESELECT_TREE             115
+#define IDC_TOMBOEDIT                   115
 #define IDD_PROPTAB_FOLDER              116
 #define IDD_PROPTAB_PASSWORD            117
 #define IDC_PASS1                       118
@@ -223,6 +225,6 @@
 #define _APS_NEXT_RESOURCE_VALUE        150
 #define _APS_NEXT_COMMAND_VALUE         40039
 #define _APS_NEXT_CONTROL_VALUE         1103
-#define _APS_NEXT_SYMED_VALUE           113
+#define _APS_NEXT_SYMED_VALUE           116
 #endif
 #endif

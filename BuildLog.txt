@@ -910,3 +910,10 @@ Finding and encrypting to the folder may not work.
 ////////////////////////////////
 
 * Some refactoring
+
+////////////////////////////////
+// B175
+////////////////////////////////
+
+* Merge YAE module.
+* Only win32 version. other version will not be worked.

@@ -61,7 +61,7 @@
 #define EXTAPP1_ATTR_NAME TEXT("ExtApp1")
 #define EXTAPP2_ATTR_NAME TEXT("ExtApp2")
 #define SAFEFILENAME_ATTR_NAME TEXT("UseSafeFileName")
-
+#define USEYAE_ATTR_NAME TEXT("UseYAEdit")
 
 // saved each exit time.
 #define HIDESTATUSBAR_ATTR_NAME TEXT("HideStatusBar")
@@ -1446,6 +1446,8 @@ BOOL Property::Load(BOOL *pStrict)
 
 	// Safe filename options
 	nSafeFileName = GetDWORDFromReg(hTomboRoot, SAFEFILENAME_ATTR_NAME, FALSE);
+
+	nUseYAEdit = GetDWORDFromReg(hTomboRoot, USEYAE_ATTR_NAME, FALSE);
 
 	RegCloseKey(hTomboRoot);
 	return TRUE;
