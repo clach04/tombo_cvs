@@ -266,7 +266,12 @@ PG: Change copyright dialog for expat.
 * Update NUM_IMG_BUTTONS for PsPC.
 * Support menu control for PsPC, PocktPC, BE-X00.
 
+////////////////////////////////
+// B095 (Tombo 1.7 beta 1)
+////////////////////////////////
 
+* Re-FIX: #1134.
+* Add menu item IDM_TOPMOST for Win32(EN).
 
 /////////////////////////////////////////////////////////////////////////
 // TODO
