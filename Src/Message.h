@@ -137,6 +137,7 @@
 #define MSG_INVALID_REGEXP		MSG("正規表現の生成に失敗しました", "Generate pattern failed")
 #define MSG_SET_POSITIVE	MSG("0以上の数を指定してください", "Please set positive number")
 #define MSG_INVALID_FONT_SIZE	MSG("フォントサイズが不正です", "Invalid font size")
-
+#define MSG_DST_FOLDER_IS_SRC_SUBFOLDER \
+								MSG("受け側のフォルダは送り側フォルダのサブフォルダです。", "Dst folder is subfolder of src folder")
 #endif
 

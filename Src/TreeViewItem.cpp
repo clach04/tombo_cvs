@@ -114,9 +114,9 @@ TreeViewFileItem::~TreeViewFileItem()
 	delete pNote;
 }
 
-BOOL TreeViewFileItem::Move(MemoManager *pMgr, MemoSelectView *pView)
+BOOL TreeViewFileItem::Move(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR *ppErr)
 {
-	if (!Copy(pMgr, pView)) {
+	if (!Copy(pMgr, pView, ppErr)) {
 		return FALSE;
 	}
 	if (g_Property.IsUseTwoPane() && pMgr->IsNoteDisplayed(pNote->MemoPath())) {
@@ -128,7 +128,7 @@ BOOL TreeViewFileItem::Move(MemoManager *pMgr, MemoSelectView *pView)
 	return TRUE;
 }
 
-BOOL TreeViewFileItem::Copy(MemoManager *pMgr, MemoSelectView *pView)
+BOOL TreeViewFileItem::Copy(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR *ppErr)
 {
 	TString sPath;
 	TString sHeadLine;
@@ -361,7 +361,14 @@ TreeViewFolderItem::TreeViewFolderItem() : TreeViewItem(TRUE)
 {
 }
 
-BOOL TreeViewFolderItem::Move(MemoManager *pMgr, MemoSelectView *pView)
+static BOOL IsSubFolder(LPCTSTR pSrc, LPCTSTR pDst)
+{
+	DWORD n = _tcslen(pSrc);
+	if (_tcsncmp(pSrc, pDst, n) == 0) return TRUE;
+	return FALSE;
+}
+
+BOOL TreeViewFolderItem::Move(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR *ppErr)
 {
 	// Srcパスの取得
 	TCHAR buf[MAX_PATH];
@@ -374,6 +381,11 @@ BOOL TreeViewFolderItem::Move(MemoManager *pMgr, MemoSelectView *pView)
 	TString sDstPath, sDstFullPath;
 	HTREEITEM hParent = pView->GetPathForNewItem(&sDstPath);
 	if (!sDstFullPath.AllocFullPath(sDstPath.Get())) return FALSE;
+
+	if (IsSubFolder(pCurrentPath, sDstPath.Get())) {
+		*ppErr = MSG_DST_FOLDER_IS_SRC_SUBFOLDER;
+		return FALSE;
+	}
 
 	// 移動しようとしているフォルダに詳細ビューでActiveになっているメモが
 	// 存在するかもしれないので詳細ビューを一旦InActiveにする
@@ -395,7 +407,7 @@ BOOL TreeViewFolderItem::Move(MemoManager *pMgr, MemoSelectView *pView)
 	return TRUE;
 }
 
-BOOL TreeViewFolderItem::Copy(MemoManager *pMgr, MemoSelectView *pView)
+BOOL TreeViewFolderItem::Copy(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR *ppErr)
 {
 	// Srcパスの取得
 	TCHAR buf[MAX_PATH];
@@ -408,6 +420,11 @@ BOOL TreeViewFolderItem::Copy(MemoManager *pMgr, MemoSelectView *pView)
 	TString sDstPath, sDstFullPath;
 	HTREEITEM hParent = pView->GetPathForNewItem(&sDstPath);
 	if (!sDstFullPath.AllocFullPath(sDstPath.Get())) return FALSE;
+
+	if (IsSubFolder(pCurrentPath, sDstPath.Get())) {
+		*ppErr = MSG_DST_FOLDER_IS_SRC_SUBFOLDER;
+		return FALSE;
+	}
 
 	// 移動しようとしているフォルダに詳細ビューでActiveになっているメモが
 	// 存在するかもしれないので詳細ビューを一旦InActiveにする

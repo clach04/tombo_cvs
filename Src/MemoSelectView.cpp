@@ -1069,15 +1069,25 @@ void MemoSelectView::OnPaste()
 	if (bCut) {
 		// ƒƒ‚‚ÌˆÚ“®
 		HTREEITEM hItem = pClipItem->GetViewItem();
-		if (!pClipItem->Move(pMemoMgr, this)) {
-			TomboMessageBox(hViewWnd, MSG_MOVE_MEMO_FAILED, TEXT("ERROR"), MB_ICONSTOP | MB_OK);
+		LPCTSTR pErr = NULL;
+		if (!pClipItem->Move(pMemoMgr, this, &pErr)) {
+			if (pErr) {
+				TomboMessageBox(hViewWnd, pErr, TEXT("ERROR"), MB_ICONSTOP | MB_OK);
+			} else {
+				TomboMessageBox(hViewWnd, MSG_MOVE_MEMO_FAILED, TEXT("ERROR"), MB_ICONSTOP | MB_OK);
+			}
 			return;
 		}
 		DeleteOneItem(hItem);
 	} else {
 		// ƒƒ‚‚ÌƒRƒs[
-		if (!pClipItem->Copy(pMemoMgr, this)) {
-			TomboMessageBox(hViewWnd, MSG_COPY_MEMO_FAILED, TEXT("ERROR"), MB_ICONSTOP | MB_OK);
+		LPCTSTR pErr = NULL;
+		if (!pClipItem->Copy(pMemoMgr, this, &pErr)) {
+			if (pErr) {
+				TomboMessageBox(hViewWnd, pErr, TEXT("ERROR"), MB_ICONSTOP | MB_OK);
+			} else {
+				TomboMessageBox(hViewWnd, MSG_COPY_MEMO_FAILED, TEXT("ERROR"), MB_ICONSTOP | MB_OK);
+			}
 		}
 	}
 }

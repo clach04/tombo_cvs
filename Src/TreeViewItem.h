@@ -35,10 +35,10 @@ public:
 	// Item operator
 
 	// このアイテムと同じデータを現在選択している位置と同列に保存する
-	virtual BOOL Move(MemoManager *pMgr, MemoSelectView *pView) = 0;
+	virtual BOOL Move(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR *ppErr) = 0;
 
 	// このアイテムと同じデータを現在選択している位置と同列にコピーする
-	virtual BOOL Copy(MemoManager *pMgr, MemoSelectView *pView) = 0;
+	virtual BOOL Copy(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR *ppErr) = 0;
 
 	// delete node. 
 	// MemoNote object that has TreeViewItem is also deleted.
@@ -92,8 +92,8 @@ public:
 	TreeViewFileItem();
 	~TreeViewFileItem();
 
-	BOOL Move(MemoManager *pMgr, MemoSelectView *pView);
-	BOOL Copy(MemoManager *pMgr, MemoSelectView *pView);
+	BOOL Move(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR *ppErr);
+	BOOL Copy(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR *ppErr);
 	BOOL Delete(MemoManager *pMgr, MemoSelectView *pView);
 	BOOL Encrypt(MemoManager *pMgr, MemoSelectView *pView);
 	BOOL Decrypt(MemoManager *pMgr, MemoSelectView *pView);
@@ -130,8 +130,8 @@ class TreeViewFolderItem : public TreeViewItem {
 public:
 	TreeViewFolderItem();
 
-	BOOL Move(MemoManager *pMgr, MemoSelectView *pView);
-	BOOL Copy(MemoManager *pMgr, MemoSelectView *pView);
+	BOOL Move(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR *ppErr);
+	BOOL Copy(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR *ppErr);
 	BOOL Delete(MemoManager *pMgr, MemoSelectView *pView);
 	BOOL Encrypt(MemoManager *pMgr, MemoSelectView *pView);
 	BOOL Decrypt(MemoManager *pMgr, MemoSelectView *pView);
