@@ -32,8 +32,10 @@ class MainFrame {
 	void ResizeStatusBar();
 #endif
 
-	HMENU hMenuEncrypt;		//「暗号化」メニュー
-	HMENU hFoldMenu;
+#if defined(PLATFORM_BE500)
+	HMENU hMSMemoMenu;
+	HMENU hMDEditMenu;
+#endif
 
 	MemoSelectView msView;
 	MemoDetailsView mdView;
@@ -68,6 +70,9 @@ protected:
 	HMENU GetMainMenu();
 	HWND GetMainToolBar();
 #endif
+	HMENU GetMDToolMenu();
+	HMENU GetMSEditMenu();
+
 	void EnableMenu(UINT uId, BOOL bEnable);
 
 public:
@@ -154,6 +159,7 @@ public:
 	void EnableCopy(BOOL bEnable);
 	void EnablePaste(BOOL bEnable);
 	void EnableNewFolder(BOOL bEnable);
+	void EnableGrep(BOOL bEnable);
 
 	// ウィンドウサイズの保存・復元
 	void LoadWinSize(HWND hWnd);

@@ -635,8 +635,6 @@ void MainFrame::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 	ShowWindow(hMDCmdBar, SW_HIDE);
 
-	hMenuEncrypt = SHGetSubMenu(hMSCmdBar, IDM_EDIT_MEMO);
-
 	RECT rMenuRect;
 	GetWindowRect(hMSCmdBar, &rMenuRect);
 	nHOffset = rMenuRect.bottom - rMenuRect.top;
@@ -656,8 +654,6 @@ void MainFrame::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	nHOffset = CommandBar_Height(hMSCmdBar);
 	r.top += nHOffset;
 	r.bottom -= nHOffset;
-
-	hMenuEncrypt = CommandBar_GetMenu(hMSCmdBar, 0);
 #endif
 #if defined(PLATFORM_HPC)
 	HWND hBand, hwnd;
@@ -701,7 +697,6 @@ void MainFrame::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	// 0番目のバンド(メニュー)の設定
 	hwnd = GetCommandBar(hBand, ID_CMDBAR_MAIN);
 	CommandBar_InsertMenubar(hwnd, pcs->hInstance, IDR_MENU_MAIN, 0);
-	hMenuEncrypt = CommandBar_GetMenu(hwnd, 0);
 
 	// 1番目のバンド(ボタン)の設定
 	hwnd = GetCommandBar(hBand, ID_BUTTONBAND);
@@ -731,7 +726,7 @@ void MainFrame::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	// 一覧ビュー
 	hMSCmdBar = MakeCSOBar(pcs->hInstance, hWnd, ID_CMDBAR_MAIN);
 	HMENU hMSMenu = LoadMenu(pcs->hInstance, MAKEINTRESOURCE(IDR_MENU_MAIN));
-	hMenuEncrypt = aSVCSOBarButtons[0].SubMenu	= GetSubMenu(hMSMenu, 0);
+	hMSMemoMenu = aSVCSOBarButtons[0].SubMenu	= GetSubMenu(hMSMenu, 0);
 	aSVCSOBarButtons[1].SubMenu	= GetSubMenu(hMSMenu, 1);
 	for (int i = 0; i < NUM_SV_CMDBAR_BUTTONS; i++) {
 		aSVCSOBarButtons[i].reshInst = pcs->hInstance;
@@ -741,7 +736,7 @@ void MainFrame::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	// 詳細ビュー
 	hMDCmdBar = MakeCSOBar(pcs->hInstance, hWnd, ID_CMDBAR_DETAILS);
 	HMENU hMDMenu = LoadMenu(pcs->hInstance, MAKEINTRESOURCE(IDR_MENU_DETAILS));
-	hFoldMenu = aDVCSOBarButtons[2].SubMenu	= GetSubMenu(hMDMenu, 0);
+	hMDEditMenu = aDVCSOBarButtons[2].SubMenu	= GetSubMenu(hMDMenu, 0);
 	for (i = 0; i < NUM_DV_CMDBAR_BUTTONS; i++) {
 		aDVCSOBarButtons[i].reshInst = pcs->hInstance;
 	}
@@ -1655,43 +1650,23 @@ static void ControlToolbar(HWND hToolbar, BOOL bSelectViewActive)
 
 void MainFrame::EnableEncrypt(BOOL bEnable)
 {
-#if defined(PLATFORM_WIN32)
-	HMENU hMenu = GetMenu(hMainWnd);
+	HMENU hMenu = GetMSEditMenu();
 	if (bEnable) {
 		EnableMenuItem(hMenu, IDM_ENCRYPT, MF_BYCOMMAND | MF_ENABLED);
-		SendMessage(hToolBar, TB_SETSTATE, IDM_ENCRYPT, MAKELONG(TBSTATE_ENABLED, 0)); 
 	} else {
 		EnableMenuItem(hMenu, IDM_ENCRYPT, MF_BYCOMMAND | MF_GRAYED);
-		SendMessage(hToolBar, TB_SETSTATE, IDM_ENCRYPT, MAKELONG(TBSTATE_ENABLED |TBSTATE_PRESSED, 0)); 
 	}
-#endif
-#if defined(_WIN32_WCE)
-	if (bEnable) {
-		EnableMenuItem(hMenuEncrypt, IDM_ENCRYPT, MF_BYCOMMAND | MF_ENABLED);
-	} else {
-		EnableMenuItem(hMenuEncrypt, IDM_ENCRYPT, MF_BYCOMMAND | MF_GRAYED);
-	}
-#endif
 }
 
 
 void MainFrame::EnableDecrypt(BOOL bEnable)
 {
-#if defined(PLATFORM_WIN32)
-	HMENU hMenu = GetMenu(hMainWnd);
+	HMENU hMenu = GetMSEditMenu();
 	if (bEnable) {
 		EnableMenuItem(hMenu, IDM_DECRYPT, MF_BYCOMMAND | MF_ENABLED);
 	} else {
 		EnableMenuItem(hMenu, IDM_DECRYPT, MF_BYCOMMAND | MF_GRAYED);
 	}
-#endif
-#if defined(_WIN32_WCE)
-	if (bEnable) {
-		EnableMenuItem(hMenuEncrypt, IDM_DECRYPT, MF_BYCOMMAND | MF_ENABLED);
-	} else {
-		EnableMenuItem(hMenuEncrypt, IDM_DECRYPT, MF_BYCOMMAND | MF_GRAYED);
-	}
-#endif
 }
 
 void MainFrame::EnableDelete(BOOL bEnable)
@@ -1746,7 +1721,13 @@ void MainFrame::EnableNewFolder(BOOL bEnable)
 {
 #if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
 	EnableMenu(IDM_NEWFOLDER, bEnable);
-//	SendMessage(GetMainToolBar(), TB_ENABLEBUTTON, IDM_PASTE, MAKELONG(bEnable, 0));
+#endif
+}
+
+void MainFrame::EnableGrep(BOOL bEnable)
+{
+#if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
+	EnableMenu(IDM_GREP, bEnable);
 #endif
 }
 
@@ -1930,6 +1911,49 @@ void MainFrame::LoadWinSize(HWND hWnd)
 }
 
 ///////////////////////////////////////////////////
+// Editview - Tools menu
+///////////////////////////////////////////////////
+
+HMENU MainFrame::GetMDToolMenu()
+{
+#if defined(PLATFORM_WIN32)
+	return GetMenu(hMainWnd);
+#endif
+#if defined(PLATFORM_PKTPC)
+	return SHGetSubMenu(hMDCmdBar, IDM_DETAILS_TOOL);
+#endif
+#if defined(PLATFORM_PSPC)
+	return CommandBar_GetMenu(hMDCmdBar, 0);
+#endif
+#if defined(PLATFORM_BE500)
+	return hMDEditMenu;
+#endif
+#if defined(PLATFORM_HPC)
+	return CommandBar_GetMenu(GetCommandBar(hMSCmdBar, ID_CMDBAR_MAIN), 0);
+#endif
+
+}
+
+HMENU MainFrame::GetMSEditMenu()
+{
+#if defined(PLATFORM_WIN32)
+	return GetMenu(hMainWnd);
+#endif
+#if defined(PLATFORM_PKTPC)
+	return SHGetSubMenu(hMSCmdBar, IDM_EDIT_MEMO);
+#endif
+#if defined(PLATFORM_PSPC)
+	return CommandBar_GetMenu(hMSCmdBar, 0);
+#endif
+#if defined(PLATFORM_HPC)
+	return CommandBar_GetMenu(GetCommandBar(hMSCmdBar, ID_CMDBAR_MAIN), 0);
+#endif
+#if defined(PLATFORM_BE500)
+	return hMSMemoMenu;
+#endif
+}
+
+///////////////////////////////////////////////////
 // 詳細ビューの折り返し表示の制御
 ///////////////////////////////////////////////////
 
@@ -1937,22 +1961,7 @@ void MainFrame::SetWrapText(BOOL bWrap)
 {
 	UINT uCheckFlg;
 
-	HMENU hMenu;
-#if defined(PLATFORM_WIN32)
-	hMenu = GetMenu(hMainWnd);
-#endif
-#if defined(PLATFORM_PKTPC)
-	hMenu = SHGetSubMenu(hMDCmdBar, IDM_DETAILS_TOOL);
-#endif
-#if defined(PLATFORM_PSPC)
-	hMenu = CommandBar_GetMenu(hMDCmdBar, 0);
-#endif
-#if defined(PLATFORM_BE500)
-	hMenu = hFoldMenu;
-#endif
-#if defined(PLATFORM_HPC)
-	hMenu = CommandBar_GetMenu(GetCommandBar(hMSCmdBar, ID_CMDBAR_MAIN), 0);
-#endif
+	HMENU hMenu = GetMDToolMenu();
 
 	if (bWrap) {
 		uCheckFlg = MF_CHECKED;
@@ -1969,56 +1978,6 @@ void MainFrame::SetWrapText(BOOL bWrap)
 	// CheckMenuItem is superseded, but CE don't have SetMenuItemInfo.
 	CheckMenuItem(hMenu, IDM_DETAILS_HSCROLL, MF_BYCOMMAND | uCheckFlg);
 }
-
-#ifdef COMMENT
-void MainFrame::ToggleFolding()
-{
-	MENUITEMINFO mii;
-	mii.cbSize = sizeof(mii);
-	mii.fMask = MIIM_STATE;
-
-	BOOL bFolding;
-	UINT uCheckFlg;
-
-	HMENU hMenu;
-#if defined(PLATFORM_WIN32)
-	hMenu = GetMenu(hMainWnd);
-#endif
-#if defined(PLATFORM_PKTPC)
-	hMenu = SHGetSubMenu(hMDCmdBar, IDM_DETAILS_TOOL);
-#endif
-#if defined(PLATFORM_PSPC)
-	hMenu = CommandBar_GetMenu(hMDCmdBar, 0);
-#endif
-#if defined(PLATFORM_BE500)
-	hMenu = hFoldMenu;
-#endif
-#if defined(PLATFORM_HPC)
-	hMenu = CommandBar_GetMenu(GetCommandBar(hMSCmdBar, ID_CMDBAR_MAIN), 0);
-//	hMenu = CommandBar_GetMenu(CommandBands_GetCommandBar(hMSCmdBar, 0), 0);
-#endif
-
-	// メニュー状態の取得
-	if(!GetMenuItemInfo(hMenu, IDM_DETAILS_HSCROLL, FALSE, &mii)) return;
-
-	// メニュー状態の反転
-	if (mii.fState & MFS_CHECKED) {
-		bFolding = TRUE;
-		uCheckFlg = MF_UNCHECKED;
-	} else {
-		bFolding = FALSE;
-		uCheckFlg = MF_CHECKED;
-	}
-	// 詳細ビューの制御
-	if (!mdView.SetFolding(bFolding)) {
-		TomboMessageBox(NULL, MSG_FOLDING_FAILED, TOMBO_APP_NAME, MB_ICONERROR | MB_OK);
-		return;
-	}
-
-	// superseded な関数だが、CEだとSetMenuItemInfoは値の設定ができないのでCheckMenuItemを使用
-	CheckMenuItem(hMenu, IDM_DETAILS_HSCROLL, MF_BYCOMMAND | uCheckFlg);
-}
-#endif
 
 ///////////////////////////////////////////////////
 // ペインの切り替え
