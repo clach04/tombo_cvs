@@ -46,6 +46,8 @@ BOOL MemoSelectView::Create(LPCTSTR pName, RECT &r, HWND hParent, DWORD nID, HIN
 	DWORD nWndStyle;
 	nWndStyle = WS_CHILD | WS_VSCROLL | WS_HSCROLL | TVS_HASLINES | TVS_HASBUTTONS | TVS_SHOWSELALWAYS | TVS_EDITLABELS;
 
+	g_pLogger->WriteLog(TEXT("MemoSelectView::Create IN\r\n"));
+
 #if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
 	hViewWnd = CreateWindowEx(WS_EX_CLIENTEDGE, WC_TREEVIEW, pName, nWndStyle,
 								r.left, r.top, r.right, r.bottom,
@@ -62,6 +64,7 @@ BOOL MemoSelectView::Create(LPCTSTR pName, RECT &r, HWND hParent, DWORD nID, HIN
 	SelectViewSetWndProc(wp, hParent, g_hInstance, this);
 	SetWindowLong(hViewWnd, GWL_WNDPROC, (LONG)NewSelectViewProc);
 #endif
+	g_pLogger->WriteLog(TEXT("MemoSelectView::Create Window Created\r\n"));
 
 	// Create Imagelist.
 	if ((hImageList = ImageList_Create(IMAGE_CX, IMAGE_CY, ILC_MASK, NUM_BITMAPS, 0)) == NULL) return FALSE;
@@ -77,6 +80,8 @@ BOOL MemoSelectView::Create(LPCTSTR pName, RECT &r, HWND hParent, DWORD nID, HIN
 	if (hFont != NULL) {
 		SendMessage(hViewWnd, WM_SETFONT, (WPARAM)hFont, MAKELPARAM(TRUE, 0));
 	}
+	g_pLogger->WriteLog(TEXT("MemoSelectView::Create END\r\n"));
+
 	return TRUE;
 }
 

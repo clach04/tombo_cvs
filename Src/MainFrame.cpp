@@ -446,6 +446,7 @@ BOOL MainFrame::Create(LPCTSTR pWndName, HINSTANCE hInst, int nCmdShow)
 	mmMemoManager.Init(this, &mdView, &msView);
 	msView.Init(&mmMemoManager);
 	mdView.Init(&mmMemoManager);
+	g_pLogger->WriteLog(TEXT("MainFrame::Create : all view Initialized\r\n"));
 
 #ifdef _WIN32_WCE
 	hMainWnd = CreateWindow(pClassName, pWndName,
@@ -484,6 +485,7 @@ BOOL MainFrame::Create(LPCTSTR pWndName, HINSTANCE hInst, int nCmdShow)
 						this);
 #endif
 #endif
+	g_pLogger->WriteLog(TEXT("MainFrame::Create : MainFrame created \r\n"));
 
 #if defined(PLATFORM_WIN32)
 	// アイコンの設定
@@ -496,6 +498,7 @@ BOOL MainFrame::Create(LPCTSTR pWndName, HINSTANCE hInst, int nCmdShow)
                                 IMAGE_ICON, 16, 16, LR_DEFAULTCOLOR);
 	SendMessage(hMainWnd, WM_SETICON, (WPARAM)ICON_SMALL, (LPARAM)hIcon);
 #endif
+	g_pLogger->WriteLog(TEXT("MainFrame::Create : Icon initialized \r\n"));
 
 	ShowWindow(hMainWnd, nCmdShow);
 	UpdateWindow(hMainWnd);
@@ -503,6 +506,7 @@ BOOL MainFrame::Create(LPCTSTR pWndName, HINSTANCE hInst, int nCmdShow)
 	// パスワードマネージャ初期化
 	pmPasswordMgr.Init(hMainWnd, hInstance);
 	mmMemoManager.SetPasswordManager(&pmPasswordMgr);
+	g_pLogger->WriteLog(TEXT("MainFrame::Create : password manager initialized\r\n"));
 
 	return TRUE;
 }
@@ -562,6 +566,7 @@ HWND CreateToolBar(HWND hParent, HINSTANCE hInst);
 void MainFrame::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
 	LPCREATESTRUCT pcs = (LPCREATESTRUCT)lParam;
+	g_pLogger->WriteLog(TEXT("MainFrame::OnCreate : called \r\n"));
 
 	DWORD nHOffset;
 
@@ -581,6 +586,7 @@ void MainFrame::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 			return;
 		}
 	}
+	g_pLogger->WriteLog(TEXT("MainFrame::OnCreate : property loaded \r\n"));
 
 	nHOffset = 0;
 	// コマンドバー
@@ -797,6 +803,7 @@ void MainFrame::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		CheckMenuItem(hMenu, IDM_TOGGLEPANE, MF_BYCOMMAND | MF_UNCHECKED);
 	}
 #endif
+	g_pLogger->WriteLog(TEXT("MainFrame::OnCreate : command/status bar created \r\n"));
 
 	// メモ詳細ビュー生成
 	mdView.Create(TEXT("MemoDetails"), r, hWnd, IDC_MEMODETAILSVIEW, IDC_MEMODETAILSVIEW_NF, hInstance, g_Property.DetailsViewFont());
@@ -804,6 +811,8 @@ void MainFrame::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	// メモ選択ビュー生成
 	msView.Create(TEXT("MemoSelect"), r, hWnd, IDC_MEMOSELECTVIEW, hInstance, g_Property.SelectViewFont());
 	msView.InitTree();
+
+	g_pLogger->WriteLog(TEXT("MainFrame::OnCreate : all view created \r\n"));
 
 	if (g_Property.IsUseTwoPane()) {
 		// 自動切換えモードに設定
@@ -823,8 +832,10 @@ void MainFrame::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		// 初期表示時の詳細ビューは新規メモと同様の扱いとする
 		mmMemoManager.NewMemo();
 	}
+	g_pLogger->WriteLog(TEXT("MainFrame::OnCreate : creation finished \r\n"));
 
 	ActivateView(TRUE);
+	g_pLogger->WriteLog(TEXT("MainFrame::OnCreate : view activation finished \r\n"));
 }
 
 #if defined(PLATFORM_WIN32)

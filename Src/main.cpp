@@ -43,10 +43,19 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPTSTR pCmdLine, int nCmdSh
 int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPSTR pCmdLine, int nCmdShow)
 #endif
 {
+	// Loggerの初期化
+	g_pLogger = &g_Logger;
+	// ログ出力時には以下の2行をコメントアウトすること
+	g_Logger.Init(TEXT("\\tombo.txt"));
+	TomboMessageBox(NULL, TEXT("Log mode is ON"), TEXT("DEBUG"), MB_OK);
+
+	g_pLogger->WriteLog(TEXT("CheckAndRaiseAnotherTombo IN\r\n"));
 	// 二重起動チェック
 	if (CheckAndRaiseAnotherTombo()) {
+		g_pLogger->WriteLog(TEXT("CheckAndRaiseAnotherTombo TRUE\r\n"));
 		return 0;
 	}
+	g_pLogger->WriteLog(TEXT("CheckAndRaiseAnotherTombo END\r\n"));
 
 	const char *p = CheckBlowFish();
 	if (p != NULL) {
@@ -60,12 +69,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPSTR pCmdLine, int nCmdSho
 		MessageBox(NULL, buf, MSG_CHECKBF_TTL, MB_ICONWARNING | MB_OK);
 		delete [] pMsg;
 	}
-
-	// Loggerの初期化
-	g_pLogger = &g_Logger;
-	// ログ出力時には以下の2行をコメントアウトすること
-//	g_Logger.Init(TEXT("\\My Documents\\Tombo.log"));
-//	TomboMessageBox(NULL, TEXT("Log mode is ON"), TEXT("DEBUG"), MB_OK);
+	g_pLogger->WriteLog(TEXT("CheckBlowFish end\r\n"));
 
 	bDisableHotKey = FALSE;
 
@@ -77,7 +81,9 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPSTR pCmdLine, int nCmdSho
    INITCOMMONCONTROLSEX icex;
    icex.dwSize = sizeof(INITCOMMONCONTROLSEX);
    icex.dwICC   = ICC_COOL_CLASSES|ICC_BAR_CLASSES;
+	g_pLogger->WriteLog(TEXT("InitCommonControlsEx\r\n"));
    InitCommonControlsEx(&icex);
+	g_pLogger->WriteLog(TEXT("InitCommonControlsEx END\r\n"));
 #endif
 
 #if defined(PLATFORM_PKTPC)
@@ -86,11 +92,11 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPSTR pCmdLine, int nCmdSho
 
 	MainFrame frmMain;
 	MainFrame::RegisterClass(hInst);
-
+	g_pLogger->WriteLog(TEXT("MainFrame::RegisterClass END\r\n"));
 
 	g_hInstance = hInst;
 	frmMain.Create(TOMBO_APP_NAME, hInst, nCmdShow);
-
+	g_pLogger->WriteLog(TEXT("frmMain.Create END. goto Main Loop\r\n"));
 
 	int res = frmMain.MainLoop();
 

@@ -42,6 +42,7 @@ extern HINSTANCE g_hInstance;
 BOOL MemoDetailsView::Create(LPCTSTR pName, RECT &r, HWND hParent, DWORD nID, DWORD nID_nf, HINSTANCE hInst, HFONT hFont)
 {
 	DWORD nWndStyle;
+	g_pLogger->WriteLog(TEXT("MemoDetailsView::Create IN\r\n"));
 
 	nWndStyle = WS_CHILD | WS_VSCROLL | ES_MULTILINE | ES_WANTRETURN;
 
@@ -66,6 +67,7 @@ BOOL MemoDetailsView::Create(LPCTSTR pName, RECT &r, HWND hParent, DWORD nID, DW
 							r.left + nLeftOffset, r.top, r.right - nLeftOffset, r.bottom, 
 							hParent, (HMENU)nID_nf, hInst, NULL);
 #endif
+	g_pLogger->WriteLog(TEXT("MemoDetailsView::Create window \r\n"));
 	if (hViewWnd_fd == NULL || hViewWnd_nf == NULL) return FALSE;
 	hViewWnd = hViewWnd_fd;
 
@@ -81,6 +83,7 @@ BOOL MemoDetailsView::Create(LPCTSTR pName, RECT &r, HWND hParent, DWORD nID, DW
 		SetFont(hFont);
 	}
 	SetTabstop();
+	g_pLogger->WriteLog(TEXT("MemoDetailsView::Create END\r\n"));
 
 	return TRUE;
 }
