@@ -17,18 +17,19 @@ CopyFiles = Files.MIPS
 CopyFiles = Files.ARM
 
 [SourceDisksNames]
-1 = ,"Common Files",,R:\work2\SF\Tombo\PocketPC\CabWiz
+1 = ,"Common Files",,R:\work2\SF\Tombo\Src\MsgRes\TomboMsg\en
 
 [SourceDisksNames.SH3]
-2 = ,"SH3 files",,R:\work2\SF\Tombo\PocketPC\Tombo\SH3ReleaseE
+2 = ,"SH3 files",,R:\work2\SF\Tombo\PocketPC\Tombo\SH3Rel
 
 [SourceDisksNames.MIPS]
-2 = ,"MIPS files",,R:\work2\SF\Tombo\PocketPC\Tombo\MIPSReleaseE
+2 = ,"MIPS files",,R:\work2\SF\Tombo\PocketPC\Tombo\MIPSRel
 
 [SourceDisksNames.ARM]
-2 = ,"ARM files",,R:\work2\SF\Tombo\PocketPC\Tombo\ARMReleaseE
+2 = ,"ARM files",,R:\work2\SF\Tombo\PocketPC\Tombo\ARMRel
 
 [SourceDisksFiles]
+TomboMsg.txt = 1
 
 [SourceDisksFiles.SH3]
 Tombo.exe = 2
@@ -54,12 +55,15 @@ Tombo,0,tombo.exe
 
 [Files.SH3]
 Tombo.exe,,,0
+TomboMsg.txt,,,0
 
 [Files.MIPS]
 Tombo.exe,,,0
+TomboMsg.txt,,,0
 
 [Files.ARM]
 Tombo.exe,,,0
+TomboMsg.txt,,,0
 
 [RegSettings.All]
 

@@ -723,3 +723,11 @@ Not fully tested on both platform, probably it will work.
 	PsPC version is not support External editor.
 * Add contect menu items (PocketPC)
 * move menu items(BE500)
+
+////////////////////////////////
+// B150(TOMBO 1.9)
+////////////////////////////////
+
+* Rename message generate scripts
+* Realign message files
+* Update release scripts

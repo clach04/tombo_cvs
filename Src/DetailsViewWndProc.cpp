@@ -13,7 +13,7 @@
 #include "PocketPCPlatform.h"
 #endif
 
-#define PLATFORM_SIG3
+//#define PLATFORM_SIG3
 
 #include "Property.h"
 

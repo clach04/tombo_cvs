@@ -1,7 +1,7 @@
 #
 # TOMBO Build program for ActivePerl(Win32)
 
-$version = "Tombo1_9b1";
+$version = "Tombo1_9";
 
 ##########################################################################
 # Tool definition
@@ -28,6 +28,7 @@ $be300root = "R:\\work2\\BE300SDK_1012\\Installer\\English PC Tools";
 @docsJP = (
 	["", "$docroot\\Jp\\COPYING-2_0.txt"],
 	["", "$docroot\\Jp\\Readme.txt"],
+	["Docs", "$docroot\\Jp\\Docs\\tombo.css"],
 	["Docs", "$docroot\\Jp\\Docs\\*.html"],
 	["Docs\\image", "$docroot\\Jp\\Docs\\image\\*.bmp"],
 	["Docs\\image", "$docroot\\Jp\\Docs\\image\\*.png"],
@@ -38,6 +39,7 @@ $be300root = "R:\\work2\\BE300SDK_1012\\Installer\\English PC Tools";
 @docsEN = (
 	["", "$docroot\\En\\COPYING-2_0.txt"],
 	["", "$docroot\\En\\Readme.txt"],
+	["Docs", "$docroot\\En\\Docs\\tombo.css"],
 	["Docs", "$docroot\\En\\Docs\\*.html"],
 	["Docs\\image", "$docroot\\En\\Docs\\image\\*.bmp"],
 	["Docs\\image", "$docroot\\En\\Docs\\image\\*.png"],
@@ -51,33 +53,40 @@ $be300root = "R:\\work2\\BE300SDK_1012\\Installer\\English PC Tools";
 
 @bin_hpc_arm_jp = (
 	["Bin\\HPCPro\\ARM", "$buildroot\\HpcPro\\Tombo\\ARMRel\\Tombo.exe"],
+	["Bin\\HPCPro\\ARM", "$buildroot\\Src\\MsgRes\\TomboMsg\\jp\\TomboMsg.txt"],
 );
 
 @bin_hpc_mips_jp = (
 	["Bin\\HPCPro\\MIPS", "$buildroot\\HpcPro\\Tombo\\MIPSRel\\Tombo.exe"],
+	["Bin\\HPCPro\\MIPS", "$buildroot\\Src\\MsgRes\\TomboMsg\\jp\\TomboMsg.txt"],
 );
 
 @bin_hpc_sh3_jp = (
 	["Bin\\HPCPro\\SH3", "$buildroot\\HpcPro\\Tombo\\SH3Rel\\Tombo.exe"],
+	["Bin\\HPCPro\\SH3", "$buildroot\\Src\\MsgRes\\TomboMsg\\jp\\TomboMsg.txt"],
 );
 
 @bin_hpc_sh4_jp =(
 	["Bin\\HPCPro\\SH4", "$buildroot\\HpcPro\\Tombo\\SH4Rel\\Tombo.exe"],
+	["Bin\\HPCPro\\SH4", "$buildroot\\Src\\MsgRes\\TomboMsg\\jp\\TomboMsg.txt"],
 );
 
 @bin_pktpc_arm_jp = (
 	["Bin\\PocketPC\\ARM", "$buildroot\\PocketPC\\CabWiz\\Tombo.arm.CAB"],
 	["Bin\\PocketPC\\ARM", "$buildroot\\PocketPC\\Tombo\\ARMRel\\Tombo.exe"],
+	["Bin\\PocketPC\\ARM", "$buildroot\\Src\\MsgRes\\TomboMsg\\jp\\TomboMsg.txt"],
 );
 
 @bin_pktpc_mips_jp =(
 	["Bin\\PocketPC\\MIPS", "$buildroot\\PocketPC\\CabWiz\\Tombo.mips.CAB"],
 	["Bin\\PocketPC\\MIPS", "$buildroot\\PocketPC\\Tombo\\MIPSRel\\Tombo.exe"],
+	["Bin\\PocketPC\\MIPS", "$buildroot\\Src\\MsgRes\\TomboMsg\\jp\\TomboMsg.txt"],
 );
 
 @bin_pktpc_sh3_jp =(
 	["Bin\\PocketPC\\SH3", "$buildroot\\PocketPC\\CabWiz\\Tombo.sh3.CAB"],
 	["Bin\\PocketPC\\SH3", "$buildroot\\PocketPC\\Tombo\\SH3Rel\\Tombo.exe"],
+	["Bin\\PocketPC\\SH3", "$buildroot\\Src\\MsgRes\\TomboMsg\\jp\\TomboMsg.txt"],
 );
 
 @bin_pspc_mips_jp =(
@@ -91,65 +100,76 @@ $be300root = "R:\\work2\\BE300SDK_1012\\Installer\\English PC Tools";
 );
 
 @bin_be500 = (
-	["Bin\\BE500", "$be500root\\Setup.exe"],
-	["Bin\\BE500", "$be500root\\Setup.ini"],
-	["Bin\\BE500", "$be500root\\Tombo.cbea"],
-	["Bin\\BE500", "$buildroot\\BE500\\Tombo\\MIPSRel\\Tombo.exe"],
+#	["Bin\\BE500", "$be500root\\Setup.exe"],
+#	["Bin\\BE500", "$be500root\\Setup.ini"],
+#	["Bin\\BE500", "$be500root\\Tombo.cbea"],
+	["Bin\\BE500", "$buildroot\\BE300\\Tombo\\MIPSRel\\Tombo.exe"],
+	["Bin\\BE500", "$buildroot\\Src\\MsgRes\\TomboMsg\\jp\\TomboMsg.txt"],
 );
 
 @bin_win32_jp = (
 	["", "$buildroot\\Win32\\Tombo\\Release\\Tombo.exe"],
+	["", "$buildroot\\Src\\MsgRes\\TomboMsg\\jp\\TomboMsg.txt"],
 );
 
 @bin_hpc_arm_en = (
-	["Bin\\HPCPro\\ARM", "$buildroot\\HpcPro\\Tombo\\ARMReleaseE\\Tombo.exe"],
+	["Bin\\HPCPro\\ARM", "$buildroot\\HpcPro\\Tombo\\ARMRel\\Tombo.exe"],
+	["Bin\\HPCPro\\ARM", "$buildroot\\Src\\MsgRes\\TomboMsg\\en\\TomboMsg.txt"],
 );
 
 @bin_hpc_mips_en = (
-	["Bin\\HPCPro\\MIPS", "$buildroot\\HpcPro\\Tombo\\MIPSReleaseE\\Tombo.exe"],
+	["Bin\\HPCPro\\MIPS", "$buildroot\\HpcPro\\Tombo\\MIPSRel\\Tombo.exe"],
+	["Bin\\HPCPro\\MIPS", "$buildroot\\Src\\MsgRes\\TomboMsg\\en\\TomboMsg.txt"],
 );
 
 @bin_hpc_sh3_en = (
-	["Bin\\HPCPro\\SH3", "$buildroot\\HpcPro\\Tombo\\SH3ReleaseE\\Tombo.exe"],
+	["Bin\\HPCPro\\SH3", "$buildroot\\HpcPro\\Tombo\\SH3Rel\\Tombo.exe"],
+	["Bin\\HPCPro\\SH3", "$buildroot\\Src\\MsgRes\\TomboMsg\\en\\TomboMsg.txt"],
 );
 
 @bin_hpc_sh4_en = (
-	["Bin\\HPCPro\\SH4", "$buildroot\\HpcPro\\Tombo\\SH4ReleaseE\\Tombo.exe"],
+	["Bin\\HPCPro\\SH4", "$buildroot\\HpcPro\\Tombo\\SH4Rel\\Tombo.exe"],
+	["Bin\\HPCPro\\SH4", "$buildroot\\Src\\MsgRes\\TomboMsg\\en\\TomboMsg.txt"],
 );
 @bin_pktpc_arm_en = (
 	["Bin\\PocketPC\\ARM", "$buildroot\\PocketPC\\CabWiz\\TomboE.arm.CAB"],
-	["Bin\\PocketPC\\ARM", "$buildroot\\PocketPC\\Tombo\\ARMReleaseE\\Tombo.exe"],
+	["Bin\\PocketPC\\ARM", "$buildroot\\PocketPC\\Tombo\\ARMRel\\Tombo.exe"],
+	["Bin\\PocketPC\\ARM", "$buildroot\\Src\\MsgRes\\TomboMsg\\en\\TomboMsg.txt"],
 );
 
 @bin_pktpc_mips_en = (
 	["Bin\\PocketPC\\MIPS", "$buildroot\\PocketPC\\CabWiz\\TomboE.mips.CAB"],
-	["Bin\\PocketPC\\MIPS", "$buildroot\\PocketPC\\Tombo\\MIPSReleaseE\\Tombo.exe"],
+	["Bin\\PocketPC\\MIPS", "$buildroot\\PocketPC\\Tombo\\MIPSRel\\Tombo.exe"],
+	["Bin\\PocketPC\\MIPS", "$buildroot\\Src\\MsgRes\\TomboMsg\\en\\TomboMsg.txt"],
 );
 
 @bin_pktpc_sh3_en = (
 	["Bin\\PocketPC\\SH3", "$buildroot\\PocketPC\\CabWiz\\TomboE.sh3.CAB"],
-	["Bin\\PocketPC\\SH3", "$buildroot\\PocketPC\\Tombo\\SH3ReleaseE\\Tombo.exe"],
+	["Bin\\PocketPC\\SH3", "$buildroot\\PocketPC\\Tombo\\SH3Rel\\Tombo.exe"],
+	["Bin\\PocketPC\\SH3", "$buildroot\\Src\\MsgRes\\TomboMsg\\en\\TomboMsg.txt"],
 );
 
 @bin_pspc_sh3_en = (
 	["Bin\\PsPC\\SH3", "$buildroot\\PsPC\\CabWiz\\TomboE.mips.CAB"],
-	["Bin\\PsPC\\SH3", "$buildroot\\PsPC\\Tombo\\SH3ReleaseE\\Tombo.exe"],
+	["Bin\\PsPC\\SH3", "$buildroot\\PsPC\\Tombo\\SH3Rel\\Tombo.exe"],
 );
 
 @bin_pspc_mips_en = (
 	["Bin\\PsPC\\MIPS", "$buildroot\\PsPC\\CabWiz\\TomboE.sh3.CAB"],
-	["Bin\\PsPC\\MIPS", "$buildroot\\PsPC\\Tombo\\MIPSReleaseE\\Tombo.exe"],
+	["Bin\\PsPC\\MIPS", "$buildroot\\PsPC\\Tombo\\MIPSRel\\Tombo.exe"],
 );
 
 @bin_be300 = (
-	["Bin\\BE300", "$be300root\\Setup.exe"],
-	["Bin\\BE300", "$be300root\\Setup.ini"],
-	["Bin\\BE300", "$be300root\\Tombo.cbea"],
+#	["Bin\\BE300", "$be300root\\Setup.exe"],
+#	["Bin\\BE300", "$be300root\\Setup.ini"],
+#	["Bin\\BE300", "$be300root\\Tombo.cbea"],
 	["Bin\\BE300", "$buildroot\\BE300\\Tombo\\MIPSRel\\Tombo.exe"],
+	["Bin\\BE300", "$buildroot\\Src\\MsgRes\\TomboMsg\\en\\TomboMsg.txt"],
 );
 
 @bin_win32_en = (
-	["", "$buildroot\\Win32\\Tombo\\ReleaseE\\Tombo.exe"],
+	["", "$buildroot\\Win32\\Tombo\\Release\\Tombo.exe"],
+	["", "$buildroot\\Src\\MsgRes\\TomboMsg\\en\\TomboMsg.txt"],
 );
 
 ##########################################################################

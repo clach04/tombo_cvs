@@ -464,12 +464,10 @@ static BOOL GetDateText(TString *pInsStr, LPCTSTR pFormat, TString *pPath)
 				q++;
 				if (st.wDay >= 10) q++;
 				break;
-#if !defined(TOMBO_LANG_ENGLISH)
 			case TEXT('w'):
 				_tcscpy(q, pWeekJ[st.wDayOfWeek]);
 				q += _tcslen(pWeekJ[st.wDayOfWeek]);
 				break;
-#endif
 			case TEXT('W'):
 				_tcscpy(q, pWeekE[st.wDayOfWeek]);
 				q += _tcslen(pWeekE[st.wDayOfWeek]);

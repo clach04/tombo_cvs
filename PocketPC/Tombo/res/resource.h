@@ -51,6 +51,7 @@
 #define IDD_FILTERDEF_ADD_LIMIT         141
 #define IDD_FILTERDEF_ADD_TIMESTAMP     142
 #define IDD_FILTERDEF_ADD_SORT          143
+#define IDD_LANG_DLG                    149
 #define IDM_MAIN_MENUITEM1              401
 #define IDM_MAIN_MENUITEM2              402
 #define IDS_MAIN_MENUITEM1              410
@@ -169,6 +170,7 @@
 #define IDC_SEARCH_FIND_LABEL           1073
 #define IDC_SEARCH_DIRECT_LABEL         1074
 #define IDC_PROPTAB_APPBTN_HELP         1075
+#define IDC_LANG_LIST                   1099
 #define IDM_ACTIONBUTTON                30001
 #define IDM_FILE_EXIT                   40002
 #define IDM_HELP_ABOUT                  40003

@@ -1289,6 +1289,8 @@ NODEP_CPP_DETAI=\
 DEP_CPP_DETAI=\
 	"..\..\Src\MemoDetailsView.h"\
 	"..\..\Src\MemoManager.h"\
+	"..\..\Src\PlatformLayer.h"\
+	"..\..\Src\PocketPCPlatform.h"\
 	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
 	"..\..\Src\TomboLib\File.h"\
@@ -1391,6 +1393,8 @@ DEP_CPP_DIALO=\
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Release"
 
 DEP_CPP_DIALO=\
+	"..\..\Src\Message.h"\
+	"..\..\Src\MsgRes\MsgDef.h"\
 	"..\..\Src\TomboLib\DialogTemplate.h"\
 	
 
@@ -1816,6 +1820,9 @@ DEP_CPP_FILES=\
 
 DEP_CPP_FILES=\
 	"..\..\Src\FileSelector.h"\
+	"..\..\Src\Message.h"\
+	"..\..\Src\MsgRes\MsgDef.h"\
+	"..\..\Src\TomboLib\DialogTemplate.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Debug"
@@ -2140,6 +2147,7 @@ DEP_CPP_FILTER=\
 	"..\..\Src\Message.h"\
 	"..\..\Src\MsgRes\MsgDef.h"\
 	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboLib\DialogTemplate.h"\
 	"..\..\Src\TomboLib\File.h"\
 	"..\..\Src\TomboLib\Logger.h"\
 	"..\..\Src\TomboLib\TString.h"\
@@ -2514,6 +2522,7 @@ DEP_CPP_GREPD=\
 	"..\..\Src\MsgRes\MsgDef.h"\
 	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboLib\DialogTemplate.h"\
 	"..\..\Src\TomboLib\File.h"\
 	"..\..\Src\TomboLib\Logger.h"\
 	"..\..\Src\TomboLib\PropertyPage.h"\
@@ -5170,7 +5179,10 @@ DEP_CPP_NEWFO=\
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Release"
 
 DEP_CPP_NEWFO=\
+	"..\..\Src\Message.h"\
+	"..\..\Src\MsgRes\MsgDef.h"\
 	"..\..\Src\NewFolderDialog.h"\
+	"..\..\Src\TomboLib\DialogTemplate.h"\
 	"..\..\Src\TomboLib\SipControl.h"\
 	
 
@@ -5300,6 +5312,7 @@ DEP_CPP_PASSW=\
 	"..\..\Src\MsgRes\MsgDef.h"\
 	"..\..\Src\PasswordDialog.h"\
 	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboLib\DialogTemplate.h"\
 	"..\..\Src\TomboLib\File.h"\
 	"..\..\Src\TomboLib\Logger.h"\
 	"..\..\Src\TomboLib\SipControl.h"\
@@ -5584,7 +5597,10 @@ DEP_CPP_PLATF=\
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Release"
 
 DEP_CPP_PLATF=\
+	"..\..\Src\Message.h"\
+	"..\..\Src\MsgRes\MsgDef.h"\
 	"..\..\Src\PlatformLayer.h"\
+	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
 	"..\..\Src\TomboLib\File.h"\
 	"..\..\Src\TomboLib\Logger.h"\
@@ -5717,6 +5733,9 @@ DEP_CPP_POCKE=\
 	"..\..\Src\PlatformLayer.h"\
 	"..\..\Src\PocketPCPlatform.h"\
 	"..\..\Src\Property.h"\
+	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboLib\File.h"\
+	"..\..\Src\TomboLib\Logger.h"\
 	"..\..\Src\TomboLib\SipControl.h"\
 	{$(INCLUDE)}"aygshell.h"\
 	{$(INCLUDE)}"sipapi.h"\
@@ -5884,9 +5903,11 @@ DEP_CPP_PROPE=\
 	"..\..\Src\PasswordManager.h"\
 	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboLib\DialogTemplate.h"\
 	"..\..\Src\TomboLib\File.h"\
 	"..\..\Src\TomboLib\Logger.h"\
 	"..\..\Src\TomboLib\PropertyPage.h"\
+	"..\..\Src\TomboLib\TString.h"\
 	"..\..\Src\TomboLib\Uniconv.h"\
 	"..\..\Src\TomboLib\VarBuffer.h"\
 	"..\..\Src\TreeViewItem.h"\
@@ -6249,9 +6270,12 @@ DEP_CPP_SEARC=\
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Release"
 
 DEP_CPP_SEARC=\
+	"..\..\Src\Message.h"\
+	"..\..\Src\MsgRes\MsgDef.h"\
 	"..\..\Src\Property.h"\
 	"..\..\Src\SearchDlg.h"\
 	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboLib\DialogTemplate.h"\
 	"..\..\Src\TomboLib\File.h"\
 	"..\..\Src\TomboLib\Logger.h"\
 	"..\..\Src\TomboLib\SipControl.h"\
@@ -6574,6 +6598,7 @@ DEP_CPP_SEARCHT=\
 	"..\..\Src\SearchEngine.h"\
 	"..\..\Src\SearchTree.h"\
 	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboLib\DialogTemplate.h"\
 	"..\..\Src\TomboLib\File.h"\
 	"..\..\Src\TomboLib\Logger.h"\
 	"..\..\Src\TomboLib\TString.h"\
@@ -7353,6 +7378,9 @@ DEP_CPP_TREEV=\
 	"..\..\Src\VFManager.h"\
 	"..\..\Src\VFStream.h"\
 	"..\..\Src\Win32Platform.h"\
+	
+NODEP_CPP_TREEV=\
+	"..\..\Src\COShellAPI.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Debug"

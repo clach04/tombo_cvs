@@ -558,53 +558,6 @@ void ConvJIS2SJIS(const char *pIn, char *pOut)
 	*q++ = '\0';
 }
 
-#ifdef COMMENT
-void ConvJIS2SJIS(const char *pIn, char *pOut)
-{
-	const BYTE *p = (const BYTE*)pIn;
-	BYTE *q = (BYTE*)pOut;
-
-	int c, d;
-	BOOL jiskanji = FALSE;
-
-	while((c = *p++) != '\0') {
-		if (c == ESC) {
-			if ((c = *p++) == '$') {
-				if ((c = *p++) == '@' || c == 'B') {
-					jiskanji = TRUE;
-				} else {
-					*q++ = ESC; *q++ = '$';
-					if (c != '\0') *q++ = (char)c;
-				}
-			} else if (c == '(') {
-				if ((c = *p++) == 'H' || c == 'J' || c == 'B') {
-					jiskanji = FALSE;
-				} else {
-					*q++ = ESC; *q++ = '(';
-					if (c != '\0') *q++ = (char)c;
-				}
-			} else if (c == 'K') {
-				jiskanji = TRUE;
-			} else if (c == 'H') {
-				jiskanji = FALSE;
-			} else {
-				*q++ = ESC; if (c != '\0') *q++ = (char)c;
-			}
-		} else if (jiskanji && c >= 0x21 && c <= 0x7E) {
-			if ((d = *p++) >= 0x21 && d <= 0x7E)
-				shift(&c, &d);
-			*q++ = c; if (d != '\0') *q++ = (char)d;
-		} else if (jiskanji && c >= 0xA1 && c <= 0xFE) {
-			if ((d = *p++) >= 0xA1 && d <= 0xFE) {
-				d &= 0x7F; c &= 0x7F; shift(&c, &d);
-			}
-			*q++ = c; if (d != '\0') *q++ = (char)d;
-		} else *q++ = c;
-	}
-	*q++ = '\0';
-}
-#endif
-
 ///////////////////////////
 // •ÏŠ·‰º¿‚¯
 

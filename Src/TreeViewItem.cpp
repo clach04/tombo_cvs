@@ -754,7 +754,6 @@ BOOL TreeViewFolderItem::ExecApp(MemoManager *pMgr, MemoSelectView *pView, ExeAp
 	return TRUE;
 #else
 
-	if (!sCurrentPath.Set(TEXT("\"\\wwwroot\""))) return FALSE;
 	SHELLEXECUTEINFO se;
 	memset(&se, 0, sizeof(se));
 	se.cbSize = sizeof(se);
