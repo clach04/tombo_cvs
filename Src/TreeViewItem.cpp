@@ -88,6 +88,10 @@ BOOL TreeViewItem::CanPaste(MemoSelectView *pView)
 	return TRUE;
 }
 
+BOOL TreeViewItem::CanGrep(MemoSelectView *pView)
+{
+	return FALSE;
+}
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -248,6 +252,11 @@ BOOL TreeViewFileItem::CanCopy(MemoSelectView *pView)
 BOOL TreeViewFileItem::CanPaste(MemoSelectView *pView)
 {
 	return TRUE;
+}
+
+BOOL TreeViewFileItem::CanGrep(MemoSelectView *pView)
+{
+	return FALSE;
 }
 
 /////////////////////////////////////////////
@@ -552,6 +561,11 @@ BOOL TreeViewFolderItem::CanNewMemo(MemoSelectView *pView)
 	return TRUE;
 }
 
+BOOL TreeViewFolderItem::CanGrep(MemoSelectView *pView)
+{
+	return TRUE;
+}
+
 BOOL TreeViewFolderItem::GetFolderPath(MemoSelectView *pView, TString *pPath)
 {
 	return pView->GetPathForNewItem(pPath, this) != NULL;
@@ -679,12 +693,12 @@ BOOL TreeViewFileLink::CanRename(MemoSelectView *pView)
 
 BOOL TreeViewFileLink::CanDecrypt(MemoSelectView *pView)
 {
-	return TRUE;
+	return FALSE;
 }
 
 BOOL TreeViewFileLink::CanEncrypt(MemoSelectView *pView)
 {
-	return TRUE;
+	return FALSE;
 }
 
 BOOL TreeViewFileLink::CanNewMemo(MemoSelectView *pView)
@@ -703,6 +717,11 @@ BOOL TreeViewFileLink::CanCopy(MemoSelectView *pView)
 }
 
 BOOL TreeViewFileLink::CanPaste(MemoSelectView *pView)
+{
+	return FALSE;
+}
+
+BOOL TreeViewFileLink::CanGrep(MemoSelectView *pView)
 {
 	return FALSE;
 }
@@ -908,6 +927,11 @@ BOOL TreeViewVirtualFolderRoot::CanPaste(MemoSelectView *pView)
 	return FALSE;
 }
 
+BOOL TreeViewVirtualFolderRoot::CanGrep(MemoSelectView *pView)
+{
+	return FALSE;
+}
+
 BOOL TreeViewVirtualFolderRoot::GetFolderPath(MemoSelectView *pView, TString *pPath)
 {
 	return pPath->Set(TEXT(""));
@@ -1034,6 +1058,11 @@ BOOL TreeViewVirtualFolder::CanCopy(MemoSelectView *pView)
 }
 
 BOOL TreeViewVirtualFolder::CanPaste(MemoSelectView *pView)
+{
+	return FALSE;
+}
+
+BOOL TreeViewVirtualFolder::CanGrep(MemoSelectView *pView)
 {
 	return FALSE;
 }
