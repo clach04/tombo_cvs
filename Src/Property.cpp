@@ -73,8 +73,8 @@
 
 #define MAX_PASSWORD_LEN 1024
 
-#define FONTSIZE_MIN 8
-#define FONTSIZE_MAX 18
+#define FONTSIZE_MIN 6
+#define FONTSIZE_MAX 32
 #define DEFAULT_FONTNAME TEXT("Tahoma")
 #define DEFAULT_FONTSIZE 9
 

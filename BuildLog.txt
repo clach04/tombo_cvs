@@ -399,7 +399,7 @@ Return to main trunk.
 * FIX: Add "paste" to context menu(#2851)
 
 ////////////////////////////////
-//
+// B111
 ////////////////////////////////
 
 * Add Ctrl+UP/DOWN/LEFT key assign at treeview.
@@ -407,12 +407,28 @@ Return to main trunk.
 	LEFT    : Move parent without closing the tree.
 
 * Add Keep space over the SIP option(#2875,#2876)
+* Crash when encrypting an not saved Note (#3294,#3754)
+* When exit with minimize, can't restore window(#2878,#2879)
 
-/////////////////////////////////////////////////////////////////////////
-// TODO
-/////////////////////////////////////////////////////////////////////////
 
-== entire
+*** document updates by Kevin Grover
 
-Refactoring: MemoInfo control under MemoManager to MemoNote.
-Move method OpenRequest() from MemoSelectView to TreeViewItem.
+Changes
+- Some grammatical English fixes
+
+- Created StyleSheet (tombo.css)
+  - moved background/text color to style sheet
+  - added background image to H# lines, use sans-serif font
+  - some indenting as well
+  - (other global style preferences should be set here)
+
+- The HTML files now uses matched XML tags (ready to be XHTML if you want)
+  To do this, change the DOCTYPE and html lines from
+  <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+  to:
+  <?xml version="1.0"?>
+  <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+		"DTD/xhtml1-transitional.dtd">
+  <html xmlns="http://www.w3.org/1999/xhtml">
+
