@@ -150,7 +150,7 @@ public:
 	LPTSTR GeneratePath(HTREEITEM hItem, LPTSTR pBuf, DWORD nSiz);
 
 	// Choose specified notes. if tree is collapsed, expand one.
-	BOOL ShowItem(LPCTSTR pPath);
+	HTREEITEM ShowItem(LPCTSTR pPath, BOOL bSelChange = TRUE);
 
 	/////////////////////////////
 	// Virtual folder

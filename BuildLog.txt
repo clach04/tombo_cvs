@@ -244,6 +244,14 @@ PG: Change copyright dialog for expat.
 
 	PsPC, PktPC, BE-x00 is not fully supported.
 
+////////////////////////////////
+// B093
+////////////////////////////////
+
+* Disable renaming(click x 2) tree node when renaming the node is not allowed.
+* Create new note to root node when on virtual folder nodes.
+* Create new note the same level of the virtual link note what is selected.
+
 
 /////////////////////////////////////////////////////////////////////////
 // TODO
@@ -253,8 +261,3 @@ PG: Change copyright dialog for expat.
 
 Refactoring: MemoInfo control under MemoManager to MemoNote.
 Move method OpenRequest() from MemoSelectView to TreeViewItem.
-
-== around virtual folder
-
-* Change icon at virtual node ?
-* Impliment sorting.

@@ -88,6 +88,7 @@ BOOL TreeViewItem::CanPaste(MemoSelectView *pView)
 	return TRUE;
 }
 
+
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 //  File
@@ -324,6 +325,13 @@ MemoLocator TreeViewFileItem::ToLocator()
 	return MemoLocator(pNote, GetViewItem());
 }
 
+BOOL TreeViewFileItem::GetFolderPath(MemoSelectView *pView, TString *pPath)
+{
+	LPCTSTR pNotePath = pNote->MemoPath();
+	if (!pPath->Alloc(_tcslen(pNotePath))) return FALSE;
+	GetFilePath(pPath->Get(), pNotePath);	
+	return TRUE;
+}
 
 /////////////////////////////////////////////
 //  Folder
@@ -544,6 +552,11 @@ BOOL TreeViewFolderItem::CanNewMemo(MemoSelectView *pView)
 	return TRUE;
 }
 
+BOOL TreeViewFolderItem::GetFolderPath(MemoSelectView *pView, TString *pPath)
+{
+	return pView->GetPathForNewItem(pPath, this) != NULL;
+}
+
 /////////////////////////////////////////////
 //  –¼Ì•ÏX
 /////////////////////////////////////////////
@@ -676,7 +689,7 @@ BOOL TreeViewFileLink::CanEncrypt(MemoSelectView *pView)
 
 BOOL TreeViewFileLink::CanNewMemo(MemoSelectView *pView)
 {
-	return FALSE;
+	return TRUE;
 }
 
 BOOL TreeViewFileLink::CanCut(MemoSelectView *pView)
@@ -693,6 +706,15 @@ BOOL TreeViewFileLink::CanPaste(MemoSelectView *pView)
 {
 	return FALSE;
 }
+
+BOOL TreeViewFileLink::GetFolderPath(MemoSelectView *pView, TString *pPath)
+{
+	LPCTSTR pNotePath = pNote->MemoPath();
+	if (!pPath->Alloc(_tcslen(pNotePath))) return FALSE;
+	GetFilePath(pPath->Get(), pNotePath);	
+	return TRUE;
+}
+
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -868,7 +890,7 @@ BOOL TreeViewVirtualFolderRoot::CanEncrypt(MemoSelectView *pView)
 
 BOOL TreeViewVirtualFolderRoot::CanNewMemo(MemoSelectView *pView)
 {
-	return FALSE;
+	return TRUE;
 }
 
 BOOL TreeViewVirtualFolderRoot::CanCut(MemoSelectView *pView)
@@ -884,6 +906,11 @@ BOOL TreeViewVirtualFolderRoot::CanCopy(MemoSelectView *pView)
 BOOL TreeViewVirtualFolderRoot::CanPaste(MemoSelectView *pView)
 {
 	return FALSE;
+}
+
+BOOL TreeViewVirtualFolderRoot::GetFolderPath(MemoSelectView *pView, TString *pPath)
+{
+	return pPath->Set(TEXT(""));
 }
 
 /////////////////////////////////////////////
@@ -993,7 +1020,7 @@ BOOL TreeViewVirtualFolder::CanEncrypt(MemoSelectView *pView)
 
 BOOL TreeViewVirtualFolder::CanNewMemo(MemoSelectView *pView)
 {
-	return FALSE;
+	return TRUE;
 }
 
 BOOL TreeViewVirtualFolder::CanCut(MemoSelectView *pView)
@@ -1009,4 +1036,9 @@ BOOL TreeViewVirtualFolder::CanCopy(MemoSelectView *pView)
 BOOL TreeViewVirtualFolder::CanPaste(MemoSelectView *pView)
 {
 	return FALSE;
+}
+
+BOOL TreeViewVirtualFolder::GetFolderPath(MemoSelectView *pView, TString *pPath)
+{
+	return pPath->Set(TEXT(""));
 }

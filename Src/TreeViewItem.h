@@ -9,6 +9,7 @@ class VFStore;
 class VFStream;
 class MemoLoctor;
 class TreeViewVirtualFolder;
+class TString;
 
 #include "MemoManager.h"
 #include "VarBuffer.h"
@@ -24,7 +25,6 @@ class TreeViewItem {
 public:
 	TreeViewItem(BOOL bMultiItem);
 	virtual ~TreeViewItem();
-
 
 	HTREEITEM GetViewItem();
 	void SetViewItem(HTREEITEM h);
@@ -60,7 +60,6 @@ public:
 	virtual BOOL CanPaste(MemoSelectView *pView);
 
 	///////////////////////////////////////////////////////
-
 	// ÉAÉCÉRÉìèÓïÒÇÃéÊìæ
 
 	virtual DWORD GetIcon(MemoSelectView *pView, DWORD nStatus) = 0;
@@ -72,6 +71,11 @@ public:
 	BOOL HasMultiItem() { return bHasMultiItem; }
 
 	virtual MemoLocator ToLocator();
+
+	///////////////////////////////////////////////////////
+	// Get path information
+	virtual BOOL GetFolderPath(MemoSelectView *pView, TString *pPath) = 0;
+
 };
 
 /////////////////////////////////////////////
@@ -108,6 +112,8 @@ public:
 	MemoNote *GetNote() { return pNote; }
 
 	MemoLocator ToLocator();
+	BOOL GetFolderPath(MemoSelectView *pView, TString *pPath);
+
 };
 
 /////////////////////////////////////////////
@@ -139,6 +145,8 @@ public:
 
 	virtual BOOL CanDelete(MemoSelectView *pView);
 	virtual BOOL Expand(MemoSelectView *pView);
+	BOOL GetFolderPath(MemoSelectView *pView, TString *pPath);
+
 };
 
 /////////////////////////////////////////////
@@ -175,6 +183,8 @@ public:
 	virtual BOOL CanCut(MemoSelectView *pView);
 	virtual BOOL CanCopy(MemoSelectView *pView);
 	virtual BOOL CanPaste(MemoSelectView *pView);
+
+	virtual BOOL GetFolderPath(MemoSelectView *pView, TString *pPath);
 };
 
 /////////////////////////////////////////////
@@ -206,6 +216,7 @@ public:
 	virtual BOOL CanCopy(MemoSelectView *pView);
 	virtual BOOL CanPaste(MemoSelectView *pView);
 
+	virtual BOOL GetFolderPath(MemoSelectView *pView, TString *pPath);
 };
 
 /////////////////////////////////////////////
@@ -231,6 +242,8 @@ public:
 	virtual BOOL CanCut(MemoSelectView *pView);
 	virtual BOOL CanCopy(MemoSelectView *pView);
 	virtual BOOL CanPaste(MemoSelectView *pView);
+
+	virtual BOOL GetFolderPath(MemoSelectView *pView, TString *pPath);
 
 	// pGen's life scope is control under TreeViewVirtualFolder.
 	// don't delete pGen after calling SetGenerator.

@@ -90,9 +90,15 @@ MemoLocator MemoManager::AllocNewMemo(LPCTSTR pText, MemoNote *pTemplate)
 	TString sHeadLine;
 	TString sMemoPath;
 
-	// パスの取得
-	HTREEITEM hParent = pMemoSelectView->GetPathForNewItem(&sMemoPath);	
-	if (hParent == NULL) return MemoLocator(NULL, NULL);
+	// get note path
+	TreeViewItem *pItem = pMemoSelectView->GetCurrentItem();
+	if (!pItem->GetFolderPath(pMemoSelectView, &sMemoPath)) return MemoLocator(NULL, NULL);
+	ChopFileSeparator(sMemoPath.Get());
+	HTREEITEM hParent = pMemoSelectView->ShowItem(sMemoPath.Get(), FALSE);
+	if (!sMemoPath.StrCat(TEXT("\\"))) return MemoLocator(NULL, NULL);
+
+//	HTREEITEM hParent;
+//	pMemoSelectView->GetCurrentItem(&hParent);
 
 	MemoNote *pNote;
 	if (pTemplate) {
@@ -127,41 +133,6 @@ BOOL MemoManager::WipeOutAndDeleteFile(LPCTSTR pFile)
 	delf.Close();
 	return DeleteFile(pFile);
 }
-
-////////////////////////////////////////////////////////
-// Control menu item
-////////////////////////////////////////////////////////
-#ifdef COMMENT
-void MemoManager::UpdateMenu(TreeViewItem *pItem)
-{
-	if (pItem == NULL) {
-		pMainFrame->EnableEncrypt(FALSE);
-		pMainFrame->EnableDecrypt(FALSE);
-		return;
-	}
-	return;
-	MemoNote *pNote;
-	if (pItem->HasMultiItem()) {
-		// Encrypt/decrypt menu
-		pMainFrame->EnableEncrypt(TRUE);
-		pMainFrame->EnableDecrypt(TRUE);
-	} else {
-		pNote = ((TreeViewFileItem*)pItem)->GetNote();
-
-		// Encrypt/decrypt menu
-		if (pNote->IsEncrypted()) {
-			pMainFrame->EnableEncrypt(FALSE);
-			pMainFrame->EnableDecrypt(TRUE);
-		} else {
-			pMainFrame->EnableEncrypt(TRUE);
-			pMainFrame->EnableDecrypt(FALSE);
-		}
-
-		pMainFrame->EnableDelete(pItem->CanDelete(pMemoSelectView));
-	}
-	
-}
-#endif
 
 ////////////////////////////////////////////////////////
 // フォルダの新規作成
