@@ -40,7 +40,7 @@ extern "C" {
 //////////////////////////////////////
 // WinMain
 //////////////////////////////////////
-
+#ifndef UNIT_TEST
 int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPTSTR pCmdLine, int nCmdShow)
 {
 	// Check other Tombo.exe is executed
@@ -101,7 +101,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPTSTR pCmdLine, int nCmdSh
 	g_Logger.Close();
 	return res;
 }
-
+#endif
 //////////////////////////////////////
 // 二重起動チェック列挙関数
 //////////////////////////////////////
