@@ -158,6 +158,7 @@ public:
 /////////////////////////////////////////////
 //  Virtual folder definition
 /////////////////////////////////////////////
+
 #define VFINFO_FLG_CASESENSITIVE	1
 #define VFINFO_FLG_CHECKCRYPTED		2
 #define VFINFO_FLG_FILENAMEONLY		4
@@ -213,8 +214,26 @@ public:
 	////////////////////////////
 	// Virtual folder operator 
 	BOOL AddSearchResult(MemoSelectView *pView, VFInfo *p);
-
 	BOOL StreamObjectsFactory(VFInfo *pInfo, TreeViewVirtualFolder **ppVf, VFDirectoryGenerator **ppGen, VFStore **ppStore);
+
+	class ItemIterator {
+		TreeViewVirtualFolderRoot *pRoot;
+		MemoSelectView *pView;
+		HWND hWnd;
+		HTREEITEM hCurrentItem;
+	public:
+		ItemIterator(MemoSelectView *pView, TreeViewVirtualFolderRoot *p);
+		BOOL First();
+		BOOL Next();
+		BOOL Get(TString *pLabel);
+
+	};
+
+	ItemIterator *GetIterator(MemoSelectView *pView);
+
+	////////////////////////////
+	// common methods
+
 	BOOL CanDelete(MemoSelectView *pView); 
 	BOOL CanRename(MemoSelectView *pView);
 	virtual BOOL CanEncrypt(MemoSelectView *pView);
@@ -228,6 +247,7 @@ public:
 
 	virtual BOOL GetFolderPath(MemoSelectView *pView, TString *pPath);
 };
+
 
 /////////////////////////////////////////////
 //  Virtual Folder (Non-root)
