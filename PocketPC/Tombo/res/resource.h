@@ -16,9 +16,13 @@
 #define IDD_PROPTAB_FOLDER              106
 #define IDC_DETAILSVIEWDLG              106
 #define IDD_FILESELECT                  107
+#define IDM_TRACELINK                   107
 #define IDB_ARTICLEBOX                  108
+#define IDM_ASSOC                       108
 #define IDD_PROPTAB_PASSWORD            109
+#define IDM_EXTAPP1                     109
 #define IDD_NEWFOLDER                   110
+#define IDM_EXTAPP2                     110
 #define IDD_PROPTAB_PASS_TIMEOUT        111
 #define IDD_PROPTAB_FONT                112
 #define IDB_TOOLBAR                     114
@@ -40,6 +44,7 @@
 #define IDD_PROPTAB_SIP                 128
 #define IDD_DETAILSVIEW                 129
 #define IDD_BOOKMARK_EDIT               134
+#define IDD_PROPTAB_EXTAPP              135
 #define IDD_FILTERDEF_SRC               138
 #define IDD_FILTERDEF_FILTER            139
 #define IDD_FILTERDEF_ADD_REGEX         140
@@ -80,7 +85,9 @@
 #define IDC_PROP_APPBUTTON3             1024
 #define IDC_KEEPTITLE                   1024
 #define IDC_PROP_APPBUTTON5             1025
+#define IDC_PROP_EXTAPP_PATH_EXTAPP1    1025
 #define IDC_SEARCH_CASESENSITIVE        1026
+#define IDC_PROP_EXTAPP_PATH_EXTAPP2    1026
 #define IDC_SEARCH_STRING               1027
 #define IDC_SEARCH_ENCRYPTMEMO          1028
 #define IDC_COPYRIGHT                   1029
@@ -145,11 +152,17 @@
 #define IDC_PROPTAB_PASS_TIMEOUT_LABEL  1062
 #define IDC_PROPTAB_PASS_TIMEOUT_HELP   1063
 #define IDC_PROPTAB_FONT_TREE_LABEL     1064
+#define IDC_PROP_EXTAPP_USEASSOC        1064
 #define IDC_PROPTAB_FONT_EDIT_LABEL     1065
+#define IDC_PROP_EXTAPP_TTL_EXTAPP1     1065
 #define IDC_PROPTAB_INSDATE_DATE1       1066
+#define IDC_PROP_EXTAPP_TTL_EXTAPP2     1066
 #define IDC_PROPTAB_INSDATE_DATE2       1067
+#define IDC_PROPTAB_EXTAPP_CHOOSE1      1067
 #define IDC_PROPTAB_KEEPCARET_HELP1     1068
+#define IDC_PROPTAB_EXTAPP_CHOOSE2      1068
 #define IDC_PROPTAB_KEEPCARET_HELP2     1069
+#define IDC_PROP_EXTAPP_CAUTION         1069
 #define IDC_PROPTAB_KEEPCARET_HELP3     1070
 #define IDC_PROPTAB_KEEPCARET_LABEL     1071
 #define IDC_PROPTAB_DEFNOTE_LABEL       1072
@@ -240,6 +253,6 @@
 #define _APS_NEXT_RESOURCE_VALUE        130
 #define _APS_NEXT_COMMAND_VALUE         40085
 #define _APS_NEXT_CONTROL_VALUE         1076
-#define _APS_NEXT_SYMED_VALUE           107
+#define _APS_NEXT_SYMED_VALUE           111
 #endif
 #endif

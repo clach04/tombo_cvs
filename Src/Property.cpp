@@ -1004,6 +1004,7 @@ void DefaultNoteTab::SetCurrent(HWND hDlg)
 //////////////////////////////////////////
 // External application tab
 //////////////////////////////////////////
+#if !defined(PLATFORM_PSPC)
 
 class ExtAppTab : public TomboPropertyTab {
 	DWORD nUseAssoc;
@@ -1100,7 +1101,7 @@ void ExtAppTab::Choose2(HWND hDlg)
 #if defined(PLATFORM_WIN32)
 	LPCTSTR pExt = MSG_DLG_EXTAPP_CHOOSE_EXT;
 #else
-	LPCTSTR pExt = TEXT(".exe");
+	LPCTSTR pExt = TEXT("*.exe");
 #endif
 
 	if (sel.Popup(g_hInstance, hDlg, MSG_DLG_EXTAPP_CHOOSE_TTL, pExt) == IDOK) {
@@ -1108,7 +1109,7 @@ void ExtAppTab::Choose2(HWND hDlg)
 		SetWindowText(hWnd, sel.SelectedPath());
 	}
 }
-
+#endif
 //////////////////////////////////////////
 // Popup property dialog
 //////////////////////////////////////////
@@ -1133,25 +1134,31 @@ DWORD Property::Popup(HINSTANCE hInst, HWND hWnd, LPCTSTR pSelPath)
 #if defined(PLATFORM_BE500) && defined(TOMBO_LANG_ENGLISH)
 	CodepageTab pgCodepage(this);
 #endif
+#if !defined(PLATFORM_PSPC)
 	ExtAppTab pgExtApp(this);
+#endif
 
-	pages[0] = &pgFolder;
-	pages[1] = &pgDefNote;
-	pages[2] = &pgTimeout;
-	pages[3] = &pgFont;
-	pages[4] = &pgDate;
-	pages[5] = &pgKeepCaret;
-	pages[6] = &pgExtApp;
+	DWORD n = 0;
+
+	pages[n++] = &pgFolder;
+	pages[n++] = &pgDefNote;
+	pages[n++] = &pgTimeout;
+	pages[n++] = &pgFont;
+	pages[n++] = &pgDate;
+	pages[n++] = &pgKeepCaret;
+#if !defined(PLATFORM_PSPC)
+	pages[n++] = &pgExtApp;
+#endif
 #if defined(PLATFORM_PKTPC)
-	pages[7] = &pgAppButton;
-	pages[8] = &pgSip;
+	pages[n++] = &pgAppButton;
+	pages[n++] = &pgSip;
 #endif
 #if defined(PLATFORM_BE500) && defined(TOMBO_LANG_ENGLISH)
-	pages[7] = &pgCodepage;
+	pages[n++] = &pgCodepage;
 #endif
 
 	PropertyPage pp;
-	if (pp.Popup(hInst, hWnd, pages, PROPTAB_PAGES, MSG_PROPTAB_TITLE, MAKEINTRESOURCE(IDI_TOMBO)) == IDOK) {
+	if (pp.Popup(hInst, hWnd, pages, n, MSG_PROPTAB_TITLE, MAKEINTRESOURCE(IDI_TOMBO)) == IDOK) {
 		if (!Save()) {
 			MessageBox(NULL, MSG_SAVE_DATA_FAILED, TEXT("ERROR"), MB_ICONSTOP | MB_OK);
 		}

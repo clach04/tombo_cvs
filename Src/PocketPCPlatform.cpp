@@ -285,12 +285,16 @@ void PocketPCPlatform::AdjustUserRect(RECT *r)
 //
 ///////////////////////////////////////////////////////
 static MenuMsgRes aMSPopupMenu[] = {
-	{ 0, IDM_CUT,        0, MSG_ID_MENUITEM_MAIN_CUT },
-	{ 1, IDM_COPY,       0, MSG_ID_MENUITEM_MAIN_COPY },
-	{ 2, IDM_PASTE,      0, MSG_ID_MENUITEM_MAIN_PASTE },
-	{ 3, -1, 0, 0},
-	{ 4, IDM_DELETEITEM, 0, MSG_ID_MENUITEM_MAIN_DELETE },
-	{ 5, IDM_RENAME,     0, MSG_ID_MENUITEM_MAIN_RENAME },
+	{  0, IDM_CUT,        0, MSG_ID_MENUITEM_MAIN_CUT },
+	{  1, IDM_COPY,       0, MSG_ID_MENUITEM_MAIN_COPY },
+	{  2, IDM_PASTE,      0, MSG_ID_MENUITEM_MAIN_PASTE },
+	{  3, -1, 0, 0},
+	{  4, IDM_DELETEITEM, 0, MSG_ID_MENUITEM_MAIN_DELETE },
+	{  5, IDM_RENAME,     0, MSG_ID_MENUITEM_MAIN_RENAME },
+	{  6, -1, 0, 0},
+	{  7, IDM_ENCRYPT,    0, MSG_ID_MENUITEM_MAIN_ENCRYPT },
+	{  8, IDM_DECRYPT,    0, MSG_ID_MENUITEM_MAIN_DECRYPT },
+
 };
 
 HMENU PocketPCPlatform::LoadSelectViewPopupMenu()

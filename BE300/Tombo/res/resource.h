@@ -26,6 +26,8 @@
 #define IDD_PROPTAB_PASS_TIMEOUT        111
 #define IDM_DV_MENU_2                   111
 #define IDM_SV_MENU_3                   112
+#define IDM_EXTAPP1                     113
+#define IDM_EXTAPP2                     114
 #define IDB_TOOLBAR                     115
 #define IDB_TOOLBAR_DETAILS             116
 #define IDD_PROPTAB_FONT                117
@@ -46,6 +48,7 @@
 #define IDD_SEARCH                      132
 #define IDB_FIND                        133
 #define IDD_PROPTAB_CODEPAGE            134
+#define IDD_PROPTAB_EXTAPP              135
 #define IDD_SEARCHING                   136
 #define IDD_GREPTAB_MAIN                137
 #define IDD_GREPTAB_PERSIST             138
@@ -93,7 +96,9 @@
 #define IDC_SEARCH_CASESENSITIVE        1023
 #define IDC_SEARCH_ENCRYPTMEMO          1024
 #define IDC_COPYRIGHT                   1025
+#define IDC_PROP_EXTAPP_PATH_EXTAPP1    1025
 #define IDC_FILENAMEONLY                1026
+#define IDC_PROP_EXTAPP_PATH_EXTAPP2    1026
 #define IDC_DATEFORMAT_DESC             1028
 #define IDC_CODEPAGE                    1030
 #define IDC_VERSIONINFO                 1031
@@ -159,6 +164,12 @@
 #define IDC_PROPTAB_DEFNOTE_LABEL       1058
 #define IDC_SEARCH_FIND_LABEL           1059
 #define IDC_SEARCH_DIRECT_LABEL         1060
+#define IDC_PROP_EXTAPP_USEASSOC        1064
+#define IDC_PROP_EXTAPP_TTL_EXTAPP1     1065
+#define IDC_PROP_EXTAPP_TTL_EXTAPP2     1066
+#define IDC_PROPTAB_EXTAPP_CHOOSE1      1067
+#define IDC_PROPTAB_EXTAPP_CHOOSE2      1068
+#define IDC_PROP_EXTAPP_CAUTION         1069
 #define IDM_ACTIONBUTTON                30001
 #define IDM_FILE_EXIT                   40002
 #define IDM_HELP_ABOUT                  40003
@@ -228,6 +239,6 @@
 #define _APS_NEXT_RESOURCE_VALUE        141
 #define _APS_NEXT_COMMAND_VALUE         40061
 #define _APS_NEXT_CONTROL_VALUE         1061
-#define _APS_NEXT_SYMED_VALUE           113
+#define _APS_NEXT_SYMED_VALUE           115
 #endif
 #endif

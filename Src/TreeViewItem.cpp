@@ -20,6 +20,10 @@
 #include "DirList.h"
 #include "VFManager.h"
 
+#if defined(PLATFORM_BE500)
+#include "COShellAPI.h"
+#endif
+
 #define ITEM_ORDER_FILE		1
 #define ITEM_ORDER_FOLDER	0
 
@@ -377,13 +381,26 @@ BOOL TreeViewFileItem::ExecApp(MemoManager *pMgr, MemoSelectView *pView, ExeAppT
 		if (!sCmdLine.StrCat(sFullPath.Get())) return FALSE;
 		if (!sCmdLine.StrCat(TEXT("\""))) return FALSE;
 		if (!CreateProcess(NULL, sCmdLine.Get(), NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi)) return FALSE;
-#else
+		CloseHandle(pi.hProcess);
+		CloseHandle(pi.hThread);
+#endif
+#if defined(PLATFORM_HPC)
 		if (!sExe.Set(pExeFile)) return FALSE;
 		if (!sCmdLine.Join(TEXT("\""), sFullPath.Get(), TEXT("\""))) return FALSE;
 		if (!CreateProcess(sExe.Get(), sCmdLine.Get(), NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi)) return FALSE;
-#endif
 		CloseHandle(pi.hProcess);
 		CloseHandle(pi.hThread);
+#endif
+#if defined(PLATFORM_PKTPC)
+		if (!sExe.Set(pExeFile)) return FALSE;
+		if (!sCmdLine.Set(sFullPath.Get())) return FALSE;
+		if (!CreateProcess(sExe.Get(), sCmdLine.Get(), NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi)) return FALSE;
+		CloseHandle(pi.hProcess);
+		CloseHandle(pi.hThread);
+#endif
+#if defined(PLATFORM_BE500)
+		return CoshExecute(pView->GetHWnd(), pExeFile, sFullPath.Get());
+#endif
 		return TRUE;
 	}
 
@@ -722,9 +739,22 @@ BOOL TreeViewFolderItem::ExecApp(MemoManager *pMgr, MemoSelectView *pView, ExeAp
 	TString sCurrentPath;
 	HTREEITEM hItem = GetViewItem();
 	LPTSTR pCurrentPath = pView->GeneratePath(hItem, buf, MAX_PATH);
-
 	if (!sCurrentPath.Join(g_Property.TopDir(), TEXT("\\"), pCurrentPath)) return FALSE;
 
+#if defined(PLATFORM_PKTPC)
+	STARTUPINFO si;
+	PROCESS_INFORMATION pi;
+	memset(&si, 0, sizeof(si));
+	memset(&pi, 0, sizeof(pi));
+	si.cb = sizeof(si);
+
+	if (!CreateProcess(TEXT("\\windows\\iexplore.exe"), sCurrentPath.Get(), NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi)) return FALSE;
+	CloseHandle(pi.hProcess);
+	CloseHandle(pi.hThread);
+	return TRUE;
+#else
+
+	if (!sCurrentPath.Set(TEXT("\"\\wwwroot\""))) return FALSE;
 	SHELLEXECUTEINFO se;
 	memset(&se, 0, sizeof(se));
 	se.cbSize = sizeof(se);
@@ -736,6 +766,7 @@ BOOL TreeViewFolderItem::ExecApp(MemoManager *pMgr, MemoSelectView *pView, ExeAp
 	se.nShow = SW_SHOWNORMAL;
 	ShellExecuteEx(&se);
 	return TRUE;
+#endif
 }
 
 /////////////////////////////////////////////

@@ -714,3 +714,12 @@ Not fully tested on both platform, probably it will work.
 * External editor linking (HPC,Win32)
 	Other platform is yet, and can't compile
 
+////////////////////////////////
+// B149
+////////////////////////////////
+
+* External editor linking (PocketPC, BE500)
+* Modify to compile for PsPC.
+	PsPC version is not support External editor.
+* Add contect menu items (PocketPC)
+* move menu items(BE500)

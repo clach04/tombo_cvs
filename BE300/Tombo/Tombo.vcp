@@ -67,7 +67,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 commctrl.lib coredll.lib /nologo /base:"0x00010000" /stack:0x10000,0x1000 /entry:"WinMainCRTStartup" /nodefaultlib:"$(CENoDefaultLib)" /subsystem:$(CESubsystem) /MACHINE:MIPS
-# ADD LINK32 commctrl.lib coredll.lib getdisk.lib cso.lib /nologo /base:"0x00010000" /stack:0x10000,0x1000 /entry:"WinMainCRTStartup" /nodefaultlib:"$(CENoDefaultLib)" /subsystem:$(CESubsystem) /MACHINE:MIPS
+# ADD LINK32 commctrl.lib coredll.lib getdisk.lib cso.lib COShellAPI.lib /nologo /base:"0x00010000" /stack:0x10000,0x1000 /entry:"WinMainCRTStartup" /nodefaultlib:"$(CENoDefaultLib)" /subsystem:$(CESubsystem) /MACHINE:MIPS
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
 
@@ -915,6 +915,8 @@ SOURCE=..\..\Src\DetailsViewWndProc.cpp
 DEP_CPP_DETAI=\
 	"..\..\Src\MemoDetailsView.h"\
 	"..\..\Src\MemoManager.h"\
+	"..\..\Src\PlatformLayer.h"\
+	"..\..\Src\PocketPCPlatform.h"\
 	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
 	"..\..\Src\TomboLib\File.h"\
@@ -983,6 +985,8 @@ SOURCE=..\..\Src\TomboLib\DialogTemplate.cpp
 !IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
 
 DEP_CPP_DIALO=\
+	"..\..\Src\Message.h"\
+	"..\..\Src\MsgRes\MsgDef.h"\
 	"..\..\Src\TomboLib\DialogTemplate.h"\
 	
 
@@ -1313,6 +1317,9 @@ SOURCE=..\..\Src\FileSelector.cpp
 
 DEP_CPP_FILES=\
 	"..\..\Src\FileSelector.h"\
+	"..\..\Src\Message.h"\
+	"..\..\Src\MsgRes\MsgDef.h"\
+	"..\..\Src\TomboLib\DialogTemplate.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
@@ -1521,6 +1528,7 @@ DEP_CPP_FILTER=\
 	"..\..\Src\Message.h"\
 	"..\..\Src\MsgRes\MsgDef.h"\
 	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboLib\DialogTemplate.h"\
 	"..\..\Src\TomboLib\File.h"\
 	"..\..\Src\TomboLib\Logger.h"\
 	"..\..\Src\TomboLib\TString.h"\
@@ -1819,6 +1827,7 @@ DEP_CPP_GREPD=\
 	"..\..\Src\MsgRes\MsgDef.h"\
 	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboLib\DialogTemplate.h"\
 	"..\..\Src\TomboLib\File.h"\
 	"..\..\Src\TomboLib\Logger.h"\
 	"..\..\Src\TomboLib\PropertyPage.h"\
@@ -3391,7 +3400,10 @@ SOURCE=..\..\Src\NewFolderDialog.cpp
 !IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
 
 DEP_CPP_NEWFO=\
+	"..\..\Src\Message.h"\
+	"..\..\Src\MsgRes\MsgDef.h"\
 	"..\..\Src\NewFolderDialog.h"\
+	"..\..\Src\TomboLib\DialogTemplate.h"\
 	"..\..\Src\TomboLib\SipControl.h"\
 	
 
@@ -3459,6 +3471,7 @@ DEP_CPP_PASSW=\
 	"..\..\Src\MsgRes\MsgDef.h"\
 	"..\..\Src\PasswordDialog.h"\
 	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboLib\DialogTemplate.h"\
 	"..\..\Src\TomboLib\File.h"\
 	"..\..\Src\TomboLib\Logger.h"\
 	"..\..\Src\TomboLib\SipControl.h"\
@@ -3640,7 +3653,10 @@ SOURCE=..\..\Src\PlatformLayer.cpp
 !IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
 
 DEP_CPP_PLATF=\
+	"..\..\Src\Message.h"\
+	"..\..\Src\MsgRes\MsgDef.h"\
 	"..\..\Src\PlatformLayer.h"\
+	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
 	"..\..\Src\TomboLib\File.h"\
 	"..\..\Src\TomboLib\Logger.h"\
@@ -3748,9 +3764,11 @@ DEP_CPP_PROPE=\
 	"..\..\Src\PasswordManager.h"\
 	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboLib\DialogTemplate.h"\
 	"..\..\Src\TomboLib\File.h"\
 	"..\..\Src\TomboLib\Logger.h"\
 	"..\..\Src\TomboLib\PropertyPage.h"\
+	"..\..\Src\TomboLib\TString.h"\
 	"..\..\Src\TomboLib\Uniconv.h"\
 	"..\..\Src\TomboLib\VarBuffer.h"\
 	"..\..\Src\TreeViewItem.h"\
@@ -3988,9 +4006,12 @@ SOURCE=..\..\Src\SearchDlg.cpp
 !IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
 
 DEP_CPP_SEARC=\
+	"..\..\Src\Message.h"\
+	"..\..\Src\MsgRes\MsgDef.h"\
 	"..\..\Src\Property.h"\
 	"..\..\Src\SearchDlg.h"\
 	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboLib\DialogTemplate.h"\
 	"..\..\Src\TomboLib\File.h"\
 	"..\..\Src\TomboLib\Logger.h"\
 	"..\..\Src\TomboLib\SipControl.h"\
@@ -4192,6 +4213,7 @@ DEP_CPP_SEARCHT=\
 	"..\..\Src\SearchEngine.h"\
 	"..\..\Src\SearchTree.h"\
 	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboLib\DialogTemplate.h"\
 	"..\..\Src\TomboLib\File.h"\
 	"..\..\Src\TomboLib\Logger.h"\
 	"..\..\Src\TomboLib\TString.h"\
@@ -4683,6 +4705,7 @@ DEP_CPP_TREEV=\
 	"..\..\Src\VFManager.h"\
 	"..\..\Src\VFStream.h"\
 	"..\..\Src\Win32Platform.h"\
+	{$(INCLUDE)}"COShellAPI.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"

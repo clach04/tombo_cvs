@@ -376,7 +376,8 @@ LRESULT MemoSelectView::OnNotify(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	NMRGINFO *pnmrginfo = (PNMRGINFO)lParam;
 	if (pnmrginfo->hdr.code == GN_CONTEXTMENU) {
 		// tap & hold
-
+		OnNotify_RClick(pnmrginfo->ptAction);
+#ifdef COMMENT
 		TV_HITTESTINFO hti;
 		hti.pt = pnmrginfo->ptAction;
 		TreeView_HitTest(hWnd, &hti);
@@ -385,6 +386,7 @@ LRESULT MemoSelectView::OnNotify(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		HMENU hPopup = PocketPCPlatform::LoadSelectViewPopupMenu();
 		TrackPopupMenuEx(hPopup, 0, pnmrginfo->ptAction.x, pnmrginfo->ptAction.x, hWnd, NULL);
 		DestroyMenu(hPopup);
+#endif
 		return TRUE;
 	}
 #endif
@@ -514,7 +516,7 @@ LRESULT MemoSelectView::OnNotify(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	return 0xFFFFFFFF;
 }
 
-#if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
+#if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC) || defined(PLATFORM_PKTPC)
 void MemoSelectView::OnNotify_RClick(POINT pt)
 {
 	TV_HITTESTINFO hti;
@@ -640,6 +642,14 @@ BOOL MemoSelectView::OnCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	case IDM_RENAME:
 		OnEditLabel(hItem);
 		return TRUE;
+#if defined(PLATFORM_BE500)
+	case IDM_EXTAPP1:
+		pItem->ExecApp(pMemoMgr, this, TreeViewItem::ExecType_ExtApp1);
+		return TRUE;
+	case IDM_EXTAPP2:
+		pItem->ExecApp(pMemoMgr, this, TreeViewItem::ExecType_ExtApp2);
+		return TRUE;
+#endif
 	}
 	return FALSE;
 }

@@ -277,4 +277,5 @@ static LPCTSTR defaultMsg[] = {
 	TEXT("CAUTION:\r\nIf external application creates backup file, TOMBO is \r\n*NOT DELETE* it. Please check yourself before encryption whether backup file exists or not."),
 	TEXT("Choose application"),
 	TEXT("app(*.exe)\0*.exe\0all(*.*)\0*.*\0\0"),
+	TEXT("Two panes"),
 };

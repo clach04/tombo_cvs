@@ -69,7 +69,7 @@ void OverrideMenuTitle(HMENU hMenu, MenuMsgRes *pRes, int nNumRes)
 ///////////////////////////////////////////////////
 // 
 ///////////////////////////////////////////////////
-#if defined(PLATFORM_HPC) || defined(PLATFORM_WIN32)
+#if defined(PLATFORM_HPC) || defined(PLATFORM_WIN32) || defined(PLATFORM_PKTPC)
 
 static MenuMsgRes aContextMenu[] = {
 	{  0, IDM_CUT,        0, MSG_ID_MENUITEM_MAIN_CUT },
