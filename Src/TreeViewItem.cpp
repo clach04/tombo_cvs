@@ -592,26 +592,57 @@ BOOL TreeViewVirtualFolderRoot::Expand(MemoSelectView *pView)
 	if (!tp.Init(sVFpath.Get(), pView, hParent)) return FALSE;
 	if (!tp.Compile()) return FALSE;
 #endif
+
 	HTREEITEM hParent = GetViewItem();
 
 	TreeViewVirtualFolder *pVf;
+	VFDirectoryGenerator *pGen;
+	VFStore *pStore;
 	VFInfo *pInfo;
 	DWORD n = vbInfo.NumItems();
 	for (DWORD i = 0; i < n; i++) {
 		pInfo = vbInfo.GetUnit(i);
-
-		pVf = new TreeViewVirtualFolder();
-		VFDirectoryGenerator *pGen = new VFDirectoryGenerator();
-		if (pGen == NULL || !pGen->Init(StringDup(pInfo->pPath))) return FALSE;
-		VFStore *pStore = new VFStore(VFStore::ORDER_TITLE);
-		pGen->SetNext(pStore);
-		pVf->SetGenerator(pGen);
-		pVf->SetStore(pStore);
+		if (!StreamObjectsFactory(pInfo, &pVf, &pGen, &pStore)) return FALSE;
 
 		if (pVf == NULL) return FALSE;
 		pView->InsertFolder(hParent, pInfo->pName, pVf, TRUE);
-
 	}
+
+	return TRUE;
+}
+
+BOOL TreeViewVirtualFolderRoot::StreamObjectsFactory(VFInfo *pInfo, TreeViewVirtualFolder **ppVf, VFDirectoryGenerator **ppGen, VFStore **ppStore)
+{
+	// Initialize regex filter
+	VFRegexFilter *pRegex = new VFRegexFilter();
+	if (!pRegex->Init(pInfo->pRegex,
+					pInfo->nFlag & VFINFO_FLG_CASESENSITIVE,
+					pInfo->nFlag & VFINFO_FLG_CHECKCRYPTED,
+					pInfo->nFlag & VFINFO_FLG_FILENAMEONLY, 
+					g_pPasswordManager)) { // Password Manager
+		return FALSE;
+	}
+
+	// Initialize other objects
+	*ppVf = new TreeViewVirtualFolder();
+	*ppGen = new VFDirectoryGenerator();
+	*ppStore = new VFStore(VFStore::ORDER_TITLE);
+	LPTSTR pPath = StringDup(pInfo->pPath);
+	if (!pRegex || !*ppVf || !*ppGen || !*ppStore || !pPath ||
+		!(*ppGen)->Init(pPath, pInfo->nFlag & VFINFO_FLG_CHECKCRYPTED)) { // pPassMgr
+		delete pRegex;
+		delete *ppVf;
+		delete *ppGen;
+		delete *ppStore;
+		delete [] pPath;
+		SetLastError(ERROR_NOT_ENOUGH_MEMORY);
+		return FALSE;
+	}
+
+	(*ppGen)->SetNext(pRegex);
+	pRegex->SetNext(*ppStore);
+	(*ppVf)->SetGenerator(*ppGen);
+	(*ppVf)->SetStore(*ppStore);
 
 	return TRUE;
 }
@@ -626,15 +657,11 @@ BOOL TreeViewVirtualFolderRoot::AddSearchResult(MemoSelectView *pView, VFInfo *p
 		pView->ToggleExpandFolder(hParent, 0);
 	} else {
 		// insert tree manually
-		TreeViewVirtualFolder *pVf = new TreeViewVirtualFolder();
-		VFDirectoryGenerator *pGen = new VFDirectoryGenerator();
-		if (pGen == NULL || !pGen->Init(StringDup(pInfo->pPath))) return FALSE;
-		VFStore *pStore = new VFStore(VFStore::ORDER_TITLE);
-		pGen->SetNext(pStore);
-		pVf->SetGenerator(pGen);
-		pVf->SetStore(pStore);
+		TreeViewVirtualFolder *pVf;
+		VFDirectoryGenerator *pGen;
+		VFStore *pStore;
+		if (!StreamObjectsFactory(pInfo, &pVf, &pGen, &pStore)) return FALSE;
 
-		if (!pVf) return FALSE;
 		if (!pView->InsertFolder(hParent, pInfo->pName, pVf, TRUE)) return FALSE;
 	}
 
@@ -647,7 +674,7 @@ BOOL TreeViewVirtualFolderRoot::AddSearchResult(MemoSelectView *pView, VFInfo *p
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 
-TreeViewVirtualFolder::TreeViewVirtualFolder() : pGenerator(NULL), pStore(NULL), pTail(NULL)
+TreeViewVirtualFolder::TreeViewVirtualFolder() : pGenerator(NULL), pStore(NULL)
 {
 }
 
@@ -691,18 +718,12 @@ DWORD TreeViewVirtualFolder::GetIcon(MemoSelectView *pView, DWORD nStatus)
 BOOL TreeViewVirtualFolder::SetGenerator(VFDirectoryGenerator *p)
 {
 	pGenerator = p;
-	pTail = p;
 	return TRUE;
 }
 
 BOOL TreeViewVirtualFolder::SetStore(VFStore *p)
 {
 	pStore = p;
-
-	if (!pTail) return FALSE;
-	pTail->SetNext(p);
-	pTail = NULL;
-
 	return TRUE;
 }
 

@@ -273,7 +273,7 @@ BOOL TSParser::DirList(TreeViewVirtualFolder *pVf)
 		delete [] pDirPath;
 		return FALSE;
 	}
-	if (!pDirGen->Init(pDirPath)) {
+	if (!pDirGen->Init(pDirPath, FALSE)) {
 		delete pDirGen;
 		delete [] pDirPath;
 		return FALSE;

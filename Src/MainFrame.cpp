@@ -518,6 +518,7 @@ BOOL MainFrame::Create(LPCTSTR pWndName, HINSTANCE hInst, int nCmdShow)
 	// パスワードマネージャ初期化
 	pmPasswordMgr.Init(hMainWnd, hInstance);
 	mmMemoManager.SetPasswordManager(&pmPasswordMgr);
+	g_pPasswordManager = &pmPasswordMgr;
 
 	return TRUE;
 }
@@ -854,6 +855,7 @@ void MainFrame::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		mmMemoManager.NewMemo();
 	}
 
+//	SetWindowPos(hWnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
 	ActivateView(TRUE);
 }
 
@@ -2194,8 +2196,9 @@ void MainFrame::OnGrep()
 
 	GrepDialog gd;
 	if (!gd.Init(sPath.Get())) return;
-	gd.Popup(hInstance, hMainWnd);
-	if (!msView.InsertVirtualFolder(&gd)) {
-		MessageBox(MSG_INSERTVFOLDER_FAIL, TOMBO_APP_NAME, MB_OK | MB_ICONERROR);
+	if (gd.Popup(hInstance, hMainWnd) == IDOK) {
+		if (!msView.InsertVirtualFolder(&gd)) {
+			MessageBox(MSG_INSERTVFOLDER_FAIL, TOMBO_APP_NAME, MB_OK | MB_ICONERROR);
+		}
 	}
 }

@@ -1,5 +1,6 @@
 #include <windows.h>
 #include <tchar.h>
+#include "Tombo.h"
 #include "resource.h"
 #include "Message.h"
 #include "GrepDialog.h"
@@ -53,10 +54,12 @@ BOOL GrepMainTab::Apply(HWND hDlg)
 	DWORD nLen = GetWindowTextLength(hMatchString);
 	if (!pMatchString->Alloc(nLen + 1)) return FALSE;
 	GetWindowText(hMatchString, pMatchString->Get(), nLen + 1);
+	RetrieveAndSaveHistory(hMatchString, TOMBO_SEARCHHIST_ATTR_NAME, pMatchString->Get(), NUM_SEARCH_HISTORY);
 
 	pDialog->SetCaseSensitive(SendMessage(hCaseSensitive, BM_GETCHECK, 0, 0) == BST_CHECKED);
 	pDialog->SetCheckCryptedMemo(SendMessage(hCheckCrypted, BM_GETCHECK, 0, 0) == BST_CHECKED);
 	pDialog->SetCheckFileName(SendMessage(hCheckFileName, BM_GETCHECK, 0, 0) == BST_CHECKED);
+
 	return TRUE;
 }
 

@@ -1368,6 +1368,7 @@ BOOL MemoSelectView::InsertVirtualFolder(GrepDialog *pGrepDlg)
 	if (pGrepDlg->IsCaseSensitive()) { nFlg |= VFINFO_FLG_CASESENSITIVE; }
 	if (pGrepDlg->IsCheckCryptedMemo()) { nFlg |= VFINFO_FLG_CHECKCRYPTED; }
 	if (pGrepDlg->IsCheckFileName()) { nFlg |= VFINFO_FLG_FILENAMEONLY; }
+	vfInfo.nFlag = nFlg;
 
 	if (pGrepDlg->GetPath()) {
 		vfInfo.pPath = new TCHAR[_tcslen(pGrepDlg->GetPath()) + 2];

@@ -12,7 +12,7 @@
 
 // version info
 
-#define TOMBO_VERSION_INFO TEXT("Tombo version 1.6")
+#define TOMBO_VERSION_INFO TEXT("Tombo version 1.7 alpha1")
 
 // コピーライト表記
 

@@ -11,6 +11,7 @@
 #include "MainFrame.h"
 #include "Property.h"
 #include "Logger.h"
+#include "PasswordManager.h"
 
 //////////////////////////////////////
 // グローバル変数
@@ -22,6 +23,8 @@ Logger g_Logger;
 Logger *g_pLogger;
 
 BOOL bDisableHotKey;
+
+PasswordManager *g_pPasswordManager = NULL;
 
 //////////////////////////////////////
 // プロトタイプ

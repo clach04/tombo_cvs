@@ -2,14 +2,14 @@
 #define VFSTREAM_H
 
 class MemoNote;
+class SearchEngineA;
+class PasswordManager;
 
 ////////////////////////////////////
 ////////////////////////////////////
 // Virtual Folder Node Stream
 ////////////////////////////////////
 ////////////////////////////////////
-// implimentation of TOMBO script.
-
 
 ////////////////////////////////////
 // stream item
@@ -38,13 +38,13 @@ public:
 	VFStream();
 	virtual ~VFStream();
 
-	virtual BOOL Prepare() = 0;
+	virtual BOOL Prepare();
 	virtual BOOL Store(VFNote *p) = 0;
-	virtual BOOL PostActivate() = 0;
+	virtual BOOL PostActivate();
 
 	BOOL SetNext(VFStream *p);
 
-	virtual void FreeObject() = 0;
+	virtual void FreeObject();
 };
 
 ////////////////////////////////////
@@ -54,20 +54,24 @@ public:
 
 class VFDirectoryGenerator : public VFStream {
 	LPTSTR pDirPath;
+	BOOL bCheckEncrypt;
 public:
 	VFDirectoryGenerator();
 	~VFDirectoryGenerator();
-	void FreeObject();
+
+	////////////////////////////
+	// VFStream implimentation
+
+	// BOOL Prepare(); inherit 
+	BOOL Store(VFNote *p);
+	// BOOL PostActivate(); inherit
+	BOOL Activate();
+	// void FreeObject(); inherit
+
 
 	// pDir's memory is controled under VFDirectoryGenerator.
 	// do not delete pDir after calling Init.
-	BOOL Init(LPTSTR pDir);
-
-	BOOL Prepare();
-	BOOL Store(VFNote *p);
-	BOOL PostActivate();
-
-	BOOL Activate();
+	BOOL Init(LPTSTR pDir, BOOL bCheckEncrypt);
 
 };
 
@@ -106,5 +110,24 @@ public:
 	void FreeArray();
 };
 
+////////////////////////////////////
+// Filter by regular expression
+////////////////////////////////////
+
+class VFRegexFilter : public VFStream {
+	SearchEngineA *pRegex;
+public:
+	VFRegexFilter();
+	~VFRegexFilter();
+	BOOL Init(LPCTSTR pPattern, BOOL bCase, BOOL bEnc, BOOL bFileName, PasswordManager *pPassMgr);
+
+	////////////////////////////
+	// VFStream implimentation
+
+	// BOOL Prepare();		inherit to VFStream
+	virtual BOOL Store(VFNote *p);
+	// BOOL PostActivate();	inherit to VFStream
+	// void FreeObject();	inherit to VFStream
+};
 
 #endif

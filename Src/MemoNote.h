@@ -104,6 +104,13 @@ public:
 #endif
 
 	static DWORD IsNote(LPCTSTR pFile);
+
+	//////////////////////////////////
+	// Factory method for MemoNote.
+	// create and initialize MemoNote and return by ppNote.
+	//
+	// if creation failed, return FALSE.
+	// if pFile is not memo, return TRUE and *ppNote sets to NULL.
 	static BOOL MemoNoteFactory(LPCTSTR pPrefix, LPCTSTR pFile, MemoNote **ppNote);
 };
 

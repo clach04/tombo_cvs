@@ -9,12 +9,7 @@
 #include "DirectoryScanner.h"
 #include "MemoNote.h"
 #include "VFStream.h"
-
-extern "C" {
-void* Regex_Compile(const char *pPattern, BOOL bIgnoreCase, const char **ppReason);
-void Regex_Free(void *p);
-int Regex_Search(void *p, int iStart, int iRange, const char *pTarget, int *pStart, int *pEnd);
-}
+#include "SearchEngine.h"
 
 #define STORE_INIT_SIZE 100
 #define STORE_EXTEND_DELTA 50
@@ -53,86 +48,38 @@ BOOL VFStream::SetNext(VFStream *p)
 	return TRUE;
 }
 
+BOOL VFStream::Prepare()
+{
+	if (pNext) return pNext->Prepare();
+	return TRUE;
+}
+
+void VFStream::FreeObject()
+{
+	if (pNext) pNext->FreeObject();
+	delete pNext;
+	pNext = NULL;
+}
+
+BOOL VFStream::PostActivate()
+{
+	if (pNext) return pNext->PostActivate();
+	return TRUE;
+}
+
 ////////////////////////////////////
-// VFDirectoryGenerator implimentation
+// Traverse directory
 ////////////////////////////////////
-/*
-class TestScan : public DirectoryScanner {
-	MemoSelectView *pView;
-	HTREEITEM hParent;
-	void *pRegex;
-	int x, numfile;
-	DWORD nTopDirLen;
-public:
-	void Init(MemoSelectView *p, HTREEITEM hItem, const char *pStr);
-	void InitialScan();	// スキャン開始前
-	void AfterScan();  // スキャン処理後
-	void PreDirectory(LPCTSTR p){} // ディレクトリ走査前
-	void PostDirectory(LPCTSTR p){} // ディレクトリ走査後
-	void File(LPCTSTR p); // ファイル
-};
+// VFDirectoryGenerator's helper class
 
-void TestScan::Init(MemoSelectView *pv, HTREEITEM hItem, const char *pStr)
-{
-	const char *p;
-	pView = pv;
-	hParent = hItem;
-	pRegex = Regex_Compile(pStr, TRUE, &p);
-	x = 0; numfile = 0;
-	LPCTSTR pDir = g_Property.TopDir();
-	nTopDirLen = _tcslen(pDir);
-	DirectoryScanner::Init(pDir, 0);
-}
-
-void TestScan::InitialScan()
-{
-}
-
-void TestScan::AfterScan()
-{
-	Regex_Free(pRegex);
-}
-
-void TestScan::File(LPCTSTR p)
-{
-	int n = _tcslen(p);
-	int s, e, r;
-	numfile++;
-	if (n < 4 || _tcscmp(p + n - 4, TEXT(".txt"))) return;
-
-	class File inf;
-	if (!inf.Open(CurrentPath(), GENERIC_READ, FILE_SHARE_READ, OPEN_EXISTING)) return;
-
-	char *pText = new char[inf.FileSize() + 1];
-	if (pText == NULL) return;
-
-	DWORD nSize = inf.FileSize();
-	if (!inf.Read((LPBYTE)pText, &nSize)) return;
-	pText[nSize] = TEXT('\0');
-
-	r = Regex_Search(pRegex, 0, nSize, pText, &s, &e);
-	delete [] pText;
-
-	if (r > 0) {
-		x++;
-		DWORD nl = _tcslen(CurrentPath() + nTopDirLen + 1) - _tcslen(p);
-		LPTSTR pPrefix = new TCHAR[nl + 1];
-		_tcsncpy(pPrefix, CurrentPath() + nTopDirLen + 1, nl);
-		pPrefix[nl] = TEXT('\0');
-		pView->InsertFile(hParent, pPrefix, p);
-		delete [] pPrefix;
-	}
-}
-*/
-
-// =============================================================
 class VirtualStreamFolderScanner : public DirectoryScanner {
 	DWORD nTopDirLen;
 	VFStream *pNext;
+	BOOL bCheckEncrypt;
 
 	DWORD nError;
 public:
-	void Init(LPCTSTR pPath, VFStream *pStream);
+	void Init(LPCTSTR pPath, VFStream *pStream, BOOL bCe);
 	void InitialScan() { nError = ERROR_SUCCESS; }
 	void AfterScan() {}
 	void PreDirectory(LPCTSTR p){}
@@ -142,11 +89,12 @@ public:
 	DWORD GetError() { return nError; }
 };
 
-void VirtualStreamFolderScanner::Init(LPCTSTR pPath, VFStream *p)
+void VirtualStreamFolderScanner::Init(LPCTSTR pPath, VFStream *p, BOOL bCe)
 {
 	TCHAR buf[MAX_PATH];
 
 	pNext = p;
+	bCheckEncrypt = bCe;
 
 	LPCTSTR pDir = g_Property.TopDir();
 	wsprintf(buf, TEXT("%s%s"), pDir, pPath);
@@ -158,21 +106,17 @@ void VirtualStreamFolderScanner::Init(LPCTSTR pPath, VFStream *p)
 
 void VirtualStreamFolderScanner::File(LPCTSTR p)
 {
-	int n = _tcslen(p);
-	if (n < 4 || _tcscmp(p + n - 4, TEXT(".txt"))) return;
+	// if encrypted memo is not search target and the note is encrypted, ignore it
+	if (!bCheckEncrypt && MemoNote::IsNote(p) == NOTE_TYPE_CRYPTED) return;
 
-	// Create & init MemoNote object.
-	PlainMemoNote *pNote = new PlainMemoNote();
-	if (pNote == NULL) {
-		nError = ERROR_NOT_ENOUGH_MEMORY;
+	// create MemoNote object
+	MemoNote *pNote = NULL;
+	if (!MemoNote::MemoNoteFactory(TEXT(""), CurrentPath() + nTopDirLen, &pNote)) {
 		StopScan();
 		return;
 	}
-	if (!pNote->Init(CurrentPath() + nTopDirLen)) {
-		nError = GetLastError();
-		StopScan();
-		delete pNote;
-	}
+	if (pNote == NULL) return;
+
 	VFNote *pVF = new VFNote();
 	if (pVF == NULL) {
 		nError = ERROR_NOT_ENOUGH_MEMORY;
@@ -198,7 +142,9 @@ void VirtualStreamFolderScanner::File(LPCTSTR p)
 	}
 }
 
-// =============================================================
+////////////////////////////////////
+// VFDirectoryGenerator
+////////////////////////////////////
 
 VFDirectoryGenerator::VFDirectoryGenerator() : pDirPath(NULL)
 {
@@ -209,15 +155,9 @@ VFDirectoryGenerator::~VFDirectoryGenerator()
 	delete [] pDirPath;
 }
 
-void VFDirectoryGenerator::FreeObject()
+BOOL VFDirectoryGenerator::Init(LPTSTR p, BOOL bCe)
 {
-	if (pNext) pNext->FreeObject();
-	delete pNext;
-	pNext = NULL;
-}
-
-BOOL VFDirectoryGenerator::Init(LPTSTR p)
-{
+	bCheckEncrypt = bCe;
 	pDirPath = p;
 	return TRUE;
 }
@@ -227,26 +167,14 @@ BOOL VFDirectoryGenerator::Activate()
 	if (!pNext) return FALSE;
 
 	VirtualStreamFolderScanner vfs;
-	vfs.Init(pDirPath, pNext);
+	vfs.Init(pDirPath, pNext, bCheckEncrypt);
 	return vfs.Scan();
-}
-
-BOOL VFDirectoryGenerator::Prepare()
-{
-	if (pNext) return pNext->Prepare();
-	return TRUE;
 }
 
 BOOL VFDirectoryGenerator::Store(VFNote *p)
 {
 	// usually, this member is not called.
 	return FALSE;
-}
-
-BOOL VFDirectoryGenerator::PostActivate()
-{
-	if (pNext) return pNext->PostActivate();
-	return TRUE;
 }
 
 ////////////////////////////////////
@@ -316,5 +244,43 @@ void VFStore::FreeArray()
 		LocalFree(ppArray);
 		ppArray = NULL;
 		nCapacity = nPos = 0;
+	}
+}
+
+////////////////////////////////////
+//  VFRegexFilter
+////////////////////////////////////
+
+VFRegexFilter::VFRegexFilter() : pRegex(NULL)
+{
+}
+
+VFRegexFilter::~VFRegexFilter()
+{
+	delete pRegex;
+}
+
+BOOL VFRegexFilter::Init(LPCTSTR pPattern, BOOL bCase, BOOL bEnc, BOOL bFileName, PasswordManager *pPassMgr)
+{
+	pRegex = new SearchEngineA();
+	const char *pReason;
+	if (!pRegex || !pRegex->Init(bEnc, bFileName, pPassMgr)) return FALSE;
+	if (!pRegex->Prepare(pPattern, bCase, &pReason)) return FALSE;
+	return TRUE;
+}
+
+BOOL VFRegexFilter::Store(VFNote *p)
+{
+	MemoNote *pNote = p->GetNote();
+	if (pNote == NULL) return FALSE;
+	char *pText = pNote->GetMemoBodyA(pRegex->GetPasswordManager());
+	if (pText == NULL) return FALSE;
+
+	if (pRegex->SearchForward(pText, 0, 0)) {
+		BOOL bResult = pNext->Store(p);
+		delete [] pText;
+		return bResult;
+	} else {
+		return TRUE;
 	}
 }

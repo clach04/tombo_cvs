@@ -8,6 +8,7 @@ class VFDirectoryGenerator;
 class VFStore;
 class VFStream;
 class MemoLoctor;
+class TreeViewVirtualFolder;
 
 #include "MemoManager.h"
 #include "VarBuffer.h"
@@ -150,6 +151,7 @@ public:
 	// Virtual folder operator 
 	BOOL AddSearchResult(MemoSelectView *pView, VFInfo *p);
 
+	BOOL StreamObjectsFactory(VFInfo *pInfo, TreeViewVirtualFolder **ppVf, VFDirectoryGenerator **ppGen, VFStore **ppStore);
 };
 
 /////////////////////////////////////////////
@@ -160,8 +162,6 @@ class TreeViewVirtualFolder : public TreeViewFolderItem {
 protected:
 	VFDirectoryGenerator *pGenerator;
 	VFStore *pStore;
-
-	VFStream *pTail;
 public:
 	TreeViewVirtualFolder();
 	~TreeViewVirtualFolder();
