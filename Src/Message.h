@@ -139,6 +139,11 @@
 								MSG("作成日の古い順", "Old order of create date")
 #define MSG_STREAM_VALUE_SORT_CREATE_DSC \
 								MSG("作成日の新しい順", "New order of create date")
+#define MSG_STREAM_VALUE_SORT_FILESIZE_ASC\
+								MSG("ファイルサイズ昇順", "Asc order of file size")
+#define MSG_STREAM_VALUE_SORT_FILESIZE_DSC\
+								MSG("ファイルサイズ降順", "Dsc order of file size")
+
 #define MSG_DLG_INIT_FAIL		MSG("ダイアログの初期化に失敗しました", "Initialize dialog failed.")
 #define MSG_INVALID_REGEXP		MSG("正規表現の生成に失敗しました", "Generate pattern failed")
 #define MSG_SET_POSITIVE	MSG("0以上の数を指定してください", "Please set positive number")

@@ -51,6 +51,7 @@ BOOL VFNote::Init(MemoNote *p, LPCTSTR pFile)
 	if (h != INVALID_HANDLE_VALUE) {
 		uLastUpdate = ((UINT64)wfd.ftLastWriteTime.dwHighDateTime << 32) | (UINT64)wfd.ftLastWriteTime.dwLowDateTime ;
 		uCreateDate = ((UINT64)wfd.ftCreationTime.dwHighDateTime << 32) | (UINT64)wfd.ftCreationTime.dwLowDateTime;
+		uFileSize = ((UINT64)wfd.nFileSizeHigh << 32 ) | (UINT64)wfd.nFileSizeLow;
 		FindClose(h);
 		return TRUE;
 	} else {
@@ -788,6 +789,26 @@ extern "C" static int SortNotes_CreateDateNewer(const void *e1, const void *e2)
 	else return -1;
 }
 
+extern "C" static int SortNotes_FileSizeAsc(const void *e1, const void *e2)
+{
+	VFNote *p1 = *(VFNote**)e1;
+	VFNote *p2 = *(VFNote**)e2;
+
+	if (p1->GetFileSize() == p2->GetFileSize()) return 0;
+	if (p1->GetFileSize() > p2->GetFileSize()) return 1;
+	else return -1;
+}
+
+extern "C" static int SortNotes_FileSizeDsc(const void *e1, const void *e2)
+{
+	VFNote *p1 = *(VFNote**)e1;
+	VFNote *p2 = *(VFNote**)e2;
+
+	if (p2->GetFileSize() == p1->GetFileSize()) return 0;
+	if (p2->GetFileSize() > p1->GetFileSize()) return 1;
+	else return -1;
+}
+
 BOOL VFSortFilter::PostActivate()
 {
 	VFNote *p;
@@ -812,6 +833,12 @@ BOOL VFSortFilter::PostActivate()
 		break;
 	case SortFunc_CreateDateDsc:
 		pFunc = SortNotes_CreateDateNewer;
+		break;
+	case SortFunc_FileSizeAsc:
+		pFunc = SortNotes_FileSizeAsc;
+		break;
+	case SortFunc_FileSizeDsc:
+		pFunc = SortNotes_FileSizeDsc;
 		break;
 	default:
 		return FALSE;
@@ -861,7 +888,14 @@ BOOL VFSortFilter::GenerateXMLOpenTag(File *pFile)
 		break;
 	case SortFunc_CreateDateDsc:
 		pType = L"createdate_dsc";
-		break;	default:
+		break;
+	case SortFunc_FileSizeAsc:
+		pType = L"filesize_asc";
+		break;
+	case SortFunc_FileSizeDsc:
+		pType = L"filesize_dsc";
+		break;
+	default:
 		SetLastError(ERROR_INVALID_DATA);
 		return FALSE;
 	}
@@ -903,6 +937,12 @@ BOOL VFSortFilter::ToString(TString *p)
 		break;
 	case SortFunc_CreateDateDsc:
 		pTmpl = MSG_STREAM_VALUE_SORT_CREATE_DSC;
+		break;
+	case SortFunc_FileSizeAsc:
+		pTmpl = MSG_STREAM_VALUE_SORT_FILESIZE_ASC;
+		break;
+	case SortFunc_FileSizeDsc:
+		pTmpl = MSG_STREAM_VALUE_SORT_FILESIZE_DSC;
 		break;
 	default:
 		SetLastError(ERROR_INVALID_DATA);

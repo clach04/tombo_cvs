@@ -102,6 +102,7 @@
 #define IDC_FILTERCTL_NEW               1041
 #define IDC_FILTERCTL_DELETE            1042
 #define IDC_FILTERDEF_SRC_PATH          1043
+#define IDC_FILTERCTL_RENAME            1043
 #define IDC_FILTERDEF_FILTER_LIST       1044
 #define IDC_FILTERDEF_FILTER_UP         1045
 #define IDC_FILTERDEF_FILTER_DOWN       1046

@@ -25,6 +25,8 @@ class VFNote {
 	LPTSTR pFileName;
 	UINT64 uLastUpdate;
 	UINT64 uCreateDate;
+	UINT64 uFileSize;
+
 public:
 	VFNote() : pNote(NULL), pFileName(NULL) {}
 	~VFNote();
@@ -40,6 +42,7 @@ public:
 
 	UINT64 GetLastUpdate() { return uLastUpdate; }
 	UINT64 GetCreateDate() { return uCreateDate; }
+	UINT64 GetFileSize() { return uFileSize; }
 };
 
 ////////////////////////////////////
@@ -290,7 +293,9 @@ public:
 		SortFunc_LastUpdateAsc,
 		SortFunc_LastUpdateDsc,
 		SortFunc_CreateDateAsc,
-		SortFunc_CreateDateDsc
+		SortFunc_CreateDateDsc,
+		SortFunc_FileSizeAsc,
+		SortFunc_FileSizeDsc
 	};
 #ifndef UNIT_TEST
 protected:

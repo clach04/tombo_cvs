@@ -459,3 +459,9 @@ Changes
 * Remove TString::AllocFullPath().
 * Merge to YAE's TomboLib.
 
+////////////////////////////////
+// B116
+////////////////////////////////
+
+* Add rename button to virtual folder dialog(#4137)
+* Add order by file size filter to virtual folder(#4020)

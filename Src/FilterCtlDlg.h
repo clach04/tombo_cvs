@@ -29,6 +29,7 @@ public:
 	void Command_ToggleKeep(HWND hDlg);
 	void Command_New(HWND hDlg);
 	void Command_Delete(HWND hDlg);
+	void Command_Rename(HWND hDlg);
 
 	BOOL Notify_ItemChanged(HWND hDlg, LPARAM lParam);
 	BOOL Notify_EndLabelEdit(HWND hDlg, LPARAM lParam);

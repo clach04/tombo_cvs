@@ -352,6 +352,21 @@ void FilterCtlDlg::Command_Delete(HWND hDlg)
 }
 
 /////////////////////////////////////////
+// "Rename" button
+/////////////////////////////////////////
+
+void FilterCtlDlg::Command_Rename(HWND hDlg)
+{
+	HWND hList = GetDlgItem(hDlg, IDC_FILTERCTL_LIST);
+	int iSel = ListView_GetNextItem(hList, -1, LVNI_SELECTED);
+
+	if (iSel < 0) return;
+
+	SetFocus(hList);
+	ListView_EditLabel(hList, iSel);
+}
+
+/////////////////////////////////////////
 // WM_NOTIFY handler
 /////////////////////////////////////////
 
@@ -509,6 +524,9 @@ static LRESULT CALLBACK FilterCtlDlgProc(HWND hDlg, UINT nMessage, WPARAM wParam
 			break;
 		case IDC_FILTERCTL_DELETE:
 			pDlg->Command_Delete(hDlg);
+			break;
+		case IDC_FILTERCTL_RENAME:
+			pDlg->Command_Rename(hDlg);
 			break;
 		}
 		return TRUE;

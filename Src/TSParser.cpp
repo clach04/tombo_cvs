@@ -428,6 +428,10 @@ BOOL TSOrderTag::StartElement(ParseInfo *p, const XML_Char **atts)
 				sfType = VFSortFilter::SortFunc_CreateDateAsc;
 			} else if (wcsicmp(atts[i + 1], L"createdate_dsc") == 0) {
 				sfType = VFSortFilter::SortFunc_CreateDateDsc;
+			} else if (wcsicmp(atts[i + 1], L"filesize_asc") == 0) {
+				sfType = VFSortFilter::SortFunc_FileSizeAsc;
+			} else if (wcsicmp(atts[i + 1], L"filesize_dsc") == 0) {
+				sfType = VFSortFilter::SortFunc_FileSizeDsc;
 			} else {
 				return FALSE;
 			}
