@@ -644,6 +644,7 @@ static BOOL GetHeadLineFromMemoText(LPCTSTR pMemo, TString *pHeadLine)
 	// 領域確保・コピー
 	if (!pHeadLine->Alloc(n + 1)) return FALSE;
 	DropInvalidFileChar(pHeadLine->Get(), sHeadLineCand.Get());
+	TrimRight(pHeadLine->Get());
 
 	return TRUE;
 }

@@ -131,5 +131,5 @@ public:
 
 void ChopFileSeparator(LPTSTR pBuf);
 
-
+void TrimRight(LPTSTR pBuf);
 #endif

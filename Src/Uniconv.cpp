@@ -1106,6 +1106,23 @@ void ChopFileSeparator(LPTSTR pBuf)
 	}
 }
 
+void TrimRight(LPTSTR pStr)
+{
+	LPTSTR p = pStr;
+	LPTSTR pLastSpc = NULL;
+	while (*p) {
+		if (*p == TEXT(' ') && pLastSpc==NULL) {
+			pLastSpc = p;
+		}
+		if (*p != TEXT(' ')) {
+			pLastSpc = NULL;
+		}
+		p = CharNext(p);
+	}
+	if (pLastSpc) {
+		*pLastSpc = TEXT('\0');
+	}
+}
 ////////////////////////////////////////////////////
 // 領域を確保してコピー
 ////////////////////////////////////////////////////

@@ -171,6 +171,7 @@ BOOL MemoManager::MakeNewFolder(HWND hWnd, TreeViewItem *pItem)
 
 		if (!sPath.AllocFullPath(sPartPath.Get())) return FALSE;
 		if (!sPath.StrCat(pFolder)) return FALSE;
+		TrimRight(sPath.Get());
 		ChopFileSeparator(sPath.Get());
 
 		if (CreateDirectory(sPath.Get(), NULL)) {
