@@ -7,7 +7,7 @@
 #include "MemoDetailsView.h"
 #include "MemoManager.h"
 
-//#define PLATFORM_SIG3
+#define PLATFORM_SIG3
 
 #include "Property.h"
 

@@ -1,7 +1,7 @@
 #
 # TOMBO Build program for ActivePerl(Win32)
 
-$version = "Tombo1_8b1";
+$version = "Tombo1_8";
 
 ##########################################################################
 # Tool definition
@@ -66,34 +66,34 @@ $be300root = "R:\\work2\\BE300SDK_1012\\Installer\\English PC Tools";
 );
 
 @bin_pktpc_arm_jp = (
-#	["Bin\\PocketPC\\ARM", "$buildroot\\PocketPC\\CabWiz\\Tombo.arm.CAB"],
+	["Bin\\PocketPC\\ARM", "$buildroot\\PocketPC\\CabWiz\\Tombo.arm.CAB"],
 	["Bin\\PocketPC\\ARM", "$buildroot\\PocketPC\\Tombo\\ARMRel\\Tombo.exe"],
 );
 
 @bin_pktpc_mips_jp =(
-#	["Bin\\PocketPC\\MIPS", "$buildroot\\PocketPC\\CabWiz\\Tombo.mips.CAB"],
+	["Bin\\PocketPC\\MIPS", "$buildroot\\PocketPC\\CabWiz\\Tombo.mips.CAB"],
 	["Bin\\PocketPC\\MIPS", "$buildroot\\PocketPC\\Tombo\\MIPSRel\\Tombo.exe"],
 );
 
 @bin_pktpc_sh3_jp =(
-#	["Bin\\PocketPC\\SH3", "$buildroot\\PocketPC\\CabWiz\\Tombo.sh3.CAB"],
+	["Bin\\PocketPC\\SH3", "$buildroot\\PocketPC\\CabWiz\\Tombo.sh3.CAB"],
 	["Bin\\PocketPC\\SH3", "$buildroot\\PocketPC\\Tombo\\SH3Rel\\Tombo.exe"],
 );
 
 @bin_pspc_mips_jp =(
-#	["Bin\\PsPC\\MIPS", "$buildroot\\PsPC\\CabWiz\\Tombo.mips.CAB"],
+	["Bin\\PsPC\\MIPS", "$buildroot\\PsPC\\CabWiz\\Tombo.mips.CAB"],
 	["Bin\\PsPC\\MIPS", "$buildroot\\PsPC\\Tombo\\MIPSRel\\Tombo.exe"],
 );
 
 @bin_pspc_sh3_jp =(
-#	["Bin\\PsPC\\SH3", "$buildroot\\PsPC\\CabWiz\\Tombo.sh3.CAB"],
+	["Bin\\PsPC\\SH3", "$buildroot\\PsPC\\CabWiz\\Tombo.sh3.CAB"],
 	["Bin\\PsPC\\SH3", "$buildroot\\PsPC\\Tombo\\SH3Rel\\Tombo.exe"],
 );
 
 @bin_be500 = (
-#	["Bin\\BE500", "$be500root\\Setup.exe"],
-#	["Bin\\BE500", "$be500root\\Setup.ini"],
-#	["Bin\\BE500", "$be500root\\Tombo.cbea"],
+	["Bin\\BE500", "$be500root\\Setup.exe"],
+	["Bin\\BE500", "$be500root\\Setup.ini"],
+	["Bin\\BE500", "$be500root\\Tombo.cbea"],
 	["Bin\\BE500", "$buildroot\\BE500\\Tombo\\MIPSRel\\Tombo.exe"],
 );
 
@@ -117,34 +117,34 @@ $be300root = "R:\\work2\\BE300SDK_1012\\Installer\\English PC Tools";
 	["Bin\\HPCPro\\SH4", "$buildroot\\HpcPro\\Tombo\\SH4ReleaseE\\Tombo.exe"],
 );
 @bin_pktpc_arm_en = (
-#	["Bin\\PocketPC\\ARM", "$buildroot\\PocketPC\\CabWiz\\TomboE.arm.CAB"],
+	["Bin\\PocketPC\\ARM", "$buildroot\\PocketPC\\CabWiz\\TomboE.arm.CAB"],
 	["Bin\\PocketPC\\ARM", "$buildroot\\PocketPC\\Tombo\\ARMReleaseE\\Tombo.exe"],
 );
 
 @bin_pktpc_mips_en = (
-#	["Bin\\PocketPC\\MIPS", "$buildroot\\PocketPC\\CabWiz\\TomboE.mips.CAB"],
+	["Bin\\PocketPC\\MIPS", "$buildroot\\PocketPC\\CabWiz\\TomboE.mips.CAB"],
 	["Bin\\PocketPC\\MIPS", "$buildroot\\PocketPC\\Tombo\\MIPSReleaseE\\Tombo.exe"],
 );
 
 @bin_pktpc_sh3_en = (
-#	["Bin\\PocketPC\\SH3", "$buildroot\\PocketPC\\CabWiz\\TomboE.sh3.CAB"],
+	["Bin\\PocketPC\\SH3", "$buildroot\\PocketPC\\CabWiz\\TomboE.sh3.CAB"],
 	["Bin\\PocketPC\\SH3", "$buildroot\\PocketPC\\Tombo\\SH3ReleaseE\\Tombo.exe"],
 );
 
 @bin_pspc_sh3_en = (
-#	["Bin\\PsPC\\SH3", "$buildroot\\PsPC\\CabWiz\\TomboE.mips.CAB"],
+	["Bin\\PsPC\\SH3", "$buildroot\\PsPC\\CabWiz\\TomboE.mips.CAB"],
 	["Bin\\PsPC\\SH3", "$buildroot\\PsPC\\Tombo\\SH3ReleaseE\\Tombo.exe"],
 );
 
 @bin_pspc_mips_en = (
-#	["Bin\\PsPC\\MIPS", "$buildroot\\PsPC\\CabWiz\\TomboE.sh3.CAB"],
+	["Bin\\PsPC\\MIPS", "$buildroot\\PsPC\\CabWiz\\TomboE.sh3.CAB"],
 	["Bin\\PsPC\\MIPS", "$buildroot\\PsPC\\Tombo\\MIPSReleaseE\\Tombo.exe"],
 );
 
 @bin_be300 = (
-#	["Bin\\BE300", "$be300root\\Setup.exe"],
-#	["Bin\\BE300", "$be300root\\Setup.ini"],
-#	["Bin\\BE300", "$be300root\\Tombo.cbea"],
+	["Bin\\BE300", "$be300root\\Setup.exe"],
+	["Bin\\BE300", "$be300root\\Setup.ini"],
+	["Bin\\BE300", "$be300root\\Tombo.cbea"],
 	["Bin\\BE300", "$buildroot\\BE300\\Tombo\\MIPSRel\\Tombo.exe"],
 );
 
@@ -226,34 +226,34 @@ $be300root = "R:\\work2\\BE300SDK_1012\\Installer\\English PC Tools";
 	[\@buildlistCEEN, "CE-EN", "_ce_all_en"],
 	[\@buildlistWin32JP, "Win32-JP", "_win32_jp"],
 	[\@buildlistWin32EN, "Win32-EN", "_win32_en"],
-	[\@buildlist_HPC_JP, "HPC-JP", "_hpcpro_jp"],
-	[\@buildlist_PKTPC_JP, "PKTPC-JP", "_pktpc_jp"],
-	[\@buildlist_PSPC_JP, "PSPC-JP", "_pspc_jp"],
-	[\@buildlist_BE500_JP, "BE500-JP", "_be500_jp"],
-	[\@buildlist_HPC_EN, "HPC-EN", "_hpcpro_en"],
-	[\@buildlist_PKTPC_EN, "PKTPC-EN", "_pktpc_en"],
-	[\@buildlist_PSPC_EN, "PSPC-EN", "_pspc_en"],
-	[\@buildlist_BE300_EN, "BE300-EN", "_be300_en"],
+#	[\@buildlist_HPC_JP, "HPC-JP", "_hpcpro_jp"],
+#	[\@buildlist_PKTPC_JP, "PKTPC-JP", "_pktpc_jp"],
+#	[\@buildlist_PSPC_JP, "PSPC-JP", "_pspc_jp"],
+#	[\@buildlist_BE500_JP, "BE500-JP", "_be500_jp"],
+#	[\@buildlist_HPC_EN, "HPC-EN", "_hpcpro_en"],
+#	[\@buildlist_PKTPC_EN, "PKTPC-EN", "_pktpc_en"],
+#	[\@buildlist_PSPC_EN, "PSPC-EN", "_pspc_en"],
+#	[\@buildlist_BE300_EN, "BE300-EN", "_be300_en"],
 
-	[\@bl_HPC_ARM_JP, "HPC-ARM-JP", "_hpcpro_arm_jp"],
-	[\@bl_HPC_MIPS_JP,"HPC-MIPS-JP", "_hpcpro_mips_jp"],
-	[\@bl_HPC_SH3_JP,"HPC-SH3-JP", "_hpcpro_sh3_jp"],
-	[\@bl_HPC_SH4_JP,"HPC-SH4-JP", "_hpcpro_sh4_jp"],
+#	[\@bl_HPC_ARM_JP, "HPC-ARM-JP", "_hpcpro_arm_jp"],
+#	[\@bl_HPC_MIPS_JP,"HPC-MIPS-JP", "_hpcpro_mips_jp"],
+#	[\@bl_HPC_SH3_JP,"HPC-SH3-JP", "_hpcpro_sh3_jp"],
+#	[\@bl_HPC_SH4_JP,"HPC-SH4-JP", "_hpcpro_sh4_jp"],
 	[\@bl_PKTPC_ARM_JP,"PKTPC-ARM-JP", "_pktpc_arm_jp"],
 	[\@bl_PKTPC_MIPS_JP,"PKTPC-MIPS-JP", "_pktpc_mips_jp"],
-	[\@bl_PKTPC_SH3_JP,"PKTPC-SH3-JP", "_pktpc_sh3_jp"],
-	[\@bl_PSPC_MIPS_JP,"PSPC-MIPS-JP", "_pspc_mips_jp"],
-	[\@bl_PSPC_SH3_JP,"PSPC-SH3-JP", "_pspc_sh3_jp"],
+#	[\@bl_PKTPC_SH3_JP,"PKTPC-SH3-JP", "_pktpc_sh3_jp"],
+#	[\@bl_PSPC_MIPS_JP,"PSPC-MIPS-JP", "_pspc_mips_jp"],
+#	[\@bl_PSPC_SH3_JP,"PSPC-SH3-JP", "_pspc_sh3_jp"],
 
-	[\@bl_HPC_ARM_EN, "HPC-ARM-EN", "_hpcpro_arm_en"],
-	[\@bl_HPC_MIPS_EN,"HPC-MIPS-EN", "_hpcpro_mips_en"],
-	[\@bl_HPC_SH3_EN,"HPC-SH3-EN", "_hpcpro_sh3_en"],
-	[\@bl_HPC_SH4_EN,"HPC-SH4-EN", "_hpcpro_sh4_en"],
+#	[\@bl_HPC_ARM_EN, "HPC-ARM-EN", "_hpcpro_arm_en"],
+#	[\@bl_HPC_MIPS_EN,"HPC-MIPS-EN", "_hpcpro_mips_en"],
+#	[\@bl_HPC_SH3_EN,"HPC-SH3-EN", "_hpcpro_sh3_en"],
+#	[\@bl_HPC_SH4_EN,"HPC-SH4-EN", "_hpcpro_sh4_en"],
 	[\@bl_PKTPC_ARM_EN,"PKTPC-ARM-EN", "_pktpc_arm_en"],
 	[\@bl_PKTPC_MIPS_EN,"PKTPC-MIPS-EN", "_pktpc_mips_en"],
-	[\@bl_PKTPC_SH3_EN,"PKTPC-SH3-EN", "_pktpc_sh3_en"],
-	[\@bl_PSPC_MIPS_EN,"PSPC-MIPS-EN", "_pspc_mips_en"],
-	[\@bl_PSPC_SH3_EN,"PSPC-SH3-EN", "_pspc_sh3_en"],
+#	[\@bl_PKTPC_SH3_EN,"PKTPC-SH3-EN", "_pktpc_sh3_en"],
+#	[\@bl_PSPC_MIPS_EN,"PSPC-MIPS-EN", "_pspc_mips_en"],
+#	[\@bl_PSPC_SH3_EN,"PSPC-SH3-EN", "_pspc_sh3_en"],
 
 #	[\@bl_snapshot, "SNAPSHOT", "snapshot"],
 );
