@@ -392,6 +392,10 @@ BOOL TreeViewFolderItem::Rename(MemoManager *pMgr, MemoSelectView *pView, LPCTST
 	TCHAR buf[MAX_PATH];
 	TString sCurrentPath;
 	LPTSTR pCurrentPath = pView->GeneratePath(this, buf, MAX_PATH);
+
+	// If root node, disable changing.
+	if (_tcslen(pCurrentPath) == 0) return FALSE;
+
 	if (!sCurrentPath.AllocFullPath(pCurrentPath)) return FALSE;
 
 	MemoFolder mf;
