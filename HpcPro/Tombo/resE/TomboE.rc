@@ -141,9 +141,9 @@ BEGIN
                     CBS_SORT | WS_VSCROLL | WS_TABSTOP
     COMBOBOX        IDC_FONT_DETAILS_NAME,35,71,95,65,CBS_DROPDOWNLIST | 
                     CBS_SORT | WS_VSCROLL | WS_TABSTOP
-    COMBOBOX        IDC_FONT_SELECT_SIZE,35,35,35,65,CBS_DROPDOWNLIST | 
+    COMBOBOX        IDC_FONT_SELECT_SIZE,35,35,35,65,CBS_DROPDOWN | 
                     WS_VSCROLL | WS_TABSTOP
-    COMBOBOX        IDC_FONT_DETAILS_SIZE,35,85,35,65,CBS_DROPDOWNLIST | 
+    COMBOBOX        IDC_FONT_DETAILS_SIZE,35,85,35,65,CBS_DROPDOWN | 
                     WS_VSCROLL | WS_TABSTOP
     CONTROL         "Use default",IDC_FONT_SELECT_USEDEFAULT,"Button",
                     BS_AUTOCHECKBOX | WS_TABSTOP,30,5,105,10
@@ -367,7 +367,7 @@ BEGIN
         MENUITEM "Find Next\tF3",               IDM_SEARCH_NEXT
         MENUITEM "Find Prev\tShift+F3",         IDM_SEARCH_PREV
         MENUITEM SEPARATOR
-        MENUITEM "Grep\tCtrl+G",                IDM_GREP
+        MENUITEM "Quick filter\tCtrl+G",        IDM_GREP
         MENUITEM "Virtual folder",              IDM_VFOLDER_DEF
     END
     POPUP "&Tools"

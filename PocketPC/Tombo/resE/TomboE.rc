@@ -108,7 +108,7 @@ BEGIN
         MENUITEM "Find Next",                   IDM_SEARCH_NEXT
         MENUITEM "Find Prev",                   IDM_SEARCH_PREV
         MENUITEM SEPARATOR
-        MENUITEM "Grep",                        IDM_GREP
+        MENUITEM "Quick filter",                IDM_GREP
         MENUITEM SEPARATOR
         MENUITEM "Encrypt",                     IDM_ENCRYPT, GRAYED
         MENUITEM "Decrypt",                     IDM_DECRYPT, GRAYED
@@ -270,9 +270,9 @@ BEGIN
                     CBS_SORT | WS_VSCROLL | WS_TABSTOP
     COMBOBOX        IDC_FONT_DETAILS_NAME,35,81,75,65,CBS_DROPDOWNLIST | 
                     CBS_SORT | WS_VSCROLL | WS_TABSTOP
-    COMBOBOX        IDC_FONT_SELECT_SIZE,35,35,35,65,CBS_DROPDOWNLIST | 
+    COMBOBOX        IDC_FONT_SELECT_SIZE,35,35,35,65,CBS_DROPDOWN | 
                     WS_VSCROLL | WS_TABSTOP
-    COMBOBOX        IDC_FONT_DETAILS_SIZE,35,95,35,65,CBS_DROPDOWNLIST | 
+    COMBOBOX        IDC_FONT_DETAILS_SIZE,35,95,35,65,CBS_DROPDOWN | 
                     WS_VSCROLL | WS_TABSTOP
     CONTROL         "Use default",IDC_FONT_SELECT_USEDEFAULT,"Button",
                     BS_AUTOCHECKBOX | WS_TABSTOP,30,5,85,10

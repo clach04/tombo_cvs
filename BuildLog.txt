@@ -355,6 +355,13 @@ Return to main trunk.
 * Change IDD_FILTERDEF_FILTER's font to "System" on BE-300 version.
 * Add ClearType font support.
 
+////////////////////////////////
+// 
+////////////////////////////////
+
+* Rename menu "Grep" to "Quick filter".
+* Change font size dropdown menu drop list to dropdown. You can set any size what you want.(#2200)
+
 
 /////////////////////////////////////////////////////////////////////////
 // TODO

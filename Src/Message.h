@@ -100,7 +100,7 @@
 #define MSG_STRING_SEARCH_CANCELED \
 								MSG("検索はキャンセルされました", "Search has been canceled.")
 
-#define MSG_GREPTAB_MAIN_TTL	MSG("Grep", "Grep")
+#define MSG_GREPTAB_MAIN_TTL	MSG("クイックフィルタ", "Quick filter")
 #define MSG_INSERTVFOLDER_FAIL	MSG("仮想フォルダの作成に失敗しました", "Create virtual folder failed.")
 #define MSG_GREP_NONAME_LABEL	MSG("検索結果", "Grep result")
 #define MSG_VFOLDER_NAME_TTL	MSG("仮想フォルダ名", "Virtual folder name")
@@ -136,7 +136,7 @@
 #define MSG_DLG_INIT_FAIL		MSG("ダイアログの初期化に失敗しました", "Initialize dialog failed.")
 #define MSG_INVALID_REGEXP		MSG("正規表現の生成に失敗しました", "Generate pattern failed")
 #define MSG_SET_POSITIVE	MSG("0以上の数を指定してください", "Please set positive number")
-
+#define MSG_INVALID_FONT_SIZE	MSG("フォントサイズが不正です", "Invalid font size")
 
 #endif
 

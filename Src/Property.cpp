@@ -505,7 +505,7 @@ static void SetFontName(HDC hDC, HWND hFontName, LPCTSTR pDefaultFontName)
 
 static void SetFontSize(HWND hFontSize, DWORD nDefaultSize)
 {
-	TCHAR buf[5];
+	TCHAR buf[32];
 	BOOL bSet = FALSE;
 
 	for (DWORD i = FONTSIZE_MIN; i <= FONTSIZE_MAX; i++) {
@@ -517,6 +517,8 @@ static void SetFontSize(HWND hFontSize, DWORD nDefaultSize)
 		}
 	}
 	if (!bSet) {
+		wsprintf(buf, TEXT("%d"), nDefaultSize);
+		SendMessage(hFontSize, CB_INSERTSTRING, 0, (LPARAM)buf);
 		SendMessage(hFontSize, CB_SETCURSEL, 0, 0);
 	}
 }
@@ -543,6 +545,7 @@ static void InitFontControls(HDC hDC, HWND hName, HWND hSize, HWND hDefault, HWN
 	}
 	SetFontName(hDC, hName, pFont);
 	SetFontSize(hSize, nSize);
+
 	if (bQuality == DEFAULT_QUALITY) {
 		SendMessage(hCT, BM_SETCHECK, BST_UNCHECKED, 0);
 	} else {
@@ -570,7 +573,17 @@ void FontTab::Init(HWND hDlg)
 	ReleaseDC(hDlg, hDC);
 }
 
-static void GetFontStat(HWND hName, HWND hSize, HWND hDefault, HWND hCT, LPTSTR pName, LPDWORD pSize, LPBYTE pClearType)
+static BOOL CheckNumberFormat(LPCTSTR pStr)
+{
+	LPCTSTR p = pStr;
+	while(*p) {
+		if (!_istdigit(*p)) return FALSE;
+		p++;
+	}
+	return TRUE;
+}
+
+static BOOL GetFontStat(HWND hName, HWND hSize, HWND hDefault, HWND hCT, LPTSTR pName, LPDWORD pSize, LPBYTE pClearType)
 {
 	DWORD nStat = SendMessage(hDefault, BM_GETCHECK, 0, 0);
 	if (nStat & BST_CHECKED) {
@@ -580,7 +593,16 @@ static void GetFontStat(HWND hName, HWND hSize, HWND hDefault, HWND hCT, LPTSTR 
 		DWORD n;
 		n = SendMessage(hName, CB_GETCURSEL, 0, 0);
 		SendMessage(hName, CB_GETLBTEXT, n, (LPARAM)pName);
-		*pSize = SendMessage(hSize, CB_GETCURSEL, 0, 0) + FONTSIZE_MIN;
+
+		// get font size
+		TCHAR buf[256];
+		GetWindowText(hSize, buf, 256);
+		int is = _ttoi(buf);
+		if (!CheckNumberFormat(buf) || is <= 0) {
+			MessageBox(hSize, MSG_INVALID_FONT_SIZE, TOMBO_APP_NAME, MB_ICONWARNING|MB_OK);
+			return FALSE;
+		}
+		*pSize = (DWORD)is;
 	}
 
 	DWORD nCT = SendMessage(hCT, BM_GETCHECK, 0, 0);
@@ -589,7 +611,7 @@ static void GetFontStat(HWND hName, HWND hSize, HWND hDefault, HWND hCT, LPTSTR 
 	} else {
 		*pClearType = DEFAULT_QUALITY;
 	}
-
+	return TRUE;
 }
 
 BOOL FontTab::Apply(HWND hDlg)
@@ -604,8 +626,12 @@ BOOL FontTab::Apply(HWND hDlg)
 	HWND hDetailsSize = GetDlgItem(hDlg, IDC_FONT_DETAILS_SIZE);
 	HWND hDetailsCT   = GetDlgItem(hDlg, IDC_FONT_DETAILS_CLEARTYPE);
 
-	GetFontStat(hSelectName, hSelectSize, hSelectUseDefault, hSelectCT, pProperty->aSelectViewFontName, &(pProperty->nSelectViewFontSize), &(pProperty->bSelectViewFontQuality));
-	GetFontStat(hDetailsName, hDetailsSize, hDetailsUseDefault, hDetailsCT, pProperty->aDetailsViewFontName, &(pProperty->nDetailsViewFontSize), &(pProperty->bDetailsViewFontQuality));
+	if(!GetFontStat(hSelectName, hSelectSize, hSelectUseDefault, hSelectCT, pProperty->aSelectViewFontName, &(pProperty->nSelectViewFontSize), &(pProperty->bSelectViewFontQuality))) {
+		return FALSE;
+	}
+	if (!GetFontStat(hDetailsName, hDetailsSize, hDetailsUseDefault, hDetailsCT, pProperty->aDetailsViewFontName, &(pProperty->nDetailsViewFontSize), &(pProperty->bDetailsViewFontQuality))) {
+		return FALSE;
+	}
 
 	return TRUE;
 }

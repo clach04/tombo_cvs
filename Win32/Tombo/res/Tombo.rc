@@ -51,7 +51,7 @@ BEGIN
         MENUITEM "次を検索\tF3",                IDM_SEARCH_NEXT
         MENUITEM "前を検索\tShift+F3",          IDM_SEARCH_PREV
         MENUITEM SEPARATOR
-        MENUITEM "Grep\tCtrl+G",                IDM_GREP
+        MENUITEM "クイックフィルタ\tCtrl+G",    IDM_GREP
         MENUITEM SEPARATOR
         MENUITEM "日付1\tCtrl+1",               IDM_INSDATE1, GRAYED
         MENUITEM "日付2\tCtrl+2",               IDM_INSDATE2, GRAYED
@@ -234,9 +234,9 @@ BEGIN
                     CBS_SORT | WS_VSCROLL | WS_TABSTOP
     COMBOBOX        IDC_FONT_DETAILS_NAME,40,85,65,65,CBS_DROPDOWNLIST | 
                     CBS_SORT | WS_VSCROLL | WS_TABSTOP
-    COMBOBOX        IDC_FONT_SELECT_SIZE,109,35,35,65,CBS_DROPDOWNLIST | 
+    COMBOBOX        IDC_FONT_SELECT_SIZE,109,35,35,65,CBS_DROPDOWN | 
                     WS_VSCROLL | WS_TABSTOP
-    COMBOBOX        IDC_FONT_DETAILS_SIZE,109,85,35,65,CBS_DROPDOWNLIST | 
+    COMBOBOX        IDC_FONT_DETAILS_SIZE,109,85,35,65,CBS_DROPDOWN | 
                     WS_VSCROLL | WS_TABSTOP
     CONTROL         "デフォルトフォントを使用",IDC_FONT_SELECT_USEDEFAULT,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,35,20,105,10
