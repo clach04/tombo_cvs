@@ -387,6 +387,13 @@ int MainFrame::MainLoop() {
 	
 #if defined(PLATFORM_PKTPC) || defined(PLATFORM_PSPC) || defined(PLATFORM_BE500)
 		// アクションキー押下に伴うVK_RETURNの無視
+
+#if defined(PLATFORM_PKTPC)
+		// On PocketPC devices, you can select enable/disable about this feature.
+		if (!g_Property.DisableExtraActionButton()) {
+		//disable logic begin
+#endif
+
 		if (msg.message == WM_KEYDOWN) {
 			WPARAM w = msg.wParam;
 			if (w == VK_PROCESSKEY) {
@@ -427,6 +434,10 @@ int MainFrame::MainLoop() {
 				continue;
 			}
 		}
+#if defined(PLATFORM_PKTPC)
+		} // disable logic end
+#endif
+
 #endif
 		// 本来の処理
 		if (!TranslateAccelerator(hMainWnd, bSelectViewActive ? hAccelSv : hAccelDv, &msg)) {
