@@ -112,6 +112,25 @@ BOOL MemoNote::Init(LPCTSTR p)
 }
 
 /////////////////////////////////////////////
+// Copy Instance
+/////////////////////////////////////////////
+// if subclass of MemoNote has class-oriented member variables,
+// create this method for each classes.
+
+MemoNote *MemoNote::Clone()
+{
+	MemoNote *p = GetNewInstance();
+	if (p == NULL || !p->Init(pPath)) return NULL;
+	return p;
+}
+
+BOOL MemoNote::Equal(MemoNote *pTarget)
+{
+	if (pTarget == NULL) return FALSE;
+	return (_tcsicmp(pPath, pTarget->MemoPath()) == 0);
+}
+
+/////////////////////////////////////////////
 // ÉÅÉÇì‡óeÇÃéÊìæ(MemoNote)
 /////////////////////////////////////////////
 
@@ -827,5 +846,40 @@ BOOL MemoNote::Rename(LPCTSTR pNewName)
 	delete [] pPath;
 	pPath = pNewPath;
 
+	return TRUE;
+}
+
+/////////////////////////////////////////////
+// MemoNote object factory
+/////////////////////////////////////////////
+
+BOOL MemoNote::MemoNoteFactory(LPCTSTR pPrefix, LPCTSTR pFile, MemoNote **ppNote)
+{
+	*ppNote = NULL;
+
+	DWORD len = _tcslen(pFile);
+	if (len <= 4) return TRUE;
+
+	if (_tcsicmp(pFile + len - 4, TEXT(".txt")) == 0) {
+		*ppNote = new PlainMemoNote();
+	} else if (_tcsicmp(pFile + len - 4, TEXT(".chi")) == 0) {
+		*ppNote = new CryptedMemoNote();
+	} else {
+		// There are no action except *.txt, *.chi
+		return TRUE;
+	}
+
+	if (*ppNote == NULL) {
+		SetLastError(ERROR_NOT_ENOUGH_MEMORY);
+		return FALSE;
+	}
+
+	TCHAR path[MAX_PATH];
+	wsprintf(path, TEXT("%s%s"), pPrefix, pFile);
+	if (!(*ppNote)->Init(path)) {
+		delete (*ppNote);
+		*ppNote = NULL;
+		return FALSE;
+	}
 	return TRUE;
 }

@@ -29,6 +29,9 @@ public:
 	virtual LPCTSTR GetExtension() = 0;
 	virtual DWORD GetMemoIcon() = 0;
 
+	MemoNote *Clone();
+	BOOL Equal(MemoNote *pTarget);
+
 	//////////////////////////////////
 	// ÉÅÉÇì‡óeëÄçÏä÷òA
 
@@ -93,6 +96,7 @@ public:
 	static void WipeOutAndDelete(char *pMemo);
 #endif
 
+	static BOOL MemoNoteFactory(LPCTSTR pPrefix, LPCTSTR pFile, MemoNote **ppNote);
 };
 
 ////////////////////////////////////////
