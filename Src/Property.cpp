@@ -45,11 +45,12 @@
 #define SWITCH_WINDOW_TITLE_ATTR_NAME TEXT("SwitchWindowTitle")
 #define KEEP_TITLE_ATTR_NAME TEXT("KeepTitle")
 #define PROP_FOLDER_ATTR_NAME TEXT("PropertyDir")
+#define CODEPAGE_ATTR_NAME TEXT("CodePage")
 
 #define TOMBO_WINSIZE_ATTR_NAME TEXT("WinSize")
 #define TOMBO_REBARHIST_ATTR_NAME TEXT("RebarPos")
 
-#if defined(PLATFORM_PKTPC)
+#if defined(PLATFORM_PKTPC) || (defined(PLATFORM_BE500) && defined(TOMBO_LANG_ENGLISH))
 #define PROPTAB_PAGES 6
 #else
 #define PROPTAB_PAGES 5
@@ -943,6 +944,44 @@ BOOL AppButtonTab::Apply(HWND hDlg)
 #endif
 
 //////////////////////////////////////////
+// Codepage tab
+//////////////////////////////////////////
+#if defined(PLATFORM_BE500) && defined(TOMBO_LANG_ENGLISH)
+
+class CodepageTab : public PropertyPage {
+public:
+	CodepageTab(Property *p) :
+	  PropertyPage(p, IDD_PROPTAB_CODEPAGE, (DLGPROC)DefaultPageProc, IDS_PROPTAB_CODEPAGE) {}
+	~CodepageTab() {}
+	void Init(HWND hDlg);
+	BOOL Apply(HWND hDlg);
+};
+
+void CodepageTab::Init(HWND hDlg)
+{
+	HWND hWnd = GetDlgItem(hDlg, IDC_CODEPAGE);
+	SendMessage(hWnd, CB_ADDSTRING, 0, (LPARAM)TEXT("Default(English)"));
+	SendMessage(hWnd, CB_ADDSTRING, 0, (LPARAM)TEXT("Greek"));
+	if (pProperty->nCodePage == 1253) {
+		SendMessage(hWnd, CB_SETCURSEL, 1, 0);
+	} else {
+		SendMessage(hWnd, CB_SETCURSEL, 0, 0);
+	}
+}
+
+BOOL CodepageTab::Apply(HWND hDlg)
+{
+	HWND hWnd = GetDlgItem(hDlg, IDC_CODEPAGE);
+	if (SendMessage(hWnd, CB_GETCURSEL, 0, 0) == 1) {
+		pProperty->nCodePage = 1253; // Greek
+	} else {
+		pProperty->nCodePage = 0; // default
+	}
+	return TRUE;
+}
+#endif
+
+//////////////////////////////////////////
 // プロパティダイアログの表示
 //////////////////////////////////////////
 
@@ -961,7 +1000,9 @@ DWORD Property::Popup(HINSTANCE hInst, HWND hWnd)
 #if defined(PLATFORM_PKTPC)
 	AppButtonTab pgAppButton(this);
 #endif
-
+#if defined(PLATFORM_BE500) && defined(TOMBO_LANG_ENGLISH)
+	CodepageTab pgCodepage(this);
+#endif
 	pages[0] = &pgFolder;
 	pages[1] = &pgTimeout;
 	pages[2] = &pgFont;
@@ -972,6 +1013,9 @@ DWORD Property::Popup(HINSTANCE hInst, HWND hWnd)
 #endif
 #if defined(PLATFORM_PKTPC)
 	pages[5] = &pgAppButton;
+#endif
+#if defined(PLATFORM_BE500) && defined(TOMBO_LANG_ENGLISH)
+	pages[5] = &pgCodepage;
 #endif
 
     PROPSHEETPAGE psp[PROPTAB_PAGES];
@@ -1186,6 +1230,15 @@ BOOL Property::Load(BOOL *pStrict)
 		aPropDir[0] = TEXT('\0');
 	}
 
+#if defined(PLATFORM_BE500)
+	// Code page
+	siz = sizeof(nCodePage);
+	res = RegQueryValueEx(hTomboRoot, CODEPAGE_ATTR_NAME, NULL, &typ, (LPBYTE)&nCodePage, &siz);
+	if (res != ERROR_SUCCESS) {
+		nCodePage = 0;
+	}
+#endif
+
 	RegCloseKey(hTomboRoot);
 	return TRUE;
 }
@@ -1266,6 +1319,10 @@ BOOL Property::Save()
 	if (_tcslen(aPropDir) > 0) {
 		if (!SetSZToReg(hTomboRoot, PROP_FOLDER_ATTR_NAME, aPropDir)) return FALSE;
 	}
+
+#if defined(PLATFORM_BE500)
+	if (!SetDWORDToReg(hTomboRoot, CODEPAGE_ATTR_NAME, nCodePage)) return FALSE;
+#endif
 
 #if defined(PLATFORM_BE500)
 	CGDFlushRegistry();

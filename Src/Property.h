@@ -40,6 +40,10 @@ class Property {
 
 	TCHAR aPropDir[MAX_PATH];
 
+#if defined(PLATFORM_BE500)
+	DWORD nCodePage;
+#endif
+
 public:
 	Property();
 
@@ -96,6 +100,10 @@ public:
 	// Property folder path
 	LPCTSTR PropertyDir() { return aPropDir; }
 
+#if defined(PLATFORM_BE500)
+	DWORD CodePage() { return nCodePage; }
+#endif
+
 	// ウィンドウサイズ関連の保存・復元
 	static BOOL SaveWinSize(LPRECT pWinRect, WORD nSelectViewWidth);
 	static BOOL GetWinSize(LPRECT pWinRect, LPWORD pSelectViewWidth);
@@ -108,6 +116,7 @@ public:
 	friend class KeepCaretTab;
 	friend class SelectMemoTab;
 	friend class AppButtonTab;
+	friend class CodepageTab;
 };
 
 ////////////////////////////////////

@@ -488,7 +488,7 @@ BOOL MemoDetailsView::Search(BOOL bFirstSearch, BOOL bForward, BOOL bNFMsg, BOOL
 	p = ConvUnicode2SJIS(pT);
 	// エディットコントロールから取得したカーソル位置はWide Charでの文字数のため、
 	// SJIS上でのバイト数に変換
-	nSearchStart = WideCharToMultiByte(CP_ACP, 0, pT, nSearchStart, NULL, 0, NULL, NULL);
+	nSearchStart = CountWCBytes(pT, nSearchStart);
 #else
 	p = pT;
 #endif
@@ -514,9 +514,10 @@ BOOL MemoDetailsView::Search(BOOL bFirstSearch, BOOL bForward, BOOL bNFMsg, BOOL
 
 		// マッチングした文字位置はMultiByteのバイト数のため、
 		// EDITBOXが食えるようにWideChar換算での文字数に変換する
-		nStart2 = MultiByteToWideChar(CP_ACP, 0, p, nStart, NULL, 0);
-		nEnd2 = nStart2 + MultiByteToWideChar(CP_ACP, 0, p + nStart, nEnd - nStart, NULL, 0);
+		nStart2 = CountMBStrings(p, nStart);
+		nEnd2 = nStart2 + CountMBStrings(p + nStart, nEnd - nStart);
 
+		// for debug code
 //		TCHAR buf[1024];
 //		wsprintf(buf, TEXT("%d - %d => %d - %d"), nStart, nEnd, nStart2, nEnd2);
 //		MessageBox(NULL, buf, TEXT("DEBUG"), MB_OK);
