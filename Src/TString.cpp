@@ -299,7 +299,10 @@ void GetFilePath(LPTSTR pFilePath, LPCTSTR pFileName)
 		}
 		p++;
 	}
-	if (q == NULL) return;
+	if (q == NULL) {
+		*pFilePath = TEXT('\0');
+		return;
+	}
 	_tcsncpy(pFilePath, pFileName, q - pFileName + 1);
 	*(pFilePath + (q - pFileName + 1)) = TEXT('\0');
 }

@@ -93,9 +93,22 @@ MemoLocator MemoManager::AllocNewMemo(LPCTSTR pText, MemoNote *pTemplate)
 	// get note path
 	TreeViewItem *pItem = pMemoSelectView->GetCurrentItem();
 	if (!pItem->GetFolderPath(pMemoSelectView, &sMemoPath)) return MemoLocator(NULL, NULL);
-	ChopFileSeparator(sMemoPath.Get());
-	HTREEITEM hParent = pMemoSelectView->ShowItem(sMemoPath.Get(), FALSE);
-	if (!sMemoPath.StrCat(TEXT("\\"))) return MemoLocator(NULL, NULL);
+
+	HTREEITEM hParent;
+	if (_tcscmp(sMemoPath.Get(), TEXT("\0")) == 0) {
+		hParent = pMemoSelectView->ShowItem(sMemoPath.Get(), FALSE);
+	} else {
+		ChopFileSeparator(sMemoPath.Get());
+		hParent = pMemoSelectView->ShowItem(sMemoPath.Get(), FALSE);
+		if (!sMemoPath.StrCat(TEXT("\\"))) return MemoLocator(NULL, NULL);
+	}
+
+	// assert
+	// if current item is root, sMemoPath == ""
+	// if current item is not root, sMemoPath == "...\"
+
+	if (hParent == NULL) return MemoLocator(NULL, NULL);
+
 
 //	HTREEITEM hParent;
 //	pMemoSelectView->GetCurrentItem(&hParent);
