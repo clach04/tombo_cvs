@@ -308,22 +308,25 @@ BEGIN
                     IDC_STATIC,10,95,115,20
 END
 
-IDD_PROPTAB_APPBUTTON DIALOG DISCARDABLE  0, 0, 122, 102
+IDD_PROPTAB_APPBUTTON DIALOG DISCARDABLE  0, 0, 122, 127
 STYLE WS_CHILD
 FONT 9, "System"
 BEGIN
     CONTROL         "ボタン1",IDC_PROP_APPBUTTON1,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,5,5,105,10
+                    WS_TABSTOP,5,10,105,10
     CONTROL         "ボタン4",IDC_PROP_APPBUTTON4,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,5,35,105,10
+                    WS_TABSTOP,5,41,105,10
     CONTROL         "ボタン2",IDC_PROP_APPBUTTON2,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,5,15,105,10
+                    WS_TABSTOP,5,21,105,10
     CONTROL         "ボタン3",IDC_PROP_APPBUTTON3,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,5,25,105,10
+                    WS_TABSTOP,5,30,105,10
     CONTROL         "ボタン5",IDC_PROP_APPBUTTON5,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,5,45,105,10
+                    WS_TABSTOP,5,50,105,10
     LTEXT           "アプリケーションボタンをアクションボタンとして割り当てます。割り当ては再起動後に有効となります。",
-                    IDC_STATIC,5,65,115,30
+                    IDC_STATIC,5,65,110,30
+    CONTROL         "編集画面ではアクションボタン無効",
+                    IDC_PROPTAB_DISABLEACTION,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,5,100,115,10
 END
 
 IDD_SEARCH DIALOG DISCARDABLE  0, 0, 111, 129
@@ -442,7 +445,7 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 115
         TOPMARGIN, 7
-        BOTTOMMARGIN, 95
+        BOTTOMMARGIN, 120
     END
 
     IDD_SEARCH, DIALOG

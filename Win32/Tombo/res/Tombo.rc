@@ -59,6 +59,7 @@ BEGIN
         MENUITEM "折り返し表示(&L)",            IDM_DETAILS_HSCROLL
         , CHECKED, GRAYED
         MENUITEM "2画面モード(P)",              IDM_TOGGLEPANE, CHECKED
+        MENUITEM "ステータスバー",              IDM_SHOWSTATUSBAR, CHECKED
         MENUITEM SEPARATOR
         MENUITEM "暗号化(&E)\tCtrl+E",          IDM_ENCRYPT, GRAYED
         MENUITEM "復号化(&P)\tCtrl+P",          IDM_DECRYPT, GRAYED

@@ -247,6 +247,7 @@ BEGIN
         MENUITEM "Erase password",              IDM_FORGETPASS
         MENUITEM SEPARATOR
         MENUITEM "&Options",                    IDM_PROPERTY
+        MENUITEM "Status bar",                  IDM_SHOWSTATUSBAR, CHECKED
     END
     POPUP "&Help"
     BEGIN

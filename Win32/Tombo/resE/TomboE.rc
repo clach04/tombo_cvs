@@ -59,6 +59,7 @@ BEGIN
         MENUITEM "Wrap Text",                   IDM_DETAILS_HSCROLL
         , CHECKED, GRAYED
         MENUITEM "Two panes",                   IDM_TOGGLEPANE, CHECKED
+        MENUITEM "Status bar",                  IDM_SHOWSTATUSBAR, CHECKED
         MENUITEM SEPARATOR
         MENUITEM "&Encrypt\tCtrl+E",            IDM_ENCRYPT, GRAYED
         MENUITEM "Decry&pt\tCtrl+P",            IDM_DECRYPT, GRAYED

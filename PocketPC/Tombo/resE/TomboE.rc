@@ -314,8 +314,11 @@ BEGIN
                     WS_TABSTOP,5,25,105,10
     CONTROL         "Button5",IDC_PROP_APPBUTTON5,"Button",BS_AUTOCHECKBOX | 
                     WS_TABSTOP,5,45,105,10
-    LTEXT           "Assigin Appliction button to action button. It is enabled after re-executing TOMBO",
-                    IDC_STATIC,5,65,115,30
+    LTEXT           "Assigin Appliction button to action button. It is enabled after restarting TOMBO",
+                    IDC_STATIC,5,55,110,25
+    CONTROL         "Disable close notes on edit view",
+                    IDC_PROPTAB_DISABLEACTION,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,5,85,115,10
 END
 
 IDD_SEARCH DIALOG DISCARDABLE  0, 0, 111, 129

@@ -73,6 +73,7 @@
 #define IDC_SEARCH_DIRECTION_UP         1034
 #define IDC_SEARCH_DIRECTION_DOWN       1035
 #define IDC_SEARCHMSG                   1036
+#define IDC_PROPTAB_DISABLEACTION       1037
 #define IDM_ACTIONBUTTON                30001
 #define IDM_FILE_EXIT                   40002
 #define IDM_HELP_ABOUT                  40003
@@ -142,7 +143,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        123
 #define _APS_NEXT_COMMAND_VALUE         40069
-#define _APS_NEXT_CONTROL_VALUE         1037
+#define _APS_NEXT_CONTROL_VALUE         1038
 #define _APS_NEXT_SYMED_VALUE           106
 #endif
 #endif

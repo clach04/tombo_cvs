@@ -246,6 +246,7 @@ BEGIN
     BEGIN
         MENUITEM "折り返し表示(&L)",            IDM_DETAILS_HSCROLL, CHECKED
         MENUITEM "2画面表示(P)",                IDM_TOGGLEPANE, CHECKED
+        MENUITEM "ステータスバー",              IDM_SHOWSTATUSBAR, CHECKED
         MENUITEM SEPARATOR
         MENUITEM "暗号化(&E)\tCtrl+E",          IDM_ENCRYPT
         MENUITEM "復号化(&D)\tCtrl+P",          IDM_DECRYPT
