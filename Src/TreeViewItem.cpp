@@ -687,7 +687,7 @@ BOOL TreeViewFolderItem::CanCopy(MemoSelectView *pView)
 
 BOOL TreeViewFolderItem::CanPaste(MemoSelectView *pView)
 {
-	return CanDelete(pView);
+	return TRUE;
 }
 
 /////////////////////////////////////////////
@@ -828,7 +828,8 @@ BOOL TreeViewVirtualFolderRoot::Expand(MemoSelectView *pView)
 	if (!sVFpath.Join(buf2, TOMBO_VFOLDER_DEF_FILE)) return FALSE;
 
 	TSParser tp;
-	if (!tp.Parse(sVFpath.Get(), pView, hParent)) return FALSE;
+	tp.Parse(sVFpath.Get(), pView, hParent);
+//	if (!tp.Parse(sVFpath.Get(), pView, hParent)) return FALSE;
 	////////
 
 
