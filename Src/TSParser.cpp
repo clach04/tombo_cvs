@@ -62,7 +62,7 @@ BOOL TSParser::Compile()
 	prev_token = "";
 
 	gettoken();
-	// TODO: Error Handling
+	// TODO:2 Error Handling
 	BOOL bRes = ExprList();
 	if (!bRes) {
 		MessageBox(NULL, TEXT("Compile error"), TEXT("DEBUG"), MB_OK);
@@ -223,7 +223,7 @@ BOOL TSParser::Expr()
 	gettoken();
 
 	// Insert virtual folder to MemoSelectView
-	pView->InsertFolderToLast(hParent, pNodeName, pVf);
+	pView->InsertFolder(hParent, pNodeName, pVf, TRUE);
 
 	delete [] pNodeName;
 
@@ -231,7 +231,7 @@ BOOL TSParser::Expr()
 }
 
 // StreamDef -> DirStreamItem '|' StoreStreamItem
-// TODO: Generalize expressions.
+// TODO:2 Generalize expressions.
 BOOL TSParser::StreamDef(TreeViewVirtualFolder *pVf)
 {
 	if (!DirStreamItem(pVf)) return FALSE;
@@ -261,7 +261,7 @@ BOOL TSParser::DirStreamItem(TreeViewVirtualFolder *pVf)
 }
 
 // DirList -> STR
-// TODO: accept multi STR's 
+// TODO:2 accept multi STR's 
 BOOL TSParser::DirList(TreeViewVirtualFolder *pVf)
 {
 	if (nexttoken != TOKEN_STR) return FALSE;
