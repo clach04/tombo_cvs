@@ -49,6 +49,7 @@ BOOL VFNote::Init(MemoNote *p, LPCTSTR pFile)
 	HANDLE h = FindFirstFile(aFullPath.Get(), &wfd);
 	if (h != INVALID_HANDLE_VALUE) {
 		uLastUpdate = ((UINT64)wfd.ftLastWriteTime.dwHighDateTime << 32) | (UINT64)wfd.ftLastWriteTime.dwLowDateTime ;
+		uCreateDate = ((UINT64)wfd.ftCreationTime.dwHighDateTime << 32) | (UINT64)wfd.ftCreationTime.dwLowDateTime;
 		FindClose(h);
 		return TRUE;
 	} else {
@@ -768,6 +769,24 @@ extern "C" static int SortNotes_LastUpdateNewer(const void *e1, const void *e2)
 	else return -1;
 }
 
+extern "C" static int SortNotes_CreateDateOlder(const void *e1, const void *e2)
+{
+	VFNote *p1 = *(VFNote**)e1;
+	VFNote *p2 = *(VFNote**)e2;
+	if (p1->GetCreateDate() == p2->GetCreateDate()) return 0;
+	if (p1->GetCreateDate() > p2->GetCreateDate()) return 1;
+	else return -1;
+}
+
+extern "C" static int SortNotes_CreateDateNewer(const void *e1, const void *e2)
+{
+	VFNote *p1 = *(VFNote**)e1;
+	VFNote *p2 = *(VFNote**)e2;
+	if (p2->GetCreateDate() == p1->GetCreateDate()) return 0;
+	if (p2->GetCreateDate() > p1->GetCreateDate()) return 1;
+	else return -1;
+}
+
 BOOL VFSortFilter::PostActivate()
 {
 	VFNote *p;
@@ -785,6 +804,12 @@ BOOL VFSortFilter::PostActivate()
 		pFunc = SortNotes_LastUpdateOlder;
 		break;
 	case SortFunc_LastUpdateDsc:
+		pFunc = SortNotes_LastUpdateNewer;
+		break;
+	case SortFunc_CreateDateAsc:
+		pFunc = SortNotes_LastUpdateOlder;
+		break;
+	case SortFunc_CreateDateDsc:
 		pFunc = SortNotes_LastUpdateNewer;
 		break;
 	default:
@@ -830,7 +855,12 @@ BOOL VFSortFilter::GenerateXMLOpenTag(File *pFile)
 	case SortFunc_LastUpdateDsc:
 		pType = L"lastupdate_dsc";
 		break;
-	default:
+	case SortFunc_CreateDateAsc:
+		pType = L"createdate_asc";
+		break;
+	case SortFunc_CreateDateDsc:
+		pType = L"createdate_dsc";
+		break;	default:
 		SetLastError(ERROR_INVALID_DATA);
 		return FALSE;
 	}
@@ -866,6 +896,12 @@ BOOL VFSortFilter::ToString(TString *p)
 		break;
 	case SortFunc_LastUpdateDsc:
 		pTmpl = MSG_STREAM_VALUE_SORT_LASTUPD_DSC;
+		break;
+	case SortFunc_CreateDateAsc:
+		pTmpl = MSG_STREAM_VALUE_SORT_CREATE_ASC;
+		break;
+	case SortFunc_CreateDateDsc:
+		pTmpl = MSG_STREAM_VALUE_SORT_CREATE_DSC;
 		break;
 	default:
 		SetLastError(ERROR_INVALID_DATA);

@@ -181,6 +181,8 @@ void SortFilterAddDlg::InitDialog(HWND hDlg)
 	SendMessage(hSortType, CB_ADDSTRING, 0, (LPARAM)MSG_STREAM_VALUE_SORT_FNAME_DSC);
 	SendMessage(hSortType, CB_ADDSTRING, 0, (LPARAM)MSG_STREAM_VALUE_SORT_LASTUPD_ASC);
 	SendMessage(hSortType, CB_ADDSTRING, 0, (LPARAM)MSG_STREAM_VALUE_SORT_LASTUPD_DSC);
+	SendMessage(hSortType, CB_ADDSTRING, 0, (LPARAM)MSG_STREAM_VALUE_SORT_CREATE_ASC);
+	SendMessage(hSortType, CB_ADDSTRING, 0, (LPARAM)MSG_STREAM_VALUE_SORT_CREATE_DSC);
 
 	DWORD n;
 	switch (sfType) {
@@ -188,6 +190,8 @@ void SortFilterAddDlg::InitDialog(HWND hDlg)
 	case VFSortFilter::SortFunc_FileNameDsc:	n = 1; break;
 	case VFSortFilter::SortFunc_LastUpdateAsc:	n = 2; break;
 	case VFSortFilter::SortFunc_LastUpdateDsc:	n = 3; break;
+	case VFSortFilter::SortFunc_CreateDateAsc:	n = 4; break;
+	case VFSortFilter::SortFunc_CreateDateDsc:	n = 5; break;
 	default:
 		n = 0;
 	}
@@ -195,13 +199,15 @@ void SortFilterAddDlg::InitDialog(HWND hDlg)
 	SendMessage(hSortType, CB_SETCURSEL, n, 0);
 }
 
-#define NUM_SOFTFILTER_SORT_TYPE 4
+#define NUM_SOFTFILTER_SORT_TYPE 6
 
 static VFSortFilter::SortFuncType sfComboList[NUM_SOFTFILTER_SORT_TYPE] = {
 	VFSortFilter::SortFunc_FileNameAsc,
 	VFSortFilter::SortFunc_FileNameDsc,
 	VFSortFilter::SortFunc_LastUpdateAsc,
-	VFSortFilter::SortFunc_LastUpdateDsc
+	VFSortFilter::SortFunc_LastUpdateDsc,
+	VFSortFilter::SortFunc_CreateDateAsc,
+	VFSortFilter::SortFunc_CreateDateDsc
 };
 
 BOOL SortFilterAddDlg::OnOK()

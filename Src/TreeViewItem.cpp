@@ -1010,6 +1010,19 @@ BOOL TreeViewVirtualFolder::Expand(MemoSelectView *pView)
 		MemoNote *p = pNote->GetNote();
 		pNote->ClearNote(); // to prevent deleting p
 		LPCTSTR pTitle = pNote->GetFileName();
+#ifdef COMMENT
+		TString sTitle;
+		sTitle.Set(pTitle);
+		if (p &&  p->MemoPath()) {
+			TString sPath;
+			sPath.GetDirectoryPath(p->MemoPath());
+			ChopFileSeparator(sPath.Get());
+			sTitle.StrCat(TEXT(" ("));
+			sTitle.StrCat(sPath.Get());
+			sTitle.StrCat(TEXT(")"));
+		}
+		pView->InsertFile(hItem, p, sTitle.Get(), TRUE, TRUE);
+#endif
 		pView->InsertFile(hItem, p, pTitle, TRUE, TRUE);
 	}
 	pStore->FreeArray();

@@ -133,6 +133,10 @@
 								MSG("最終更新日の古い順", "Old order of last update")
 #define MSG_STREAM_VALUE_SORT_LASTUPD_DSC \
 								MSG("最終更新日の新しい順", "New order of last update")
+#define MSG_STREAM_VALUE_SORT_CREATE_ASC \
+								MSG("作成日の古い順", "Old order of create date")
+#define MSG_STREAM_VALUE_SORT_CREATE_DSC \
+								MSG("作成日の新しい順", "New order of create date")
 #define MSG_DLG_INIT_FAIL		MSG("ダイアログの初期化に失敗しました", "Initialize dialog failed.")
 #define MSG_INVALID_REGEXP		MSG("正規表現の生成に失敗しました", "Generate pattern failed")
 #define MSG_SET_POSITIVE	MSG("0以上の数を指定してください", "Please set positive number")
