@@ -63,10 +63,21 @@ void MemoManager::SetCurrentNote(MemoLocator *pLoc)
 		pCurrentNote = NULL;
 		hCurrentItem = NULL;
 	} else {
-		delete pCurrentNote;
-		pCurrentNote = pNote->Clone();
-		hCurrentItem = pLoc->GetHITEM();
+		if (pCurrentNote != pNote) {
+			delete pCurrentNote;
+			pCurrentNote = pNote->Clone();
+			hCurrentItem = pLoc->GetHITEM();
+		}
 	}
+}
+
+////////////////////////////////////////////////////////
+// Get MemoLocator keeps now
+////////////////////////////////////////////////////////
+
+MemoLocator MemoManager::CurrentLoc()
+{
+	return MemoLocator(pCurrentNote, hCurrentItem);
 }
 
 ////////////////////////////////////////////////////////

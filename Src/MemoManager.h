@@ -124,6 +124,7 @@ public:
 	PasswordManager *GetPasswordManager() { return pPassMgr; }
 	MemoNote *CurrentNote() { return pCurrentNote; }
 	MainFrame *GetMainFrame() { return pMainFrame; }
+	MemoLocator CurrentLoc();
 
 	/////////////////////////////////////
 	// Notify from MemoSelectView

@@ -1343,16 +1343,14 @@ void MainFrame::OnList(BOOL bAskSave)
 		// 2Paneの場合、暗号化されたメモのみクリアする
 		if (nYNC == IDNO) {
 			// メモを破棄し、旧メモをリロード
-			MemoLocator loc(mmMemoManager.CurrentNote(), NULL);
-			RequestOpenMemo(&loc, OPEN_REQUEST_MDVIEW_ACTIVE);
+			RequestOpenMemo(&(mmMemoManager.CurrentLoc()), OPEN_REQUEST_MDVIEW_ACTIVE);
 		} else {
 			MemoNote *pCurrent = mmMemoManager.CurrentNote();
 			if (pCurrent && pCurrent->IsEncrypted()) {
 				mmMemoManager.NewMemo();
 			} else {
 #if defined(PLATFORM_HPC)
-				MemoLocator loc(mmMemoManager.CurrentNote());
-				RequestOpenMemo(&loc, OPEN_REQUEST_MDVIEW_ACTIVE);
+				RequestOpenMemo(&(mmMemoManager.CurrentLoc()), OPEN_REQUEST_MDVIEW_ACTIVE);
 #endif
 			}
 		}
