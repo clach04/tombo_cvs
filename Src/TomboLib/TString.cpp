@@ -3,8 +3,6 @@
 #include "UniConv.h"
 #include "TString.h"
 
-// ヘッドライン除外文字列
-#define SKIPCHAR TEXT("\\/:,;*?<>\"\t")
 
 ////////////////////////////////////////////////////
 // TString implimentation
@@ -225,113 +223,6 @@ BOOL WString::Set(TString *pSrc)
 	return TRUE;
 }
 
-////////////////////////////////////////////////////////////////////
-// ファイル名として使用できない文字を抜いた形で文字列をコピー
-////////////////////////////////////////////////////////////////////
-
-void DropInvalidFileChar(LPTSTR pDst, LPCTSTR pSrc)
-{
-	LPTSTR q = pDst;
-	LPCTSTR p = pSrc;
-
-	// ファイル名として使用できない文字をスキップしてヘッドラインをコピー
-	while(*p) {
-#ifndef _WIN32_WCE
-		if (IsDBCSLeadByte(*p)) {
-			*q++ = *p++;
-			*q++ = *p++;
-			continue;
-		}
-#endif
-		if (_tcschr(SKIPCHAR, *p) != NULL) {
-			p++;
-			continue;
-		}
-		*q++ = *p++;
-	}
-	*q = TEXT('\0');
-}
-
-////////////////////////////////////////////////////////////////////
-// パスファイル名からベース名(パスと拡張子を除いたもの)を取得
-////////////////////////////////////////////////////////////////////
-// ...\..\AA.txt -> AA
-BOOL GetBaseName(TString *pBase, LPCTSTR pFull)
-{
-	LPCTSTR p = pFull;
-	LPCTSTR pLastDot = NULL;
-	LPCTSTR pLastYen = NULL;
-	while (*p) {
-#ifndef _WIN32_WCE
-		if (IsDBCSLeadByte(*p)) {
-			p += 2;
-			continue;
-		}
-#endif
-		if (*p == TEXT('.')) pLastDot = p;
-		if (*p == TEXT('\\')) pLastYen = p;
-		p++;
-	}
-	if (pLastDot == NULL) pLastDot = p;
-	if (pLastYen == NULL) pLastYen = pFull - 1;
-
-	DWORD n = pLastDot - pLastYen - 1;
-	if (!pBase->Alloc(n + 1)) return FALSE;
-	_tcsncpy(pBase->Get(), pLastYen + 1, n);
-	*(pBase->Get() + n) = TEXT('\0');
-	return TRUE;
-}
-
-////////////////////////////////////////////////////////////////////
-// find next '\\'
-////////////////////////////////////////////////////////////////////
-
-LPCTSTR GetNextDirSeparator(LPCTSTR pStart)
-{
-	LPCTSTR p = pStart;
-	while(*p) {
-#if defined(PLATFORM_WIN32)
-		if (IsDBCSLeadByte((BYTE)*p)) {
-			p++;
-			if (*p) p++;
-			continue;
-		}
-#endif
-		if (*p == TEXT('\\')) return p;
-		p++;
-	}
-	return NULL;
-}
-
-////////////////////////////////////////////////////////////////////
-// Get file path
-////////////////////////////////////////////////////////////////////
-
-void GetFilePath(LPTSTR pFilePath, LPCTSTR pFileName)
-{
-	LPCTSTR p = pFileName;
-	LPCTSTR q = NULL;
-
-	// get last position of '\'
-	while(*p) {
-#ifdef PLATFORM_WIN32
-		if (IsDBCSLeadByte((BYTE)*p)) {
-			p+= 2;
-			continue;
-		}
-#endif
-		if (*p == TEXT('\\')) {
-			q = p;
-		}
-		p++;
-	}
-	if (q == NULL) {
-		*pFilePath = TEXT('\0');
-		return;
-	}
-	_tcsncpy(pFilePath, pFileName, q - pFileName + 1);
-	*(pFilePath + (q - pFileName + 1)) = TEXT('\0');
-}
 
 /////////////////////////////////////////////
 // セキュアなバッファ

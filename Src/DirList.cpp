@@ -8,12 +8,12 @@ extern "C" int SortItems(const void *e1, const void *e2)
 {
 	const DirListItem *p1 = (const DirListItem*)e1;
 	const DirListItem *p2 = (const DirListItem*)e2;
-	LPCTSTR q1 = pSortSB->Get(p1->nNamePos);
-	LPCTSTR q2 = pSortSB->Get(p2->nNamePos);
-	if (p1->bFlg == p2->bFlg) {
+	LPCTSTR q1 = pSortSB->Get(p1->nFileNamePos);
+	LPCTSTR q2 = pSortSB->Get(p2->nFileNamePos);
+	if (p1->bFolder == p2->bFolder) {
 		return _tcsicmp(q1, q2);
 	} else {
-		if (p1->bFlg == 1) {
+		if (p1->bFolder) {
 			return -1;
 		} else {
 			return 1;
@@ -21,13 +21,15 @@ extern "C" int SortItems(const void *e1, const void *e2)
 	}
 }
 
-BOOL DirList::Init(BOOL bCE, BOOL bAMN)
+BOOL DirList::Init(DWORD nOption, LPCTSTR pUB)
 {
-	bChopExtension = bCE;
-	bAllocMemoNotes = bAMN;
+	bChopExtension = nOption & DIRLIST_OPT_CHOPEXTENSION;
+	bAllocMemoNotes = nOption & DIRLIST_OPT_ALLOCMEMONOTE;
+
+	pURIBase = pUB;
 
 	if (!vDirList.Init(50, 10)) return FALSE;
-	if (!sbDirList.Init(100, 50)) return FALSE;
+	if (!sbDirList.Init(400, 20)) return FALSE;
 	return TRUE;
 }
 
@@ -50,7 +52,7 @@ BOOL DirList::GetList(LPCTSTR pPrefix, LPCTSTR pMatchPath)
 			DWORD l = _tcslen(wfd.cFileName);
 			if (wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
 				// folder 
-				di.bFlg = 1;
+				di.bFolder = TRUE;
 			} else {
 				// file
 				if (bAllocMemoNotes) {
@@ -60,7 +62,7 @@ BOOL DirList::GetList(LPCTSTR pPrefix, LPCTSTR pMatchPath)
 					if (n == NOTE_TYPE_NO || n == NOTE_TYPE_TDT) continue;
 				}
 				
-				di.bFlg = 0;
+				di.bFolder = FALSE;
 				di.pNote = pNote;
 				if (bChopExtension) {
 					l -= 4;
@@ -69,7 +71,7 @@ BOOL DirList::GetList(LPCTSTR pPrefix, LPCTSTR pMatchPath)
 			}
 
 			// Add file name to buffer
-			if (!sbDirList.Add(wfd.cFileName, l + 1, &(di.nNamePos))) return FALSE;
+			if (!sbDirList.Add(wfd.cFileName, l + 1, &(di.nFileNamePos))) return FALSE;
 			if (!vDirList.Add(&di)) return FALSE;
 
 		} while(FindNextFile(hHandle, &wfd));

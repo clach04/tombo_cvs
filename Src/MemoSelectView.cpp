@@ -154,6 +154,7 @@ HTREEITEM MemoSelectView::InsertFile(HTREEITEM hParent, const TomboURI *pURI,
 	ti.hInsertAfter = TVI_LAST;
 	ti.item.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE | TVIF_PARAM;
 	ti.item.iImage = ti.item.iSelectedImage = pNote->GetMemoIcon();
+	delete pNote;
 
 	TreeViewFileItem *tvi;
 	if (bLink) {
@@ -162,12 +163,9 @@ HTREEITEM MemoSelectView::InsertFile(HTREEITEM hParent, const TomboURI *pURI,
 		tvi = new TreeViewFileItem();
 	}
 
-	if (!tvi) {
-		delete pNote;
-		return NULL;
-	}
+	if (!tvi) return NULL;
 
-	tvi->SetNote(pNote);
+	tvi->SetNote(pURI);
 	ti.item.lParam = (LPARAM)tvi;
 
 	ti.item.pszText = (LPTSTR)pTitle;

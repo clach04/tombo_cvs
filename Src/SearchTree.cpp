@@ -150,7 +150,7 @@ SearchResult SearchTree::SearchTreeRec(LPCTSTR pNextParse, LPTSTR pBase)
 {
 	// expand directory list
 	DirList dl;
-	if (!dl.Init(FALSE, FALSE)) return SR_FAILED;
+	if (!dl.Init(DIRLIST_OPT_NONE, NULL)) return SR_FAILED;
 	_tcscpy(pBase, TEXT("*.*"));
 	if (!dl.GetList(TEXT(""), aPath)) return SR_FAILED;
 
@@ -197,10 +197,10 @@ SearchResult SearchTree::SearchTreeRec(LPCTSTR pNextParse, LPTSTR pBase)
 		}
 
 		DirListItem *pItem = dl.GetItem(i);
-		LPCTSTR pFileName = dl.GetFileName(pItem->nNamePos);
+		LPCTSTR pFileName = dl.GetFileName(pItem->nFileNamePos);
 
 		_tcscpy(pBase, pFileName);
-		if (pItem->bFlg) {
+		if (pItem->bFolder) {
 			// directory
 			DWORD l = _tcslen(pFileName);
 			_tcscpy(pBase + l, TEXT("\\\0"));
@@ -252,7 +252,7 @@ static DWORD FindList(DirList *pDl, LPCTSTR pString)
 	DWORD n = pDl->NumItems();
 	for (DWORD i = 0; i < n; i++) {
 		DirListItem *p = pDl->GetItem(i);
-		LPCTSTR q = pDl->GetFileName(p->nNamePos);
+		LPCTSTR q = pDl->GetFileName(p->nFileNamePos);
 
 		if (_tcscmp(q, pString) == 0) return i;
 	}

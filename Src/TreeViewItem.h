@@ -105,8 +105,7 @@ protected:
 		Locator() : pURI(NULL) {}
 		~Locator();
 		const TomboURI *getURI() const { return pURI; }
-		void set(MemoNote *p);
-		void set(TomboURI *pURI);
+		void set(const TomboURI *pURI);
 	};
 
 	Locator loc;
@@ -118,7 +117,7 @@ public:
 	////////////////////////////////
 	// class specific methods
 
-	void SetNote(MemoNote *p);
+	void SetNote(const TomboURI *p);
 
 	////////////////////////////////
 	// inherited methods

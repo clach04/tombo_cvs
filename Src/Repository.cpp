@@ -111,7 +111,7 @@ BOOL Repository::GetAttachURI(const TomboURI *pBase, TomboURI *pAttached)
 
 URIOption::~URIOption()
 {
-	delete pNewNote;
+//	delete pNewNote;
 	delete pNewURI;
 	delete pNewHeadLine;
 }

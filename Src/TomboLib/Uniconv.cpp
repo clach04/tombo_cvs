@@ -5,6 +5,7 @@
 #include "Property.h"
 #endif
 #include "Uniconv.h"
+#include "TString.h"
 
 #ifndef ESC
 #define ESC 0x1B
@@ -796,10 +797,10 @@ char *ConvSJIS2JIS(char *str)
 	return outbuf;
 }
 
+#ifdef COMMENT
 ////////////////////////////////////////////////////
 // Base64Encoder実装
 ////////////////////////////////////////////////////
-
 
 // 変更するとうまく動かなくなるかも。
 // BASE64_LINE_WIDTHはENCODE_BUF_SIZEより 最低でも4/3 + 18以上大きいこと。
@@ -1024,9 +1025,10 @@ char *Base64Encoder::AllocLine()
 	}
 	return p;
 }
+#endif
 
 ////////////////////////////////////////////////////
-// Base64Encoder実装
+// misc functions
 ////////////////////////////////////////////////////
 
 static LPTSTR GetTail(LPTSTR pBuf)
@@ -1202,4 +1204,218 @@ LPWSTR ConvUTF8ToUCS2(const char *pUTFData)
 	*q = TEXT('\0');
 
 	return pData;
+}
+
+////////////////////////////////////////////////////
+// Base64 encode/decode
+////////////////////////////////////////////////////
+
+#if defined(USE_CPPUNIT)
+DWORD g_Base64EncodeAllocSize;
+#endif
+
+char *Base64Encode(const LPBYTE pBinary, DWORD nSrcLen)
+{
+	if (pBinary == NULL || nSrcLen == 0) return NULL;
+
+	static char enctable[65] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+
+	DWORD nBufSiz = nSrcLen / 3 * 4;
+	if (nSrcLen % 3 != 0) { nBufSiz += 4; }
+	nBufSiz++; // for \0
+
+#if defined(USE_CPPUNIT)
+	g_Base64EncodeAllocSize = nBufSiz;
+#endif
+
+	// alloc
+	unsigned char *pOutBuf = new unsigned char[nBufSiz];
+	if (pOutBuf == NULL) return NULL;
+
+	LPBYTE p = pBinary;
+	unsigned char *q = pOutBuf;
+
+	DWORD v;
+	DWORD n = nSrcLen;
+
+	while(n >= 3) {
+		v = *p >> 2;
+		*q++ = enctable[v];
+		v = ((*p & 3) << 4) + (*(p+1) >> 4);
+		*q++ = enctable[v];
+		v = ((*(p+1) & 0xF) << 2) + (*(p+2) >> 6);
+		*q++ = enctable[v];
+		v = *(p+2) & 0x3F;
+		*q++ = enctable[v];
+
+		p += 3;
+		n -= 3;
+	}
+
+	if (n == 2) {
+		v = *p >> 2;
+		*q++ = enctable[v];
+		v = ((*p & 3) << 4) + (*(p+1) >> 4);
+		*q++ = enctable[v];
+		v = ((*(p+1) & 0x0F) << 2);
+		*q++ = enctable[v];
+		*q++ = '=';
+	} else if (n == 1) {
+		v = *p >> 2;
+		*q++ = enctable[v];
+		v = (*p & 3) << 4;
+		*q++ = enctable[v];
+		*q++ = '=';
+		*q++ = '=';
+	}
+	*q = '\0';
+	return (char*)pOutBuf;
+}
+
+
+LPBYTE Base64Decode(const char *pM64str, LPDWORD pDataSize)
+{
+	DWORD nPrevSize = strlen(pM64str);
+	LPBYTE pDecData = new BYTE[nPrevSize];
+
+	if (pDecData == NULL || nPrevSize % 4 != 0) return NULL;
+
+	const char *p = pM64str;
+	LPBYTE q = pDecData;
+	BYTE b1, b2, b3;
+
+	unsigned char c1, c2, c3, c4;
+
+	while(*p) {
+		c1 = dec64(*p++);
+		c2 = dec64(*p++);
+		c3 = dec64(*p++);
+		c4 = dec64(*p++);
+
+		b1 = (c1 << 2) | ((c2 & 0x30) >> 4);
+		*q++ = b1;
+
+		if (c3 != 64) {
+			b2 = ((c2 & 0xF) << 4) | ((c3 & 0x3c) >> 2);
+			*q++ = b2;
+		}
+
+		if (c3 != 64 && c4 != 64) {
+			b3 = ((c3 & 0x3) << 6) | c4;
+			*q++ = b3;
+		}
+	}
+	*pDataSize = q - pDecData;
+	return pDecData;
+}
+
+////////////////////////////////////////////////////////////////////
+// ファイル名として使用できない文字を抜いた形で文字列をコピー
+////////////////////////////////////////////////////////////////////
+
+// ヘッドライン除外文字列
+#define SKIPCHAR TEXT("\\/:,;*?<>\"\t")
+
+void DropInvalidFileChar(LPTSTR pDst, LPCTSTR pSrc)
+{
+	LPTSTR q = pDst;
+	LPCTSTR p = pSrc;
+
+	// ファイル名として使用できない文字をスキップしてヘッドラインをコピー
+	while(*p) {
+#ifndef _WIN32_WCE
+		if (IsDBCSLeadByte(*p)) {
+			*q++ = *p++;
+			*q++ = *p++;
+			continue;
+		}
+#endif
+		if (_tcschr(SKIPCHAR, *p) != NULL) {
+			p++;
+			continue;
+		}
+		*q++ = *p++;
+	}
+	*q = TEXT('\0');
+}
+
+////////////////////////////////////////////////////////////////////
+// パスファイル名からベース名(パスと拡張子を除いたもの)を取得
+////////////////////////////////////////////////////////////////////
+// ...\..\AA.txt -> AA
+BOOL GetBaseName(TString *pBase, LPCTSTR pFull)
+{
+	LPCTSTR p = pFull;
+	LPCTSTR pLastDot = NULL;
+	LPCTSTR pLastYen = NULL;
+	while (*p) {
+#ifndef _WIN32_WCE
+		if (IsDBCSLeadByte(*p)) {
+			p += 2;
+			continue;
+		}
+#endif
+		if (*p == TEXT('.')) pLastDot = p;
+		if (*p == TEXT('\\')) pLastYen = p;
+		p++;
+	}
+	if (pLastDot == NULL) pLastDot = p;
+	if (pLastYen == NULL) pLastYen = pFull - 1;
+
+	DWORD n = pLastDot - pLastYen - 1;
+	if (!pBase->Alloc(n + 1)) return FALSE;
+	_tcsncpy(pBase->Get(), pLastYen + 1, n);
+	*(pBase->Get() + n) = TEXT('\0');
+	return TRUE;
+}
+
+////////////////////////////////////////////////////////////////////
+// find next '\\'
+////////////////////////////////////////////////////////////////////
+
+LPCTSTR GetNextDirSeparator(LPCTSTR pStart)
+{
+	LPCTSTR p = pStart;
+	while(*p) {
+#if defined(PLATFORM_WIN32)
+		if (IsDBCSLeadByte((BYTE)*p)) {
+			p++;
+			if (*p) p++;
+			continue;
+		}
+#endif
+		if (*p == TEXT('\\')) return p;
+		p++;
+	}
+	return NULL;
+}
+
+////////////////////////////////////////////////////////////////////
+// Get file path
+////////////////////////////////////////////////////////////////////
+
+void GetFilePath(LPTSTR pFilePath, LPCTSTR pFileName)
+{
+	LPCTSTR p = pFileName;
+	LPCTSTR q = NULL;
+
+	// get last position of '\'
+	while(*p) {
+#ifdef PLATFORM_WIN32
+		if (IsDBCSLeadByte((BYTE)*p)) {
+			p+= 2;
+			continue;
+		}
+#endif
+		if (*p == TEXT('\\')) {
+			q = p;
+		}
+		p++;
+	}
+	if (q == NULL) {
+		*pFilePath = TEXT('\0');
+		return;
+	}
+	_tcsncpy(pFilePath, pFileName, q - pFileName + 1);
+	*(pFilePath + (q - pFileName + 1)) = TEXT('\0');
 }

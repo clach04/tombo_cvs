@@ -514,6 +514,7 @@ void MainFrame::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	RepositoryOption roOpt;
 	roOpt.bKeepCaret = g_Property.KeepCaret();
 	roOpt.bKeepTitle = g_Property.KeepTitle();
+	roOpt.bSafeFileName = TRUE;
 	g_Repository.Init(g_Property.TopDir(), &roOpt);
 
 	// create toolbar

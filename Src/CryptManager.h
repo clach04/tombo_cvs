@@ -10,7 +10,7 @@ class CryptManager {
 public:
 	~CryptManager();
 
-	// パスワードを指定する。
+	// Set password
 	BOOL Init(const char *pKey);
 
 	// pBufに平文を設定して呼ぶことでpBufに暗号文を返す。
@@ -28,8 +28,8 @@ public:
 	// 戻り値のバッファはnewされているため、いらなくなった段階で呼び出し元がdelete[]する必要がある。
 	LPBYTE LoadAndDecrypt(LPDWORD pSize, LPCTSTR pFileName);
 
-//	BOOL EncryptFile(LPCTSTR pSrc, LPCTSTR pDst);
-//	BOOL DecryptFile(LPCTSTR pSrc, LPCTSTR pDst);
+	LPBYTE EncryptBuffer(const LPBYTE pData, int nSize, int *pLen);
+	LPBYTE DecryptBuffer(const LPBYTE pCrypted, int nSize);
 };
 
 extern "C" {

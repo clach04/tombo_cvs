@@ -55,6 +55,8 @@ public:
 ////////////////////////////////////
 // secure auto ptr string buffer
 
+// SecureBuffer decides erase range by INITIAL string length. So be careful if you want to update buffer.
+
 class SecureBufferT {
 	LPTSTR pBuf;
 	DWORD nBufLen;
@@ -74,22 +76,5 @@ public:
 
 	char *Get() { return pBuf; }
 };
-
-////////////////////////////////////
-//  File path operation funcs.
-////////////////////////////////////
-
-// Eliminate letters "\\/:,;*?<>\"\t" from pSrc.
-// pDst has at least same size of pSrc
-void DropInvalidFileChar(LPTSTR pDst, LPCTSTR pSrc);
-
-// Get base file name (except path and extensions)
-BOOL GetBaseName(TString *pBase, LPCTSTR pFull);
-
-LPCTSTR GetNextDirSeparator(LPCTSTR pStart);
-
-// chop file name and leave path.
-// ex. C:\foo\bar\baz.txt -> C:\foo\bar\ 
-void GetFilePath(LPTSTR pPath, LPCTSTR pFullPath);
 
 #endif

@@ -46,6 +46,9 @@ extern "C" {
 #ifndef UNIT_TEST
 int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPTSTR pCmdLine, int nCmdShow)
 {
+	// initialize random seed
+	srand(GetTickCount());
+
 	// load message resources.
 	g_mMsgRes.Init();
 

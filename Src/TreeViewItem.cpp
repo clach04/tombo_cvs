@@ -85,14 +85,7 @@ TreeViewFileItem::Locator::~Locator()
 	delete pURI;
 }
 
-void TreeViewFileItem::Locator::set(MemoNote *p)
-{
-	delete pURI;
-	pURI = new TomboURI();
-	p->GetURI(pURI);
-}
-
-void TreeViewFileItem::Locator::set(TomboURI *p)
+void TreeViewFileItem::Locator::set(const TomboURI *p)
 {
 	delete pURI;
 	pURI = new TomboURI();
@@ -107,8 +100,8 @@ TreeViewFileItem::~TreeViewFileItem()
 {
 }
 
-void TreeViewFileItem::SetNote(MemoNote *p)
-{ 
+void TreeViewFileItem::SetNote(const TomboURI *p)
+{
 	loc.set(p);
 	bIsEncrypted = g_Repository.IsEncrypted(loc.getURI());
 }
@@ -180,7 +173,7 @@ BOOL TreeViewFileItem::Encrypt(MemoManager *pMgr, MemoSelectView *pView)
 	}
 
 	// replace MemoNote that TreeViewItem have
-	loc.set(opt.pNewNote);
+	loc.set(opt.pNewURI);
 	bIsEncrypted = TRUE;
 
 	// update icon and headline string
@@ -210,7 +203,7 @@ BOOL TreeViewFileItem::Decrypt(MemoManager *pMgr, MemoSelectView *pView)
 	}
 
 	// replace MemoNote that TreeViewItem have
-	loc.set(opt.pNewNote);
+	loc.set(opt.pNewURI);
 	bIsEncrypted = FALSE;
 
 	// update icon and headline string
@@ -246,7 +239,7 @@ BOOL TreeViewFileItem::Rename(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR 
 		return FALSE;
 	}
 
-	loc.set(opt.pNewNote);
+	loc.set(opt.pNewURI);
 	return TRUE;
 }
 
@@ -608,7 +601,6 @@ BOOL TreeViewFolderItem::IsOperationEnabled(MemoSelectView *pView, OpType op)
 	}
 }
 
-
 BOOL TreeViewFolderItem::GetURIItem(MemoSelectView *pView, TString *pItem)
 {
 	TCHAR buf[MAX_PATH];
@@ -667,16 +659,19 @@ BOOL TreeViewFolderItem::Expand(MemoSelectView *pView)
 	wsprintf(buf2, TEXT("%s\\%s*.*"), g_Property.TopDir(), pPrefix);
 	LPCTSTR pMatchPath = buf2;
 
+	TomboURI sURI;
+	if (!pView->GetURI(&sURI, hParent)) return FALSE;
+
 	DirList dlDirList;
-	if (!dlDirList.Init(TRUE, TRUE)) return FALSE;
+	if (!dlDirList.Init(DIRLIST_OPT_CHOPEXTENSION | DIRLIST_OPT_ALLOCMEMONOTE, sURI.GetFullURI())) return FALSE;
 	if (!dlDirList.GetList(pPrefix, pMatchPath)) return FALSE;
 
 	// Insert to folder
 	DWORD n = dlDirList.NumItems();
 	for (DWORD i = 0; i < n; i++) {
 		struct DirListItem *p = dlDirList.GetItem(i);
-		LPCTSTR q = dlDirList.GetFileName(p->nNamePos);
-		if (p->bFlg) {
+		LPCTSTR q = dlDirList.GetFileName(p->nFileNamePos);
+		if (p->bFolder) {
 			// folder
 			TreeViewFolderItem *pItem = new TreeViewFolderItem();
 			pView->InsertFolder(hParent, q, pItem, TRUE);
@@ -741,9 +736,6 @@ BOOL TreeViewFileLink::IsOperationEnabled(MemoSelectView *pView, OpType op)
 
 BOOL TreeViewFileLink::OpenMemo(MemoSelectView *pView, DWORD nOption)
 {
-//	TomboURI sURI;
-//	loc.get()->GetURI(&sURI);
-//	pView->GetManager()->GetMainFrame()->OpenDetailsView(sURI.GetFullURI(), nOption);
 	pView->GetManager()->GetMainFrame()->OpenDetailsView(GetRealURI()->GetFullURI(), nOption);
 	return TRUE;
 }
@@ -838,7 +830,6 @@ BOOL TreeViewVirtualFolderRoot::Expand(MemoSelectView *pView)
 
 	return TRUE;
 }
-
 
 BOOL TreeViewVirtualFolderRoot::AddSearchResult(MemoSelectView *pView, const VFInfo *pInfo)
 {

@@ -23,6 +23,7 @@ class RepositoryOption {
 public:
 	BOOL bKeepTitle;
 	BOOL bKeepCaret;
+	BOOL bSafeFileName; // scramble filename
 };
 
 //////////////////////////////////////////////////////////////
@@ -77,7 +78,7 @@ public:
 
 class URIOption {
 public:
-	URIOption(DWORD flg = 0) : nFlg(flg), pNewNote(NULL), pNewURI(NULL), pNewHeadLine(NULL) {}
+	URIOption(DWORD flg = 0) : nFlg(flg), pNewURI(NULL), pNewHeadLine(NULL) {}
 	~URIOption();
 
 	// request section
@@ -88,7 +89,6 @@ public:
 	// if these value is not set by NULL, delete when NoteOption is deleted.
 	TString *pNewHeadLine;
 	TomboURI *pNewURI;
-	MemoNote *pNewNote;
 
 	// error info section
 	DWORD nErrorCode; // if success, value is 0

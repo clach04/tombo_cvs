@@ -53,15 +53,25 @@ class LocalFileRepository : public RepositoryImpl {
 	const RepositoryOption *pOpt;
 
 protected:
+	//////////////////////////////////////////
+	// Save notes and its subroutines
+
 	BOOL Save(const TomboURI *pCurrentURI, LPCTSTR pMemo, TomboURI *pNewURI, TString *pHeadLine);
 
 	BOOL SaveIfHeadLineIsNotChanged(MemoNote *pNote, const char *pText, LPCTSTR pOrigFile);
 	BOOL SaveIfHeadLineIsChanged(MemoNote *pNote, const char *pText,
 								 LPCTSTR pOrigFile, LPCTSTR pHeadLine, 
 								 TString *pNewHeadLine);
-	
+
+	////////////////////////////////////////
+	// Encryption/Decryption subroutines
 	BOOL EncryptLeaf(const TomboURI *pCurrentURI, URIOption *pOption);
 	BOOL DecryptLeaf(const TomboURI *pCurrentURI, URIOption *pOption);
+
+	TomboURI *DoEncryptFile(MemoNote *pNote, TString *pHeadLine);
+	BOOL NegotiateNewName(LPCTSTR pMemoPath, LPCTSTR pText, 
+							 LPCTSTR pMemoDir,
+							 TString *pFullPath, LPTSTR *ppNotePath, TString *pHeadLine);
 public:
 	LocalFileRepository();
 	virtual ~LocalFileRepository();

@@ -824,3 +824,12 @@ Not fully tested on both platform, probably it will work.
 to manage Note/folder tree as single virtual tree.
 
 * DEV: Replace MemoNote to TomboURI in TreeViewFileItem
+
+////////////////////////////////
+// B163
+////////////////////////////////
+
+* DEV: Prepare to safe file name support.
+
+Encryption is not work correctly at this version.
+

@@ -55,10 +55,21 @@ char *ConvSJIS2JIS(char *pStr);
 
 void CopyKanjiString(LPTSTR pDst, LPCTSTR pSrc, DWORD nLen);
 
+
+//////////////////////////////////
+// BASE64 Encode
+//////////////////////////////////
+//
+// This encoder 
+
+char *Base64Encode(const LPBYTE pBinary, DWORD nSrcLen);
+LPBYTE Base64Decode(const char *pM64str, LPDWORD pDataSize);
+
+
+#ifdef COMMENT
 //////////////////////////////////
 // BASE64 Decode
 //////////////////////////////////
-// 
 
 BOOL MimeDec(char *pDst, const char *pSrc);
 
@@ -119,6 +130,7 @@ public:
 
 	Item *First() { return head; }
 };
+#endif
 
 //////////////////////////////////
 // 文字種判別用マクロ
@@ -133,11 +145,27 @@ public:
 #endif
 
 //////////////////////////////////
-// 末尾のファイルセパレータを取る
+// helper functions
 //////////////////////////////////
-// aa\xx\ -> aa\xx
+class TString;
 
+// remove '\' 
+// ex. aa\xx\ -> aa\xx
 void ChopFileSeparator(LPTSTR pBuf);
 
 void TrimRight(LPTSTR pBuf);
+
+// Eliminate letters "\\/:,;*?<>\"\t" from pSrc.
+// pDst has at least same size of pSrc
+void DropInvalidFileChar(LPTSTR pDst, LPCTSTR pSrc);
+
+// Get base file name (except path and extensions)
+BOOL GetBaseName(TString *pBase, LPCTSTR pFull);
+
+LPCTSTR GetNextDirSeparator(LPCTSTR pStart);
+
+// chop file name and leave path.
+// ex. C:\foo\bar\baz.txt -> C:\foo\bar\ 
+void GetFilePath(LPTSTR pPath, LPCTSTR pFullPath);
+
 #endif

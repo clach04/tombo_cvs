@@ -22,19 +22,12 @@
 static BOOL GetHeadLineFromMemoText(LPCTSTR pMemo, TString *pHeadLine);
 static int ChopFileNumberLen(LPTSTR pHeadLine);
 static BOOL IsFileExist(LPCTSTR pFileName);
+static BOOL GetHeadLineFromFilePath(LPCTSTR pFilePath, TString *pHeadLine);
 
-// IN:
-//		pHeadLine   : ヘッドライン文字列 or ラベル文字列
-//		pMemoPath   : メモのパス
-//		pExt	    : 拡張子(".txt" or ".chi")
-// OUT:
-//		pFullPath	: フルパス
-//		pNewHeadLine: 修正後ヘッドライン文字列(=ラベル文字列)
-//		*ppNodePath	: メモのパス(フルパスからTOMBOROOTPATHを除いたもの)
 
-static BOOL GetHeadLinePath(LPCTSTR pMemoPath, LPCTSTR pHeadLine, LPCTSTR pExt, 
-							TString *pFullPath, LPTSTR *ppNotePath, TString *pNewHeadLine,
-							LPCTSTR pTopDir);
+static BOOL GetHeadLinePath(LPCTSTR pTopDir, LPCTSTR pMemoPath, LPCTSTR pHeadLine, LPCTSTR pExt, BOOL bEncrypt, 
+							TString *pFullPath, LPTSTR *ppNotePath, TString *pNewHeadLine);
+
 
 /////////////////////////////////////////
 // Repository ctor & dtor, initializer
@@ -160,8 +153,8 @@ BOOL LocalFileRepository::SaveIfHeadLineIsChanged(
 		TString sNewFile;
 
 		if (!sMemoDir.GetDirectoryPath(pNote->pPath)) return FALSE;
-		if (!GetHeadLinePath(sMemoDir.Get(), pHeadLine, pNote->GetExtension(),
-							 &sNewFile, &pNotePath, pNewHeadLine, pTopDir)) return FALSE;
+		if (!GetHeadLinePath(pTopDir, sMemoDir.Get(), pHeadLine, pNote->GetExtension(), FALSE, 
+							 &sNewFile, &pNotePath, pNewHeadLine)) return FALSE;
 
 		BOOL bResult = pNote->SaveData(g_pPassManager, pText, sNewFile.Get());
 		if (bResult) {
@@ -213,54 +206,6 @@ BOOL LocalFileRepository::SaveIfHeadLineIsNotChanged(MemoNote *pNote, const char
 	return TRUE;
 }
 
-/////////////////////////////////////////////
-// 与えられた文字列からファイル名を生成する
-/////////////////////////////////////////////
-
-// IN:	pMemoPath	: メモのパス(TOPDIRからの相対パス,ファイル名は含まず)
-//		pHeadLine	: ヘッドライン文字列
-//		pExt		: 付与する拡張子
-// OUT:	pFullPath	: メモのフルパス
-//		ppNotePath	: メモのパス(TOPDIRからの相対パス,ファイル名を含み、
-//					  必要なら"(n)"でディレクトリで一意となるように調整されている
-//		pNewHeadLine: 一覧表示用新ヘッドライン(必要に応じて"(n)"が付与されている)
-
-static BOOL GetHeadLinePath(LPCTSTR pMemoPath, LPCTSTR pHeadLine, LPCTSTR pExt, 
-							TString *pFullPath, LPTSTR *ppNotePath, TString *pNewHeadLine,
-							LPCTSTR pTopDir)
-{
-	DWORD n = _tcslen(pHeadLine);
-	if (n < _tcslen(DEFAULT_HEADLINE)) n = _tcslen(DEFAULT_HEADLINE);
-
-	DWORD nHeadLineLen = n + 20;
-	DWORD nFullPathLen = _tcslen(pTopDir) + 1 + 
-						 _tcslen(pMemoPath) + nHeadLineLen + _tcslen(pExt);
-	if (!pNewHeadLine->Alloc(nHeadLineLen + 1)) return FALSE;
-	if (!pFullPath->Alloc(nFullPathLen + 1)) return FALSE;
-
-	DropInvalidFileChar(pNewHeadLine->Get(), pHeadLine);
-	if (_tcslen(pNewHeadLine->Get()) == 0) _tcscpy(pNewHeadLine->Get(), DEFAULT_HEADLINE);
-	wsprintf(pFullPath->Get(), TEXT("%s\\%s%s"), pTopDir, pMemoPath, pNewHeadLine->Get());
-
-	LPTSTR p = pFullPath->Get();
-	LPTSTR q = p + _tcslen(p);
-	LPTSTR r = pNewHeadLine->Get() + _tcslen(pNewHeadLine->Get());
-
-	*ppNotePath = pFullPath->Get() + _tcslen(pTopDir) + 1;
-
-	// ファイル名の確定
-	// 同名のファイルが存在した場合には"(n)"を付加する
-	_tcscpy(q, pExt);
-	if (!IsFileExist(p)) return TRUE;
-
-	DWORD i = 1;
-	do {
-		wsprintf(q, TEXT("(%d)%s"), i, pExt);
-		wsprintf(r, TEXT("(%d)"), i);
-		i++;
-	} while(IsFileExist(p));
-	return TRUE;
-}
 
 /////////////////////////////////////////////
 // ヘッドラインの取得
@@ -407,21 +352,190 @@ BOOL LocalFileRepository::SetOption(const TomboURI *pCurrentURI, URIOption *pOpt
 // Encrypt/decrypt subroutines
 /////////////////////////////////////////
 
-BOOL LocalFileRepository::EncryptLeaf(const TomboURI *pCurrentURI, URIOption *pOption)
+static BOOL GetHeadLineFromFilePath(LPCTSTR pFilePath, TString *pHeadLine)
 {
-	BOOL b;
-	MemoNote *pCur = MemoNote::MemoNoteFactory(pCurrentURI);
-	AutoPointer<MemoNote> ap(pCur);
+	LPCTSTR p = pFilePath;
+	LPCTSTR q = NULL;
+#ifdef _WIN32_WCE
+	while (*p) {
+		if (*p == TEXT('\\')) q = p;
+		p++;
+	}
+#else
+	while (*p) {
+		if (*p == TEXT('\\')) q = p;
+		if (IsDBCSLeadByte(*p)) {
+			p++;
+		}
+		p++;
+	}
+#endif
+	if (q == NULL) {
+		if (!pHeadLine->Set(pFilePath)) return FALSE;
+	} else {
+		if (!pHeadLine->Set(q + 1)) return FALSE;
+	}
+
+	pHeadLine->ChopExtension();
+	pHeadLine->ChopFileNumber();
+	return TRUE;
+}
+
+static BOOL GetRandomName(LPCTSTR pBaseDir, TString *pFileName)
+{
+	int n = rand() % 10000;
+
+	return TRUE;
+}
+
+/////////////////////////////////////////////
+// 与えられた文字列からファイル名を生成する
+/////////////////////////////////////////////
+
+// IN:	pTopDir		: Top directory
+//		pMemoPath	: メモのパス(TOPDIRからの相対パス,ファイル名は含まず)
+//		pHeadLine	: ヘッドライン文字列
+//		pExt		: 付与する拡張子
+// OUT:	pFullPath	: メモのフルパス
+//		ppNotePath	: メモのパス(TOPDIRからの相対パス,ファイル名を含み、
+//					  必要なら"(n)"でディレクトリで一意となるように調整されている
+//		pNewHeadLine: 一覧表示用新ヘッドライン(必要に応じて"(n)"が付与されている)
+
+static BOOL GetHeadLinePath(LPCTSTR pTopDir, LPCTSTR pMemoPath, LPCTSTR pHeadLine, LPCTSTR pExt, BOOL bEncrypt, 
+							TString *pFullPath, LPTSTR *ppNotePath, TString *pNewHeadLine)
+{
+	DWORD n = _tcslen(pHeadLine);
+	if (n < _tcslen(DEFAULT_HEADLINE)) n = _tcslen(DEFAULT_HEADLINE);
+
+	DWORD nHeadLineLen = n + 20;
+	DWORD nFullPathLen = _tcslen(pTopDir) + 1 + 
+						 _tcslen(pMemoPath) + nHeadLineLen + _tcslen(pExt);
+	if (!pNewHeadLine->Alloc(nHeadLineLen + 1)) return FALSE;
+	if (!pFullPath->Alloc(nFullPathLen + 1)) return FALSE;
+
+	DropInvalidFileChar(pNewHeadLine->Get(), pHeadLine);
+	if (_tcslen(pNewHeadLine->Get()) == 0) _tcscpy(pNewHeadLine->Get(), DEFAULT_HEADLINE);
+
+	wsprintf(pFullPath->Get(), TEXT("%s\\%s%s"), pTopDir, pMemoPath, pNewHeadLine->Get());
+
+	LPTSTR p = pFullPath->Get();
+	LPTSTR q = p + _tcslen(p);
+	LPTSTR r = pNewHeadLine->Get() + _tcslen(pNewHeadLine->Get());
+
+	*ppNotePath = pFullPath->Get() + _tcslen(pTopDir) + 1;
+
+	// ファイル名の確定
+	// 同名のファイルが存在した場合には"(n)"を付加する
+	_tcscpy(q, pExt);
+	if (!IsFileExist(p)) return TRUE;
+
+	DWORD i = 1;
+	do {
+		wsprintf(q, TEXT("(%d)%s"), i, pExt);
+		wsprintf(r, TEXT("(%d)"), i);
+		i++;
+	} while(IsFileExist(p));
+	return TRUE;
+}
+
+/////////////////////////////////////////
+// Decide new allocated filename
+/////////////////////////////////////////
+
+BOOL LocalFileRepository::NegotiateNewName(LPCTSTR pMemoPath, LPCTSTR pText, LPCTSTR pMemoDir,
+							 TString *pFullPath, LPTSTR *ppNotePath, TString *pNewHeadLine)
+{
+	TString sHeadLine;
+
+	if (pOpt->bSafeFileName) {
+		// decide file name
+		if (!pFullPath->Join(pTopDir, TEXT("\\"), pMemoDir, TEXT("0000000000000000.chs"))) return FALSE;
+		LPTSTR pFileNamePart = pFullPath->Get() + _tcslen(pTopDir) + 1 + _tcslen(pMemoDir);
+		int nw;
+		do {
+			// generate 10digit random number
+			nw = rand() % 10000;
+			wsprintf(pFileNamePart, TEXT("%04d"), nw);
+			nw = rand() % 10000;
+			wsprintf(pFileNamePart + 4, TEXT("%04d"), nw);
+			nw = rand() % 100;
+			wsprintf(pFileNamePart + 8, TEXT("%04d"), nw);
+			nw = rand() % 100;
+			wsprintf(pFileNamePart + 12, TEXT("%04d"), nw);
+			strcpy(pFileNamePart + 16, TEXT(".chs"));
+		} while(IsFileExist(pFullPath->Get())); // if same name exists, retry it
+
+		*ppNotePath = pFileNamePart;
+		if (!GetHeadLineFromMemoText(pText, pNewHeadLine)) return FALSE;
+	} else {
+		if (pOpt->bKeepTitle) {
+			if (!GetHeadLineFromFilePath(pMemoPath, &sHeadLine)) return FALSE;
+		} else {
+			if (!GetHeadLineFromMemoText(pText, &sHeadLine)) return FALSE;
+		}
+	
+		if (!GetHeadLinePath(pTopDir, pMemoDir, sHeadLine.Get(), TEXT(".chi"), FALSE, 
+								pFullPath, ppNotePath, pNewHeadLine)) {
+			return FALSE;
+		}
+	}
+	return TRUE;
+}
+
+//////////////////////////////
+// Encrypt file
+//
+// assume pCurURI is Leaf.
+
+TomboURI *LocalFileRepository::DoEncryptFile(MemoNote *pNote, TString *pHeadLine)
+{
+	TString sMemoDir;
+	if (!sMemoDir.GetDirectoryPath(pNote->MemoPath())) return NULL;
+
+	// Get plain memo data from file
+	LPTSTR pText = pNote->GetMemoBody(g_pPassManager);
+	if (pText == NULL) return NULL;
+	SecureBufferT sbt(pText);
+
+	TString sFullPath;
+	LPTSTR pNotePath;
+
+	// Decide new name
+	if (!NegotiateNewName(pNote->MemoPath(), pText, sMemoDir.Get(), 
+						&sFullPath, &pNotePath, pHeadLine)) return NULL;
+
+	// Create new CyrptedMemoNote instance
+	CryptedMemoNote *p = new CryptedMemoNote();
+	if (!p->Init(pNotePath)) return NULL;
+	AutoPointer<CryptedMemoNote> ap(p);
+
+	// convert date as write
+	char *pTextA = ConvUnicode2SJIS(pText);
+	if (pTextA == NULL) return NULL;
+	SecureBufferA sba(pTextA);
+
+	// Save memo
+	if (!p->SaveData(g_pPassManager, pTextA, sFullPath.Get())) return NULL;
+
+	// generate new URI
+	TomboURI *pURI = new TomboURI();
+	if (pURI == NULL || !p->GetURI(pURI)) return NULL;
+
+	return pURI;
+}
+
+BOOL LocalFileRepository::EncryptLeaf(const TomboURI *pPlainURI, URIOption *pOption)
+{
+	MemoNote *pPlain = MemoNote::MemoNoteFactory(pPlainURI);
+	AutoPointer<MemoNote> ap(pPlain);
 
 	pOption->pNewHeadLine = new TString();
 	if (pOption->pNewHeadLine == NULL) return FALSE;
 
-	MemoNote *p = pCur->Encrypt(g_pPassManager, pOption->pNewHeadLine, &b);
-	if (p == NULL) return FALSE;
+	pOption->pNewURI = DoEncryptFile(pPlain, pOption->pNewHeadLine);
+	if (pOption->pNewURI == NULL) return FALSE;
 
-	pOption->pNewNote = p;
-
-	if (!pCur->DeleteMemoData()) {
+	if (!pPlain->DeleteMemoData()) {
 		pOption->nErrorCode = MSG_ID_DELETE_PREV_CRYPT_MEMO_FAILED;
 		pOption->iLevel = MB_ICONWARNING;
 		return FALSE;
@@ -440,8 +554,12 @@ BOOL LocalFileRepository::DecryptLeaf(const TomboURI *pCurrentURI, URIOption *pO
 
 	MemoNote *p = pCur->Decrypt(g_pPassManager, pOption->pNewHeadLine, &b);
 	if (p == NULL) return FALSE;
+	AutoPointer<MemoNote> ap2(p);
 
-	pOption->pNewNote = p;
+	pOption->pNewURI = new TomboURI();
+	if (pOption->pNewURI == NULL) return FALSE;
+	if (!p->GetURI(pOption->pNewURI)) return FALSE;
+
 	if (!pCur->DeleteMemoData()) {
 		pOption->nErrorCode = MSG_ID_DEL_PREV_DECRYPT_MEMO_FAILED;
 		pOption->iLevel = MB_ICONWARNING;
@@ -531,8 +649,7 @@ BOOL LocalFileRepository::ChangeHeadLine(const TomboURI *pURI, LPCTSTR pReqNewHe
 {
 	MemoNote *pNote = MemoNote::MemoNoteFactory(pURI);
 	if (pNote == NULL) return FALSE;
-
-	pOption->pNewNote = pNote;
+	AutoPointer<MemoNote> ap(pNote);
 
 	if (!pNote->Rename(pReqNewHeadLine)) {
 		switch (GetLastError()) {
@@ -550,6 +667,13 @@ BOOL LocalFileRepository::ChangeHeadLine(const TomboURI *pURI, LPCTSTR pReqNewHe
 		}
 		return FALSE;
 	}
+
+	TomboURI *p = new TomboURI();
+	if (p == NULL || !pNote->GetURI(p)) {
+		delete p;
+		return FALSE;
+	}
+	pOption->pNewURI = p;
 
 	return TRUE;
 }

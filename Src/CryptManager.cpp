@@ -3,17 +3,6 @@
 #include "CryptManager.h"
 #include "File.h"
 
-
-// CryptManagerによる暗号化ファイルのフォーマット
-// '*'は暗号化されたデータ
-// 
-// 0-3  : BF01(4 bytes)
-// 4-7  : データ長(含む rand + md5sum)(4 bytes)
-// 8-15 :* random data(8 bytes)
-//16-31 :* 平文のmd5sum(16 bytes)
-//32-   :* data
-
-
 void WipeOutAndDelete(char *p, DWORD len);
 #ifdef _WIN32_WCE
 void WipeOutAndDelete(LPTSTR p, DWORD len);
@@ -108,58 +97,16 @@ BOOL CryptManager::Decrypt(LPBYTE pBuf, int len)
 
 BOOL CryptManager::EncryptAndStore(const LPBYTE pData, int nSize, LPCTSTR pFileName)
 {
-	// 領域確保・暗号化
-
-	int i=0;
-	int len = ((nSize >> 3) + 1) * 8;
-	len += 24;
-
-	LPBYTE pBuf = new BYTE[len];
-	if (pBuf == NULL) {
-		MessageBox(NULL, TEXT("CryptManager::EncryptAndStore memory allocation failed"), TEXT("DEBUG"), MB_OK);
-		SetLastError(ERROR_NOT_ENOUGH_MEMORY);
-		return FALSE;
-	}
-
-	// 乱数の埋め込み
-	for (i = 0; i < 8; i++) {
-		pBuf[i] = (BYTE)(rand() & 0xFF);
-	}
-
-	// 平文のMD5SUMを取得
-	getMD5Sum(pBuf + 8, pData, nSize);
-
-	// 平文のコピー
-	LPBYTE p = pBuf + 24;
-	const BYTE *q = pData;
-	for (i = 0; i < nSize; i++) {
-		*p++ = *q++;
-	}
-
-	// 暗号化
-	if (!Encrypt(pBuf, nSize + 24)) {
-		for (i = 0; i < len; i++) pBuf[i] = 0;
-		WipeOutAndDelete((char*)pBuf, len);
-		
-		MessageBox(NULL, TEXT("CryptManager::EncryptAndStore : Encrypt failed"), TEXT("DEBUG"), MB_OK);
-		return FALSE;
-	}
-
+	int len;
+	LPBYTE pBuf = EncryptBuffer(pData, nSize, &len);
 	// ファイルへの保存
 	File outf;
 
 	if (!outf.Open(pFileName, GENERIC_WRITE, 0, OPEN_ALWAYS)) {
-		for (i = 0; i < len; i++) pBuf[i] = 0;
 		WipeOutAndDelete((char*)pBuf, len);
-
-		TCHAR buf[1024];
-		wsprintf(buf, TEXT("CryptManager::EncryptAndStore : Open File failed %s %d"), pFileName, GetLastError());
-		MessageBox(NULL, buf, TEXT("DEBUG"), MB_OK);
 		return FALSE;
 	}
-	if (!outf.Write((LPBYTE)"BF01", 4) ||				// バージョンヘッダ
-		!outf.Write((const LPBYTE)&nSize, sizeof(nSize)) ||	// 平文データ長
-		!outf.Write(pBuf, len)) {							// データ
+	if (!outf.Write(pBuf, len)) {
 		TCHAR buf[1024];
 		wsprintf(buf, TEXT("CryptManager::EncryptAndStore write failed %d"), GetLastError());
 		MessageBox(NULL, buf, TEXT("DEBUG"), MB_OK);
@@ -170,6 +117,66 @@ BOOL CryptManager::EncryptAndStore(const LPBYTE pData, int nSize, LPCTSTR pFileN
 	WipeOutAndDelete((char*)pBuf, len);
 	return TRUE;
 }
+
+//////////////////////////////////////////////////
+// Encrypt data and add header
+//////////////////////////////////////////////////
+// CryptManagerによる暗号化ファイルのフォーマット
+// The format of the container is:
+// 0-3  : BF01(4 bytes)
+// 4-7  : data length (include randum area + md5sum)(4 bytes)
+// 8-15 :* random data(8 bytes)
+//16-31 :* md5sum of plain text(16 bytes)
+//32-   :* data
+
+// '*' is encrypted.
+// 
+
+LPBYTE CryptManager::EncryptBuffer(const LPBYTE pData, int nSize, int *pLen)
+{
+	int i=0;
+	int len = ((nSize >> 3) + 1) * 8;
+	len += 24;
+
+	len += 8;
+
+	LPBYTE pBufF = new BYTE[len];
+	if (pBufF == NULL) {
+		SetLastError(ERROR_NOT_ENOUGH_MEMORY);
+		return NULL;
+	}
+	LPBYTE pBuf = pBufF + 8;
+
+	// set random number
+	for (i = 0; i < 8; i++) {
+		pBuf[i] = (BYTE)(rand() & 0xFF);
+	}
+
+	strncpy((char*)pBufF, "BF01", 4);
+	*(int*)(pBufF + 4) = nSize;
+
+	// get md5sum of plain data
+	getMD5Sum(pBuf + 8, pData, nSize);
+
+	// copy plain data
+	LPBYTE p = pBuf + 24;
+	const BYTE *q = pData;
+	for (i = 0; i < nSize; i++) {
+		*p++ = *q++;
+	}
+
+	// encryption
+	if (!Encrypt(pBuf, nSize + 24)) {
+		WipeOutAndDelete((char*)pBufF, len);
+		return NULL;
+	}
+	*pLen = len;
+	return pBufF;
+}
+
+//////////////////////////////////////////////////
+// Load from file and decrypt data
+//////////////////////////////////////////////////
 
 LPBYTE CryptManager::LoadAndDecrypt(LPDWORD pSize, LPCTSTR pFileName)
 {
@@ -199,6 +206,7 @@ LPBYTE CryptManager::LoadAndDecrypt(LPDWORD pSize, LPCTSTR pFileName)
 	LPBYTE pBuf = new BYTE[nFileSize + 1];
 	n = nFileSize - 4 - sizeof(nDataSize);
 	inf.Read(pBuf, &n);
+
 	if (!Decrypt(pBuf, n)) {
 		WipeOutAndDelete((char*)pBuf, nFileSize + 1);
 		return NULL;
@@ -231,6 +239,49 @@ LPBYTE CryptManager::LoadAndDecrypt(LPDWORD pSize, LPCTSTR pFileName)
 	memcpy(pData, pBuf + 24, nDataSize);
 	pData[nDataSize] = '\0';
 	WipeOutAndDelete((char*)pBuf, nFileSize + 1);
+	return pData;
+}
+
+LPBYTE CryptManager::DecryptBuffer(const LPBYTE pCrypted, int nSize)
+{
+	if (nSize % 8 != 0) {
+		SetLastError(ERROR_INVALID_DATA);
+		return NULL;
+	}
+
+	LPBYTE pBuf = new BYTE[nSize];
+	if (pBuf == NULL) return NULL;
+
+	memcpy(pBuf, pCrypted, nSize);
+
+	if (!Decrypt(pBuf + 8, nSize - 8)) {
+		WipeOutAndDelete((char*)pBuf, nSize);
+		return NULL;
+	}
+
+	DWORD n = *(LPDWORD)(pBuf + 4);
+
+	BYTE decriptsum[16];
+	getMD5Sum(decriptsum, pBuf + 32, n);
+
+	for (int i = 0; i < 16; i++) {
+		if (pBuf[16 + i] != decriptsum[i]) {
+			WipeOutAndDelete((char*)pBuf, nSize);
+			SetLastError(ERROR_INVALID_PASSWORD);
+			return NULL;
+		}
+	}
+
+	LPBYTE pData = new BYTE[n + 1];
+	if (pData == NULL) {
+		WipeOutAndDelete((char*)pBuf, nSize);
+		SetLastError(ERROR_NOT_ENOUGH_MEMORY);
+		return NULL;
+	}
+	memcpy(pData, pBuf + 32, n);
+	pData[n] = 0;
+
+	WipeOutAndDelete((char*)pBuf, nSize);
 	return pData;
 }
 
