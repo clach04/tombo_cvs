@@ -726,31 +726,6 @@ BEGIN
     "Z",            IDM_UNDO,               VIRTKEY, CONTROL, NOINVERT
 END
 
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// String Table
-//
-
-STRINGTABLE DISCARDABLE 
-BEGIN
-    IDS_PROPTAB_FOLDER      "メモ"
-    IDS_PROPTAB_TITLE       "プロパティ"
-    IDS_PROPTAB_PASSWORD    "パスワード"
-    IDS_PROPERTY_PASSWORD_DESC 
-                            "パスワードのチェックサムを保存します。パスワードそのものは保存されません。\r\n設定ボタンを明示的に押さない限りは設定されませんので注意してください。\r\n暗号化されたメモがある状態でパスワードを変更した場合、メモを開くためには元(メモの暗号化時)のパスワードが必要となります。"
-    IDS_PROPTAB_PASS_TIMEOUT "タイムアウト"
-    IDS_PROPTAB_FONT        "フォント"
-    IDS_PROPTAB_DATE        "日付"
-    IDS_PROPTAB_KEEPCARET   "詳細ビュー"
-    IDS_TIPS_NEWMEMO        "メモの新規作成"
-    IDS_TIPS_SAVE           "メモの保存"
-    IDS_PROPTAB_SELECTMEMO  "メモ選択"
-    IDS_GREPTAB_MAIN        "メイン"
-    IDS_GREPTAB_PERSIST     "保存"
-    IDS_PROPTAB_DEFNOTE     "トップページ"
-END
-
 #endif    // 日本語 resources
 /////////////////////////////////////////////////////////////////////////////
 

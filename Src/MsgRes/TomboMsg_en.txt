@@ -117,3 +117,19 @@ Name
 Path
 Delete bookmarks
 Deleting selected bookmarks. Are you sure?
+Memo
+Password
+Font
+Date
+Memo view
+Timeout
+Toppage
+Property
+Main
+Save
+AppButton
+SIP
+CodePage
+Memo
+Tool
+Edit

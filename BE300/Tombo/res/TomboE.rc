@@ -619,55 +619,6 @@ BEGIN
     "Z",            IDM_UNDO,               VIRTKEY, CONTROL, NOINVERT
 END
 
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// String Table
-//
-
-STRINGTABLE DISCARDABLE 
-BEGIN
-    IDS_APP_TITLE           "HelloWinCE"
-    IDS_HELLO               "Hello World!"
-    IDC_HELLOWINCE          "HELLOWINCE"
-END
-
-STRINGTABLE DISCARDABLE 
-BEGIN
-    IDS_MAIN_MENUITEM1      "File"
-    IDS_MAIN_MENUITEM2      "f"
-END
-
-STRINGTABLE DISCARDABLE 
-BEGIN
-    IDS_MENUITEM40005       "Memo"
-    IDS_MENUITEM40011       "s"
-    IDS_MENUITEM40014       "Tool"
-END
-
-STRINGTABLE DISCARDABLE 
-BEGIN
-    IDS_MENUITEM40017       "New"
-    IDS_MENUITEM40020       "New Memo"
-    IDS_MENUITEM40027       "Memo"
-    IDS_PROPTAB_FOLDER      "Memo"
-END
-
-STRINGTABLE DISCARDABLE 
-BEGIN
-    IDS_MENUITEM40033       "New"
-    IDS_PROPTAB_PASS_TIMEOUT "Timeout"
-    IDS_MENUITEM40037       "Tree"
-    IDS_MENUITEM40039       "New"
-    IDS_PROPTAB_FONT        "Font"
-    IDS_PROPTAB_DATE        "Date"
-    IDS_PROPTAB_KEEPCARET   "Cursor"
-    IDS_PROPTAB_CODEPAGE    "Codepage"
-    IDS_GREPTAB_MAIN        "Main"
-    IDS_GREPTAB_PERSIST     "Save"
-    IDS_PROPTAB_DEFNOTE     "Toppage"
-END
-
 #endif    // Japanese resources
 /////////////////////////////////////////////////////////////////////////////
 

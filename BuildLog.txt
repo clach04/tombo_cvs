@@ -669,3 +669,10 @@ Not fully tested on both platform, probably it will work.
 
 * Split message data to message file.
 	This is a part of i18n.
+
+////////////////////////////////
+// B143
+////////////////////////////////
+// main trunk
+
+* Arranges resource data.

@@ -765,19 +765,6 @@ END
 
 STRINGTABLE DISCARDABLE 
 BEGIN
-    IDS_APP_TITLE           "HelloWinCE"
-    IDS_HELLO               "Hello World!"
-    IDC_HELLOWINCE          "HELLOWINCE"
-END
-
-STRINGTABLE DISCARDABLE 
-BEGIN
-    IDS_MAIN_MENUITEM1      "File"
-    IDS_MAIN_MENUITEM2      "f"
-END
-
-STRINGTABLE DISCARDABLE 
-BEGIN
     IDS_MENUITEM40005       "Memo"
     IDS_MENUITEM40011       "s"
     IDS_MENUITEM40014       "Tool"
@@ -788,19 +775,14 @@ BEGIN
     IDS_MENUITEM40017       "New"
     IDS_MENUITEM40020       "New Memo"
     IDS_MENUITEM40027       "Memo"
-    IDS_PROPTAB_FOLDER      "Memo"
-    IDS_PROPTAB_TITLE       "Property"
-    IDS_PROPTAB_PASSWORD    "Password"
 END
 
 STRINGTABLE DISCARDABLE 
 BEGIN
     IDS_MENUITEM40033       "New"
-    IDS_PROPTAB_PASS_TIMEOUT "Timeout"
     IDS_MENUITEM40037       "list"
     IDS_MENUITEM40039       "New"
     IDS_MENUITEM40041       "Edit"
-    IDS_PROPTAB_FONT        "Font"
     IDS_MENUITEM40045       "Save"
 END
 
@@ -808,14 +790,7 @@ STRINGTABLE DISCARDABLE
 BEGIN
     IDS_MENUITEM40048       "HELO"
     IDS_MENUITEM40051       "DV_POPUP"
-    IDS_PROPTAB_DATE        "Date"
     IDS_MENUITEM40056       "SV_POPUP"
-    IDS_PROPTAB_KEEPCARET   "Details"
-    IDS_PROPTAB_APPBUTTON   "AppButton"
-    IDS_GREPTAB_MAIN        "Main"
-    IDS_GREPTAB_PERSIST     "Save"
-    IDS_PROPTAB_SIP         "SIP"
-    IDS_PROPTAB_DEFNOTE     "Toppage"
 END
 
 #endif    // Japanese resources

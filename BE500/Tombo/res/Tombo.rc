@@ -609,56 +609,6 @@ BEGIN
     "Z",            IDM_UNDO,               VIRTKEY, CONTROL, NOINVERT
 END
 
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// String Table
-//
-
-STRINGTABLE DISCARDABLE 
-BEGIN
-    IDS_APP_TITLE           "HelloWinCE"
-    IDS_HELLO               "Hello World!"
-    IDC_HELLOWINCE          "HELLOWINCE"
-END
-
-STRINGTABLE DISCARDABLE 
-BEGIN
-    IDS_MAIN_MENUITEM1      "File"
-    IDS_MAIN_MENUITEM2      "f"
-END
-
-STRINGTABLE DISCARDABLE 
-BEGIN
-    IDS_MENUITEM40005       "メモ"
-    IDS_MENUITEM40011       "s"
-    IDS_MENUITEM40014       "ツール"
-END
-
-STRINGTABLE DISCARDABLE 
-BEGIN
-    IDS_MENUITEM40017       "新規"
-    IDS_MENUITEM40020       "新規メモ"
-    IDS_MENUITEM40027       "メモ"
-    IDS_PROPTAB_FOLDER      "フォルダ"
-END
-
-STRINGTABLE DISCARDABLE 
-BEGIN
-    IDS_PROPERTY_PASSWORD_DESC 
-                            "パスワードのチェックサムを保存します。パスワードそのものは保存されません。\r\n暗号化されたメモがある状態でパスワードを変更した場合、メモを開くためには元(メモの暗号化時)のパスワードが必要となります。"
-    IDS_MENUITEM40033       "新規"
-    IDS_PROPTAB_PASS_TIMEOUT "タイムアウト"
-    IDS_MENUITEM40037       "一覧"
-    IDS_MENUITEM40039       "新規"
-    IDS_PROPTAB_FONT        "メモ"
-    IDS_PROPTAB_DATE        "日付"
-    IDS_PROPTAB_KEEPCARET   "カーソル"
-    IDS_GREPTAB_MAIN        "メイン"
-    IDS_GREPTAB_PERSIST     "保存"
-    IDS_PROPTAB_DEFNOTE     "トップページ"
-END
-
 #endif    // Japanese resources
 /////////////////////////////////////////////////////////////////////////////
 

@@ -26,7 +26,7 @@ BOOL GrepDialog::Init(LPCTSTR pPath)
 class GrepMainTab : public PropertyTab {
 	GrepDialog *pDialog;
 public:
-	GrepMainTab(GrepDialog *pDlg) : pDialog(pDlg), PropertyTab(IDD_GREPTAB_MAIN, IDS_GREPTAB_MAIN, (DLGPROC)DefaultPageProc) {}
+	GrepMainTab(GrepDialog *pDlg) : pDialog(pDlg), PropertyTab(IDD_GREPTAB_MAIN, MSG_GREPTAB_MAIN, (DLGPROC)DefaultPageProc) {}
 	~GrepMainTab() {}
 
 	void Init(HWND hDlg);
@@ -76,7 +76,7 @@ BOOL GrepMainTab::OnCommand(HWND hDlg, WPARAM wParam, LPARAM lParam)
 
 class GrepPersistTab : public PropertyTab {
 public:
-	GrepPersistTab() : PropertyTab(IDD_GREPTAB_PERSIST, IDS_GREPTAB_PERSIST, (DLGPROC)DefaultPageProc) {}
+	GrepPersistTab() : PropertyTab(IDD_GREPTAB_PERSIST, MSG_GREPTAB_PERSIST, (DLGPROC)DefaultPageProc) {}
 	~GrepPersistTab() {}
 
 	void Init(HWND hDlg);

@@ -107,6 +107,7 @@ BOOL TomboMessage::LoadMsg(HANDLE h)
 			*p = *(p+1) = TEXT('\0');
 			p += 2;
 			if (i >= NUM_MESSAGES) break;
+			if (_tcslen(p) == 0) break;
 			pMsg[i++] = p;
 		}
 #if defined(PLATFORM_WIN32)
@@ -130,7 +131,7 @@ BOOL TomboMessage::LoadMsg(HANDLE h)
 
 LPCTSTR TomboMessage::GetMsg(DWORD nMsgID)
 {
-	if (nMsgID == 0 || nMsgID >= NUM_MESSAGES) return NULL;
+	if (nMsgID == 0 || nMsgID > NUM_MESSAGES) return NULL;
 	return pMsg[nMsgID - 1];
 }
 

@@ -119,5 +119,21 @@
 #define MSG_BMDLG_TITLE_PATH (g_mMsgRes.GetMsg(117))
 #define MSG_DEL_BOOKMARK (g_mMsgRes.GetMsg(118))
 #define MSG_CONFIRM (g_mMsgRes.GetMsg(119))
+#define MSG_PROPTAB_FOLDER (g_mMsgRes.GetMsg(120))
+#define MSG_PROPTAB_PASSWORD (g_mMsgRes.GetMsg(121))
+#define MSG_PROPTAB_FONT (g_mMsgRes.GetMsg(122))
+#define MSG_PROPTAB_DATE (g_mMsgRes.GetMsg(123))
+#define MSG_PROPTAB_KEEPCARET (g_mMsgRes.GetMsg(124))
+#define MSG_PROPTAB_PASS_TIMEOUT (g_mMsgRes.GetMsg(125))
+#define MSG_PROPTAB_DEFNOTE (g_mMsgRes.GetMsg(126))
+#define MSG_PROPTAB_TITLE (g_mMsgRes.GetMsg(127))
+#define MSG_GREPTAB_MAIN (g_mMsgRes.GetMsg(128))
+#define MSG_GREPTAB_PERSIST (g_mMsgRes.GetMsg(129))
+#define MSG_PROPTAB_APPBUTTON (g_mMsgRes.GetMsg(130))
+#define MSG_PROPTAB_SIP (g_mMsgRes.GetMsg(131))
+#define MSG_PROPTAB_CODEPAGE (g_mMsgRes.GetMsg(132))
+#define MSG_MENU_NOTE (g_mMsgRes.GetMsg(133))
+#define MSG_MENU_TOOL (g_mMsgRes.GetMsg(134))
+#define MSG_MENU_EDIT (g_mMsgRes.GetMsg(135))
 
-#define NUM_MESSAGES 119
+#define NUM_MESSAGES 135

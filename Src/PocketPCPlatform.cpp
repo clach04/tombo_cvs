@@ -31,6 +31,7 @@ LPTSTR pMDToolTip[] = {
 
 void PocketPCPlatform::Create(HWND hWnd, HINSTANCE hInst)
 {
+	// menubar for Tree view
 	SHMENUBARINFO mbi;
 	memset(&mbi, 0, sizeof(SHMENUBARINFO));
 	mbi.cbSize = sizeof(SHMENUBARINFO);
@@ -44,9 +45,30 @@ void PocketPCPlatform::Create(HWND hWnd, HINSTANCE hInst)
 	}
 	hMSCmdBar = mbi.hwndMB;
 
+	TBBUTTONINFO tbi;
+	memset(&tbi, 0, sizeof(&tbi));
+	tbi.cbSize = sizeof(tbi);
+	tbi.dwMask = TBIF_TEXT;
+
+	tbi.pszText = (LPTSTR)MSG_MENU_NOTE;
+	tbi.cchText = _tcslen(MSG_MENU_NOTE);
+	SendMessage(hMSCmdBar, TB_SETBUTTONINFO, (WPARAM)(INT)IDM_EDIT_MEMO, (LPARAM)&tbi);
+
+	tbi.pszText = (LPTSTR)MSG_MENU_TOOL;
+	tbi.cchText = _tcslen(MSG_MENU_TOOL);
+	SendMessage(hMSCmdBar, TB_SETBUTTONINFO, (WPARAM)(INT)IDM_MENUITEM3, (LPARAM)&tbi);
+
 	pMSToolTip[0] = (LPTSTR)MSG_TOOLTIPS_NEWMEMO;
 	SendMessage(hMSCmdBar, TB_SETTOOLTIPS, (WPARAM)NUM_MS_TOOLTIP, (LPARAM)pMSToolTip);
 
+	////////////////////--
+//	HMENU hM = SHGetSubMenu(hMSCmdBar, IDM_EDIT_MEMO);
+
+//	InsertMenu(hM, 0, MF_BYPOSITION | MF_STRING, IDM_EXIT, TEXT("EXIT"));
+
+	////////////////////--
+
+	// menubar for edit view
 	memset(&mbi, 0, sizeof(SHMENUBARINFO));
 	mbi.cbSize = sizeof(SHMENUBARINFO);
 	mbi.hwndParent = hWnd;
@@ -141,6 +163,20 @@ void PocketPCPlatform::OpenDetailsView()
 {
 	ShowWindow(hMDCmdBar, SW_SHOW);
 	ShowWindow(hMSCmdBar, SW_HIDE);
+
+	TBBUTTONINFO tbi;
+	memset(&tbi, 0, sizeof(&tbi));
+	tbi.cbSize = sizeof(tbi);
+	tbi.dwMask = TBIF_TEXT;
+
+	tbi.pszText = (LPTSTR)MSG_MENU_TOOL;
+	tbi.cchText = _tcslen(MSG_MENU_TOOL);
+	SendMessage(hMDCmdBar, TB_SETBUTTONINFO, (WPARAM)(INT)IDM_DETAILS_TOOL, (LPARAM)&tbi);
+
+	tbi.pszText = (LPTSTR)MSG_MENU_EDIT;
+	tbi.cchText = _tcslen(MSG_MENU_EDIT);
+	SendMessage(hMDCmdBar, TB_SETBUTTONINFO, (WPARAM)(INT)IDM_EDIT_MEMO, (LPARAM)&tbi);
+
 }
 
 void PocketPCPlatform::CloseDetailsView()

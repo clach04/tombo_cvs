@@ -697,29 +697,6 @@ BEGIN
     "Z",            IDM_UNDO,               VIRTKEY, CONTROL, NOINVERT
 END
 
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// String Table
-//
-
-STRINGTABLE DISCARDABLE 
-BEGIN
-    IDS_PROPTAB_FOLDER      "Memo"
-    IDS_PROPTAB_TITLE       "Property"
-    IDS_PROPTAB_PASSWORD    "Password"
-    IDS_PROPTAB_PASS_TIMEOUT "Timeout"
-    IDS_PROPTAB_FONT        "Font"
-    IDS_PROPTAB_DATE        "Date"
-    IDS_PROPTAB_KEEPCARET   "Memo view"
-    IDS_TIPS_NEWMEMO        "New memo"
-    IDS_TIPS_SAVE           "Save memo"
-    IDS_PROPTAB_SELECTMEMO  "Select memo"
-    IDS_GREPTAB_MAIN        "Main"
-    IDS_GREPTAB_PERSIST     "Save"
-    IDS_PROPTAB_DEFNOTE     "Toppage"
-END
-
 #endif    // “ú–{Œê resources
 /////////////////////////////////////////////////////////////////////////////
 

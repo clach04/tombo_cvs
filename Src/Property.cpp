@@ -177,17 +177,17 @@ class TomboPropertyTab : public PropertyTab {
 protected:
 	Property *pProperty;
 public:
-	TomboPropertyTab(Property *prop, DWORD id, DLGPROC proc, DWORD nTitleResID) : PropertyTab(id, nTitleResID, proc), pProperty(prop) {}
+	TomboPropertyTab(Property *prop, DWORD id, DLGPROC proc, LPCTSTR pTitleName) : PropertyTab(id, pTitleName, proc), pProperty(prop) {}
 };
 
 //////////////////////////////////////////
-// フォルダ選択タブ
+// TomboRoot setting tab
 //////////////////////////////////////////
 
 class FolderTab : public TomboPropertyTab {
 public:
 	FolderTab(Property *p) : 
-	  TomboPropertyTab(p, IDD_PROPTAB_FOLDER,(DLGPROC)DefaultPageProc, IDS_PROPTAB_FOLDER) {}
+	  TomboPropertyTab(p, IDD_PROPTAB_FOLDER,(DLGPROC)DefaultPageProc, MSG_PROPTAB_FOLDER) {}
 	~FolderTab() {}
 	void Init(HWND hDlg);
 	BOOL Apply(HWND hDlg);
@@ -289,7 +289,7 @@ BOOL FolderTab::Apply(HWND hDlg)
 		FindClose(h);
 	}
 
-	// 履歴の保存
+	// Save history
 	RetrieveAndSaveHistory(hTopPath, TOMBO_TOPDIRHIST_ATTR_NAME, p, MEMO_TOP_DIR_NUM_HISTORY);
 
 	HWND hReadOnly = GetDlgItem(hDlg, IDC_PROP_READONLY);
@@ -320,145 +320,13 @@ BOOL FolderTab::OnCommand(HWND hDlg, WPARAM wParam, LPARAM lParam)
 }
 
 //////////////////////////////////////////
-// パスワード設定タブ
-//////////////////////////////////////////
-
-class PasswordTab : public TomboPropertyTab {
-public:
-	PasswordTab(Property *p) : 
-	  TomboPropertyTab(p, IDD_PROPTAB_PASSWORD,(DLGPROC)DefaultPageProc, IDS_PROPTAB_PASSWORD) {}
-	~PasswordTab() {}
-	void Init(HWND hDlg);
-	BOOL Apply(HWND hDlg);
-	BOOL OnCommand(HWND hDlg, WPARAM wParam, LPARAM lParam);
-};
-
-void PasswordTab::Init(HWND hDlg)
-{
-	HWND hPass1 = GetDlgItem(hDlg, IDC_PASS1);
-	HWND hPass2 = GetDlgItem(hDlg, IDC_PASS2);
-	HWND hDesc = GetDlgItem(hDlg, IDC_PROP_PASSWORD_DESC);
-	SetWindowText(hPass1, TEXT(""));
-	SetWindowText(hPass2, TEXT(""));
-	SetWindowText(hDesc, RESMSG(IDS_PROPERTY_PASSWORD_DESC));
-}
-
-BOOL PasswordTab::Apply(HWND hDlg)
-{
-	HWND hPass1 = GetDlgItem(hDlg, IDC_PASS1);
-	HWND hPass2 = GetDlgItem(hDlg, IDC_PASS2);
-
-	if (!pProperty->bValidSum) {
-		SetFocus(hPass1);
-		return FALSE;
-	}
-
-	SetWindowText(hPass1, TEXT(""));
-	SetWindowText(hPass2, TEXT(""));
-	return TRUE;
-}
-
-static BOOL SaveFingerPrint(LPBYTE pPasswordSum, DWORD nLen)
-{
-	DWORD sam, res;
-	HKEY hTomboRoot;
-
-#ifdef _WIN32_WCE
-	res = RegCreateKeyEx(HKEY_CURRENT_USER, TOMBO_MAIN_KEY, 0, NULL, 0,
-				0, NULL, &hTomboRoot, &sam);
-#else
-	res = RegCreateKeyEx(HKEY_CURRENT_USER, TOMBO_MAIN_KEY, 0, NULL, REG_OPTION_NON_VOLATILE,
-				KEY_ALL_ACCESS, NULL, &hTomboRoot, &sam);
-#endif
-	if (res != ERROR_SUCCESS) {
-		SetLastError(res);
-		return FALSE;
-	}
-
-	// パスワードFingerPrint
-	res = RegSetValueEx(hTomboRoot, FINGERPRINT_ATTR_NAME, 0, REG_BINARY, pPasswordSum, nLen);
-	if (res != ERROR_SUCCESS) {
-		SetLastError(res);
-		RegCloseKey(hTomboRoot);
-		return FALSE;
-	}
-
-	RegCloseKey(hTomboRoot);
-	return TRUE;
-}
-
-BOOL PasswordTab::OnCommand(HWND hDlg, WPARAM wParam, LPARAM lParam)
-{
-	switch(LOWORD(wParam)) {
-	case IDC_PROP_SETPASS:
-		{
-			if (pProperty->bValidSum) {
-				if (MessageBox(hDlg, MSG_REG_PASSWD, MSG_REG_PASSWD_TTL,  MB_YESNO) == IDNO) {
-					return TRUE;
-				}
-			}
-			TCHAR aPass1[MAX_PASSWORD_LEN];
-			TCHAR aPass2[MAX_PASSWORD_LEN];
-
-			// パスワード取得
-			HWND hPass1 = GetDlgItem(hDlg, IDC_PASS1);
-			HWND hPass2 = GetDlgItem(hDlg, IDC_PASS2);
-			GetWindowText(hPass1, aPass1, MAX_PASSWORD_LEN);
-			GetWindowText(hPass2, aPass2, MAX_PASSWORD_LEN);
-
-			// 有効性チェック
-			if (_tcslen(aPass1) == 0) {
-				MessageBox(NULL, MSG_PLEASE_SET_PASS, TEXT("Warning"), MB_ICONEXCLAMATION | MB_OK);
-				return TRUE;
-			}
-			if (_tcscmp(aPass1, aPass2) != 0) {
-				MessageBox(NULL, MSG_PASS_NOT_MATCH, TEXT("Warning"), MB_ICONEXCLAMATION | MB_OK);
-				return TRUE;
-			}
-
-			char *pPassA = ConvUnicode2SJIS(aPass1);
-			SetWindowText(hPass1, TEXT(""));
-			SetWindowText(hPass2, TEXT(""));
-			for (DWORD i = 0; i < MAX_PASSWORD_LEN; i++) {
-				aPass1[i] = aPass2[i] = TEXT('\0');
-			}
-
-			if (pPassA == NULL) {
-				MessageBox(NULL, MSG_GET_PASS_FAILED, TEXT("Error"), MB_ICONERROR | MB_OK);
-				return TRUE;
-			}
-
-			if (!GetFingerPrint(pProperty->aPasswordSum, pPassA)) {
-				MessageBox(NULL, MSG_GET_FP_FAILED, TEXT("Error"), MB_ICONERROR | MB_OK);
-				MemoNote::WipeOutAndDelete(pPassA);
-				return TRUE;
-			}
-
-			if (pProperty->bValidSum) {
-				if (SaveFingerPrint(pProperty->aPasswordSum, sizeof(pProperty->aPasswordSum))) {
-					// パスワードの変更反映
-					MessageBox(hDlg, MSG_PW_REGED, MSG_REG_PASSWD_TTL, MB_ICONINFORMATION | MB_OK);
-					pProperty->bValidSum = TRUE;
-				} else {
-					MessageBox(hDlg, MSG_PW_REG_FAILED, TEXT("Error"), MB_ICONERROR | MB_OK);
-				}
-			}
-			MemoNote::WipeOutAndDelete(pPassA);
-			return TRUE;
-		}
-		break;
-	}
-	return TRUE;
-}
-
-//////////////////////////////////////////
-// パスワードタイムアウトタブ
+// Password timeout setting tab
 //////////////////////////////////////////
 
 class PassTimeoutTab : public TomboPropertyTab {
 public:
 	PassTimeoutTab(Property *p) : 
-	  TomboPropertyTab(p, IDD_PROPTAB_PASS_TIMEOUT,(DLGPROC)DefaultPageProc, IDS_PROPTAB_PASS_TIMEOUT) {}
+	  TomboPropertyTab(p, IDD_PROPTAB_PASS_TIMEOUT,(DLGPROC)DefaultPageProc, MSG_PROPTAB_PASS_TIMEOUT) {}
 	~PassTimeoutTab() {}
 	void Init(HWND hDlg);
 	BOOL Apply(HWND hDlg);
@@ -490,13 +358,13 @@ BOOL PassTimeoutTab::Apply(HWND hDlg)
 }
 
 //////////////////////////////////////////
-// フォントタブ
+// Font setting tab
 //////////////////////////////////////////
 
 class FontTab : public TomboPropertyTab {
 public:
 	FontTab(Property *p) :
-	  TomboPropertyTab(p, IDD_PROPTAB_FONT, (DLGPROC)DefaultPageProc, IDS_PROPTAB_FONT) {}
+	  TomboPropertyTab(p, IDD_PROPTAB_FONT, (DLGPROC)DefaultPageProc, MSG_PROPTAB_FONT) {}
 	~FontTab() {}
 	void Init(HWND hDlg);
 	BOOL Apply(HWND hDlg);
@@ -711,7 +579,7 @@ int CALLBACK PropEnumFonts(ENUMLOGFONT FAR *pFont, NEWTEXTMETRIC FAR *pMetric, i
 class DateFormatTab : public TomboPropertyTab {
 public:
 	DateFormatTab(Property *p) :
-	  TomboPropertyTab(p, IDD_PROPTAB_INSDATE, (DLGPROC)DefaultPageProc, IDS_PROPTAB_DATE) {}
+	  TomboPropertyTab(p, IDD_PROPTAB_INSDATE, (DLGPROC)DefaultPageProc, MSG_PROPTAB_DATE) {}
 	~DateFormatTab() {}
 	void Init(HWND hDlg);
 	BOOL Apply(HWND hDlg);
@@ -746,7 +614,7 @@ BOOL DateFormatTab::Apply(HWND hDlg)
 class KeepCaretTab : public TomboPropertyTab {
 public:
 	KeepCaretTab(Property *p) :
-	  TomboPropertyTab(p, IDD_PROPTAB_KEEPCARET, (DLGPROC)DefaultPageProc, IDS_PROPTAB_KEEPCARET) {}
+	  TomboPropertyTab(p, IDD_PROPTAB_KEEPCARET, (DLGPROC)DefaultPageProc, MSG_PROPTAB_KEEPCARET) {}
 	~KeepCaretTab() {}
 	void Init(HWND hDlg);
 	BOOL Apply(HWND hDlg);
@@ -812,62 +680,6 @@ BOOL KeepCaretTab::Apply(HWND hDlg)
 }
 
 //////////////////////////////////////////
-// 一覧ビュー設定
-//////////////////////////////////////////
-
-#ifdef COMMENT
-#if defined(PLATFORM_WIN32)
-class SelectMemoTab : public TomboPropertyTab {
-public:
-	SelectMemoTab(Property *p) :
-	  TomboPropertyTab(p, IDD_PROPTAB_SELECTMEMO, (DLGPROC)DefaultPageProc, IDS_PROPTAB_SELECTMEMO) {}
-	~SelectMemoTab() {}
-	void Init(HWND hDlg);
-	BOOL Apply(HWND hDlg);
-};
-
-void SelectMemoTab::Init(HWND hDlg)
-{
-	HWND hAutoSelect = GetDlgItem(hDlg, IDC_PROP_AUTOLOAD);
-	HWND hSingleClick = GetDlgItem(hDlg, IDC_PROP_SINGLECLICK);
-
-	if (pProperty->AutoSelectMemo()) {
-		SendMessage(hAutoSelect, BM_SETCHECK, BST_CHECKED, 0);
-	} else {
-		SendMessage(hAutoSelect, BM_SETCHECK, BST_UNCHECKED, 0);
-	}
-
-	if (pProperty->SingleClickOpenMemo()) {
-		SendMessage(hSingleClick, BM_SETCHECK, BST_CHECKED, 0);
-	} else {
-		SendMessage(hSingleClick, BM_SETCHECK, BST_UNCHECKED, 0);
-	}
-}
-
-BOOL SelectMemoTab::Apply(HWND hDlg)
-{
-	HWND hAutoSelect = GetDlgItem(hDlg, IDC_PROP_AUTOLOAD);
-	HWND hSingleClick = GetDlgItem(hDlg, IDC_PROP_SINGLECLICK);
-
-	if (SendMessage(hAutoSelect, BM_GETCHECK, 0, 0) == BST_CHECKED) {
-		pProperty->nAutoSelectMemo = TRUE;
-	} else {
-		pProperty->nAutoSelectMemo = FALSE;
-	}
-
-	if (SendMessage(hSingleClick, BM_GETCHECK, 0, 0) == BST_CHECKED) {
-		pProperty->nSingleClick = TRUE;
-	} else {
-		pProperty->nSingleClick = FALSE;
-	}
-
-	return TRUE;
-}
-
-#endif
-#endif
-
-//////////////////////////////////////////
 // アクションボタン設定
 //////////////////////////////////////////
 
@@ -875,7 +687,7 @@ BOOL SelectMemoTab::Apply(HWND hDlg)
 class AppButtonTab : public TomboPropertyTab {
 public:
 	AppButtonTab(Property *p) :
-	  TomboPropertyTab(p, IDD_PROPTAB_APPBUTTON, (DLGPROC)DefaultPageProc, IDS_PROPTAB_APPBUTTON) {}
+	  TomboPropertyTab(p, IDD_PROPTAB_APPBUTTON, (DLGPROC)DefaultPageProc, MSG_PROPTAB_APPBUTTON) {}
 	~AppButtonTab() {}
 	void Init(HWND hDlg);
 	BOOL Apply(HWND hDlg);
@@ -978,7 +790,7 @@ BOOL AppButtonTab::Apply(HWND hDlg)
 class SipTab : public TomboPropertyTab {
 public:
 	SipTab(Property *p) :
-	  TomboPropertyTab(p, IDD_PROPTAB_SIP, (DLGPROC)DefaultPageProc, IDS_PROPTAB_SIP) {}
+	  TomboPropertyTab(p, IDD_PROPTAB_SIP, (DLGPROC)DefaultPageProc, MSG_PROPTAB_SIP) {}
   ~SipTab() {}
 
   void Init(HWND hDlg);
@@ -1016,7 +828,7 @@ BOOL SipTab::Apply(HWND hDlg)
 class CodepageTab : public TomboPropertyTab {
 public:
 	CodepageTab(Property *p) :
-	  TomboPropertyTab(p, IDD_PROPTAB_CODEPAGE, (DLGPROC)DefaultPageProc, IDS_PROPTAB_CODEPAGE) {}
+	  TomboPropertyTab(p, IDD_PROPTAB_CODEPAGE, (DLGPROC)DefaultPageProc, MSG_PROPTAB_CODEPAGE) {}
 	~CodepageTab() {}
 	void Init(HWND hDlg);
 	BOOL Apply(HWND hDlg);
@@ -1054,7 +866,7 @@ class DefaultNoteTab : public TomboPropertyTab {
 	LPCTSTR pCurrentPath;
 public:
 	DefaultNoteTab(Property *p, LPCTSTR pPath) :
-	  TomboPropertyTab(p, IDD_PROPTAB_DEFNOTE, (DLGPROC)DefaultPageProc, IDS_PROPTAB_DEFNOTE), pCurrentPath(pPath) {}
+	  TomboPropertyTab(p, IDD_PROPTAB_DEFNOTE, (DLGPROC)DefaultPageProc, MSG_PROPTAB_DEFNOTE), pCurrentPath(pPath) {}
 	~DefaultNoteTab() {}
 	void Init(HWND hDlg);
 	BOOL Apply(HWND hDlg);
@@ -1145,7 +957,7 @@ DWORD Property::Popup(HINSTANCE hInst, HWND hWnd, LPCTSTR pSelPath)
 	pages[6] = &pgCodepage;
 #endif
 	PropertyPage pp;
-	if (pp.Popup(hInst, hWnd, pages, PROPTAB_PAGES, RESMSG(IDS_PROPTAB_TITLE), MAKEINTRESOURCE(IDI_TOMBO)) == IDOK) {
+	if (pp.Popup(hInst, hWnd, pages, PROPTAB_PAGES, MSG_PROPTAB_TITLE, MAKEINTRESOURCE(IDI_TOMBO)) == IDOK) {
 		if (!Save()) {
 			MessageBox(NULL, MSG_SAVE_DATA_FAILED, TEXT("ERROR"), MB_ICONSTOP | MB_OK);
 		}
