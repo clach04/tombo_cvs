@@ -684,3 +684,10 @@ Not fully tested on both platform, probably it will work.
 
 * i18nized dialog messages(win32).
 * Change dialog font to Tahoma(win32).
+
+////////////////////////////////
+//B145
+////////////////////////////////
+
+* i18nized dialog messages(PocketPC).
+* Change dialog font to Tahoma(PocketPC).

@@ -739,8 +739,20 @@ public:
 	BOOL Apply(HWND hDlg);
 };
 
+static DlgMsgRes aAppButtonRes[] = {
+	{ IDC_PROP_APPBUTTON1,       MSG_ID_DLG_PROPTAB_APPBTN_BUTTON1 }, 
+	{ IDC_PROP_APPBUTTON2,       MSG_ID_DLG_PROPTAB_APPBTN_BUTTON2 },
+	{ IDC_PROP_APPBUTTON3,       MSG_ID_DLG_PROPTAB_APPBTN_BUTTON3 },
+	{ IDC_PROP_APPBUTTON4,       MSG_ID_DLG_PROPTAB_APPBTN_BUTTON4 },
+	{ IDC_PROP_APPBUTTON5,       MSG_ID_DLG_PROPTAB_APPBTN_BUTTON5 },
+	{ IDC_PROPTAB_APPBTN_HELP,   MSG_ID_DLG_PROPTAB_APPBTN_HELP },
+	{ IDC_PROPTAB_DISABLEACTION, MSG_ID_DLG_PROPTAB_APPBTN_DISABLE },
+};
+
 void AppButtonTab::Init(HWND hDlg)
 {
+	OverrideDlgMsg(hDlg, -1, aAppButtonRes, sizeof(aAppButtonRes)/sizeof(DlgMsgRes));
+
 	HWND hAppButton1 = GetDlgItem(hDlg, IDC_PROP_APPBUTTON1);
 	HWND hAppButton2 = GetDlgItem(hDlg, IDC_PROP_APPBUTTON2);
 	HWND hAppButton3 = GetDlgItem(hDlg, IDC_PROP_APPBUTTON3);
@@ -843,8 +855,14 @@ public:
   BOOL Apply(HWND hDlg);
 };
 
+static DlgMsgRes aSIPRes[] = {
+	{ IDC_PROP_SIPDELTA, MSG_ID_DLG_PROPTAB_SIP_SHIFT },
+};
+
 void SipTab::Init(HWND hDlg)
 {
+	OverrideDlgMsg(hDlg, -1, aSIPRes, sizeof(aSIPRes)/sizeof(DlgMsgRes));
+
 	HWND hKeepDelta = GetDlgItem(hDlg, IDC_PROP_SIPDELTA);
 	if (pProperty->SipSizeDelta() != 0) {
 		SendMessage(hKeepDelta, BM_SETCHECK, BST_CHECKED, 0);

@@ -211,13 +211,13 @@ STYLE WS_CHILD | WS_BORDER
 FONT 9, "System"
 BEGIN
     LTEXT           "FolderÅF",IDC_STATIC,5,5,40,10
-    PUSHBUTTON      "...",IDC_FOLDERSEL,100,20,15,10
-    LTEXT           "Folder to store Tombo Notes",IDC_STATIC,10,35,115,10
+    PUSHBUTTON      "...",IDC_FOLDERSEL,100,15,15,10
+    LTEXT           "Folder to store Tombo Notes",IDC_STATIC,10,30,115,10
     CONTROL         "Sync file name and title",IDC_KEEPTITLE,"Button",
                     BS_AUTOCHECKBOX | WS_TABSTOP,5,50,120,10
-    LTEXT           "Rename file name if headline changed.",IDC_STATIC,10,70,
+    LTEXT           "Rename file name if headline changed.",IDC_STATIC,10,65,
                     115,20
-    COMBOBOX        IDC_TOPFOLDER,5,20,90,85,CBS_DROPDOWN | CBS_AUTOHSCROLL | 
+    COMBOBOX        IDC_TOPFOLDER,5,15,90,85,CBS_DROPDOWN | CBS_AUTOHSCROLL | 
                     WS_VSCROLL | WS_TABSTOP
     CONTROL         "Open notes read-only mode",IDC_PROP_READONLY,"Button",
                     BS_AUTOCHECKBOX | WS_TABSTOP,5,95,104,10
@@ -317,9 +317,9 @@ BEGIN
     LTEXT           "Show memo title to titlebar",IDC_STATIC,10,95,115,20
 END
 
-IDD_PROPTAB_APPBUTTON DIALOG DISCARDABLE  0, 0, 122, 102
+IDD_PROPTAB_APPBUTTON DIALOG DISCARDABLE  0, 0, 122, 122
 STYLE WS_CHILD
-FONT 9, "System"
+FONT 9, "Tahoma"
 BEGIN
     CONTROL         "Button1",IDC_PROP_APPBUTTON1,"Button",BS_AUTOCHECKBOX | 
                     WS_TABSTOP,5,5,105,10
@@ -338,7 +338,7 @@ BEGIN
                     WS_TABSTOP,5,85,115,10
 END
 
-IDD_SEARCH DIALOG DISCARDABLE  0, 0, 111, 129
+IDD_SEARCH DIALOGEX 0, 0, 111, 129
 STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE 0x80000000L
 CAPTION "Search"
@@ -346,18 +346,18 @@ FONT 9, "System"
 BEGIN
     LTEXT           "Search StrÅF",IDC_STATIC,5,5,40,8
     CONTROL         "Case sensitive",IDC_SEARCH_CASESENSITIVE,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,5,35,100,15
+                    BS_AUTOCHECKBOX | WS_TABSTOP,5,30,100,15
     COMBOBOX        IDC_SEARCH_STRING,5,15,100,50,CBS_DROPDOWN | WS_VSCROLL | 
                     WS_TABSTOP
     CONTROL         "Find encrypted memo",IDC_SEARCH_ENCRYPTMEMO,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,5,85,100,15
+                    BS_AUTOCHECKBOX | WS_TABSTOP,5,75,100,15
     CONTROL         "Find to file name",IDC_FILENAMEONLY,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,5,105,105,10
+                    BS_AUTOCHECKBOX | WS_TABSTOP,5,90,105,10
     CONTROL         "Up",IDC_SEARCH_DIRECTION_UP,"Button",BS_AUTORADIOBUTTON,
-                    10,60,25,10
+                    10,55,35,10
     CONTROL         "Down",IDC_SEARCH_DIRECTION_DOWN,"Button",
-                    BS_AUTORADIOBUTTON,40,60,34,10
-    GROUPBOX        "Direction",IDC_STATIC,5,50,75,25
+                    BS_AUTORADIOBUTTON,55,55,40,10
+    GROUPBOX        "Direction",IDC_STATIC,5,45,95,25
 END
 
 IDD_SEARCHING DIALOG DISCARDABLE  0, 0, 89, 63
@@ -496,7 +496,7 @@ STYLE WS_CHILD
 FONT 9, "System"
 BEGIN
     CONTROL         "Keep space over the SIP",IDC_PROP_SIPDELTA,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,5,10,94,10
+                    BS_AUTOCHECKBOX | WS_TABSTOP,5,10,110,10
 END
 
 IDD_PROPTAB_DEFNOTE DIALOG DISCARDABLE  0, 0, 131, 140
@@ -610,7 +610,7 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 115
         TOPMARGIN, 7
-        BOTTOMMARGIN, 95
+        BOTTOMMARGIN, 115
     END
 
     IDD_SEARCH, DIALOG

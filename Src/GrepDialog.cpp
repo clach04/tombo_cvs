@@ -95,14 +95,14 @@ public:
 	BOOL OnCommand(HWND hDlg, WPARAM wParam, LPARAM lParam);
 };
 
-static DlgMsgRes aPersist[] = {
-	{ IDC_PROPTAB_PERSIST_SELECTPERSIST, MSG_ID_DLG_GREPTAB_PERSIST_KEEP },
-	{ IDC_GREPTAB_PERSIST_LABEL, MSG_ID_DLG_GREPTAB_PERSIST_LABEL },
-};
+//static DlgMsgRes aPersist[] = {
+//	{ IDC_PROPTAB_PERSIST_SELECTPERSIST, MSG_ID_DLG_GREPTAB_PERSIST_KEEP },
+//	{ IDC_GREPTAB_PERSIST_LABEL, MSG_ID_DLG_GREPTAB_PERSIST_LABEL },
+//};
 
 void GrepPersistTab::Init(HWND hDlg)
 {
-	OverrideDlgMsg(hDlg, -1, aPersist, sizeof(aPersist)/sizeof(DlgMsgRes));
+//	OverrideDlgMsg(hDlg, -1, aPersist, sizeof(aPersist)/sizeof(DlgMsgRes));
 }
 
 BOOL GrepPersistTab::Apply(HWND hDlg)

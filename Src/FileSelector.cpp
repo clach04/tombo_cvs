@@ -4,6 +4,9 @@
 #include "FileSelector.h"
 #include "Resource.h"
 
+#include "DialogTemplate.h"
+#include "Message.h"
+
 #if defined(PLATFORM_WIN32)
 ////////////////////////////////////////////////////
 ////////////////////////////////////////////////////
@@ -131,13 +134,13 @@ DWORD FileSelector::Popup(HINSTANCE hInst, HWND hWnd, LPCTSTR pt, LPCTSTR pExt)
 //////////////////////////////////////////////////
 
 static DlgMsgRes aMsgRes[] = {
-	{ IDOK,     MSG_DLG_CMN_OK},
-	{ IDCANCEL, MSG_DLG_CMN_CANCEL},
+	{ IDOK,     MSG_ID_DLG_CMN_OK},
+	{ IDCANCEL, MSG_ID_DLG_CMN_CANCEL},
 };
 
 void FileSelector::InitDialog(HWND hWnd)
 {
-	OverrideDlgMsg(hWnd, MSG_DLG_FILESELECT_TITLE, aMsgRes, sizeof(aMsgRes)/sizeof(DlgMsgRes));
+	OverrideDlgMsg(hWnd, MSG_ID_DLG_FILESELECT_TITLE, aMsgRes, sizeof(aMsgRes)/sizeof(DlgMsgRes));
 
 	HWND hTree = GetDlgItem(hWnd, IDC_FILESELECT_TREE);
 

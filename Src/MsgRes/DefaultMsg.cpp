@@ -256,4 +256,12 @@ static LPCTSTR defaultMsg[] = {
 	TEXT("Direction"),
 	TEXT("Up"),
 	TEXT("Down"),
+	TEXT("Button1"),
+	TEXT("Button2"),
+	TEXT("Button3"),
+	TEXT("Button4"),
+	TEXT("Button5"),
+	TEXT("Assigin Appliction button to action button. It is enabled after restarting TOMBO"),
+	TEXT("Disable close notes on edit view"),
+	TEXT("Keep space over the SIP"),
 };
