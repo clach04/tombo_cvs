@@ -1,0 +1,65 @@
+[Version]
+Signature = "$Windows NT$"
+Provider = "FlatFish"
+CESignature = "$Windows CE$"
+
+[DefaultInstall]
+AddReg=RegSettings.All
+CEShortcuts = Shortcuts.All
+
+[DefaultInstall.SH3]
+CopyFiles = Files.SH3
+
+[DefaultInstall.MIPS]
+CopyFiles = Files.MIPS
+
+[DefaultInstall.ARM]
+CopyFiles = Files.ARM
+
+[SourceDisksNames]
+1 = ,"Common Files",,R:\work2\Tombo\PocketPC\CabWiz
+
+[SourceDisksNames.SH3]
+2 = ,"SH3 files",,R:\work2\Tombo\PocketPC\Tombo\SH3Rel
+
+[SourceDisksNames.MIPS]
+2 = ,"MIPS files",,R:\work2\Tombo\PocketPC\Tombo\MIPSRel
+
+[SourceDisksNames.ARM]
+2 = ,"ARM files",,R:\work2\Tombo\PocketPC\Tombo\ARMRel
+
+[SourceDisksFiles]
+
+[SourceDisksFiles.SH3]
+Tombo.exe = 2
+
+[SourceDisksFiles.MIPS]
+Tombo.exe = 2
+
+[SourceDisksFiles.ARM]
+Tombo.exe = 2
+
+[DestinationDirs]
+Files.SH3 = 0,%InstallDir%
+Files.MIPS = 0,%InstallDir%
+Files.ARM = 0,%InstallDir%
+Shortcuts.All = ,%CE11%
+
+[CEStrings]
+AppName = TOMBO
+InstallDir = %CE1%
+
+[Shortcuts.All]
+Tombo,0,tombo.exe
+
+[Files.SH3]
+Tombo.exe,,,0
+
+[Files.MIPS]
+Tombo.exe,,,0
+
+[Files.ARM]
+Tombo.exe,,,0
+
+[RegSettings.All]
+

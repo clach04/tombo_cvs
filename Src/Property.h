@@ -1,0 +1,138 @@
+#ifndef PROPERTY_H
+#define PROPERTY_H
+
+#include <commctrl.h>
+
+#define MAX_DATEFORMAT_LEN 256
+
+////////////////////////////////////
+// クラス定義
+////////////////////////////////////
+
+class Property {
+	TCHAR aTopDir[MAX_PATH];
+
+	BOOL bValidSum;
+	BYTE aPasswordSum[33];
+	DWORD nPassTimeOut;
+
+	TCHAR aSelectViewFontName[LF_FACESIZE];
+	DWORD nSelectViewFontSize;
+
+	TCHAR aDetailsViewFontName[LF_FACESIZE];
+	DWORD nDetailsViewFontSize;
+
+	TCHAR aDateFormat1[MAX_DATEFORMAT_LEN];
+	TCHAR aDateFormat2[MAX_DATEFORMAT_LEN];
+
+	DWORD nKeepCaret;
+	DWORD nTabstop;
+
+	DWORD nAutoSelectMemo;
+	DWORD nSingleClick;
+
+	DWORD nAppButton1, nAppButton2, nAppButton3, nAppButton4, nAppButton5;
+
+	DWORD nUseTwoPane;
+	DWORD nSwitchWindowTitle;
+
+	DWORD nKeepTitle;
+
+public:
+	Property();
+
+	LPCTSTR TopDir() { return aTopDir; }
+	const LPBYTE FingerPrint() { return bValidSum ? aPasswordSum : NULL; }
+
+	DWORD PassTimeout() { return nPassTimeOut; }
+	BOOL ScrollPage() { return TRUE; }
+
+	// フォント
+	HFONT SelectViewFont();
+	HFONT DetailsViewFont();
+
+	// 日付フォーマット
+	LPCTSTR DateFormat1() { return aDateFormat1; }
+	LPCTSTR DateFormat2() { return aDateFormat2; }
+
+	// タブストップ位置
+	DWORD Tabstop() { return nTabstop; }
+
+	// カーソル位置の保持
+	BOOL KeepCaret() { return nKeepCaret; }
+
+	// 選択ビューの挙動
+	BOOL AutoSelectMemo() { return nAutoSelectMemo; }
+	BOOL SingleClickOpenMemo() { return nSingleClick; }
+
+	// アプリケーションボタン
+	DWORD AppButton1() { return nAppButton1; }
+	DWORD AppButton2() { return nAppButton2; }
+	DWORD AppButton3() { return nAppButton3; }
+	DWORD AppButton4() { return nAppButton4; }
+	DWORD AppButton5() { return nAppButton5; }
+
+	// ウィンドウをメモ名に連動させるか?
+	BOOL SwitchWindowTitle() { return nSwitchWindowTitle; }
+
+	// プロパティダイアログの表示
+	DWORD Popup(HINSTANCE hInst, HWND hWnd);
+
+	// プロパティ値のロード
+	BOOL Load(BOOL *pStrict);
+
+	// プロパティ値のセーブ
+	BOOL Save();
+
+	// 2Paneモードを使うかどうか
+	BOOL IsUseTwoPane() { return nUseTwoPane; }
+	void SetUseTwoPane(BOOL bPane);
+
+	// ファイル名をメモのタイトルに連動させない
+	BOOL KeepTitle() { return nKeepTitle; }
+
+	// ウィンドウサイズ関連の保存・復元
+	static BOOL SaveWinSize(LPRECT pWinRect, WORD nSelectViewWidth);
+	static BOOL GetWinSize(LPRECT pWinRect, LPWORD pSelectViewWidth);
+
+	friend class FolderTab;
+	friend class PasswordTab;
+	friend class PassTimeoutTab;
+	friend class FontTab;
+	friend class DateFormatTab;
+	friend class KeepCaretTab;
+	friend class SelectMemoTab;
+	friend class AppButtonTab;
+};
+
+////////////////////////////////////
+// 検索履歴
+////////////////////////////////////
+
+LPTSTR LoadStringHistory(LPCTSTR pAttrName);
+BOOL StoreStringHistory(LPCTSTR pAttrName, LPCTSTR pHistString, DWORD nSize);
+BOOL RetrieveAndSaveHistory(HWND hCombo, LPCTSTR pAttrName, LPCTSTR pSelValue, DWORD nSave);
+BOOL LoadHistory(HWND hCombo, LPCTSTR pAttrName);
+
+////////////////////////////////////
+// コマンドバー位置情報保持
+////////////////////////////////////
+
+#if defined(PLATFORM_HPC)
+BOOL SetCommandbarInfo(LPCOMMANDBANDSRESTOREINFO p, DWORD n);
+BOOL GetCommandbarInfo(LPCOMMANDBANDSRESTOREINFO p, DWORD n);
+#endif
+
+////////////////////////////////////
+// グローバル変数宣言
+////////////////////////////////////
+extern Property g_Property;
+
+/////////////////////////////////////////////
+// 属性名定義(ファイル間をまたがるもののみ)
+/////////////////////////////////////////////
+
+#define TOMBO_SEARCHHIST_ATTR_NAME TEXT("SearchHistory")
+#define TOMBO_TOPDIRHIST_ATTR_NAME TEXT("TopDirHistory")
+
+#endif

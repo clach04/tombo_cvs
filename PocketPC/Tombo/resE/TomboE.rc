@@ -1,0 +1,577 @@
+//Microsoft Developer Studio generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "newres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// Japanese resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_JPN)
+#ifdef _WIN32
+LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
+#pragma code_page(932)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDB_MEMOSELECT_IMAGES   BITMAP  DISCARDABLE     "../../../Src/image/memoimg.bmp"
+IDB_ARTICLEBOX          BITMAP  DISCARDABLE     "../../../Src/image/draftimg.bmp"
+IDB_TOOLBAR             BITMAP  DISCARDABLE     "../../../Src/image/toolbar.bmp"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_TOMBO               ICON    DISCARDABLE     "../../../Src/image/Tombo.ICO"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Data
+//
+
+IDM_MAIN_MENU SHMENUBAR DISCARDABLE 
+BEGIN
+    IDM_MAIN_MENU, 7,
+    2, 40019, TBSTATE_ENABLED, TBSTYLE_AUTOSIZE, 60178, 0, 0,
+    I_IMAGENONE, IDM_EDIT_MEMO, TBSTATE_ENABLED, 
+    TBSTYLE_DROPDOWN | TBSTYLE_AUTOSIZE, IDS_MENUITEM40005, 0, 0,
+    I_IMAGENONE, IDM_MENUITEM3, TBSTATE_ENABLED, 
+    TBSTYLE_DROPDOWN | TBSTYLE_AUTOSIZE, IDS_MENUITEM40014, 0, 1,
+    I_IMAGENONE, 0, TBSTATE_ENABLED, TBSTYLE_SEP, 0, 0, NOMENU,
+    7, IDM_SEARCH_PREV, 0, TBSTYLE_AUTOSIZE, 0, 0, 2,
+    8, IDM_SEARCH_NEXT, 0, TBSTYLE_AUTOSIZE, 0, 0, 2,
+    I_IMAGENONE, 0, TBSTATE_ENABLED, TBSTYLE_SEP, 0, 0, NOMENU,
+END
+
+IDM_DETAILS_MENU SHMENUBAR DISCARDABLE 
+BEGIN
+    IDM_DETAILS_MENU, 11,
+    0, 40022, TBSTATE_ENABLED, TBSTYLE_AUTOSIZE, 60178, 0, 0,
+    5, 40044, TBSTATE_ENABLED, TBSTYLE_AUTOSIZE, 60178, 0, 0,
+    I_IMAGENONE, IDM_EDIT_MEMO, TBSTATE_ENABLED, 
+    TBSTYLE_DROPDOWN | TBSTYLE_AUTOSIZE, IDM_COPY, 0, 0,
+    I_IMAGENONE, IDM_DETAILS_TOOL, TBSTATE_ENABLED, 
+    TBSTYLE_DROPDOWN | TBSTYLE_AUTOSIZE, IDS_MENUITEM40014, 0, 1,
+    I_IMAGENONE, 0, TBSTATE_ENABLED, TBSTYLE_SEP, 0, 0, NOMENU,
+    3, 40053, TBSTATE_ENABLED, TBSTYLE_AUTOSIZE, 0, IDM_INSDATE, 2,
+    4, 40054, TBSTATE_ENABLED, TBSTYLE_AUTOSIZE, 0, 0, 2,
+    I_IMAGENONE, 0, TBSTATE_ENABLED, TBSTYLE_SEP, 0, 0, NOMENU,
+    7, IDM_SEARCH_PREV, 0, TBSTYLE_AUTOSIZE, 0, 0, 2,
+    8, IDM_SEARCH_NEXT, 0, TBSTYLE_AUTOSIZE, 0, 0, 2,
+    I_IMAGENONE, 0, TBSTATE_ENABLED, TBSTYLE_SEP, 0, 0, NOMENU,
+END
+
+IDR_POPUP SHMENUBAR DISCARDABLE 
+BEGIN
+    IDR_POPUP, 2,
+    I_IMAGENONE, ID_MENUITEM40050, TBSTATE_ENABLED, 
+    TBSTYLE_DROPDOWN | TBSTYLE_AUTOSIZE, IDS_MENUITEM40051, 0, 0,
+    I_IMAGENONE, ID_MENUITEM40055, TBSTATE_ENABLED, 
+    TBSTYLE_DROPDOWN | TBSTYLE_AUTOSIZE, IDS_MENUITEM40056, 0, 1,
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menubar
+//
+
+IDM_MAIN_MENU MENU DISCARDABLE 
+BEGIN
+    POPUP "Memo"
+    BEGIN
+        MENUITEM "NewFolder",                   IDM_NEWFOLDER
+        MENUITEM "Cut",                         IDM_CUT
+        MENUITEM "Copy",                        IDM_COPY
+        MENUITEM "Paste",                       IDM_PASTE
+        MENUITEM SEPARATOR
+        MENUITEM "Rename",                      IDM_RENAME
+        MENUITEM "Delete",                      IDM_DELETEITEM
+        MENUITEM SEPARATOR
+        MENUITEM "Find",                        IDM_SEARCH
+        MENUITEM "Find Next",                   IDM_SEARCH_NEXT
+        MENUITEM "Find Prev",                   IDM_SEARCH_PREV
+        MENUITEM SEPARATOR
+        MENUITEM "Encrypt",                     IDM_ENCRYPT, GRAYED
+        MENUITEM "Decrypt",                     IDM_DECRYPT, GRAYED
+    END
+    POPUP "Tool"
+    BEGIN
+        MENUITEM "Exit",                        IDM_EXIT
+        MENUITEM SEPARATOR
+        MENUITEM "About",                       IDM_ABOUT
+        MENUITEM "Options",                     IDM_PROPERTY
+        MENUITEM "ForgetPass",                  IDM_FORGETPASS
+    END
+END
+
+IDM_DETAILS_MENU MENU DISCARDABLE 
+BEGIN
+    POPUP "Edit"
+    BEGIN
+        MENUITEM "Cut",                         IDM_CUT
+        MENUITEM "Copy",                        IDM_COPY
+        MENUITEM "Paste",                       IDM_PASTE
+        MENUITEM SEPARATOR
+        MENUITEM "Select All",                  IDM_SELALL
+        MENUITEM SEPARATOR
+        MENUITEM "Find",                        IDM_SEARCH
+        MENUITEM "Find Next",                   IDM_SEARCH_NEXT
+        MENUITEM "Find Prev",                   IDM_SEARCH_PREV
+    END
+    POPUP "Tool"
+    BEGIN
+        MENUITEM "Wrap Text",                   IDM_DETAILS_HSCROLL, CHECKED
+        MENUITEM SEPARATOR
+        MENUITEM "About",                       IDM_ABOUT
+        MENUITEM "Exit",                        IDM_EXIT
+    END
+END
+
+IDR_POPUP MENU DISCARDABLE 
+BEGIN
+    POPUP "DV_POPUP"
+    BEGIN
+        MENUITEM "Cut",                         IDM_CUT
+        MENUITEM "Copy",                        IDM_COPY
+        MENUITEM "Paste",                       IDM_PASTE
+        MENUITEM SEPARATOR
+        MENUITEM "Insert Date1",                IDM_INSDATE1
+        MENUITEM "Insert Date2",                IDM_INSDATE2
+    END
+    POPUP "SV_POPUP"
+    BEGIN
+        MENUITEM "Cut",                         IDM_CUT
+        MENUITEM "Copy",                        IDM_COPY
+        MENUITEM "Paste",                       IDM_PASTE
+        MENUITEM SEPARATOR
+        MENUITEM "Delete",                      IDM_DELETEITEM
+        MENUITEM "Rename",                      IDM_RENAME
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_ABOUTBOX DIALOGEX 0, 0, 162, 166
+STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+EXSTYLE 0x80000000L
+CAPTION "About HelloWinCE"
+FONT 8, "Tahoma"
+BEGIN
+    ICON            IDI_TOMBO,IDC_STATIC,10,10,20,20
+    LTEXT           "Tombo Ver. 1.3",IDC_STATIC,40,15,100,8,SS_NOPREFIX
+    EDITTEXT        IDC_COPYRIGHT,7,34,143,120,ES_MULTILINE | ES_AUTOVSCROLL | 
+                    ES_AUTOHSCROLL | ES_READONLY | WS_VSCROLL | WS_HSCROLL | 
+                    NOT WS_TABSTOP
+END
+
+IDD_PASSWORD DIALOG DISCARDABLE  0, 0, 114, 53
+STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Password"
+FONT 9, "System"
+BEGIN
+    EDITTEXT        IDC_PASS,5,5,105,12,ES_PASSWORD | ES_AUTOHSCROLL
+    EDITTEXT        IDC_PASS2,5,20,105,12,ES_PASSWORD | ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "OK",IDOK,25,35,40,12
+    PUSHBUTTON      "Cancel",IDCANCEL,70,35,40,12
+END
+
+IDD_PROPTAB_FOLDER DIALOG DISCARDABLE  0, 0, 131, 111
+STYLE WS_CHILD | WS_BORDER
+FONT 9, "System"
+BEGIN
+    LTEXT           "FolderÅF",IDC_STATIC,5,5,40,10
+    PUSHBUTTON      "...",IDC_FOLDERSEL,100,20,15,10
+    LTEXT           "Folder to store Tombo Notes",IDC_STATIC,10,35,115,10
+    CONTROL         "Sync file name and title",IDC_KEEPTITLE,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,5,50,120,10
+    LTEXT           "Rename file name if headline changed.",IDC_STATIC,10,70,
+                    115,25
+    COMBOBOX        IDC_TOPFOLDER,5,20,90,85,CBS_DROPDOWN | CBS_AUTOHSCROLL | 
+                    WS_VSCROLL | WS_TABSTOP
+END
+
+IDD_FILESELECT DIALOG DISCARDABLE  0, 0, 134, 89
+STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Select File"
+FONT 9, "System"
+BEGIN
+    PUSHBUTTON      "OK",IDOK,55,70,35,15
+    PUSHBUTTON      "CANCEL",IDCANCEL,95,70,35,15
+    CONTROL         "Tree1",IDC_FILESELECT_TREE,"SysTreeView32",
+                    TVS_HASBUTTONS | TVS_HASLINES | TVS_LINESATROOT | 
+                    WS_BORDER | WS_TABSTOP,5,0,125,65
+END
+
+IDD_PROPTAB_PASSWORD DIALOG DISCARDABLE  0, 0, 131, 121
+STYLE WS_CHILD | WS_BORDER
+FONT 9, "System"
+BEGIN
+    EDITTEXT        IDC_PASS1,5,15,90,12,ES_PASSWORD | ES_AUTOHSCROLL
+    EDITTEXT        IDC_PASS2,5,40,90,12,ES_PASSWORD | ES_AUTOHSCROLL
+    LTEXT           "Password:",IDC_STATIC,5,5,105,10
+    LTEXT           "ReEnter:",IDC_STATIC,5,30,75,10
+    EDITTEXT        IDC_PROP_PASSWORD_DESC,5,55,120,60,ES_MULTILINE | 
+                    ES_AUTOVSCROLL | ES_READONLY
+    PUSHBUTTON      "Option",IDC_PROP_SETPASS,95,39,29,13
+END
+
+IDD_NEWFOLDER DIALOG DISCARDABLE  0, 0, 103, 38
+STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "NewFolder"
+FONT 9, "System"
+BEGIN
+    EDITTEXT        IDC_NEWFOLDER_NAME,5,5,95,10,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "OK",IDOK,15,20,40,15
+    PUSHBUTTON      "Cancel",IDCANCEL,60,20,40,14
+END
+
+IDD_PROPTAB_PASS_TIMEOUT DIALOG DISCARDABLE  0, 0, 131, 115
+STYLE WS_CHILD | WS_BORDER
+FONT 9, "System"
+BEGIN
+    LTEXT           "Password timeout(min)ÅF",IDC_STATIC,5,10,110,10
+    EDITTEXT        IDC_PASS_TIMEOUT,35,25,35,12,ES_AUTOHSCROLL
+    LTEXT           "Timeout length(1-60).",IDC_STATIC,5,50,120,60
+END
+
+IDD_PROPTAB_FONT DIALOG DISCARDABLE  0, 0, 117, 122
+STYLE WS_CHILD
+FONT 9, "System"
+BEGIN
+    LTEXT           "Tree:",IDC_STATIC,5,5,25,10
+    LTEXT           "Memo:",IDC_STATIC,5,55,25,10
+    COMBOBOX        IDC_FONT_SELECT_NAME,35,20,75,65,CBS_DROPDOWNLIST | 
+                    CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_FONT_DETAILS_NAME,35,71,75,65,CBS_DROPDOWNLIST | 
+                    CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_FONT_SELECT_SIZE,35,35,35,65,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_FONT_DETAILS_SIZE,35,85,35,65,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    CONTROL         "Use default",IDC_FONT_SELECT_USEDEFAULT,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,30,5,85,10
+    CONTROL         "Use default",IDC_FONT_DETAILS_USEDEFAULT,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,30,55,80,10
+END
+
+IDD_PROPTAB_INSDATE DIALOG DISCARDABLE  0, 0, 115, 122
+STYLE WS_CHILD
+FONT 9, "System"
+BEGIN
+    LTEXT           "Date1:",IDC_STATIC,5,5,25,10
+    LTEXT           "Date2:",IDC_STATIC,5,20,25,10
+    EDITTEXT        IDC_PROP_DATEFORMAT1,36,5,69,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_PROP_DATEFORMAT2,36,20,69,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_DATEFORMAT_DESC,5,35,105,75,ES_MULTILINE | 
+                    ES_AUTOHSCROLL | ES_READONLY | WS_VSCROLL | NOT 
+                    WS_TABSTOP
+END
+
+IDD_PROPTAB_KEEPCARET DIALOG DISCARDABLE  0, 0, 132, 126
+STYLE WS_CHILD
+FONT 9, "System"
+BEGIN
+    CONTROL         "Keep Caret",IDC_PROP_KEEPCARET,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,5,5,100,10
+    LTEXT           "TabStop",IDC_STATIC,5,50,40,10
+    EDITTEXT        IDC_PROP_TABSTOP,50,50,35,12,ES_AUTOHSCROLL
+    CONTROL         "Show title",IDC_PROP_SWITCHTITLE,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,5,80,105,10
+    LTEXT           "Show memo title to titlebar",IDC_STATIC,10,95,115,20
+END
+
+IDD_PROPTAB_APPBUTTON DIALOG DISCARDABLE  0, 0, 122, 102
+STYLE WS_CHILD
+FONT 9, "System"
+BEGIN
+    CONTROL         "Button1",IDC_PROP_APPBUTTON1,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,5,5,105,10
+    CONTROL         "Button4",IDC_PROP_APPBUTTON4,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,5,35,105,10
+    CONTROL         "Button2",IDC_PROP_APPBUTTON2,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,5,15,105,10
+    CONTROL         "Button3",IDC_PROP_APPBUTTON3,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,5,25,105,10
+    CONTROL         "Button5",IDC_PROP_APPBUTTON5,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,5,45,105,10
+    LTEXT           "Assigin Appliction button to action button. It is enabled after re-executing TOMBO",
+                    IDC_STATIC,5,65,115,30
+END
+
+IDD_SEARCH DIALOG DISCARDABLE  0, 0, 111, 129
+STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+EXSTYLE 0x80000000L
+CAPTION "Search"
+FONT 9, "System"
+BEGIN
+    LTEXT           "Search StrÅF",IDC_STATIC,5,5,40,8
+    CONTROL         "Case sensitive",IDC_SEARCH_CASESENSITIVE,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,5,35,100,15
+    COMBOBOX        IDC_SEARCH_STRING,5,15,100,50,CBS_DROPDOWN | WS_VSCROLL | 
+                    WS_TABSTOP
+    CONTROL         "Find encrypted memo",IDC_SEARCH_ENCRYPTMEMO,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,5,50,100,15
+    CONTROL         "Find to file name",IDC_FILENAMEONLY,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,5,70,105,10
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO DISCARDABLE 
+BEGIN
+    IDD_ABOUTBOX, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 157
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 154
+    END
+
+    IDD_PASSWORD, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 107
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 46
+    END
+
+    IDD_PROPTAB_FOLDER, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 124
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 104
+    END
+
+    IDD_PROPTAB_PASSWORD, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 124
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 114
+    END
+
+    IDD_NEWFOLDER, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 96
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 31
+    END
+
+    IDD_PROPTAB_PASS_TIMEOUT, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 124
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 108
+    END
+
+    IDD_PROPTAB_FONT, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 110
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 115
+    END
+
+    IDD_PROPTAB_INSDATE, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 108
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 115
+    END
+
+    IDD_PROPTAB_KEEPCARET, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 125
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 119
+    END
+
+    IDD_PROPTAB_APPBUTTON, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 115
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 95
+    END
+
+    IDD_SEARCH, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 104
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 122
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Accelerator
+//
+
+IDR_ACCEL_SELECT ACCELERATORS DISCARDABLE 
+BEGIN
+    "C",            IDM_COPY,               VIRTKEY, CONTROL, NOINVERT
+    "E",            IDM_ENCRYPT,            VIRTKEY, CONTROL, NOINVERT
+    "F",            IDM_SEARCH,             VIRTKEY, CONTROL, NOINVERT
+    "N",            IDM_NEWMEMO,            VIRTKEY, CONTROL, NOINVERT
+    "P",            IDM_DECRYPT,            VIRTKEY, CONTROL, NOINVERT
+    "V",            IDM_PASTE,              VIRTKEY, CONTROL, NOINVERT
+    VK_F3,          IDM_SEARCH_NEXT,        VIRTKEY, NOINVERT
+    VK_F3,          IDM_SEARCH_PREV,        VIRTKEY, SHIFT, NOINVERT
+    "X",            IDM_CUT,                VIRTKEY, CONTROL, NOINVERT
+END
+
+IDR_ACCEL_DETAIL ACCELERATORS DISCARDABLE 
+BEGIN
+    "1",            IDM_INSDATE1,           VIRTKEY, CONTROL, NOINVERT
+    "2",            IDM_INSDATE2,           VIRTKEY, CONTROL, NOINVERT
+    "A",            IDM_SELALL,             VIRTKEY, CONTROL, NOINVERT
+    "F",            IDM_SEARCH,             VIRTKEY, CONTROL, NOINVERT
+    "S",            IDM_SAVE,               VIRTKEY, CONTROL, NOINVERT
+    VK_ESCAPE,      IDM_RETURNLIST,         VIRTKEY, NOINVERT
+    VK_F3,          IDM_SEARCH_NEXT,        VIRTKEY, NOINVERT
+    VK_F3,          IDM_SEARCH_PREV,        VIRTKEY, SHIFT, NOINVERT
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_APP_TITLE           "HelloWinCE"
+    IDS_HELLO               "Hello World!"
+    IDC_HELLOWINCE          "HELLOWINCE"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_MAIN_MENUITEM1      "File"
+    IDS_MAIN_MENUITEM2      "f"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_MENUITEM40005       "Memo"
+    IDS_MENUITEM40011       "s"
+    IDS_MENUITEM40014       "Tool"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_MENUITEM40017       "New"
+    IDS_MENUITEM40020       "New Memo"
+    IDS_MENUITEM40027       "Memo"
+    IDS_PROPTAB_FOLDER      "Memo"
+    IDS_PROPTAB_TITLE       "Property"
+    IDS_PROPTAB_PASSWORD    "Password"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_MENUITEM40033       "New"
+    IDS_PROPTAB_PASS_TIMEOUT "Timeout"
+    IDS_MENUITEM40037       "list"
+    IDS_MENUITEM40039       "New"
+    IDS_MENUITEM40041       "Edit"
+    IDS_PROPTAB_FONT        "Font"
+    IDS_MENUITEM40045       "Save"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_MENUITEM40048       "HELO"
+    IDS_MENUITEM40051       "DV_POPUP"
+    IDS_PROPTAB_DATE        "Date"
+    IDS_MENUITEM40056       "SV_POPUP"
+    IDS_PROPTAB_KEEPCARET   "Details"
+    IDS_PROPTAB_APPBUTTON   "AppButton"
+END
+
+#endif    // Japanese resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "#include ""newres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+
