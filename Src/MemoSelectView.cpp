@@ -619,12 +619,14 @@ BOOL MemoSelectView::OnCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		OnDecrypt(pItem);
 		return TRUE;
 	case IDM_DELETEITEM:
+		// DEL key is handled by SelectView findows procedure, but leave this chunk for sending WM_COMMAND
 		OnDelete(hItem, pItem);
 		return TRUE;
 	case IDM_ACTIONBUTTON:
 		OnActionButton(hWnd);
 		return TRUE;
 	case IDM_CUT:
+		// Cut/Copy/Paste key is handled by SelectView findows procedure, but leave this chunk for sending WM_COMMAND
 		OnCut(pItem);
 		return TRUE;
 	case IDM_COPY:
