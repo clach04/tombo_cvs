@@ -627,6 +627,7 @@ public:
 static DlgMsgRes aDateRes[] = {
 	{ IDC_PROPTAB_INSDATE_DATE1, MSG_ID_DLG_PROPTAB_DATE_INSDATE1 },
 	{ IDC_PROPTAB_INSDATE_DATE2, MSG_ID_DLG_PROPTAB_DATE_INSDATE2 },
+	{ IDC_DATEFORMAT_DESC,       MSG_ID_DATEFORMAT_DESC },
 };
 
 void DateFormatTab::Init(HWND hDlg)
@@ -640,7 +641,7 @@ void DateFormatTab::Init(HWND hDlg)
 	SetWindowText(hFormat2, pProperty->aDateFormat2);
 	DWORD nTS = 4*4;
 	SendMessage(hDesc, EM_SETTABSTOPS, 1, (LPARAM)&nTS);
-	SetWindowText(hDesc, MSG_DATEFORMAT_DESC);
+//	SetWindowText(hDesc, MSG_DATEFORMAT_DESC);
 }
 
 BOOL DateFormatTab::Apply(HWND hDlg)

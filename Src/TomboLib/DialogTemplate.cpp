@@ -99,6 +99,8 @@ DWORD DialogTemplate::Popup(HINSTANCE hInst, WORD nID, HWND hParent)
 void OverrideDlgMsg(HWND hDlg, int nTitleMsg, DlgMsgRes aMsgRes[], int nMsgRes)
 {
 #if !defined(PLATFORM_PSPC)
+	HFONT hFont = (HFONT)GetStockObject(DEFAULT_GUI_FONT); // not need release
+
 	if (nTitleMsg != -1) {
 		SetWindowText(hDlg, g_mMsgRes.GetMsg(nTitleMsg));
 	}
@@ -106,6 +108,7 @@ void OverrideDlgMsg(HWND hDlg, int nTitleMsg, DlgMsgRes aMsgRes[], int nMsgRes)
 	HWND h;
 	for (int i = 0; i < nMsgRes; i++) {
 		h = GetDlgItem(hDlg, aMsgRes[i].iCtlID);
+		SendMessage(h, WM_SETFONT, (WPARAM)hFont, MAKELPARAM(FALSE, 0));
 		SetWindowText(h, g_mMsgRes.GetMsg(aMsgRes[i].iMsgID));
 	}
 #endif

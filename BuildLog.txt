@@ -739,3 +739,9 @@ Not fully tested on both platform, probably it will work.
 * Replace message file revised by Gerry(Thanks!)
 * FIX: The bookmark menu isn't i18nlized(#5000,#5001)
 * FIX: More than one lines can't be chosen(#4998,#4999)
+
+////////////////////////////////
+// B152 (SNAPSHOT20040920)
+////////////////////////////////
+
+* FIX:  Dialog isn't indicated right on Windows98SE(#5013,#5014)
