@@ -57,10 +57,10 @@
 #define OPENREADONLY_ATTR_NAME TEXT("OpenReadOnly")
 #define DEFAULTNOTE_ATTR_NAME TEXT("DefaultNote")
 #define DISABLESAVEDLG_ATTR_NAME TEXT("DisableSaveDlg")
-
 #define USEASSOC_ATTR_NAME TEXT("UseSoftwareAssoc")
 #define EXTAPP1_ATTR_NAME TEXT("ExtApp1")
 #define EXTAPP2_ATTR_NAME TEXT("ExtApp2")
+#define SAFEFILENAME_ATTR_NAME TEXT("UseSafeFileName")
 
 
 // saved each exit time.
@@ -355,6 +355,8 @@ public:
 static DlgMsgRes aPassTimeout[] = {
 	{ IDC_PROPTAB_PASS_TIMEOUT_LABEL,MSG_ID_DLG_PROPTAB_PASSTO_LABEL },
 	{ IDC_PROPTAB_PASS_TIMEOUT_HELP, MSG_ID_DLG_PROPTAB_PASSTO_HELP },
+	{ IDC_PASS_TIMEOUT_USE_SAFEFILE, MSG_ID_DLG_PROPTAB_TIMEOUT_USE_SAFENAME},
+	{ IDC_PROPTAB_PASS_TIMEOUT_SAFEFILE_HELP, MSG_ID_DLG_PROPTAB_TIMEOUT_USE_SAFENAME_HELP},
 };
 
 void PassTimeoutTab::Init(HWND hDlg)
@@ -364,6 +366,13 @@ void PassTimeoutTab::Init(HWND hDlg)
 	TCHAR buf[64];
 	wsprintf(buf, TEXT("%d"), pProperty->nPassTimeOut);
 	SetWindowText(hTimeout, buf);
+
+	HWND hSafeFileName = GetDlgItem(hDlg, IDC_PASS_TIMEOUT_USE_SAFEFILE);
+	if (pProperty->UseSafeFileName()) {
+		SendMessage(hSafeFileName, BM_SETCHECK, BST_CHECKED, 0);
+	} else {
+		SendMessage(hSafeFileName, BM_SETCHECK, BST_UNCHECKED, 0);
+	}
 }
 
 BOOL PassTimeoutTab::Apply(HWND hDlg)
@@ -380,6 +389,13 @@ BOOL PassTimeoutTab::Apply(HWND hDlg)
 		return FALSE;
 	}
 	pProperty->nPassTimeOut = n;
+
+	HWND hSafeFileName = GetDlgItem(hDlg, IDC_PASS_TIMEOUT_USE_SAFEFILE);
+	if (SendMessage(hSafeFileName, BM_GETCHECK, 0, 0) == BST_CHECKED) {
+		pProperty->nSafeFileName = TRUE;
+	} else {
+		pProperty->nSafeFileName = FALSE;
+	}
 	return TRUE;
 }
 
@@ -1428,6 +1444,9 @@ BOOL Property::Load(BOOL *pStrict)
 		aExtApp2[0] = TEXT('\0');
 	}
 
+	// Safe filename options
+	nSafeFileName = GetDWORDFromReg(hTomboRoot, SAFEFILENAME_ATTR_NAME, FALSE);
+
 	RegCloseKey(hTomboRoot);
 	return TRUE;
 }
@@ -1536,6 +1555,7 @@ BOOL Property::Save()
 	if (!SetSZToReg(hTomboRoot, EXTAPP1_ATTR_NAME, aExtApp1)) return FALSE;
 	if (!SetSZToReg(hTomboRoot, EXTAPP2_ATTR_NAME, aExtApp2)) return FALSE;
 	
+	if (!SetDWORDToReg(hTomboRoot, SAFEFILENAME_ATTR_NAME, nSafeFileName)) return FALSE;
 
 #if defined(PLATFORM_BE500)
 	CGDFlushRegistry();

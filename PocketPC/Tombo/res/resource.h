@@ -172,6 +172,8 @@
 #define IDC_SEARCH_DIRECT_LABEL         1074
 #define IDC_PROPTAB_APPBTN_HELP         1075
 #define IDC_PROPTAB_DISABLESAVEDLG      1076
+#define IDC_PASS_TIMEOUT_USE_SAFEFILE   1077
+#define IDC_PROPTAB_PASS_TIMEOUT_SAFEFILE_HELP 1078
 #define IDC_LANG_LIST                   1099
 #define IDM_ACTIONBUTTON                30001
 #define IDM_FILE_EXIT                   40002
@@ -256,7 +258,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        132
 #define _APS_NEXT_COMMAND_VALUE         40085
-#define _APS_NEXT_CONTROL_VALUE         1077
+#define _APS_NEXT_CONTROL_VALUE         1079
 #define _APS_NEXT_SYMED_VALUE           111
 #endif
 #endif

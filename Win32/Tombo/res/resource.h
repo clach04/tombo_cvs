@@ -177,6 +177,8 @@
 #define IDC_PROPTAB_EXTAPP_CHOOSE2      1099
 #define IDC_LANG_LIST                   1099
 #define IDC_PROPTAB_DISABLESAVEDLG      1100
+#define IDC_PASS_TIMEOUT_USE_SAFEFILE   1101
+#define IDC_PROPTAB_PASS_TIMEOUT_SAFEFILE_HELP 1102
 #define IDM_EXIT                        40001
 #define IDM_NEWMEMO                     40002
 #define IDM_RETURNLIST                  40003
@@ -220,7 +222,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        150
 #define _APS_NEXT_COMMAND_VALUE         40039
-#define _APS_NEXT_CONTROL_VALUE         1101
+#define _APS_NEXT_CONTROL_VALUE         1103
 #define _APS_NEXT_SYMED_VALUE           113
 #endif
 #endif

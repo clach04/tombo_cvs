@@ -13,6 +13,9 @@
 #include "PasswordManager.h"
 #include "MemoInfo.h"
 
+#include "DirectoryScanner.h"
+#include "MemoFolder.h"
+
 /////////////////////////////////////////
 // static funcs
 /////////////////////////////////////////
@@ -286,6 +289,27 @@ BOOL LocalFileRepository::GetHeadLine(const TomboURI *pURI, TString *pHeadLine)
 
 BOOL LocalFileRepository::GetOption(const TomboURI *pURI, URIOption *pOption) const
 {
+	if (pOption->nFlg & NOTE_OPTIONMASK_VALID) {
+		LPCTSTR p = pURI->GetFullURI();
+		DWORD len = _tcslen(p);
+		if (_tcscmp(p + len - 1, TEXT("/")) == 0) {
+			// folder
+			pOption->bValid = TRUE;
+			pOption->bFolder = TRUE;
+		} else {
+			// file
+			p = p + len - 4;
+			if (_tcsicmp(p, TEXT(".txt")) == 0 ||
+				_tcsicmp(p, TEXT(".chi")) == 0 || 
+				_tcsicmp(p, TEXT(".chs")) == 0) {
+				pOption->bValid = TRUE;
+				pOption->bFolder = FALSE;
+			} else {
+				pOption->bValid = FALSE;
+				return TRUE;
+			}
+		}
+	}
 	if (pOption->nFlg & NOTE_OPTIONMASK_ENCRYPTED) {
 		pOption->bEncrypt = pURI->IsEncrypted();
 	}
@@ -319,7 +343,7 @@ BOOL LocalFileRepository::SetOption(const TomboURI *pCurrentURI, URIOption *pOpt
 			}
 		} else {
 			// set option to folder
-			// TODO: impliment
+			return EnDecryptFolder(pCurrentURI, pOption);
 		}
 	}
 	return TRUE;
@@ -454,6 +478,47 @@ BOOL LocalFileRepository::DecryptLeaf(const TomboURI *pCurrentURI, URIOption *pO
 		return FALSE;
 	}
 
+	return TRUE;
+}
+
+/////////////////////////////////////////
+// Encrypt/Decrypt folder
+/////////////////////////////////////////
+
+BOOL LocalFileRepository::EnDecryptFolder(const TomboURI *pCurrentURI, URIOption *pOption)
+{
+	TString sPath;
+	if (!GetPhysicalPath(pCurrentURI, &sPath)) {
+		pOption->iLevel = MB_ICONERROR;
+		pOption->pErrorReason = MSG_NOT_ENOUGH_MEMORY;
+		return FALSE;
+	}
+
+	DSEncrypt fc;
+	if (!fc.Init(pTopDir, sPath.Get(), pCurrentURI->GetFullURI(), pOption->bEncrypt)) {
+		pOption->iLevel = MB_ICONERROR;
+		pOption->pErrorReason = MSG_NOT_ENOUGH_MEMORY;
+		return FALSE;
+	}
+
+	// ask password
+	BOOL bCancel;
+	const char *pPass = g_pPassManager->Password(&bCancel, pOption->bEncrypt);
+	if (pPass == NULL) {
+		pOption->iLevel = MB_ICONINFORMATION;
+		pOption->pErrorReason = MSG_GET_PASS_FAILED;
+		return FALSE;
+	}
+
+	// scan and encrypt/decrypt
+	if (!fc.Scan() || fc.nNotEncrypted != 0) {
+		pOption->iLevel = MB_ICONERROR;
+		pOption->pErrorReason = StringDup(fc.pErrorReason);
+		if (pOption->pErrorReason == NULL) {
+			pOption->pErrorReason = MSG_NOT_ENOUGH_MEMORY;
+		}		
+		return FALSE;
+	}
 	return TRUE;
 }
 

@@ -14,6 +14,7 @@ class RepositoryOption;
 
 #define NOTE_OPTIONMASK_ENCRYPTED  1
 #define NOTE_OPTIONMASK_SAFEFILE   2
+#define NOTE_OPTIONMASK_VALID      4
 //#define NOTE_OPTIONMASK_POSITION  2
 
 /////////////////////////////////////////
@@ -81,13 +82,15 @@ public:
 
 class URIOption {
 public:
-	URIOption(DWORD flg = 0) : nFlg(flg), pNewURI(NULL), pNewHeadLine(NULL) {}
+	URIOption(DWORD flg = 0) : nFlg(flg), pNewURI(NULL), pNewHeadLine(NULL), pErrorReason(NULL) {}
 	~URIOption();
 
 	// request section
 	DWORD nFlg;
 	BOOL bEncrypt;
 	BOOL bSafeFileName;
+	BOOL bValid;
+	BOOL bFolder;
 
 	// result info section
 	// if these value is not set by NULL, delete when NoteOption is deleted.
@@ -97,6 +100,7 @@ public:
 	// error info section
 	DWORD nErrorCode; // if success, value is 0
 	UINT iLevel; // MB_ICONERROR or MB_ICONWARNING
+	LPCTSTR pErrorReason;
 };
 
 

@@ -11,9 +11,8 @@
 #include "Property.h"
 #include "MemoManager.h"
 #include "MainFrame.h"
-#include "PasswordManager.h"
-#include "MemoFolder.h"
 #include "DirectoryScanner.h"
+#include "MemoFolder.h"
 #include "Message.h"
 #include "VFStream.h"
 #include "TSParser.h"
@@ -410,7 +409,7 @@ BOOL TreeViewFolderItem::Move(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR 
 
 	// 移動処理
 	MemoFolder mfFolder;
-	if (!mfFolder.Init(sCurrentPath.Get())) return FALSE;
+	if (!mfFolder.Init(g_Property.TopDir(), sCurrentPath.Get())) return FALSE;
 	if (!mfFolder.Move(sDstFullPath.Get())) return FALSE;	
 
 	// 表示の追加
@@ -453,7 +452,7 @@ BOOL TreeViewFolderItem::Copy(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR 
 
 	// ファイルのコピー
 	MemoFolder mf;
-	mf.Init(sCurrentPath.Get());
+	mf.Init(g_Property.TopDir(), sCurrentPath.Get());
 	BOOL bResult = mf.Copy(sDstFullPath.Get());
 
 	// フォルダの修正
@@ -486,7 +485,7 @@ BOOL TreeViewFolderItem::Delete(MemoManager *pMgr, MemoSelectView *pView)
 	pView->TreeCollapse(GetViewItem());
 
 	MemoFolder mf;
-	mf.Init(sCurrentPath.Get());	
+	mf.Init(g_Property.TopDir(), sCurrentPath.Get());	
 	if (mf.Delete()) {
 		return TRUE;
 	} else {
@@ -498,23 +497,20 @@ BOOL TreeViewFolderItem::Delete(MemoManager *pMgr, MemoSelectView *pView)
 
 BOOL TreeViewFolderItem::Encrypt(MemoManager *pMgr, MemoSelectView *pView)
 {
-	TCHAR buf[MAX_PATH];
-	TString sCurrentPath;
-	HTREEITEM hItem = GetViewItem();
-	LPTSTR pCurrentPath = pView->GeneratePath(hItem, buf, MAX_PATH);
-	if (!sCurrentPath.Join(g_Property.TopDir(), TEXT("\\"), pCurrentPath)) return FALSE;
+	TomboURI sURI;
+	if (!pView->GetURI(&sURI)) return FALSE;
 
-	if (_tcslen(pCurrentPath) == 0 ||
-		TomboMessageBox(NULL, MSG_CONFIRM_ENCRYPT_FOLDER, MSG_CONFIRM_ENCRYPT_FOLDER_TTL, MB_ICONQUESTION | MB_OKCANCEL) != IDOK) return TRUE;
+	if (sURI.IsRoot()) return TRUE;
+	if (TomboMessageBox(NULL, MSG_CONFIRM_ENCRYPT_FOLDER, MSG_CONFIRM_ENCRYPT_FOLDER_TTL, MB_ICONQUESTION | MB_OKCANCEL) != IDOK) return TRUE;
 
 	pMgr->InactiveDetailsView();
 	pView->TreeCollapse(GetViewItem());
-	MemoFolder mf;
-	mf.Init(sCurrentPath.Get());	
 
-	if (!mf.Encrypt(pMgr->GetPasswordManager())) {
-		LPCTSTR pErr = mf.GetErrorReason();
-		MessageBox(NULL, pErr ? pErr : MSG_NOT_ENOUGH_MEMORY, TOMBO_APP_NAME, MB_ICONERROR | MB_OK);
+	// encrypt request to repository
+	URIOption opt(NOTE_OPTIONMASK_ENCRYPTED);
+	opt.bEncrypt = TRUE;
+	if (!g_Repository.SetOption(&sURI, &opt)) {
+		MessageBox(NULL, opt.pErrorReason, TOMBO_APP_NAME, opt.iLevel | MB_OK);
 		return TRUE;
 	}
 	return TRUE;
@@ -522,23 +518,20 @@ BOOL TreeViewFolderItem::Encrypt(MemoManager *pMgr, MemoSelectView *pView)
 
 BOOL TreeViewFolderItem::Decrypt(MemoManager *pMgr, MemoSelectView *pView)
 {
-	TCHAR buf[MAX_PATH];
-	TString sCurrentPath;
-	HTREEITEM hItem = GetViewItem();
-	LPTSTR pCurrentPath = pView->GeneratePath(hItem, buf, MAX_PATH);
-	if (!sCurrentPath.Join(g_Property.TopDir(), TEXT("\\"), pCurrentPath)) return FALSE;
+	TomboURI sURI;
+	if (!pView->GetURI(&sURI)) return FALSE;
 
-	if (_tcslen(pCurrentPath) == 0 ||
-		TomboMessageBox(NULL, MSG_CONFIRM_DECRYPT_FOLDER, MSG_CONFIRM_DECRYPT_FOLDER_TTL, MB_ICONQUESTION | MB_OKCANCEL) != IDOK) return TRUE;
+	if (sURI.IsRoot()) return TRUE;
+	if (TomboMessageBox(NULL, MSG_CONFIRM_DECRYPT_FOLDER, MSG_CONFIRM_DECRYPT_FOLDER_TTL, MB_ICONQUESTION | MB_OKCANCEL) != IDOK) return TRUE;
 
 	pMgr->InactiveDetailsView();
 	pView->TreeCollapse(GetViewItem());
-	MemoFolder mf;
-	mf.Init(sCurrentPath.Get());	
 
-	if (!mf.Decrypt(pMgr->GetPasswordManager())) {
-		LPCTSTR pErr = mf.GetErrorReason();
-		MessageBox(NULL, pErr ? pErr : MSG_NOT_ENOUGH_MEMORY, TOMBO_APP_NAME, MB_ICONERROR | MB_OK);
+	// decrypt request to repository
+	URIOption opt(NOTE_OPTIONMASK_ENCRYPTED);
+	opt.bEncrypt = FALSE;
+	if (!g_Repository.SetOption(&sURI, &opt)) {
+		MessageBox(NULL, opt.pErrorReason, TOMBO_APP_NAME, opt.iLevel | MB_OK);
 		return TRUE;
 	}
 	return TRUE;
@@ -623,7 +616,7 @@ BOOL TreeViewFolderItem::Rename(MemoManager *pMgr, MemoSelectView *pView, LPCTST
 	pView->TreeCollapse(GetViewItem());
 
 	MemoFolder mf;
-	mf.Init(sCurrentPath.Get());	
+	mf.Init(g_Property.TopDir(), sCurrentPath.Get());	
 
 	BOOL bResult = mf.Rename(pNewName);
 	if (!bResult) {

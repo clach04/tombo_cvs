@@ -177,6 +177,18 @@ BOOL TomboURI::IsLeaf() const
 }
 
 /////////////////////////////////////////////
+// Root node?
+/////////////////////////////////////////////
+
+BOOL TomboURI::IsRoot() const
+{
+	LPCTSTR p = _tcschr(uri.Get() + _tcslen(TEXT("tombo://")), TEXT('/'));
+	if (p == NULL) return FALSE; // invalid URI
+	if (*(p+1) == TEXT('\0')) return TRUE;
+	return FALSE;
+}
+
+/////////////////////////////////////////////
 // get parent path
 /////////////////////////////////////////////
 

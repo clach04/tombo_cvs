@@ -56,6 +56,9 @@ public:
 	// Checking does only to URI string. Not confirm to repository.
 	BOOL IsLeaf() const;
 
+	// Is the URI point to root node?
+	BOOL IsRoot() const;
+
 	// Get path string
 	// This method will be obsoleted in future version.
 	// ex. tombo://default/aaa/bbb/ccc.txt -> aaa\bbb\ccc.txt

@@ -850,8 +850,17 @@ Encryption is not work correctly at this version.
 Finding and encrypting to the folder may not work.
 
 ////////////////////////////////
-//
+// B166
 ////////////////////////////////
 
 * FIX: GPF occured when pURIBase is NULL.
 * FIX: create new note failed when choosing a notes.
+* FIX: search failed even though the keyword exists in safe file.
+
+////////////////////////////////
+// B167
+////////////////////////////////
+
+* Support encryption to folder.
+* Add option tab.
+

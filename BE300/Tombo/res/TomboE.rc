@@ -140,8 +140,12 @@ BEGIN
     LTEXT           "Password timeout(min):",IDC_PROPTAB_PASS_TIMEOUT_LABEL,
                     5,10,115,10
     EDITTEXT        IDC_PASS_TIMEOUT,60,25,35,12,ES_AUTOHSCROLL
-    LTEXT           "Timeout length(1-60).",IDC_PROPTAB_PASS_TIMEOUT_HELP,15,
-                    45,95,35
+    LTEXT           "Timeout length(1-60).",IDC_PROPTAB_PASS_TIMEOUT_HELP,5,
+                    45,110,30
+    CONTROL         "Check1",IDC_PASS_TIMEOUT_USE_SAFEFILE,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,5,80,100,10
+    LTEXT           "Static",IDC_PROPTAB_PASS_TIMEOUT_SAFEFILE_HELP,5,95,110,
+                    20
 END
 
 IDD_PROPTAB_FONT DIALOG DISCARDABLE  0, 0, 132, 132

@@ -123,7 +123,7 @@ Password
 Font
 Date
 Memo view
-Timeout
+Security
 Toppage
 Property
 Main
@@ -283,3 +283,5 @@ Use ClearType font
 Disable save daialog
 Toolbar
 Save options failed. Change may not be reflected.
+Use random filename
+When encrypting, generate file name by random number.

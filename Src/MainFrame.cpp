@@ -522,8 +522,7 @@ void MainFrame::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	roOpt.bKeepCaret = g_Property.KeepCaret();
 	roOpt.bKeepTitle = g_Property.KeepTitle();
 
-//	roOpt.bSafeFileName = TRUE;
-	roOpt.bSafeFileName = FALSE;
+	roOpt.bSafeFileName = g_Property.UseSafeFileName();
 
 	g_Repository.Init(g_Property.TopDir(), &roOpt);
 

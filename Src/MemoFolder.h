@@ -1,33 +1,66 @@
 #ifndef MEMOFOLDER_H
 #define MEMOFOLDER_H
 
-#include "TString.h"
-#include "MemoNote.h"
-
 class PasswordManager;
+class TString;
+
+/////////////////////////////////////////
+// Folder operation classes
+/////////////////////////////////////////
+//
+// Thease classes should be used by only LocalRepository.
+// If you want to use thease features, request to it.
+
 
 class MemoFolder {
+	LPCTSTR pTopDir;
 	LPTSTR pFullPath;
 	TString sErrorReason;
-
-	BOOL EnDeCrypt(PasswordManager *pMgr, BOOL bEncrypt);
-
 public:
 
 	///////////////////////////////////////////////
 	// ctor & dtor
 	MemoFolder();
 	~MemoFolder();
-	BOOL Init(LPCTSTR pPath);
+	BOOL Init(LPCTSTR pTopDir, LPCTSTR pPath);
 
 	BOOL Copy(LPCTSTR pDst);
 	BOOL Move(LPCTSTR pDst);
 	BOOL Delete();
 	BOOL Rename(LPCTSTR pNewName);
-	BOOL Encrypt(PasswordManager *pMgr) { return EnDeCrypt(pMgr, TRUE); }
-	BOOL Decrypt(PasswordManager *pMgr) { return EnDeCrypt(pMgr, FALSE); }
 
 	LPCTSTR GetErrorReason() { return sErrorReason.Get(); }
+};
+
+/////////////////////////////////////////
+// Encrypt/decrypt folder
+/////////////////////////////////////////
+
+class DSEncrypt: public DirectoryScanner {
+	DWORD nBaseLen;
+	PasswordManager *pPassMgr;
+	BOOL bEncrypt;
+
+	TString *pURI;
+	DWORD nURIBufSize;
+	DWORD nCurrentPos;
+
+protected:
+	BOOL CheckURIBuffer(LPCTSTR p);
+
+public:
+	DWORD nNotEncrypted;
+	LPCTSTR pErrorReason;
+
+	~DSEncrypt();
+	// If bEncrypt is FALSE, decrypt files.
+	BOOL Init(LPCTSTR pTopDir, LPCTSTR pPath, LPCTSTR pBaseURI, BOOL bEncrypt);
+
+	void InitialScan() {}
+	void AfterScan() {}
+	void PreDirectory(LPCTSTR);
+	void PostDirectory(LPCTSTR);
+	void File(LPCTSTR);
 };
 
 #endif

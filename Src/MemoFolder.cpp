@@ -3,14 +3,15 @@
 #include <tchar.h>
 
 #include "Tombo.h"
-#include "Property.h"
 #include "UniConv.h"
 #include "TString.h"
-#include "MemoFolder.h"
+#include "TomboURI.h"
 #include "DirectoryScanner.h"
+#include "MemoFolder.h"
 #include "PasswordManager.h"
 #include "MemoNote.h"
 #include "Message.h"
+#include "Repository.h"
 
 ///////////////////////////////////////////////
 // ctor & dtor
@@ -25,8 +26,9 @@ MemoFolder::~MemoFolder()
 	if (pFullPath) delete [] pFullPath;
 }
 
-BOOL MemoFolder::Init(LPCTSTR p)
+BOOL MemoFolder::Init(LPCTSTR pTop, LPCTSTR p)
 {
+	pTopDir = pTop;
 	if ((pFullPath = StringDup(p)) == NULL) return FALSE;
 	return TRUE;
 }
@@ -239,101 +241,91 @@ BOOL MemoFolder::Rename(LPCTSTR pNewName)
 }
 
 ///////////////////////////////////////////////
-// Encrypt/Decrypt
+//  Encrypt/decrypt to folderr
 ///////////////////////////////////////////////
 
-class DSEncrypt: public DirectoryScanner {
-	DWORD nBaseLen;
-	PasswordManager *pPassMgr;
-	BOOL bEncrypt;
-public:
-	DWORD nNotEncrypted;
-	LPCTSTR pErrorReason;
+DSEncrypt::~DSEncrypt()
+{
+	delete pURI;
+}
 
-	// If bEncrypt is FALSE, decrypt files.
-	BOOL Init(LPCTSTR pPath, PasswordManager *pMgr, BOOL bEncrypt);
-
-	void InitialScan() {}
-	void AfterScan() {}
-	void PreDirectory(LPCTSTR) {}
-	void PostDirectory(LPCTSTR) {}
-	void File(LPCTSTR);
-};
-
-BOOL DSEncrypt::Init(LPCTSTR pPath, PasswordManager *pMgr, BOOL bEnc) {
-	nBaseLen = _tcslen(g_Property.TopDir());
+BOOL DSEncrypt::Init(LPCTSTR pTopDir, LPCTSTR pPath, LPCTSTR pBaseURI, BOOL bEnc) {
+	nBaseLen = _tcslen(pTopDir);
 	nNotEncrypted = 0;
-	pPassMgr = pMgr;
 	bEncrypt = bEnc;
+	pURI = new TString();
+	if (pURI == NULL || !pURI->Alloc(MAX_PATH)) return FALSE;
+	nURIBufSize = MAX_PATH;
+
+	_tcscpy(pURI->Get(), pBaseURI);
+	nCurrentPos = _tcslen(pBaseURI);
+
 	return DirectoryScanner::Init(pPath, 0);
+}
+
+BOOL DSEncrypt::CheckURIBuffer(LPCTSTR p)
+{
+	// check buffer size
+	if (nCurrentPos + _tcslen(p) > nURIBufSize) {
+		TString *pNewBuf = new TString();
+		if (pNewBuf == NULL || !pNewBuf->Alloc(nURIBufSize + MAX_PATH)) {
+			pErrorReason = MSG_NOT_ENOUGH_MEMORY;
+			StopScan();
+			return FALSE;
+		}
+		_tcscpy(pNewBuf->Get(), pURI->Get());
+		delete pURI;
+		pURI = pNewBuf;
+	}
+	return TRUE;
+}
+
+void DSEncrypt::PreDirectory(LPCTSTR pDir)
+{
+	if (!CheckURIBuffer(pDir)) return;
+
+	DWORD n = _tcslen(pDir);
+	_tcscpy(pURI->Get() + nCurrentPos, pDir);
+	nCurrentPos += n;
+	_tcscat(pURI->Get() + nCurrentPos, TEXT("/"));
+	nCurrentPos++;
+}
+
+void DSEncrypt::PostDirectory(LPCTSTR pDir)
+{
+	DWORD n = _tcslen(pDir);
+	nCurrentPos -= n + 1;
+	*(pURI->Get() + nCurrentPos) = TEXT('\0');
 }
 
 void DSEncrypt::File(LPCTSTR pFile)
 {
-	LPCTSTR pPath = CurrentPath() + nBaseLen;
-	MemoNote *pNote;
-	if (!MemoNote::MemoNoteFactory(TEXT(""), pPath, &pNote)) {
+	if (!CheckURIBuffer(pFile)) return;
+
+	_tcscpy(pURI->Get() + nCurrentPos, pFile);
+
+	TomboURI sURI;
+	if (!sURI.Init(pURI->Get())) {
+		pErrorReason = MSG_NOT_ENOUGH_MEMORY;
+		StopScan();
+		return;
+	}
+
+	URIOption gopt(NOTE_OPTIONMASK_VALID | NOTE_OPTIONMASK_ENCRYPTED);
+	if (!g_Repository.GetOption(&sURI, &gopt)) {
+		pErrorReason = gopt.pErrorReason;
 		nNotEncrypted++;
 		return;
 	}
-	if (pNote == NULL) return;
-	TString s;
-	BOOL b;
+	if (gopt.bValid == FALSE || gopt.bFolder == TRUE) return;
 
-	// skip already encrypted/decrypted
-	if (bEncrypt && pNote->IsEncrypted() ||
-		!bEncrypt && !pNote->IsEncrypted()) return;
+	if (gopt.bEncrypt == bEncrypt) return;
 
-	MemoNote *pNewNote;
-	if (bEncrypt) {
-		pNewNote = pNote->Encrypt(pPassMgr, &s, &b);
-	} else {
-		pNewNote = pNote->Decrypt(pPassMgr, &s, &b);
-	}
-
-	if (pNewNote) {
-		if (!pNote->DeleteMemoData()) {
-			// delete failed. plain memo exists.
-			if (bEncrypt) {
-				pErrorReason = MSG_PLAIN_TEXT_DEL_FAILED;
-			} else {
-				pErrorReason = MSG_CRYPT_FILE_DEL_FAILED;
-			}
-			nNotEncrypted++;
-		}
-	} else {
-		// encrypt failed.
+	URIOption opt(NOTE_OPTIONMASK_ENCRYPTED);
+	opt.bEncrypt = bEncrypt;
+	if (!g_Repository.SetOption(&sURI, &opt)) {
+		pErrorReason = opt.pErrorReason;
 		nNotEncrypted++;
-		if (bEncrypt) {
-			pErrorReason = MSG_ENCRYPT_FAILED;
-		} else {
-			pErrorReason = MSG_DECRYPT_FAILED;
-		}
+		return;
 	}
-
-	delete pNote;
-	delete pNewNote;
 }
-
-BOOL MemoFolder::EnDeCrypt(PasswordManager *pMgr, BOOL bEncrypt)
-{
-	DSEncrypt fc;
-	fc.Init(pFullPath, pMgr, bEncrypt);
-
-	// for cancel, get password before encryption.
-	BOOL bCancel;
-	const char *pPass = pMgr->Password(&bCancel, bEncrypt);
-	if (!pPass) {
-		sErrorReason.Set(MSG_GET_PASS_FAILED);
-		return FALSE;
-	}
-
-	// Scan directory and encrypt files
-	if (!fc.Scan() || fc.nNotEncrypted != 0) {
-		sErrorReason.Set(fc.pErrorReason);
-		return FALSE;
-	}
-
-	return TRUE;
-}
-

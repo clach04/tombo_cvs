@@ -65,6 +65,7 @@ protected:
 	// Encryption/Decryption subroutines
 	BOOL EncryptLeaf(const TomboURI *pCurrentURI, URIOption *pOption);
 	BOOL DecryptLeaf(const TomboURI *pCurrentURI, URIOption *pOption);
+	BOOL EnDecryptFolder(const TomboURI *pCurrentURI, URIOption *pOption);
 
 	TomboURI *DoEncryptFile(MemoNote *pNote, TString *pHeadLine);
 	BOOL NegotiateNewName(LPCTSTR pMemoPath, LPCTSTR pText, 
@@ -89,6 +90,8 @@ public:
 	BOOL GetPhysicalPath(const TomboURI *pURI, TString *pFullPath);
 
 	BOOL GetOption(const TomboURI *pURI, URIOption *pOption) const;
+
+	// change note status
 	BOOL SetOption(const TomboURI *pCurrentURI, URIOption *pOption);
 };
 

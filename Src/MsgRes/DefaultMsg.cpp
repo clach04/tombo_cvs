@@ -125,7 +125,7 @@ static LPCTSTR defaultMsg[] = {
 	TEXT("Font"),
 	TEXT("Date"),
 	TEXT("Memo view"),
-	TEXT("Timeout"),
+	TEXT("Security"),
 	TEXT("Toppage"),
 	TEXT("Property"),
 	TEXT("Main"),
@@ -285,4 +285,6 @@ static LPCTSTR defaultMsg[] = {
 	TEXT("Disable save daialog"),
 	TEXT("Toolbar"),
 	TEXT("Save options failed. Change may not be reflected."),
+	TEXT("Use random filename"),
+	TEXT("When encrypting, generate file name by random number."),
 };

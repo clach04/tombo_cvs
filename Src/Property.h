@@ -70,6 +70,8 @@ class Property {
 	TCHAR aExtApp2[MAX_PATH];
 	DWORD nUseAssoc;
 
+	DWORD nSafeFileName;
+
 public:
 	Property();
 	~Property();
@@ -183,6 +185,8 @@ public:
 	DWORD UseAssociation() { return nUseAssoc; }
 	LPCTSTR GetExtApp1() { return aExtApp1; }
 	LPCTSTR GetExtApp2() { return aExtApp2; }
+
+	DWORD UseSafeFileName() { return nSafeFileName; }
 
 	friend class FolderTab;
 	friend class PasswordTab;
