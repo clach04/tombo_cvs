@@ -200,7 +200,6 @@ BOOL MemoManager::SaveIfModify(LPDWORD pYNC, BOOL bDupMode)
 	}
 
 	if (pYNC) {
-//		*pYNC = TomboMessageBox(NULL, MSG_MEMO_EDITED, MSG_CONFIRM_SAVE, MB_ICONQUESTION | MB_YESNOCANCEL);
 		*pYNC = pMainFrame->MessageBox(MSG_MEMO_EDITED, MSG_CONFIRM_SAVE, MB_ICONQUESTION | MB_YESNOCANCEL | MB_APPLMODAL);
 		if (*pYNC == IDNO || *pYNC == IDCANCEL) return TRUE;
 	}
@@ -232,6 +231,11 @@ BOOL MemoManager::SaveIfModify(LPDWORD pYNC, BOOL bDupMode)
 		// この時点で新規メモではなくなるのでステータスを変える
 		pMainFrame->SetNewMemoStatus(FALSE);
 	}
+	HTREEITEM hOrigItem = pMemoSelectView->GetTreeItemFromPath(pCurrentNote->MemoPath());
+
+	if (hOrigItem != hCurrentItem) {
+		MessageBox(NULL, TEXT("hItem Mismatch"), TEXT("DEBUG"), MB_OK);
+	}
 
 	// ヘッドライン文字列の取得
 	TString sHeadLine;
@@ -248,7 +252,7 @@ BOOL MemoManager::SaveIfModify(LPDWORD pYNC, BOOL bDupMode)
 
 	// ヘッドライン文字列の変更
 	if (hCurrentItem) {
-		MemoLocator loc(pCurrentNote, hCurrentItem);
+		MemoLocator loc(pCurrentNote, hOrigItem);
 		pMemoSelectView->UpdateHeadLine(&loc, sHeadLine.Get());
 	}
 

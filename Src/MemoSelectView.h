@@ -42,6 +42,8 @@ class MemoSelectView {
 	BOOL SearchItems(HTREEITEM hItem, BOOL bSearchEncryptedMemo, BOOL bFileNameOnly, BOOL bForward);
 	BOOL SearchOneItem(HTREEITEM hItem, BOOL bSearchEncryptedMemo, BOOL bFileNameOnly);
 
+	/////////////////////////////
+
 public:
 	/////////////////////////////
 	// Initialize functions
@@ -117,6 +119,7 @@ public:
 	// 選択しているアイテムがフォルダの場合、自身までのパスを含む
 	HTREEITEM GetPathForNewItem(TString *pPath);
 
+	HTREEITEM GetTreeItemFromPath(LPCTSTR pPath);
 
 	// ノードの選択
 	void SelectNote(MemoNote *pNote);
