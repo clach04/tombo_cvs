@@ -1,6 +1,6 @@
 #
 
-$version = "Tombo1_6";
+$version = "Tombo1_7b1";
 
 use File::Glob ':glob';
 
@@ -49,6 +49,8 @@ $be300root = "R:\\work2\\BE300SDK_1012\\Installer\\English PC Tools";
 	["Docs", "$docroot\\Jp\\Docs\\*.html"],
 	["Docs\\image", "$docroot\\Jp\\Docs\\image\\*.bmp"],
 	["Docs\\image", "$docroot\\Jp\\Docs\\image\\*.png"],
+	["", "$buildroot\\etc\\vfolder.xml"],
+	["", "$buildroot\\etc\\TOMBO_vfolder.dtd"],
 );
 
 @buildlistWin32JP = (
@@ -59,6 +61,8 @@ $be300root = "R:\\work2\\BE300SDK_1012\\Installer\\English PC Tools";
 	["Docs", "$docroot\\Jp\\Docs\\*.html"],
 	["Docs\\image", "$docroot\\Jp\\Docs\\image\\*.bmp"],
 	["Docs\\image", "$docroot\\Jp\\Docs\\image\\*.png"],
+	["", "$buildroot\\etc\\vfolder.xml"],
+	["", "$buildroot\\etc\\TOMBO_vfolder.dtd"],
 );
 
 @buildlist_HPC_JP = (
@@ -72,6 +76,8 @@ $be300root = "R:\\work2\\BE300SDK_1012\\Installer\\English PC Tools";
 	["Docs", "$docroot\\Jp\\Docs\\*.html"],
 	["Docs\\image", "$docroot\\Jp\\Docs\\image\\*.bmp"],
 	["Docs\\image", "$docroot\\Jp\\Docs\\image\\*.png"],
+	["", "$buildroot\\etc\\vfolder.xml"],
+	["", "$buildroot\\etc\\TOMBO_vfolder.dtd"],
 );
 
 @buildlist_PKTPC_JP = (
@@ -87,6 +93,8 @@ $be300root = "R:\\work2\\BE300SDK_1012\\Installer\\English PC Tools";
 	["Docs", "$docroot\\Jp\\Docs\\*.html"],
 	["Docs\\image", "$docroot\\Jp\\Docs\\image\\*.bmp"],
 	["Docs\\image", "$docroot\\Jp\\Docs\\image\\*.png"],
+	["", "$buildroot\\etc\\vfolder.xml"],
+	["", "$buildroot\\etc\\TOMBO_vfolder.dtd"],
 );
 
 @buildlist_PSPC_JP = (
@@ -100,6 +108,8 @@ $be300root = "R:\\work2\\BE300SDK_1012\\Installer\\English PC Tools";
 	["Docs", "$docroot\\Jp\\Docs\\*.html"],
 	["Docs\\image", "$docroot\\Jp\\Docs\\image\\*.bmp"],
 	["Docs\\image", "$docroot\\Jp\\Docs\\image\\*.png"],
+	["", "$buildroot\\etc\\vfolder.xml"],
+	["", "$buildroot\\etc\\TOMBO_vfolder.dtd"],
 );
 
 @buildlist_BE500_JP = (
@@ -113,6 +123,8 @@ $be300root = "R:\\work2\\BE300SDK_1012\\Installer\\English PC Tools";
 	["Docs", "$docroot\\Jp\\Docs\\*.html"],
 	["Docs\\image", "$docroot\\Jp\\Docs\\image\\*.bmp"],
 	["Docs\\image", "$docroot\\Jp\\Docs\\image\\*.png"],
+	["", "$buildroot\\etc\\vfolder.xml"],
+	["", "$buildroot\\etc\\TOMBO_vfolder.dtd"],
 );
 
 @buildlistCEEN = (
@@ -146,6 +158,8 @@ $be300root = "R:\\work2\\BE300SDK_1012\\Installer\\English PC Tools";
 	["Docs", "$docroot\\En\\Docs\\*.html"],
 	["Docs\\image", "$docroot\\En\\Docs\\image\\*.bmp"],
 	["Docs\\image", "$docroot\\En\\Docs\\image\\*.png"],
+	["", "$buildroot\\etc\\vfolder.xml"],
+	["", "$buildroot\\etc\\TOMBO_vfolder.dtd"],
 );
 
 @buildlistWin32EN = (
@@ -156,6 +170,8 @@ $be300root = "R:\\work2\\BE300SDK_1012\\Installer\\English PC Tools";
 	["Docs", "$docroot\\En\\Docs\\*.html"],
 	["Docs\\image", "$docroot\\En\\Docs\\image\\*.bmp"],
 	["Docs\\image", "$docroot\\En\\Docs\\image\\*.png"],
+	["", "$buildroot\\etc\\vfolder.xml"],
+	["", "$buildroot\\etc\\TOMBO_vfolder.dtd"],
 );
 
 @buildlist_HPC_EN = (
@@ -169,6 +185,8 @@ $be300root = "R:\\work2\\BE300SDK_1012\\Installer\\English PC Tools";
 	["Docs", "$docroot\\En\\Docs\\*.html"],
 	["Docs\\image", "$docroot\\En\\Docs\\image\\*.bmp"],
 	["Docs\\image", "$docroot\\En\\Docs\\image\\*.png"],
+	["", "$buildroot\\etc\\vfolder.xml"],
+	["", "$buildroot\\etc\\TOMBO_vfolder.dtd"],
 );
 
 @buildlist_PKTPC_EN = (
@@ -184,6 +202,8 @@ $be300root = "R:\\work2\\BE300SDK_1012\\Installer\\English PC Tools";
 	["Docs", "$docroot\\En\\Docs\\*.html"],
 	["Docs\\image", "$docroot\\En\\Docs\\image\\*.bmp"],
 	["Docs\\image", "$docroot\\En\\Docs\\image\\*.png"],
+	["", "$buildroot\\etc\\vfolder.xml"],
+	["", "$buildroot\\etc\\TOMBO_vfolder.dtd"],
 );
 
 @buildlist_PSPC_EN = (
@@ -197,6 +217,8 @@ $be300root = "R:\\work2\\BE300SDK_1012\\Installer\\English PC Tools";
 	["Docs", "$docroot\\En\\Docs\\*.html"],
 	["Docs\\image", "$docroot\\En\\Docs\\image\\*.bmp"],
 	["Docs\\image", "$docroot\\En\\Docs\\image\\*.png"],
+	["", "$buildroot\\etc\\vfolder.xml"],
+	["", "$buildroot\\etc\\TOMBO_vfolder.dtd"],
 );
 
 @buildlist_BE300_EN = (
@@ -210,6 +232,8 @@ $be300root = "R:\\work2\\BE300SDK_1012\\Installer\\English PC Tools";
 	["Docs", "$docroot\\En\\Docs\\*.html"],
 	["Docs\\image", "$docroot\\En\\Docs\\image\\*.bmp"],
 	["Docs\\image", "$docroot\\En\\Docs\\image\\*.png"],
+	["", "$buildroot\\etc\\vfolder.xml"],
+	["", "$buildroot\\etc\\TOMBO_vfolder.dtd"],
 );
 
 ##########################################################################
