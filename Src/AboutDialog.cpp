@@ -63,6 +63,8 @@ TEXT("\r\n")
 TEXT("--------\r\n")
 TEXT("\r\n")
 TEXT("Thanks To:\r\n")
+TEXT("  Kevin Grover\r\n")
+TEXT("  Michael Efimov\r\n")
 TEXT("  Shigeyuki Matsuki\r\n");
 
 
