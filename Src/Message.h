@@ -108,7 +108,7 @@
 #define MSG_DEL_VFOLDER_TTL		MSG("仮想フォルダの削除", "Delete virtual folder")
 #define MSG_FILTERDEFDLG_TTL	MSG("フィルタの設定", "Filter settings")
 #define MSG_FILTERDEFPROPTTL_SRC \
-								MSG("フォルダ", "Folder")
+								MSG("ソース", "Source")
 #define MSG_FILTERDEFPROPTTL_FILTER \
 								MSG("フィルタ", "Filter")
 #define MSG_FILTERDEFPROPTTL_FILTERTYPE_HDR \
