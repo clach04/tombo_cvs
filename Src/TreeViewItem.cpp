@@ -406,87 +406,66 @@ static BOOL IsSubFolder(LPCTSTR pSrc, LPCTSTR pDst)
 
 BOOL TreeViewFolderItem::Move(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR *ppErr)
 {
-	// Srcパスの取得
-	TCHAR buf[MAX_PATH];
-	TString sCurrentPath;
-	HTREEITEM hItem = GetViewItem();
-	LPTSTR pCurrentPath = pView->GeneratePath(hItem, buf, MAX_PATH);
-	if (!sCurrentPath.Join(g_Property.TopDir(), TEXT("\\"), pCurrentPath)) return FALSE;
+	// Inactivate edit view
+	pMgr->InactiveDetailsView();
+	pView->TreeCollapse(GetViewItem());
 
-	// Dstパスの取得
-	TString sDstPath, sDstFullPath;
-	HTREEITEM hParent = pView->GetPathForNewItem(&sDstPath);
-	if (!sDstFullPath.Join(g_Property.TopDir(), TEXT("\\"), sDstPath.Get())) return FALSE;
+	// convert to URI
+	TomboURI sSrcURI, sDstURI;
+	HTREEITEM hSrcItem = GetViewItem();
+	if (!pView->GetURI(&sSrcURI, hSrcItem)) return FALSE;
 
-	if (IsSubFolder(pCurrentPath, sDstPath.Get())) {
-		*ppErr = MSG_DST_FOLDER_IS_SRC_SUBFOLDER;
+	HTREEITEM hDstItem;
+	TomboURI sSelURI;
+	if (!pView->GetCurrentItem(&hDstItem)) return FALSE;
+	if (!pView->GetURI(&sSelURI, hDstItem)) return FALSE;
+	if (!g_Repository.GetAttachURI(&sSelURI, &sDstURI)) return FALSE;
+	HTREEITEM hParentX = pView->ShowItemByURI(&sDstURI, FALSE, FALSE);
+
+	URIOption opt;
+	if (!g_Repository.Move(&sSrcURI, &sDstURI, &opt)) {
+		if (GetLastError() == ERROR_TOMBO_W_OPERATION_NOT_PERMITTED) {
+			*ppErr = MSG_DST_FOLDER_IS_SRC_SUBFOLDER;
+		}
 		return FALSE;
 	}
 
-	// 移動しようとしているフォルダに詳細ビューでActiveになっているメモが
-	// 存在するかもしれないので詳細ビューを一旦InActiveにする
-	pMgr->InactiveDetailsView();
-
-	// ツリーのCollapse
-	pView->TreeCollapse(GetViewItem());
-
-	// 移動処理
-	MemoFolder mfFolder;
-	if (!mfFolder.Init(g_Property.TopDir(), sCurrentPath.Get())) return FALSE;
-	if (!mfFolder.Move(sDstFullPath.Get())) return FALSE;	
-
-	// 表示の追加
-	TString sItemName;
-	ChopFileSeparator(pCurrentPath);
-	sItemName.GetPathTail(pCurrentPath);
-	pView->CreateNewFolder(hParent, sItemName.Get());
+	TString sHL;
+	if (!g_Repository.GetHeadLine(&sSrcURI, &sHL)) return FALSE;
+	pView->CreateNewFolder(hParentX, sHL.Get());
 	return TRUE;
 }
 
 BOOL TreeViewFolderItem::Copy(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR *ppErr)
 {
-	// Srcパスの取得
-	TCHAR buf[MAX_PATH];
-	TString sCurrentPath;
-	HTREEITEM hItem = GetViewItem();
-	LPTSTR pCurrentPath = pView->GeneratePath(hItem, buf, MAX_PATH);
-	if (!sCurrentPath.Join(g_Property.TopDir(), TEXT("\\"), pCurrentPath)) return FALSE;
-
-	// Dstパスの取得
-	TString sDstPath, sDstFullPath;
-	HTREEITEM hParent = pView->GetPathForNewItem(&sDstPath);
-	if (!sDstFullPath.Join(g_Property.TopDir(), TEXT("\\"), sDstPath.Get())) return FALSE;
-
-	if (IsSubFolder(pCurrentPath, sDstPath.Get())) {
-		*ppErr = MSG_DST_FOLDER_IS_SRC_SUBFOLDER;
-		return FALSE;
-	}
-
-	// 移動しようとしているフォルダに詳細ビューでActiveになっているメモが
-	// 存在するかもしれないので詳細ビューを一旦InActiveにする
+	// Inactivate edit view
 	pMgr->InactiveDetailsView();
 
-	// コピー先が同名のアイテム名になるよう補正
-	TString sItemName;
-	ChopFileSeparator(pCurrentPath);
-	sItemName.GetPathTail(pCurrentPath);
-	sDstFullPath.StrCat(sItemName.Get());
-	sDstFullPath.StrCat(TEXT("\\"));
+	// convert to URI
+	TomboURI sSrcURI, sDstURI;
+	HTREEITEM hSrcItem = GetViewItem();
+	if (!pView->GetURI(&sSrcURI, hSrcItem)) return FALSE;
 
-	// ファイルのコピー
-	MemoFolder mf;
-	mf.Init(g_Property.TopDir(), sCurrentPath.Get());
-	BOOL bResult = mf.Copy(sDstFullPath.Get());
+	HTREEITEM hDstItem;
+	TomboURI sSelURI;
+	if (!pView->GetCurrentItem(&hDstItem)) return FALSE;
+	if (!pView->GetURI(&sSelURI, hDstItem)) return FALSE;
+	if (!g_Repository.GetAttachURI(&sSelURI, &sDstURI)) return FALSE;
+	HTREEITEM hParentX = pView->ShowItemByURI(&sDstURI, FALSE, FALSE);
 
-	// フォルダの修正
-	if (bResult) {
-		pView->CreateNewFolder(hParent, sItemName.Get());
-		return TRUE;
-	} else {
-		LPCTSTR pErr = mf.GetErrorReason();
-		MessageBox(NULL, pErr ? pErr : MSG_NOT_ENOUGH_MEMORY, TOMBO_APP_NAME, MB_ICONERROR | MB_OK);
+	URIOption opt;
+	if (!g_Repository.Copy(&sSrcURI, &sDstURI, &opt)) {
+		if (GetLastError() == ERROR_TOMBO_W_OPERATION_NOT_PERMITTED) {
+			*ppErr = MSG_DST_FOLDER_IS_SRC_SUBFOLDER;
+		}
 		return FALSE;
 	}
+
+	TString sHL;
+	if (!g_Repository.GetHeadLine(&sSrcURI, &sHL)) return FALSE;
+
+	pView->CreateNewFolder(hParentX, sHL.Get());
+	return TRUE;
 }
 
 BOOL TreeViewFolderItem::Delete(MemoManager *pMgr, MemoSelectView *pView)
@@ -642,43 +621,40 @@ BOOL TreeViewFolderItem::GetURIItem(MemoSelectView *pView, TString *pItem)
 
 BOOL TreeViewFolderItem::Rename(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR pNewName)
 {
-	TCHAR buf[MAX_PATH];
-	TString sCurrentPath;
-	HTREEITEM hItem = GetViewItem();
-	LPTSTR pCurrentPath = pView->GeneratePath(hItem, buf, MAX_PATH);
-
-	// If root node, disable changing.
-	if (_tcslen(pCurrentPath) == 0) return FALSE;
-
-	if (!sCurrentPath.Join(g_Property.TopDir(), TEXT("\\"), pCurrentPath)) return FALSE;
+	TomboURI sCurrentURI;
+	if (!pView->GetURI(&sCurrentURI)) return FALSE;
+	
+	if (sCurrentURI.IsRoot()) return FALSE;
 
 	pMgr->InactiveDetailsView();
 	pView->TreeCollapse(GetViewItem());
 
-	MemoFolder mf;
-	mf.Init(g_Property.TopDir(), sCurrentPath.Get());	
-
-	BOOL bResult = mf.Rename(pNewName);
-	if (!bResult) {
+	URIOption opt;
+	if (!g_Repository.ChangeHeadLine(&sCurrentURI, pNewName, &opt)) {
 		DWORD nErr = GetLastError();
-		if (nErr == ERROR_NO_DATA) {
+		switch (nErr) {
+		case ERROR_NO_DATA:
 			TomboMessageBox(NULL, MSG_NO_FOLDERNAME, TOMBO_APP_NAME, MB_ICONWARNING | MB_OK);
-		} else if (nErr == ERROR_ALREADY_EXISTS) {
+			break;
+		case ERROR_ALREADY_EXISTS:
 			TomboMessageBox(NULL, MSG_SAME_FOLDER, TOMBO_APP_NAME, MB_ICONWARNING | MB_OK);
-		} else {
-			TCHAR buf[MAX_PATH];
-			wsprintf(buf, MSG_REN_FOLDER_FAILED, nErr);
-			TomboMessageBox(NULL, buf, TOMBO_APP_NAME, MB_ICONERROR | MB_OK);
+			break;
+		default:
+			{
+				TCHAR buf[MAX_PATH];
+				wsprintf(buf, MSG_REN_FOLDER_FAILED, nErr);
+				TomboMessageBox(NULL, buf, TOMBO_APP_NAME, MB_ICONERROR | MB_OK);
+			}
 		}
+		return FALSE;
 	}
-	return bResult;
+	return TRUE;
 }
 
 DWORD TreeViewFolderItem::ItemOrder()
 {
 	return ITEM_ORDER_FOLDER;
 }
-
 
 BOOL TreeViewFolderItem::Expand(MemoSelectView *pView)
 {

@@ -27,6 +27,7 @@ public:
 	virtual BOOL Update(TomboURI *pCurrentURI, LPCTSTR pData, TomboURI *pNewURI, TString *pNewHeadLine) = 0;
 	virtual BOOL Delete(const TomboURI *pURI, URIOption *pOption) = 0;
 	virtual BOOL Copy(const TomboURI *pCopyFrom, const TomboURI *pCopyTo, URIOption *pOption) = 0;
+	virtual BOOL Move(const TomboURI *pMoveFrom, const TomboURI *pMoveTo, URIOption *pOption) = 0;
 
 	virtual BOOL ChangeHeadLine(const TomboURI *pURI, LPCTSTR pReqNewHeadLine, URIOption *pOption) = 0;
 
@@ -90,6 +91,8 @@ public:
 	BOOL Update(TomboURI *pCurrentURI, LPCTSTR pData, TomboURI *pNewURI, TString *pNewHeadLine);
 	BOOL Delete(const TomboURI *pURI, URIOption *pOption);
 	BOOL Copy(const TomboURI *pCopyFrom, const TomboURI *pCopyTo, URIOption *pOption);
+	BOOL Move(const TomboURI *pMoveFrom, const TomboURI *pMoveTo, URIOption *pOption);
+
 	BOOL ChangeHeadLine(const TomboURI *pURI, LPCTSTR pReqNewHeadLine, URIOption *pOption);
 
 	BOOL GetHeadLine(const TomboURI *pURI, TString *pHeadLine);

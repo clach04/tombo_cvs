@@ -81,6 +81,11 @@ BOOL Repository::Copy(const TomboURI *pCopyFrom, const TomboURI *pCopyTo, URIOpt
 	return pDefaultImpl->Copy(pCopyFrom, pCopyTo, pOption);
 }
 
+BOOL Repository::Move(const TomboURI *pMoveFrom, const TomboURI *pMoveTo, URIOption *pOption)
+{
+	return pDefaultImpl->Move(pMoveFrom, pMoveTo, pOption);
+}
+
 BOOL Repository::GetPhysicalPath(const TomboURI *pURI, TString *pFullPath)
 {
 	return pDefaultImpl->GetPhysicalPath(pURI, pFullPath);

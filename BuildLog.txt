@@ -871,3 +871,11 @@ Finding and encrypting to the folder may not work.
 * FIX: bookmark is not work
 * FIX: Copy of *.chs file is not work
 
+////////////////////////////////
+// B169
+////////////////////////////////
+
+* Add AutoPtr.h 
+* Change repository mode for *.vcp, *.vcw, *.dsp, *.dsw to binary. (Thanx Alex!)
+* Move to RepositoryImpl.* about move, copy, rename to folder codes.
+

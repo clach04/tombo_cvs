@@ -582,6 +582,15 @@ BOOL LocalFileRepository::GetPhysicalPath(const TomboURI *pURI, TString *pFullPa
 }
 
 /////////////////////////////////////////
+
+static BOOL IsSubFolder(LPCTSTR pSrc, LPCTSTR pDst)
+{
+	DWORD n = _tcslen(pSrc);
+	if (_tcsncmp(pSrc, pDst, n) == 0) return TRUE;
+	return FALSE;
+}
+
+/////////////////////////////////////////
 // Copy note/folder
 /////////////////////////////////////////
 
@@ -599,8 +608,23 @@ BOOL LocalFileRepository::Copy(const TomboURI *pCopyFrom, const TomboURI *pCopyT
 	}
 
 	if (opt1.bFolder) {
-		// TODO: impliment
-		return FALSE;
+		TString sSrcFull, sDstFull;
+		if (!GetPhysicalPath(pCopyFrom, &sSrcFull)) return FALSE;
+		if (!GetPhysicalPath(pCopyTo, &sDstFull)) return FALSE;
+
+		if (IsSubFolder(sSrcFull.Get(), sDstFull.Get())) {
+			SetLastError(ERROR_TOMBO_W_OPERATION_NOT_PERMITTED);
+			return FALSE;
+		}
+		
+		// Adjust Path
+		TString sHL;
+		if (!GetHeadLine(pCopyFrom, &sHL)) return FALSE;
+		if (!sDstFull.StrCat(sHL.Get()) || !sDstFull.StrCat(TEXT("\\"))) return FALSE;
+
+		MemoFolder mf;
+		if (!mf.Init(pTopDir, sSrcFull.Get())) return FALSE;
+		return mf.Copy(sDstFull.Get());
 	} else {
 		if ((pOption->pNewHeadLine = new TString()) == NULL) { SetLastError(ERROR_NOT_ENOUGH_MEMORY); return FALSE; }
 		if ((pOption->pNewURI = new TomboURI()) == NULL) { SetLastError(ERROR_NOT_ENOUGH_MEMORY); return FALSE; }
@@ -649,6 +673,44 @@ BOOL LocalFileRepository::Copy(const TomboURI *pCopyFrom, const TomboURI *pCopyT
 }
 
 /////////////////////////////////////////
+// Move(Rename)
+/////////////////////////////////////////
+
+BOOL LocalFileRepository::Move(const TomboURI *pMoveFrom, const TomboURI *pMoveTo, URIOption *pOption)
+{
+	URIOption opt1(NOTE_OPTIONMASK_ENCRYPTED | NOTE_OPTIONMASK_SAFEFILE | NOTE_OPTIONMASK_VALID);
+	if (!GetOption(pMoveFrom, &opt1)) return FALSE;
+
+	URIOption opt2(NOTE_OPTIONMASK_VALID);
+	if (!GetOption(pMoveTo, &opt2)) return FALSE;
+
+	if (!opt1.bValid || !opt2.bValid) {
+		SetLastError(ERROR_TOMBO_E_INVALIDURI);
+		return FALSE;
+	}
+
+	if (opt1.bFolder) {
+		TString sFullSrc;
+		if (!GetPhysicalPath(pMoveFrom, &sFullSrc)) return FALSE;
+		TString sFullDst;
+		if (!GetPhysicalPath(pMoveTo, &sFullDst)) return FALSE;
+
+		if (IsSubFolder(sFullSrc.Get(), sFullDst.Get())) {
+			SetLastError(ERROR_TOMBO_W_OPERATION_NOT_PERMITTED);
+			return FALSE;
+		}
+
+		MemoFolder mfFolder;
+		if (!mfFolder.Init(pTopDir, sFullSrc.Get())) return FALSE;
+		if (!mfFolder.Move(sFullDst.Get())) return FALSE;	
+
+	} else {
+		// not merged yet
+	}
+	return TRUE;
+}
+
+/////////////////////////////////////////
 // Rename headline
 /////////////////////////////////////////
 
@@ -660,23 +722,34 @@ BOOL LocalFileRepository::ChangeHeadLine(const TomboURI *pURI, LPCTSTR pReqNewHe
 		SetLastError(ERROR_TOMBO_E_INVALIDURI);
 		return FALSE;
 	}
-	if (opt.bEncrypt && opt.bSafeFileName) {
-		SetLastError(ERROR_TOMBO_I_OPERATION_NOT_PERFORMED);
-		return FALSE;
+
+	if (opt.bFolder) {
+		TString sFullPath;
+		if (!GetPhysicalPath(pURI, &sFullPath)) return FALSE;
+
+		MemoFolder mf;
+		if (!mf.Init(pTopDir, sFullPath.Get())) return FALSE;
+
+		return mf.Rename(pReqNewHeadLine);
+	} else {
+		if (opt.bEncrypt && opt.bSafeFileName) {
+			SetLastError(ERROR_TOMBO_I_OPERATION_NOT_PERFORMED);
+			return FALSE;
+		}
+
+		MemoNote *pNote = MemoNote::MemoNoteFactory(pURI);
+		if (pNote == NULL) return FALSE;
+		AutoPointer<MemoNote> ap(pNote);
+
+		if (!pNote->Rename(pReqNewHeadLine)) return FALSE;
+
+		TomboURI *p = new TomboURI();
+		if (p == NULL || !pNote->GetURI(p)) {
+			delete p;
+			return FALSE;
+		}
+		pOption->pNewURI = p;
+
+		return TRUE;
 	}
-
-	MemoNote *pNote = MemoNote::MemoNoteFactory(pURI);
-	if (pNote == NULL) return FALSE;
-	AutoPointer<MemoNote> ap(pNote);
-
-	if (!pNote->Rename(pReqNewHeadLine)) return FALSE;
-
-	TomboURI *p = new TomboURI();
-	if (p == NULL || !pNote->GetURI(p)) {
-		delete p;
-		return FALSE;
-	}
-	pOption->pNewURI = p;
-
-	return TRUE;
 }
