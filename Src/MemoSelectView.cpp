@@ -941,74 +941,6 @@ BOOL MemoSelectView::CreateNewFolder(HTREEITEM hItem, LPCTSTR pFolder)
 	return TRUE;
 }
 
-////////////////////////////////////////////////////////////////////
-// Split path with directory separator
-////////////////////////////////////////////////////////////////////
-//	pSrc	: aaa\\bbb\\ccc\\ddd.txt\0
-//  pWorkBuf: aaa\0bbb\0ccc\0ddd.txt\0\0
-// pWorkBuf must have at leaset _tcslen(pSrc) + 2.
-void SplitDirSeparator(LPCTSTR pSrc, LPTSTR pWorkBuf)
-{
-	_tcscpy(pWorkBuf, pSrc);
-
-	DWORD n = _tcslen(pWorkBuf);
-	if (n > 4 && 
-		(_tcscmp(pWorkBuf + n - 4, TEXT(".txt")) == 0 ||
-		_tcscmp(pWorkBuf + n - 4, TEXT(".chi")) == 0)) {
-		*(pWorkBuf + n - 4) = TEXT('\0');
-	}				
-
-	*(pWorkBuf + _tcslen(pWorkBuf) + 1) = TEXT('\0');
-	LPTSTR p = pWorkBuf;
-	while (*p) {
-		if (IsDBCSLeadByte(*p)) {
-			p++;
-		} else {
-			if (*p == TEXT('\\')) {
-				*p = TEXT('\0');
-			}
-		}
-		p++;
-	}
-}
-
-
-HTREEITEM MemoSelectView::GetTreeItemFromPath(LPCTSTR pPath)
-{
-	HTREEITEM hItem = TreeView_GetChild(hViewWnd, TVI_ROOT);
-
-	TCHAR aSplitBuf[MAX_PATH + 1];
-
-	SplitDirSeparator(pPath, aSplitBuf);
-	LPTSTR p = aSplitBuf;
-
-	TCHAR partPath[MAX_PATH];
-	TV_ITEM ti;
-	ti.mask = TVIF_TEXT | TVIF_PARAM;
-	ti.pszText = partPath;
-	ti.cchTextMax = MAX_PATH;
-
-	HTREEITEM hChild = TreeView_GetChild(hViewWnd, hItem);
-	while(hChild) {
-		ti.hItem = hChild;
-		TreeView_GetItem(hViewWnd, &ti);
-		
-		// set next item;
-		if (_tcscmp(partPath, p) == 0) {
-			HTREEITEM hOrig = hChild;
-			hChild = TreeView_GetChild(hViewWnd, hOrig);
-			p += _tcslen(p) + 1;
-			if (*p == NULL) {
-				// matched.
-				return hOrig;
-			}
-			continue;
-		}
-
-		hChild = TreeView_GetNextSibling(hViewWnd, hChild);
-	}
-	return NULL;
-}
 /////////////////////////////////////////
 // ヘッドライン文字列の変更
 /////////////////////////////////////////
@@ -1336,11 +1268,13 @@ HTREEITEM MemoSelectView::ShowItem(LPCTSTR pPath, BOOL bSelChange)
 		q = p + 1;
 		pPartPath = q;
 		while(*q) {
+#if defined(PLATFORM_WIN32)
 			if (IsDBCSLeadByte(*q)) {
 				q++;
 				if (*q) q++;
 				continue;
 			}
+#endif
 			if (*q == TEXT('\\')) break;
 			q++;
 		}

@@ -122,8 +122,6 @@ public:
 	// 選択しているアイテムがフォルダの場合、自身までのパスを含む
 	HTREEITEM GetPathForNewItem(TString *pPath, TreeViewItem *pItem = NULL);
 
-	HTREEITEM GetTreeItemFromPath(LPCTSTR pPath);
-
 	HTREEITEM GetParentItem(HTREEITEM hItem) { return TreeView_GetParent(hViewWnd, hItem); }
 
 	// ノードの選択
