@@ -313,6 +313,10 @@ SOURCE=..\..\Src\VarBuffer.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\Src\VFManager.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\Src\VFStream.cpp
 # End Source File
 # End Group
@@ -504,6 +508,10 @@ SOURCE=..\..\Src\Uniconv.h
 # Begin Source File
 
 SOURCE=..\..\Src\VarBuffer.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\VFManager.h
 # End Source File
 # Begin Source File
 
