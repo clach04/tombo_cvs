@@ -592,7 +592,7 @@ Changes
 * Down button ignored at filterdef dialog(#2771,#2772)
 
 ////////////////////////////////
-//
+// B132
 ////////////////////////////////
 // 2.0 branch
 
@@ -606,3 +606,9 @@ other fix:
 * show caret when moving by cursor.
 * disable Ctrl-S handler.
 
+////////////////////////////////
+// B133
+////////////////////////////////
+// 2.0 branch
+
+* merged B128-B130(main trunk) updates.
