@@ -470,6 +470,9 @@ LRESULT MemoSelectView::OnNotify(HWND hWnd, WPARAM wParam, LPARAM lParam)
 						// ã‚Ìif•¶‚Ì‘æ2ðŒ‚Íˆê‹“‚É•¡”‚ÌSELCHANGING‚ª—ˆ‚é‚½‚ß
 					if (!pMemoMgr->SaveIfModify(&nYNC, FALSE)) {
 						// ƒZ[ƒu‚ÉŽ¸”s...
+						TCHAR buf[1024];
+						wsprintf(buf, MSG_SAVE_FAILED, GetLastError());
+						pMemoMgr->GetMainFrame()->MessageBox(buf, TEXT("ERROR"), MB_ICONSTOP | MB_OK | MB_APPLMODAL);
 	
 						// Ø‚è‘Ö‚¦‚ç‚ê‚é‚Æ¢‚é‚Ì‚Å‘jŽ~
 						return TRUE;
@@ -664,7 +667,9 @@ BOOL MemoSelectView::OnHotKey(HWND hWnd, WPARAM wParam)
 void MemoSelectView::OnEncrypt(TreeViewItem *pItem)
 {
 	if (!pItem->Encrypt(pMemoMgr, this)) {
-		TomboMessageBox(hViewWnd, MSG_ENCRYPTION_FAILED, TEXT("ERROR"), MB_ICONSTOP | MB_OK);
+		TCHAR buf[1024];
+		wsprintf(buf, MSG_ENCRYPTION_FAILED, GetLastError());
+		TomboMessageBox(hViewWnd, buf, TEXT("ERROR"), MB_ICONSTOP | MB_OK);
 	}
 }
 
@@ -675,7 +680,9 @@ void MemoSelectView::OnEncrypt(TreeViewItem *pItem)
 void MemoSelectView::OnDecrypt(TreeViewItem *pItem)
 {
 	if (!pItem->Decrypt(pMemoMgr, this)) {
-		TomboMessageBox(hViewWnd, MSG_DECRYPTION_FAILED, TEXT("ERROR"), MB_ICONSTOP | MB_OK);
+		TCHAR buf[1024];
+		wsprintf(buf, MSG_DECRYPTION_FAILED, GetLastError());
+		TomboMessageBox(hViewWnd, buf, TEXT("ERROR"), MB_ICONSTOP | MB_OK);
 	}
 }
 
