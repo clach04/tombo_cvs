@@ -530,3 +530,64 @@ Changes
 	caret positions
 	BS/DEL key handers
 	...
+
+////////////////////////////////
+// B125
+////////////////////////////////
+// 2.0 branch
+
+* FIX: YAE hangups when switch to other note and click the text.
+* FIX: Selected region shifts when resizing.
+* Support CE version.
+
+////////////////////////////////
+// B126
+////////////////////////////////
+// 2.0 branch
+
+* FIX: Crush when encrypting folder(#4286,#4287).
+* FIX: Ctrl-C,V,X is not worked on HPC.
+
+////////////////////////////////
+// B127
+////////////////////////////////
+// main trunk
+
+// merged from B126
+
+* separate MemoDetailsView and its implimentation.
+* FIX: Crush when encrypting folder(#4286,#4287).
+
+////////////////////////////////
+// B128
+////////////////////////////////
+// main trunk
+
+* minor refactoring to MainFrame.cpp
+* remove MWM_OPEN_REQUEST and add MWM_SWITCH_VIEW
+* remove HTREEITEM from MemoManager for simplify the node management.
+
+////////////////////////////////
+// B129
+////////////////////////////////
+// main trunk
+
+* remove MemoLocator
+* many refactoring
+
+////////////////////////////////
+// B130
+////////////////////////////////
+// main trunk
+
+* remove MemoManager::pCurrentNote
+
+////////////////////////////////
+// B131 (Tombo_1_8_1)
+////////////////////////////////
+// Tombo_1_8_1 branch
+
+* Crush when encrypting folder(#4286,#4287)
+* Crush when pressing "Search Next" button(#4308,#4309)
+* Down button ignored at filterdef dialog(#2771,#2772)
+

@@ -9,52 +9,15 @@ typedef WNDPROC SUPER_WND_PROC;
 typedef FARPROC SUPER_WND_PROC;
 #endif 
 
-class MemoDetailsView {
-public:
-	MemoDetailsView() {}
-	virtual ~MemoDetailsView() {}
-
-	virtual BOOL Create(LPCTSTR pName, RECT &r, HWND hParent, HINSTANCE hInst, HFONT hFont) = 0;
-
-	virtual void SetTabstop() = 0;
-	virtual BOOL SetFolding(BOOL bFold) = 0;
-	virtual void SetReadOnly(BOOL bReadOnly) = 0;
-	virtual BOOL IsReadOnly() = 0;
-
-	virtual void SetModifyStatus() = 0;
-
-	virtual BOOL Show(int nCmdShow) = 0;
-	virtual void SetFocus() = 0;
-	virtual void SetFont(HFONT hFont) = 0;
-	virtual void MoveWindow(DWORD x, DWORD y, DWORD nWidth, DWORD nHeight) = 0;
-
-	virtual BOOL OnCommand(HWND hWnd, WPARAM wParam, LPARAM lParam) = 0;
-	virtual BOOL OnHotKey(HWND hWnd, WPARAM wParam) = 0;
-	virtual void OnGetFocus() = 0;
-
-	virtual BOOL SetMemo(LPCTSTR pMemo, DWORD nPos, BOOL bReadOnly) = 0;
-	virtual LPTSTR GetMemo() = 0;
-	virtual BOOL IsModify() = 0;
-	virtual void ResetModify() = 0;
-
-	virtual DWORD GetCursorPos() = 0;
-	virtual DWORD GetInitialPos() = 0;
-
-	virtual void SelectAll() = 0;
-
-	virtual BOOL Search(BOOL bFirstSearch, BOOL bForward, BOOL bNFMsg, BOOL bSearchFromTop) = 0;
-};
 
 //////////////////////////////////////////
 // Edit view
 //////////////////////////////////////////
 
-class SimpleEditor : public MemoDetailsView {
+class MemoDetailsView {
 	HWND hViewWnd;		// The window handle used now(hViewWnd_fd or hViewWnd_nf)
 	HWND hViewWnd_fd;	// The window created by wrapping options
 	HWND hViewWnd_nf;	// The window created by no wrapping options
-
-	DWORD nID, nID_nf;
 
 	MemoManager *pMemoMgr;
 	DWORD nLeftOffset;
@@ -70,9 +33,9 @@ public:
 	///////////////////////
 	// Initialize
 
-	SimpleEditor() : hViewWnd(NULL) {}
-	BOOL Init(MemoManager *p, DWORD nID, DWORD nID_nf);
-	BOOL Create(LPCTSTR pName, RECT &r, HWND hParent, HINSTANCE hInst, HFONT hFont);
+	MemoDetailsView() : hViewWnd(NULL) {}
+	BOOL Init(MemoManager *p) { pMemoMgr = p; return TRUE; }
+	BOOL Create(LPCTSTR pName, RECT &r, HWND hParent, DWORD nID, DWORD nID_nf, HINSTANCE hInst, HFONT hFont);
 
 
 	///////////////////////

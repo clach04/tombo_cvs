@@ -23,9 +23,7 @@
 #define ITEM_ORDER_FOLDER	0
 
 /////////////////////////////////////////////
-/////////////////////////////////////////////
-//  TreeViewItem
-/////////////////////////////////////////////
+//  ctor & dtor
 /////////////////////////////////////////////
 
 TreeViewItem::TreeViewItem(BOOL bItem) : bHasMultiItem(bItem), hItem(NULL)
@@ -51,10 +49,59 @@ MemoLocator TreeViewItem::ToLocator()
 	return MemoLocator(NULL, NULL);
 }
 
-BOOL TreeViewItem::IsOperationEnabled(MemoSelectView *pView, OpType op)
+BOOL TreeViewItem::CanDelete(MemoSelectView *pView)
 {
-	DWORD nOpMatrix = OpNewMemo | OpNewFolder | OpCut | OpCopy | OpPaste;
-	return (nOpMatrix & op) != 0;
+	return FALSE;
+}
+
+BOOL TreeViewItem::CanRename(MemoSelectView *pView)
+{
+	return FALSE;
+}
+
+BOOL TreeViewItem::CanEncrypt(MemoSelectView *pView)
+{
+	return FALSE;
+}
+
+BOOL TreeViewItem::CanDecrypt(MemoSelectView *pView)
+{
+	return FALSE;
+}
+
+BOOL TreeViewItem::CanNewMemo(MemoSelectView *pView)
+{
+	return TRUE;
+}
+
+BOOL TreeViewItem::CanNewFolder(MemoSelectView *pView)
+{
+	return TRUE;
+}
+
+BOOL TreeViewItem::CanCut(MemoSelectView *pView)
+{
+	return TRUE;
+}
+
+BOOL TreeViewItem::CanCopy(MemoSelectView *pView)
+{
+	return TRUE;
+}
+
+BOOL TreeViewItem::CanPaste(MemoSelectView *pView)
+{
+	return TRUE;
+}
+
+BOOL TreeViewItem::CanGrep(MemoSelectView *pView)
+{
+	return FALSE;
+}
+
+BOOL TreeViewItem::CanLink(MemoSelectView *pView)
+{
+	return FALSE;
 }
 
 /////////////////////////////////////////////
@@ -184,21 +231,53 @@ BOOL TreeViewFileItem::Decrypt(MemoManager *pMgr, MemoSelectView *pView)
 	return TRUE;
 }
 
-BOOL TreeViewFileItem::IsOperationEnabled(MemoSelectView *pView, OpType op)
+BOOL TreeViewFileItem::CanEncrypt(MemoSelectView *pView)
 {
-	if (op == OpEncrypt) {
-		MemoNote *p = GetNote();
-		if (p == NULL) return FALSE;
-		return !p->IsEncrypted();
-	} else if (op == OpDecrypt) {
-		MemoNote *p = GetNote();
-		if (p == NULL) return FALSE;
-		return p->IsEncrypted();
-	} else {
-		DWORD nOpMatrix = OpDelete | OpRename | OpNewMemo | OpNewFolder | OpCut | OpCopy | OpPaste;
-		return (nOpMatrix & op) != 0;
-	}
+	MemoNote *p = GetNote();
+	if (p == NULL) return FALSE;
+	return !p->IsEncrypted();
 }
+
+BOOL TreeViewFileItem::CanDecrypt(MemoSelectView *pView)
+{
+	MemoNote *p = GetNote();
+	if (p == NULL) return FALSE;
+	return p->IsEncrypted();
+}
+
+BOOL TreeViewFileItem::CanNewMemo(MemoSelectView *pView)
+{
+	return TRUE;
+}
+
+BOOL TreeViewFileItem::CanNewFolder(MemoSelectView *pView)
+{
+	return TRUE;
+}
+
+BOOL TreeViewFileItem::CanCut(MemoSelectView *pView)
+{
+	return TRUE;
+}
+
+BOOL TreeViewFileItem::CanCopy(MemoSelectView *pView)
+{
+	return TRUE;
+}
+
+BOOL TreeViewFileItem::CanPaste(MemoSelectView *pView)
+{
+	return TRUE;
+}
+
+BOOL TreeViewFileItem::CanGrep(MemoSelectView *pView)
+{
+	return FALSE;
+}
+
+/////////////////////////////////////////////
+//  Rename
+/////////////////////////////////////////////
 
 BOOL TreeViewFileItem::Rename(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR pNewName)
 {
@@ -217,6 +296,15 @@ BOOL TreeViewFileItem::Rename(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR 
 	}
 	return bResult;
 }
+
+BOOL TreeViewFileItem::CanRename(MemoSelectView *pView)
+{
+	return TRUE;
+}
+
+/////////////////////////////////////////////
+// 
+/////////////////////////////////////////////
 
 DWORD TreeViewFileItem::GetIcon(MemoSelectView *, DWORD nStatus)
 {
@@ -243,10 +331,19 @@ DWORD TreeViewFileItem::GetIcon(MemoSelectView *, DWORD nStatus)
 	}
 }
 
+
 DWORD TreeViewFileItem::ItemOrder()
 {
 	return ITEM_ORDER_FILE;
 }
+
+BOOL TreeViewFileItem::CanDelete(MemoSelectView *pView)
+{
+	return TRUE;
+}
+
+/////////////////////////////////////////////
+//  Get MemoLocator
 
 MemoLocator TreeViewFileItem::ToLocator()
 {
@@ -299,9 +396,7 @@ BOOL TreeViewFileItem::GetURIItem(MemoSelectView *pView, TString *pItem)
 }
 
 /////////////////////////////////////////////
-/////////////////////////////////////////////
 //  Folder
-/////////////////////////////////////////////
 /////////////////////////////////////////////
 
 TreeViewFolderItem::TreeViewFolderItem() : TreeViewItem(TRUE)
@@ -521,16 +616,29 @@ DWORD TreeViewFolderItem::GetIcon(MemoSelectView *pView, DWORD nStatus)
 	}
 }
 
-BOOL TreeViewFolderItem::IsOperationEnabled(MemoSelectView *pView, OpType op)
+BOOL TreeViewFolderItem::CanDecrypt(MemoSelectView *pView)
 {
-	if (op == OpDelete || op == OpRename || op == OpCut || op == OpCopy) {
-		HTREEITEM hParent = pView->GetParentItem(GetViewItem());
-		if (hParent == NULL) return FALSE;
-		return TRUE;
-	} else {
-		DWORD nOpMatrix = OpEncrypt | OpDecrypt | OpNewMemo | OpNewFolder | OpPaste | OpGrep;
-		return (nOpMatrix & op) != 0;
-	}
+	return TRUE;
+}
+
+BOOL TreeViewFolderItem::CanEncrypt(MemoSelectView *pView)
+{
+	return TRUE;
+}
+
+BOOL TreeViewFolderItem::CanNewMemo(MemoSelectView *pView)
+{
+	return TRUE;
+}
+
+BOOL TreeViewFolderItem::CanNewFolder(MemoSelectView *pView)
+{
+	return TRUE;
+}
+
+BOOL TreeViewFolderItem::CanGrep(MemoSelectView *pView)
+{
+	return TRUE;
 }
 
 BOOL TreeViewFolderItem::GetFolderPath(MemoSelectView *pView, TString *pPath)
@@ -550,6 +658,10 @@ BOOL TreeViewFolderItem::GetURIItem(MemoSelectView *pView, TString *pItem)
 	return pItem->Set(buf);
 }
 
+/////////////////////////////////////////////
+//  –¼Ì•ÏX
+/////////////////////////////////////////////
+
 BOOL TreeViewFolderItem::Rename(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR pNewName)
 {
 	TCHAR buf[MAX_PATH];
@@ -560,6 +672,7 @@ BOOL TreeViewFolderItem::Rename(MemoManager *pMgr, MemoSelectView *pView, LPCTST
 	// If root node, disable changing.
 	if (_tcslen(pCurrentPath) == 0) return FALSE;
 
+//	if (!sCurrentPath.AllocFullPath(pCurrentPath)) return FALSE;
 	if (!sCurrentPath.Join(g_Property.TopDir(), TEXT("\\"), pCurrentPath)) return FALSE;
 
 	pMgr->InactiveDetailsView();
@@ -622,6 +735,33 @@ BOOL TreeViewFolderItem::Expand(MemoSelectView *pView)
 	return TRUE;
 }
 
+BOOL TreeViewFolderItem::CanDelete(MemoSelectView *pView)
+{
+	HTREEITEM hParent = pView->GetParentItem(GetViewItem());
+	if (hParent == NULL) return FALSE;
+	return TRUE;
+}
+
+BOOL TreeViewFolderItem::CanRename(MemoSelectView *pView)
+{
+	// In current version, act is same as CanDelete, so calls it.
+	return CanDelete(pView);
+}
+
+BOOL TreeViewFolderItem::CanCut(MemoSelectView *pView)
+{
+	return CanDelete(pView);
+}
+
+BOOL TreeViewFolderItem::CanCopy(MemoSelectView *pView)
+{
+	return CanDelete(pView);
+}
+
+BOOL TreeViewFolderItem::CanPaste(MemoSelectView *pView)
+{
+	return TRUE;
+}
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -629,12 +769,60 @@ BOOL TreeViewFolderItem::Expand(MemoSelectView *pView)
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 
-BOOL TreeViewFileLink::IsOperationEnabled(MemoSelectView *pView, OpType op)
+BOOL TreeViewFileLink::CanDelete(MemoSelectView *pView)
 {
-	DWORD nOpMatrix = OpNewMemo | OpLink;
-	return (nOpMatrix & op) != 0;
+	return FALSE;
 }
 
+BOOL TreeViewFileLink::CanRename(MemoSelectView *pView)
+{
+	return FALSE;
+}
+
+BOOL TreeViewFileLink::CanDecrypt(MemoSelectView *pView)
+{
+	return FALSE;
+}
+
+BOOL TreeViewFileLink::CanEncrypt(MemoSelectView *pView)
+{
+	return FALSE;
+}
+
+BOOL TreeViewFileLink::CanNewMemo(MemoSelectView *pView)
+{
+	return TRUE;
+}
+
+BOOL TreeViewFileLink::CanNewFolder(MemoSelectView *pView)
+{
+	return FALSE;
+}
+
+BOOL TreeViewFileLink::CanCut(MemoSelectView *pView)
+{
+	return FALSE;
+}
+
+BOOL TreeViewFileLink::CanCopy(MemoSelectView *pView)
+{
+	return FALSE;
+}
+
+BOOL TreeViewFileLink::CanPaste(MemoSelectView *pView)
+{
+	return FALSE;
+}
+
+BOOL TreeViewFileLink::CanGrep(MemoSelectView *pView)
+{
+	return FALSE;
+}
+
+BOOL TreeViewFileLink::CanLink(MemoSelectView *pView)
+{
+	return TRUE;
+}
 
 BOOL TreeViewFileLink::GetFolderPath(MemoSelectView *pView, TString *pPath)
 {
@@ -653,6 +841,10 @@ BOOL TreeViewFileLink::GetLocationPath(MemoSelectView *pView, TString *pPath)
 /////////////////////////////////////////////
 //  Virtual folder(Root)
 /////////////////////////////////////////////
+/////////////////////////////////////////////
+
+/////////////////////////////////////////////
+// ctor & dtor
 /////////////////////////////////////////////
 
 TreeViewVirtualFolderRoot::TreeViewVirtualFolderRoot()
@@ -748,13 +940,55 @@ BOOL TreeViewVirtualFolderRoot::AddSearchResult(MemoSelectView *pView, const VFI
 	return TRUE;
 }
 
-
-BOOL TreeViewVirtualFolderRoot::IsOperationEnabled(MemoSelectView *pView, OpType op)
+BOOL TreeViewVirtualFolderRoot::CanDelete(MemoSelectView *pView)
 {
-	DWORD nOpMatrix = OpNewMemo;
-	return (nOpMatrix & op) != 0;
+	return FALSE;
 }
 
+BOOL TreeViewVirtualFolderRoot::CanRename(MemoSelectView *pView)
+{
+	return FALSE;
+}
+
+BOOL TreeViewVirtualFolderRoot::CanDecrypt(MemoSelectView *pView)
+{
+	return FALSE;
+}
+
+BOOL TreeViewVirtualFolderRoot::CanEncrypt(MemoSelectView *pView)
+{
+	return FALSE;
+}
+
+BOOL TreeViewVirtualFolderRoot::CanNewMemo(MemoSelectView *pView)
+{
+	return TRUE;
+}
+
+BOOL TreeViewVirtualFolderRoot::CanNewFolder(MemoSelectView *pView)
+{
+	return FALSE;
+}
+
+BOOL TreeViewVirtualFolderRoot::CanCut(MemoSelectView *pView)
+{
+	return FALSE;
+}
+
+BOOL TreeViewVirtualFolderRoot::CanCopy(MemoSelectView *pView)
+{
+	return FALSE;
+}
+
+BOOL TreeViewVirtualFolderRoot::CanPaste(MemoSelectView *pView)
+{
+	return FALSE;
+}
+
+BOOL TreeViewVirtualFolderRoot::CanGrep(MemoSelectView *pView)
+{
+	return FALSE;
+}
 
 BOOL TreeViewVirtualFolderRoot::GetFolderPath(MemoSelectView *pView, TString *pPath)
 {
@@ -850,16 +1084,73 @@ BOOL TreeViewVirtualFolder::Expand(MemoSelectView *pView)
 		MemoNote *p = pNote->GetNote();
 		pNote->ClearNote(); // to prevent deleting p
 		LPCTSTR pTitle = pNote->GetFileName();
+#ifdef COMMENT
+		TString sTitle;
+		sTitle.Set(pTitle);
+		if (p &&  p->MemoPath()) {
+			TString sPath;
+			sPath.GetDirectoryPath(p->MemoPath());
+			ChopFileSeparator(sPath.Get());
+			sTitle.StrCat(TEXT(" ("));
+			sTitle.StrCat(sPath.Get());
+			sTitle.StrCat(TEXT(")"));
+		}
+		pView->InsertFile(hItem, p, sTitle.Get(), TRUE, TRUE);
+#endif
 		pView->InsertFile(hItem, p, pTitle, TRUE, TRUE);
 	}
 	pStore->FreeArray();
 	return TRUE;
 }
 
-BOOL TreeViewVirtualFolder::IsOperationEnabled(MemoSelectView *pView, OpType op)
+BOOL TreeViewVirtualFolder::CanDelete(MemoSelectView *pView)
 {
-	DWORD nOpMatrix = OpNewMemo;
-	return (nOpMatrix & op) != 0;
+	return FALSE;
+}
+
+BOOL TreeViewVirtualFolder::CanRename(MemoSelectView *pView)
+{
+	return FALSE;
+}
+
+BOOL TreeViewVirtualFolder::CanDecrypt(MemoSelectView *pView)
+{
+	return FALSE;
+}
+
+BOOL TreeViewVirtualFolder::CanEncrypt(MemoSelectView *pView)
+{
+	return FALSE;
+}
+
+BOOL TreeViewVirtualFolder::CanNewMemo(MemoSelectView *pView)
+{
+	return TRUE;
+}
+
+BOOL TreeViewVirtualFolder::CanNewFolder(MemoSelectView *pView)
+{
+	return FALSE;
+}
+
+BOOL TreeViewVirtualFolder::CanCut(MemoSelectView *pView)
+{
+	return FALSE;
+}
+
+BOOL TreeViewVirtualFolder::CanCopy(MemoSelectView *pView)
+{
+	return FALSE;
+}
+
+BOOL TreeViewVirtualFolder::CanPaste(MemoSelectView *pView)
+{
+	return FALSE;
+}
+
+BOOL TreeViewVirtualFolder::CanGrep(MemoSelectView *pView)
+{
+	return FALSE;
 }
 
 BOOL TreeViewVirtualFolder::GetFolderPath(MemoSelectView *pView, TString *pPath)

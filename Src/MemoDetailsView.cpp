@@ -19,7 +19,7 @@
 
 static BOOL GetDateText(TString *pInsStr, LPCTSTR pFormat, TString *pPath);
 
-void SetWndProc(SUPER_WND_PROC wp, HWND hParent, HINSTANCE h, SimpleEditor *p, MemoManager *pMgr);
+void SetWndProc(SUPER_WND_PROC wp, HWND hParent, HINSTANCE h, MemoDetailsView *p, MemoManager *pMgr);
 LRESULT CALLBACK NewDetailsViewProc( HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam );
 
 LPCTSTR pMonth[12] = {
@@ -36,20 +36,12 @@ LPCTSTR pWeekE[7] = {
 	TEXT("Sun"), TEXT("Mon"), TEXT("Tue"), TEXT("Wed"), TEXT("Thr"), TEXT("Fri"), TEXT("Sat")
 };
 
-BOOL SimpleEditor::Init(MemoManager *p, DWORD id, DWORD id_nf)
-{
-	nID = id;
-	nID_nf = id_nf;
-	pMemoMgr = p;
-	return TRUE;
-}
-
 ///////////////////////////////////////////
 // ウィンドウ生成
 ///////////////////////////////////////////
 extern HINSTANCE g_hInstance;
 
-BOOL SimpleEditor::Create(LPCTSTR pName, RECT &r, HWND hParent, HINSTANCE hInst, HFONT hFont)
+BOOL MemoDetailsView::Create(LPCTSTR pName, RECT &r, HWND hParent, DWORD nID, DWORD nID_nf, HINSTANCE hInst, HFONT hFont)
 {
 	DWORD nWndStyle;
 
@@ -98,7 +90,7 @@ BOOL SimpleEditor::Create(LPCTSTR pName, RECT &r, HWND hParent, HINSTANCE hInst,
 // 表示/非表示切り替え
 ///////////////////////////////////////////
 
-BOOL SimpleEditor::Show(int nCmdShow)
+BOOL MemoDetailsView::Show(int nCmdShow)
 {
 	ShowWindow(hViewWnd, nCmdShow);
 	if (nCmdShow == SW_SHOW) {
@@ -120,7 +112,7 @@ BOOL SimpleEditor::Show(int nCmdShow)
 // ウィンドウサイズの移動
 ///////////////////////////////////////////
 
-void SimpleEditor::MoveWindow(DWORD x, DWORD y, DWORD nWidth, DWORD nHeight)
+void MemoDetailsView::MoveWindow(DWORD x, DWORD y, DWORD nWidth, DWORD nHeight)
 {
 	::MoveWindow(hViewWnd_nf, x + nLeftOffset, y, nWidth - nLeftOffset, nHeight, TRUE);
 	::MoveWindow(hViewWnd_fd, x + nLeftOffset, y, nWidth - nLeftOffset, nHeight, TRUE);
@@ -130,7 +122,7 @@ void SimpleEditor::MoveWindow(DWORD x, DWORD y, DWORD nWidth, DWORD nHeight)
 // OnCommandの処理
 ///////////////////////////////////////////
 
-BOOL SimpleEditor::OnCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
+BOOL MemoDetailsView::OnCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
 	switch(LOWORD(wParam)) {
 	case IDM_CUT:
@@ -150,11 +142,23 @@ BOOL SimpleEditor::OnCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		return TRUE;
 	case IDM_INSDATE1:
 		{
+//			TString sDate;
+//			if (!GetDateText(&sDate, g_Property.DateFormat1())) {
+//				TomboMessageBox(NULL, MSG_GET_DATE_FAILED, TEXT("ERROR"), MB_ICONERROR | MB_OK);
+//				return TRUE;
+//			}
+//			SendMessage(hViewWnd, EM_REPLACESEL, 0, (LPARAM)sDate.Get());
 			InsertDate1();
 			return TRUE;
 		}
 	case IDM_INSDATE2:
 		{
+//			TString sDate;
+//			if (!GetDateText(&sDate, g_Property.DateFormat2())) {
+//				TomboMessageBox(NULL, MSG_GET_DATE_FAILED, TEXT("ERROR"), MB_ICONERROR | MB_OK);
+//				return TRUE;
+//			}
+//			SendMessage(hViewWnd, EM_REPLACESEL, 0, (LPARAM)sDate.Get());
 			InsertDate2();
 			return TRUE;
 		}
@@ -172,7 +176,7 @@ BOOL SimpleEditor::OnCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 // ホットキーの処理
 ///////////////////////////////////////////
 
-BOOL SimpleEditor::OnHotKey(HWND hWnd, WPARAM wParam)
+BOOL MemoDetailsView::OnHotKey(HWND hWnd, WPARAM wParam)
 {
 	switch(wParam) {
 	case APP_BUTTON1:
@@ -195,7 +199,7 @@ BOOL SimpleEditor::OnHotKey(HWND hWnd, WPARAM wParam)
 // フォーカスの取得
 ///////////////////////////////////////////
 
-void SimpleEditor::OnGetFocus()
+void MemoDetailsView::OnGetFocus()
 {
 	if (!g_Property.IsUseTwoPane()) return;
 
@@ -223,7 +227,7 @@ void SimpleEditor::OnGetFocus()
 // メモの設定
 ///////////////////////////////////////////
 
-BOOL SimpleEditor::SetMemo(LPCTSTR pMemo, DWORD nPos, BOOL bReadOnly)
+BOOL MemoDetailsView::SetMemo(LPCTSTR pMemo, DWORD nPos, BOOL bReadOnly)
 {
 	SetReadOnly(bReadOnly);
 
@@ -242,7 +246,7 @@ BOOL SimpleEditor::SetMemo(LPCTSTR pMemo, DWORD nPos, BOOL bReadOnly)
 // メモの取得
 ///////////////////////////////////////////
 
-LPTSTR SimpleEditor::GetMemo()
+LPTSTR MemoDetailsView::GetMemo()
 {
 	DWORD n = GetWindowTextLength(hViewWnd);
 
@@ -259,7 +263,7 @@ LPTSTR SimpleEditor::GetMemo()
 // フォントの設定
 /////////////////////////////////////////
 
-void SimpleEditor::SetFont(HFONT hFont)
+void MemoDetailsView::SetFont(HFONT hFont)
 {
 	SendMessage(hViewWnd_fd, WM_SETFONT, (WPARAM)hFont, MAKELPARAM(TRUE, 0));
 	SendMessage(hViewWnd_nf, WM_SETFONT, (WPARAM)hFont, MAKELPARAM(TRUE, 0));
@@ -269,7 +273,7 @@ void SimpleEditor::SetFont(HFONT hFont)
 // get cursor position
 /////////////////////////////////////////
 
-DWORD SimpleEditor::GetCursorPos()
+DWORD MemoDetailsView::GetCursorPos()
 {
 	DWORD nPos;
 	SendMessage(hViewWnd, EM_GETSEL, (WPARAM)&nPos, (LPARAM)NULL);
@@ -526,7 +530,7 @@ static BOOL GetDateText(TString *pInsStr, LPCTSTR pFormat, TString *pPath)
 // ステータス表示
 /////////////////////////////////////////
 
-void SimpleEditor::SetModifyStatus()
+void MemoDetailsView::SetModifyStatus()
 {
 	pMemoMgr->GetMainFrame()->SetModifyStatus(IsModify());
 }
@@ -535,7 +539,7 @@ void SimpleEditor::SetModifyStatus()
 // ステータス表示
 /////////////////////////////////////////
 
-void SimpleEditor::SelectAll() 
+void MemoDetailsView::SelectAll() 
 {	
 	SetFocus();
 	SendMessage(hViewWnd, EM_SETSEL, 0, -1); 
@@ -545,7 +549,7 @@ void SimpleEditor::SelectAll()
 // 折り返し表示の切り替え
 /////////////////////////////////////////
 
-BOOL SimpleEditor::SetFolding(BOOL bFold)
+BOOL MemoDetailsView::SetFolding(BOOL bFold)
 {
 	HWND hPrev;
 	HWND hAfter;
@@ -589,7 +593,7 @@ BOOL SimpleEditor::SetFolding(BOOL bFold)
 // タブストップの設定
 /////////////////////////////////////////
 
-void SimpleEditor::SetTabstop() {
+void MemoDetailsView::SetTabstop() {
 	DWORD n = g_Property.Tabstop() * 4;
 	SendMessage(hViewWnd_fd, EM_SETTABSTOPS, 1, (LPARAM)&n);
 	SendMessage(hViewWnd_nf, EM_SETTABSTOPS, 1, (LPARAM)&n);
@@ -607,7 +611,7 @@ void SimpleEditor::SetTabstop() {
 // pFound: if string is found, set TRUE otherwise set FALSE.
 
 
-BOOL SimpleEditor::Search(BOOL bFirstSearch, BOOL bForward, BOOL bNFMsg, BOOL bSearchFromTop)
+BOOL MemoDetailsView::Search(BOOL bFirstSearch, BOOL bForward, BOOL bNFMsg, BOOL bSearchFromTop)
 {
 	SearchEngineA *pSE;
 	pSE = pMemoMgr->GetSearchEngine();
@@ -674,7 +678,7 @@ BOOL SimpleEditor::Search(BOOL bFirstSearch, BOOL bForward, BOOL bNFMsg, BOOL bS
 		SendMessage(hViewWnd, EM_SCROLLCARET, 0, 0);
 
 	} else {
-		if (bNFMsg) MessageBox(NULL, MSG_STRING_NOT_FOUND, TOMBO_APP_NAME, MB_OK | MB_ICONINFORMATION);
+		if (bNFMsg) MessageBox(hViewWnd, MSG_STRING_NOT_FOUND, TOMBO_APP_NAME, MB_OK | MB_ICONINFORMATION);
 	}
 
 	delete [] p;
@@ -685,7 +689,7 @@ BOOL SimpleEditor::Search(BOOL bFirstSearch, BOOL bForward, BOOL bNFMsg, BOOL bS
 // change read only mode
 /////////////////////////////////////////
 
-void SimpleEditor::SetReadOnly(BOOL bro)
+void MemoDetailsView::SetReadOnly(BOOL bro)
 {
 	bReadOnly = bro;
 //	SendMessage(hViewWnd, EM_SETREADONLY, (WPARAM)bReadOnly, 0);
@@ -696,7 +700,7 @@ void SimpleEditor::SetReadOnly(BOOL bro)
 // Insert date
 /////////////////////////////////////////
 
-void SimpleEditor::InsertDate1()
+void MemoDetailsView::InsertDate1()
 {
 	TString sDate;
 
@@ -710,7 +714,7 @@ void SimpleEditor::InsertDate1()
 	SendMessage(hViewWnd, EM_REPLACESEL, 0, (LPARAM)sDate.Get());
 }
 
-void SimpleEditor::InsertDate2()
+void MemoDetailsView::InsertDate2()
 {
 	TString sDate;
 

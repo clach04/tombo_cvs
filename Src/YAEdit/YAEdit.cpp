@@ -1,6 +1,8 @@
 #include <windows.h>
 #include <tchar.h>
+#if !defined(PLATFORM_PSPC)
 #include <imm.h>
+#endif
 #if defined(PLATFORM_WIN32)
 #include <zmouse.h>
 #endif
@@ -170,7 +172,7 @@ BOOL YAEdit::Create(HINSTANCE hInst, HWND hParent, DWORD nId, RECT &r, YAECallba
 	if (!pDoc->Init("", this, pDocCb)) return FALSE;
 
 	
-#if defined(PLATFORM_WIN32)
+#if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
 	pView->hViewWnd = CreateWindowEx(WS_EX_CLIENTEDGE, YAEDIT_CLASS_NAME, TEXT(""),
 						WS_CHILD | WS_VISIBLE | WS_VSCROLL | WS_HSCROLL,
 						r.left,
@@ -637,6 +639,7 @@ YAEditDoc *YAEdit::SetDoc(YAEditDoc *pNewDoc)
 	pLineMgr->RecalcWrap(pWrapper);
 
 	pView->SetCaretPosition(Coordinate(0, 0));
+	ClearSelectedRegion();	
 
 	pView->ResetScrollbar();
 	pView->RedrawAllScreen();
@@ -665,6 +668,10 @@ void YAEdit::ResizeWindow(int x, int y, int width, int height)
 	Coordinate cPhCursorPos;
 	pLineMgr->LogicalPosToPhysicalPos(&(pView->GetCaretPosition()), &cPhCursorPos);
 
+	Region rPhRgn;
+	pLineMgr->LogicalPosToPhysicalPos(&(rSelRegion.posStart), &(rPhRgn.posStart));
+	pLineMgr->LogicalPosToPhysicalPos(&(rSelRegion.posEnd), &(rPhRgn.posEnd));
+
 	// Rewrapping. Logical line will be changed.
 	pLineMgr->RecalcWrap(pWrapper);
 	pView->ResetScrollbar();
@@ -673,6 +680,9 @@ void YAEdit::ResizeWindow(int x, int y, int width, int height)
 	Coordinate cLgCursorPos;
 	pLineMgr->PhysicalPosToLogicalPos(&cPhCursorPos, &cLgCursorPos);
 	pView->SetCaretPosition(cLgCursorPos);
+
+	pLineMgr->PhysicalPosToLogicalPos(&(rPhRgn.posStart), &(rSelRegion.posStart));
+	pLineMgr->PhysicalPosToLogicalPos(&(rPhRgn.posEnd), &(rSelRegion.posEnd));
 
 	// redraw screen
 	pView->RedrawAllScreen();

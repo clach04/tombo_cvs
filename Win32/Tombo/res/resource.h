@@ -30,9 +30,7 @@
 #define IDC_STATUS                      106
 #define IDD_ABOUTBOX                    107
 #define IDC_MEMODETAILSVIEW_NF          107
-#define IDT_SELSCROLL                   108
 #define IDI_TOMBO                       109
-#define IDC_TOMBOEDIT                   109
 #define IDB_ARTICLEBOX                  110
 #define IDD_PROPTAB                     111
 #define IDD_FILESELECT                  112
@@ -183,6 +181,6 @@
 #define _APS_NEXT_RESOURCE_VALUE        148
 #define _APS_NEXT_COMMAND_VALUE         40039
 #define _APS_NEXT_CONTROL_VALUE         1067
-#define _APS_NEXT_SYMED_VALUE           110
+#define _APS_NEXT_SYMED_VALUE           108
 #endif
 #endif

@@ -45,8 +45,7 @@ class MainFrame {
 #endif
 
 	MemoSelectView msView;
-//	MemoDetailsView mdView;
-	MemoDetailsView *pDetailsView;
+	MemoDetailsView mdView;
 
 	MemoManager mmMemoManager;
 

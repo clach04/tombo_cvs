@@ -44,7 +44,7 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /YX /FD /c
-# ADD CPP /nologo /W3 /GX /O2 /I "../../Src" /I "../../Src/regex" /I "./res" /I "../../expat/include/" /I "../../Src/TomboLib" /I "../../Src/YAEdit" /I "." /D "NDEBUG" /D "TOMBO" /D "PLATFORM_WIN32" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /YX /FD /c
+# ADD CPP /nologo /W3 /GX /O2 /I "../../Src" /I "../../Src/regex" /I "./res" /I "../../expat/include/" /I "../../Src/TomboLib" /I "." /D "NDEBUG" /D "TOMBO" /D "PLATFORM_WIN32" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /YX /FD /c
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x411 /d "NDEBUG"
@@ -54,7 +54,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /machine:I386
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib comctl32.lib imm32.lib /nologo /subsystem:windows /machine:I386 /nodefaultlib:"LIBCMT.LIB"
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib comctl32.lib /nologo /subsystem:windows /machine:I386 /nodefaultlib:"LIBCMT.LIB"
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 Debug"
 
@@ -70,7 +70,7 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /YX /FD /GZ /c
-# ADD CPP /nologo /W3 /Gm /GX /ZI /Od /I "../../lib/" /I "../../Src" /I "../../Src/regex" /I "./res" /I "../../expat/include/" /I "../../Src/TomboLib" /I "../../Src/YAEdit" /I "." /D "_DEBUG" /D "TOMBO" /D "PLATFORM_WIN32" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /YX /FD /GZ /c
+# ADD CPP /nologo /W3 /Gm /GX /ZI /Od /I "../../lib/" /I "../../Src" /I "../../Src/regex" /I "./res" /I "../../expat/include/" /I "../../Src/TomboLib" /I "." /D "_DEBUG" /D "TOMBO" /D "PLATFORM_WIN32" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /YX /FD /GZ /c
 # ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x411 /d "_DEBUG"
@@ -80,7 +80,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 imm32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib comctl32.lib imm32.lib /nologo /subsystem:windows /debug /machine:I386 /nodefaultlib:"LIBCMT.LIB" /pdbtype:sept
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib comctl32.lib /nologo /subsystem:windows /debug /machine:I386 /nodefaultlib:"LIBCMT.LIB" /pdbtype:sept
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 ReleaseE"
 
@@ -97,7 +97,7 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /I "../../Src/regex" /I "./res" /I "." /D "NDEBUG" /D "TOMBO" /D "PLATFORM_WIN32" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /YX /FD /c
-# ADD CPP /nologo /W3 /GX /O2 /I "./resE" /I "../../Src" /I "../../Src/regex" /I "./res" /I "../../expat/include/" /I "../../Src/TomboLib" /I "../../Src/YAEdit" /I "." /D "NDEBUG" /D "TOMBO" /D "PLATFORM_WIN32" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /D "TOMBO_LANG_ENGLISH" /YX /FD /c
+# ADD CPP /nologo /W3 /GX /O2 /I "./resE" /I "../../Src" /I "../../Src/regex" /I "./res" /I "../../expat/include/" /I "../../Src/TomboLib" /I "." /D "NDEBUG" /D "TOMBO" /D "PLATFORM_WIN32" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /D "TOMBO_LANG_ENGLISH" /YX /FD /c
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x411 /d "NDEBUG"
@@ -107,7 +107,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib comctl32.lib /nologo /subsystem:windows /machine:I386
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib comctl32.lib imm32.lib /nologo /subsystem:windows /machine:I386 /nodefaultlib:"LIBCMT.LIB"
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib comctl32.lib /nologo /subsystem:windows /machine:I386 /nodefaultlib:"LIBCMT.LIB"
 
 !ENDIF 
 
@@ -119,208 +119,9 @@ LINK32=link.exe
 # Begin Group "Source Files"
 
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
-# Begin Group "TomboLib"
-
-# PROP Default_Filter ""
-# Begin Source File
-
-SOURCE=..\..\Src\TomboLib\Clipboard.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\TomboLib\Clipboard.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\TomboLib\DialogTemplate.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\TomboLib\DialogTemplate.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\TomboLib\DirectoryScanner.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\TomboLib\DirectoryScanner.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\TomboLib\File.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\TomboLib\File.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\TomboLib\FileInputStream.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\TomboLib\FileInputStream.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\TomboLib\List.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\TomboLib\List.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\TomboLib\Logger.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\TomboLib\Logger.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\TomboLib\PropertyPage.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\TomboLib\PropertyPage.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\TomboLib\SipControl.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\TomboLib\SipControl.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\TomboLib\TString.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\TomboLib\TString.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\TomboLib\Uniconv.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\TomboLib\Uniconv.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\TomboLib\VarBuffer.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\TomboLib\VarBuffer.h
-# End Source File
-# End Group
-# Begin Group "YAE"
-
-# PROP Default_Filter ""
-# Begin Source File
-
-SOURCE=..\..\Src\YAEdit\FontWidthCache.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\YAEdit\FontWidthCache.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\YAEdit\LineManager.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\YAEdit\LineManager.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\YAEdit\LineWrapper.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\YAEdit\LineWrapper.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\YAEdit\LineWrapperImpl.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\YAEdit\LineWrapperImpl.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\YAEdit\MemManager.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\YAEdit\MemManager.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\YAEdit\PhysicalLineManager.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\YAEdit\PhysicalLineManager.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\YAEdit\Region.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\YAEdit\Region.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\YAEdit\StringSplitter.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\YAEdit\StringSplitter.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\YAEdit\YAEdit.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\YAEdit\YAEdit.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\YAEdit\YAEditDoc.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\YAEdit\YAEditDoc.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\YAEdit\YAEditView.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\YAEdit\YAEditView.h
-# End Source File
-# End Group
-# Begin Group "Tombo"
-
-# PROP Default_Filter ""
 # Begin Source File
 
 SOURCE=..\..\Src\AboutDialog.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\AboutDialog.h
 # End Source File
 # Begin Source File
 
@@ -332,23 +133,7 @@ SOURCE=..\..\Src\BookMark.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\Src\BookMark.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\..\Src\BookMarkDlg.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\BookMarkDlg.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\Chipher.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\regex\config.h
 # End Source File
 # Begin Source File
 
@@ -356,15 +141,7 @@ SOURCE=..\..\Src\Crypt.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\Src\Crypt.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\..\Src\CryptManager.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\CryptManager.h
 # End Source File
 # Begin Source File
 
@@ -372,15 +149,23 @@ SOURCE=..\..\Src\DetailsViewWndProc.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\Src\TomboLib\DialogTemplate.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\TomboLib\DirectoryScanner.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\Src\DirList.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\Src\DirList.h
+SOURCE=..\..\Src\TomboLib\File.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\expat\include\expat.h
+SOURCE=..\..\Src\TomboLib\FileInputStream.cpp
 # End Source File
 # Begin Source File
 
@@ -388,15 +173,7 @@ SOURCE=..\..\Src\FileSelector.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\Src\FileSelector.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\..\Src\FilterAddDlg.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\FilterAddDlg.h
 # End Source File
 # Begin Source File
 
@@ -404,15 +181,7 @@ SOURCE=..\..\Src\FilterCtlDlg.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\Src\FilterCtlDlg.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\..\Src\FilterDefDlg.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\FilterDefDlg.h
 # End Source File
 # Begin Source File
 
@@ -420,7 +189,11 @@ SOURCE=..\..\Src\GrepDialog.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\Src\GrepDialog.h
+SOURCE=..\..\Src\TomboLib\List.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\TomboLib\Logger.cpp
 # End Source File
 # Begin Source File
 
@@ -432,10 +205,6 @@ SOURCE=..\..\Src\MainFrame.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\Src\MainFrame.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\..\Src\gnupg\md5.c
 # End Source File
 # Begin Source File
@@ -444,15 +213,7 @@ SOURCE=..\..\Src\MemoDetailsView.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\Src\MemoDetailsView.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\..\Src\MemoFolder.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\MemoFolder.h
 # End Source File
 # Begin Source File
 
@@ -460,15 +221,7 @@ SOURCE=..\..\Src\MemoInfo.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\Src\MemoInfo.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\..\Src\MemoManager.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\MemoManager.h
 # End Source File
 # Begin Source File
 
@@ -476,19 +229,7 @@ SOURCE=..\..\Src\MemoNote.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\Src\MemoNote.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\..\Src\MemoSelectView.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\MemoSelectView.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\Message.h
 # End Source File
 # Begin Source File
 
@@ -496,15 +237,7 @@ SOURCE=..\..\Src\NewFolderDialog.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\Src\NewFolderDialog.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\..\Src\PasswordDialog.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\PasswordDialog.h
 # End Source File
 # Begin Source File
 
@@ -512,15 +245,11 @@ SOURCE=..\..\Src\PasswordManager.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\Src\PasswordManager.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\..\Src\Property.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\Src\Property.h
+SOURCE=..\..\Src\TomboLib\PropertyPage.cpp
 # End Source File
 # Begin Source File
 
@@ -528,45 +257,7 @@ SOURCE=..\..\Src\regex\regex.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\Src\regex\regex.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\res\resource.h
-
-!IF  "$(CFG)" == "Tombo - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "Tombo - Win32 Debug"
-
-!ELSEIF  "$(CFG)" == "Tombo - Win32 ReleaseE"
-
-# PROP Exclude_From_Build 1
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
-SOURCE=.\resE\resource.h
-
-!IF  "$(CFG)" == "Tombo - Win32 Release"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "Tombo - Win32 Debug"
-
-!ELSEIF  "$(CFG)" == "Tombo - Win32 ReleaseE"
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
 SOURCE=..\..\Src\SearchDlg.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\SearchDlg.h
 # End Source File
 # Begin Source File
 
@@ -574,15 +265,7 @@ SOURCE=..\..\Src\SearchEngine.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\Src\SearchEngine.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\..\Src\SearchTree.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\SearchTree.h
 # End Source File
 # Begin Source File
 
@@ -590,7 +273,7 @@ SOURCE=..\..\Src\SelectViewWndProc.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\Src\Tombo.h
+SOURCE=..\..\Src\TomboLib\SipControl.cpp
 # End Source File
 # Begin Source File
 
@@ -630,15 +313,7 @@ SOURCE=..\..\Src\TomboURI.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\Src\TomboURI.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\..\Src\TreeViewItem.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\TreeViewItem.h
 # End Source File
 # Begin Source File
 
@@ -646,7 +321,11 @@ SOURCE=..\..\Src\TSParser.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\Src\TSParser.h
+SOURCE=..\..\Src\TomboLib\TString.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\TomboLib\Uniconv.cpp
 # End Source File
 # Begin Source File
 
@@ -654,7 +333,229 @@ SOURCE=..\..\Src\regex\util.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\Src\TomboLib\VarBuffer.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\Src\VFManager.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\VFStream.cpp
+# End Source File
+# End Group
+# Begin Group "Header Files"
+
+# PROP Default_Filter "h;hpp;hxx;hm;inl"
+# Begin Source File
+
+SOURCE=..\..\Src\AboutDialog.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\BookMark.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\BookMarkDlg.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\Chipher.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\regex\config.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\Crypt.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\CryptManager.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\TomboLib\DialogTemplate.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\TomboLib\DirectoryScanner.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\DirList.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\expat\include\expat.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\TomboLib\File.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\TomboLib\FileInputStream.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\FileSelector.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\FilterAddDlg.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\FilterCtlDlg.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\FilterDefDlg.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\GrepDialog.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\TomboLib\List.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\TomboLib\Logger.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\MainFrame.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\MemoDetailsView.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\MemoFolder.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\MemoInfo.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\MemoManager.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\MemoNote.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\MemoSelectView.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\Message.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\NewFolderDialog.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\PasswordDialog.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\PasswordManager.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\Property.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\TomboLib\PropertyPage.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\regex\regex.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\res\resource.h
+
+!IF  "$(CFG)" == "Tombo - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 Debug"
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 ReleaseE"
+
+# PROP Exclude_From_Build 1
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\resE\resource.h
+
+!IF  "$(CFG)" == "Tombo - Win32 Release"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 Debug"
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 ReleaseE"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\SearchDlg.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\SearchEngine.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\SearchTree.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\TomboLib\SipControl.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\Tombo.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\TomboURI.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\TreeViewItem.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\TSParser.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\TomboLib\TString.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\TomboLib\Uniconv.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\TomboLib\VarBuffer.h
 # End Source File
 # Begin Source File
 
@@ -662,25 +563,8 @@ SOURCE=..\..\Src\VFManager.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\Src\VFStream.cpp
-# End Source File
-# Begin Source File
-
 SOURCE=..\..\Src\VFStream.h
 # End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\YAEditor.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\YAEditor.h
-# End Source File
-# End Group
-# End Group
-# Begin Group "Header Files"
-
-# PROP Default_Filter "h;hpp;hxx;hm;inl"
 # End Group
 # Begin Group "Resource Files"
 

@@ -509,7 +509,7 @@ LRESULT MemoSelectView::OnNotify(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	case TVN_BEGINLABELEDIT:
 		{
 			TreeViewItem *pItem = (TreeViewItem*)(((LPNMTVDISPINFO)lParam)->item.lParam);
-			if (pItem && !pItem->IsOperationEnabled(this, TreeViewItem::OpRename)) return TRUE;
+			if (pItem && !pItem->CanRename(this)) return TRUE;
 			return FALSE;
 		}
 	case TVN_ENDLABELEDIT:
@@ -542,17 +542,16 @@ void MemoSelectView::OnNotify_RClick()
 
 	HMENU hContextMenu = LoadMenu(g_hInstance, MAKEINTRESOURCE(IDR_CONTEXTMENU));
 	HMENU hMenu = GetSubMenu(hContextMenu, 0);
-
-	ControlSubMenu(hMenu, IDM_ENCRYPT, pItem->IsOperationEnabled(this, TreeViewItem::OpEncrypt));
-	ControlSubMenu(hMenu, IDM_DECRYPT, pItem->IsOperationEnabled(this, TreeViewItem::OpDecrypt));
-	ControlSubMenu(hMenu, IDM_CUT, pItem->IsOperationEnabled(this, TreeViewItem::OpCut));
-	ControlSubMenu(hMenu, IDM_COPY, pItem->IsOperationEnabled(this, TreeViewItem::OpCopy));
-	ControlSubMenu(hMenu, IDM_PASTE, pItem->IsOperationEnabled(this, TreeViewItem::OpPaste));
-	ControlSubMenu(hMenu, IDM_RENAME, pItem->IsOperationEnabled(this, TreeViewItem::OpRename));
-	ControlSubMenu(hMenu, IDM_DELETEITEM, pItem->IsOperationEnabled(this, TreeViewItem::OpDelete));
-	ControlSubMenu(hMenu, IDM_NEWFOLDER, pItem->IsOperationEnabled(this, TreeViewItem::OpNewFolder));
-	ControlSubMenu(hMenu, IDM_SEARCH, pItem->IsOperationEnabled(this, TreeViewItem::OpGrep));
-	ControlSubMenu(hMenu, IDM_TRACELINK, pItem->IsOperationEnabled(this, TreeViewItem::OpLink));
+	ControlSubMenu(hMenu, IDM_ENCRYPT, pItem->CanEncrypt(this));
+	ControlSubMenu(hMenu, IDM_DECRYPT, pItem->CanDecrypt(this));
+	ControlSubMenu(hMenu, IDM_CUT, pItem->CanCut(this));
+	ControlSubMenu(hMenu, IDM_COPY, pItem->CanCopy(this));
+	ControlSubMenu(hMenu, IDM_PASTE, pItem->CanPaste(this));
+	ControlSubMenu(hMenu, IDM_RENAME, pItem->CanRename(this));
+	ControlSubMenu(hMenu, IDM_DELETEITEM, pItem->CanDelete(this));
+	ControlSubMenu(hMenu, IDM_NEWFOLDER, pItem->CanNewMemo(this));
+	ControlSubMenu(hMenu, IDM_SEARCH, pItem->CanGrep(this));
+	ControlSubMenu(hMenu, IDM_TRACELINK, pItem->CanLink(this));
 
 	DWORD id = TrackPopupMenuEx(hMenu, TPM_RETURNCMD, pt.x, pt.y, hViewWnd, NULL);
 	DestroyMenu(hContextMenu);
@@ -569,17 +568,18 @@ void MemoSelectView::OnNotify_RClick()
 		break;
 	case IDM_ENCRYPT:
 		{
-			MemoNote *pNote = ((TreeViewFileItem*)pItem)->GetNote();
-			if (g_Property.IsUseTwoPane() && pMemoMgr->IsNoteDisplayed(pNote->MemoPath())) {
-				pMemoMgr->InactiveDetailsView();
+			if (!pItem->HasMultiItem()) {
+				MemoNote *pNote = ((TreeViewFileItem*)pItem)->GetNote();
+				if (g_Property.IsUseTwoPane() && pMemoMgr->IsNoteDisplayed(pNote->MemoPath())) {
+					pMemoMgr->InactiveDetailsView();
+				}
+				TV_HITTESTINFO hti;
+				hti.pt = pth;
+				TreeView_HitTest(hViewWnd, &hti);
+				if (hti.hItem == NULL) return;
+
+				pItem = GetTVItem(hti.hItem);
 			}
-			TV_HITTESTINFO hti;
-			hti.pt = pth;
-			TreeView_HitTest(hViewWnd, &hti);
-			if (hti.hItem == NULL) return;
-
-			TreeViewItem *pItem = GetTVItem(hti.hItem);
-
 			OnEncrypt(pItem);
 		}
 		break;
@@ -1188,21 +1188,20 @@ void MemoSelectView::ControlMenu()
 
 	TreeViewItem *pItem = GetCurrentItem();
 	if (pItem) {
-		pMf->EnableDelete(pItem->IsOperationEnabled(this, TreeViewItem::OpDelete));
-		pMf->EnableRename(pItem->IsOperationEnabled(this, TreeViewItem::OpRename));
+		pMf->EnableDelete(pItem->CanDelete(this));
+		pMf->EnableRename(pItem->CanRename(this));
 
-		pMf->EnableEncrypt(pItem->IsOperationEnabled(this, TreeViewItem::OpEncrypt));
-		pMf->EnableDecrypt(pItem->IsOperationEnabled(this, TreeViewItem::OpDecrypt));
+		pMf->EnableEncrypt(pItem->CanEncrypt(this));
+		pMf->EnableDecrypt(pItem->CanDecrypt(this));
 
-		pMf->EnableNew(pItem->IsOperationEnabled(this, TreeViewItem::OpNewMemo));
-		pMf->EnableNewFolder(pItem->IsOperationEnabled(this, TreeViewItem::OpNewFolder));
+		pMf->EnableNew(pItem->CanNewMemo(this));
+		pMf->EnableNewFolder(pItem->CanNewFolder(this));
 
-		pMf->EnableCut(pItem->IsOperationEnabled(this, TreeViewItem::OpCut));
-		pMf->EnableCopy(pItem->IsOperationEnabled(this, TreeViewItem::OpCopy));
-		pMf->EnablePaste(pItem->IsOperationEnabled(this, TreeViewItem::OpPaste));
+		pMf->EnableCut(pItem->CanCut(this));
+		pMf->EnableCopy(pItem->CanCopy(this));
+		pMf->EnablePaste(pItem->CanPaste(this));
 
-		pMf->EnableGrep(pItem->IsOperationEnabled(this, TreeViewItem::OpGrep));
-
+		pMf->EnableGrep(pItem->CanGrep(this));
 	} else {
 		pMf->EnableDelete(FALSE);
 		pMf->EnableRename(FALSE);

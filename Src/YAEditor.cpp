@@ -3,6 +3,7 @@
 #include "YAEditor.h"
 
 #include "Tombo.h"
+#include "UniConv.h"
 #include "Region.h"
 #include "YAEdit.h"
 #include "YAEditDoc.h"
@@ -62,7 +63,13 @@ LPTSTR YAEditor::GetMemo()
 {
 	DWORD nLen;
 	char *pData = pEdit->GetDoc()->GetDocumentData(&nLen);
+#if defined(PLATFORM_WIN32)
 	return pData;
+#else
+	LPTSTR pDataW = ConvSJIS2Unicode(pData);
+	delete [] pData;
+	return pDataW;
+#endif
 }
 
 void YAEditor::MoveWindow(DWORD x, DWORD y, DWORD nWidth, DWORD nHeight)
@@ -70,10 +77,19 @@ void YAEditor::MoveWindow(DWORD x, DWORD y, DWORD nWidth, DWORD nHeight)
 	if (pEdit) pEdit->ResizeWindow(x, y, nWidth, nHeight);
 }
 
-BOOL YAEditor::SetMemo(LPCTSTR pMemo, DWORD nPos, BOOL bReadOnly)
+BOOL YAEditor::SetMemo(LPCTSTR pMemoW, DWORD nPos, BOOL bReadOnly)
 {
 	YAEditDoc *pDoc = new YAEditDoc();
+#if defined(PLATFORM_WIN32)
+	const char *pMemo = pMemoW;
+#else
+	char *pMemo = ConvUnicode2SJIS(pMemoW);
+#endif
 	if (!pDoc->Init(pMemo, pEdit, new TomboDocCallback(pMemoMgr))) return FALSE;
+
+#if !defined(PLATFORM_WIN32)
+	delete [] pMemo;
+#endif
 
 	YAEditDoc *pOldDoc = pEdit->SetDoc(pDoc);
 	delete pOldDoc;
