@@ -548,6 +548,7 @@ LRESULT MemoSelectView::OnNotify(HWND hWnd, WPARAM wParam, LPARAM lParam)
 			ControlSubMenu(hMenu, IDM_DELETEITEM, pItem->CanDelete(this));
 			ControlSubMenu(hMenu, IDM_NEWFOLDER, pItem->CanNewMemo(this));
 			ControlSubMenu(hMenu, IDM_SEARCH, pItem->CanGrep(this));
+			ControlSubMenu(hMenu, IDM_TRACELINK, pItem->CanLink(this));
 
 			DWORD id = TrackPopupMenuEx(hMenu, TPM_RETURNCMD, pt.x, pt.y, hWnd, NULL);
 			DestroyMenu(hContextMenu);
@@ -580,6 +581,10 @@ LRESULT MemoSelectView::OnNotify(HWND hWnd, WPARAM wParam, LPARAM lParam)
 			case IDM_SEARCH:
 				TreeView_SelectItem(hViewWnd, hti.hItem);
 				pMemoMgr->GetMainFrame()->OnSearch();
+				break;
+			case IDM_TRACELINK:
+				TreeViewFileLink *p = (TreeViewFileLink*)pItem;
+				ShowItem(p->GetNote()->MemoPath(), TRUE);
 				break;
 			}
 			break;

@@ -99,6 +99,11 @@ BOOL TreeViewItem::CanGrep(MemoSelectView *pView)
 	return FALSE;
 }
 
+BOOL TreeViewItem::CanLink(MemoSelectView *pView)
+{
+	return FALSE;
+}
+
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 //  File
@@ -762,6 +767,11 @@ BOOL TreeViewFileLink::CanPaste(MemoSelectView *pView)
 BOOL TreeViewFileLink::CanGrep(MemoSelectView *pView)
 {
 	return FALSE;
+}
+
+BOOL TreeViewFileLink::CanLink(MemoSelectView *pView)
+{
+	return TRUE;
 }
 
 BOOL TreeViewFileLink::GetFolderPath(MemoSelectView *pView, TString *pPath)

@@ -62,6 +62,7 @@ public:
 	virtual BOOL CanCopy(MemoSelectView *pView);
 	virtual BOOL CanPaste(MemoSelectView *pView);
 	virtual BOOL CanGrep(MemoSelectView *pVIew);
+	virtual BOOL CanLink(MemoSelectView *pView);
 
 	///////////////////////////////////////////////////////
 	// ÉAÉCÉRÉìèÓïÒÇÃéÊìæ
@@ -173,6 +174,7 @@ public:
 	virtual BOOL CanCopy(MemoSelectView *pView);
 	virtual BOOL CanPaste(MemoSelectView *pView);
 	virtual BOOL CanGrep(MemoSelectView *pVIew);
+	virtual BOOL CanLink(MemoSelectView *pView);
 
 	virtual BOOL GetFolderPath(MemoSelectView *pView, TString *pPath);
 };
