@@ -5,11 +5,11 @@ class MemoManager;
 class MemoNote;
 class TString;
 class TreeViewItem;
+class TreeViewFileItem;
 
 class MemoSelectView {
 	HWND hViewWnd;
 	HIMAGELIST hImageList;
-
 
 	MemoManager *pMemoMgr;
 
@@ -96,7 +96,7 @@ public:
 	void TreeCollapse(HTREEITEM hItem);
 
 	// 新規メモ生成時処理
-	BOOL NewMemoCreated(MemoNote *pNote, LPCTSTR pHeadLine, HTREEITEM hItem);
+	TreeViewFileItem *NewMemoCreated(MemoNote *pNote, LPCTSTR pHeadLine, HTREEITEM hItem);
 
 	// TreeViewItemの状態が変わったことによるビューへの変更依頼
 	BOOL UpdateItemStatus(TreeViewItem *pItem, LPCTSTR pNewHeadLine);
@@ -125,7 +125,8 @@ public:
 	// 選択されていない場合には戻り値としてNULLを返す。
 	//MemoNote *GetCurrentItem(HTREEITEM *pItem = NULL);
 	TreeViewItem *GetCurrentItem(HTREEITEM *pItem = NULL);
-	MemoNote *GetNote(TreeViewItem *p);
+
+	//MemoNote *GetNote(TreeViewItem *p);
 
 	TreeViewItem *GetTVItem(HTREEITEM h);
 

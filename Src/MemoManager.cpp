@@ -42,15 +42,34 @@ BOOL MemoManager::Init(MainFrame *mf, MemoDetailsView *md, MemoSelectView *ms)
 	pMainFrame = mf;
 	pMemoDetailsView = md;
 	pMemoSelectView = ms;
-	pCurrentNote = NULL;
+	pCurrentItem = NULL;
 	return TRUE; 
+}
+
+////////////////////////////////////////////////////////
+// 
+////////////////////////////////////////////////////////
+
+BOOL MemoManager::IsNoteDisplayed(MemoNote *pNote) 
+{ 
+	return pCurrentItem ? (pNote == pCurrentItem->GetNote()) : FALSE; 
+}
+
+MemoNote *MemoManager::CurrentNote()
+{ 
+	return pCurrentItem ? pCurrentItem->GetNote() : FALSE; 
+}
+
+TreeViewFileItem *MemoManager::CurrentItem()
+{
+	return pCurrentItem;
 }
 
 ////////////////////////////////////////////////////////
 // 新規メモの割り当て
 ////////////////////////////////////////////////////////
 
-MemoNote *MemoManager::AllocNewMemo(LPCTSTR pText, MemoNote *pTemplate)
+TreeViewFileItem *MemoManager::AllocNewMemo(LPCTSTR pText, MemoNote *pTemplate)
 {
 	TString sHeadLine;
 	TString sMemoPath;
@@ -70,8 +89,7 @@ MemoNote *MemoManager::AllocNewMemo(LPCTSTR pText, MemoNote *pTemplate)
 		return NULL;
 	}
 
-	pMemoSelectView->NewMemoCreated(pNote, sHeadLine.Get(), hParent);
-	return pNote;
+	return pMemoSelectView->NewMemoCreated(pNote, sHeadLine.Get(), hParent);
 }
 
 /////////////////////////////////////////////
@@ -178,20 +196,22 @@ BOOL MemoManager::SaveIfModify(LPDWORD pYNC, BOOL bDupMode)
 	}
 
 	if (bDupMode) {
-		if (pCurrentNote == NULL) {
-			pCurrentNote = AllocNewMemo(p);
+		if (pCurrentItem == NULL) {
+			pCurrentItem = AllocNewMemo(p);
 		} else {
-			pCurrentNote = AllocNewMemo(p, pCurrentNote);
+			pCurrentItem = AllocNewMemo(p, pCurrentItem->GetNote());
 		}
 	}
 
 	// 新規メモの場合、ノードの作成
-	if (pCurrentNote == NULL) {
-		pCurrentNote = AllocNewMemo(p);
+	if (pCurrentItem == NULL) {
+		pCurrentItem = AllocNewMemo(p);
 
 		// この時点で新規メモではなくなるのでステータスを変える
 		pMainFrame->SetNewMemoStatus(FALSE);
 	}
+
+	MemoNote *pCurrentNote = pCurrentItem->GetNote();
 
 	// ヘッドライン文字列の取得
 	TString sHeadLine;
@@ -221,10 +241,13 @@ BOOL MemoManager::SaveIfModify(LPDWORD pYNC, BOOL bDupMode)
 // メモ内容の表示
 ////////////////////////////////////////////////////////
 
-BOOL MemoManager::SetMemo(MemoNote *pNote)
+BOOL MemoManager::SetMemo(TreeViewFileItem *pItem)
 {
 	BOOL bLoop = FALSE;
 	LPTSTR p;
+
+	if (!pItem) return FALSE;
+	MemoNote *pNote = pItem->GetNote();
 
 	do {
 		bLoop = FALSE;
@@ -248,8 +271,7 @@ BOOL MemoManager::SetMemo(MemoNote *pNote)
 
 	pMemoDetailsView->SetMemo(p, nPos);
 	MemoNote::WipeOutAndDelete(p);
-	pCurrentNote = pNote;
-
+	pCurrentItem = pItem;
 	return TRUE;
 }
 
@@ -274,7 +296,7 @@ BOOL MemoManager::NewMemo()
 BOOL MemoManager::ClearMemo()
 {
 	pMemoDetailsView->SetMemo(TEXT(""), 0);
-	pCurrentNote = NULL;
+	pCurrentItem = NULL;
 	return TRUE;
 }
 
@@ -289,8 +311,8 @@ BOOL MemoManager::StoreCursorPos()
 		DWORD nPos = pMemoDetailsView->GetCursorPos();
 
 		MemoInfo mi;
-		if (pCurrentNote) {
-			mi.WriteInfo(pCurrentNote->MemoPath(), nPos);
+		if (pCurrentItem) {
+			mi.WriteInfo(pCurrentItem->GetNote()->MemoPath(), nPos);
 		}
 	}
 	return TRUE;

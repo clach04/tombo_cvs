@@ -7,6 +7,7 @@ class MainFrame;
 class MemoNote;
 class PasswordManager;
 class TreeViewItem;
+class TreeViewFileItem;
 
 class SearchEngineA;
 
@@ -17,9 +18,9 @@ protected:
 	MainFrame *pMainFrame;
 	PasswordManager *pPassMgr;
 
-	MemoNote *pCurrentNote;
+	TreeViewFileItem *pCurrentItem;
 
-	MemoNote *AllocNewMemo(LPCTSTR pText, MemoNote *pTemplate = NULL);
+	TreeViewFileItem *AllocNewMemo(LPCTSTR pText, MemoNote *pTemplate = NULL);
 
 	SearchEngineA *pSearchEngineA;
 
@@ -56,7 +57,7 @@ public:
 	BOOL SaveIfModify(LPDWORD pYNC, BOOL bDupMode);
 
 	// メモのロード
-	BOOL SetMemo(MemoNote *pNote);
+	BOOL SetMemo(TreeViewFileItem *pItem);
 
 	// メモのクリア
 	BOOL ClearMemo();
@@ -72,7 +73,7 @@ public:
 	void SelectAll();	// 全選択(詳細ビュー)
 
 	// 指定したメモが現在詳細ビューで表示されているか
-	BOOL IsNoteDisplayed(MemoNote *pNote) { return pNote == pCurrentNote; }
+	BOOL IsNoteDisplayed(MemoNote *pNote);
 
 	// 詳細ビューに表示されている場合に必要なら保存し、一覧ビューにフォーカスを移す
 	// TOOD: 保存依頼に置き換えられる気がする
@@ -91,7 +92,8 @@ public:
 	// データアクセサ
 
 	PasswordManager *GetPasswordManager() { return pPassMgr; }
-	MemoNote *CurrentNote() { return pCurrentNote; }
+	MemoNote *CurrentNote();
+	TreeViewFileItem *CurrentItem();
 	MainFrame *GetMainFrame() { return pMainFrame; }
 
 	/////////////////////////////////////

@@ -25,7 +25,7 @@
 #define IMAGE_CY 16
 
 // IDB_MEMOSELECT_IMAGESに格納されているイメージ数
-#define NUM_BITMAPS 8
+#define NUM_BITMAPS 10
 
 void SelectViewSetWndProc(WNDPROC wp, HWND hParent, HINSTANCE h, MemoSelectView *p);
 LRESULT CALLBACK NewSelectViewProc( HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam );
@@ -188,12 +188,12 @@ static BOOL InsertFile(HWND hTree, HTREEITEM hParent, LPCTSTR pPrefix, LPCTSTR p
 	wsprintf(path, TEXT("%s%s"), pPrefix, pFile);
 	if (!pNote->Init(path)) return FALSE;
 
-	TreeViewFileItem *ptvi = new TreeViewFileItem(); // XXXX
+	TreeViewFileItem *ptvi = new TreeViewFileItem();
 	if (!ptvi) {
 		delete pNote;
 		return FALSE;
 	}
-	ptvi->pNote = pNote;
+	ptvi->SetNote(pNote);
 	ti.item.lParam = (LPARAM)ptvi;
 
 	*(disp + len - 4) = TEXT('\0');
@@ -262,10 +262,9 @@ void MemoSelectView::DeleteItemsRec(HTREEITEM hFirst)
 
 		TreeViewItem *tvi;
 		tvi = (TreeViewItem *)ti.lParam;
-		if (tvi) {
-			p = tvi->pNote;
-		} else {
-			p = NULL;
+		p = NULL;
+		if (tvi && !tvi->HasMultiItem()) {
+			p = ((TreeViewFileItem *)tvi)->GetNote();
 		}
 
 		hChild = TreeView_GetChild(hTree, hItem);
@@ -391,7 +390,9 @@ LRESULT MemoSelectView::OnNotify(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 			// シングルクリックモード・自動追従モードの場合、2回ロードされることになるが、とりあえずこのまま
 			// Viewの切り替えだけではSelectViewにフォーカスがあたってしまう。なぜ？
-			PostMessage(hWnd, MWM_OPEN_REQUEST, (WPARAM)OPEN_REQUEST_MSVIEW_ACTIVE, (LPARAM)tvi->pNote);
+			if (!tvi->HasMultiItem()) {
+				PostMessage(hWnd, MWM_OPEN_REQUEST, (WPARAM)OPEN_REQUEST_MSVIEW_ACTIVE, (LPARAM)(TreeViewFileItem*)tvi);
+			}
 			// 暗黙でExpand/Collapseが発生
 		}
 		break;
@@ -411,7 +412,7 @@ LRESULT MemoSelectView::OnNotify(HWND hWnd, WPARAM wParam, LPARAM lParam)
 			if (tvi->HasMultiItem()) {
 				ToggleExpandFolder(hItem, it.state & TVIS_EXPANDED);
 			} else {
-				SendMessage(hWnd, MWM_OPEN_REQUEST, (WPARAM)OPEN_REQUEST_MSVIEW_ACTIVE, (LPARAM)tvi->pNote);				
+				SendMessage(hWnd, MWM_OPEN_REQUEST, (WPARAM)OPEN_REQUEST_MSVIEW_ACTIVE, (LPARAM)(TreeViewFileItem*)tvi);
 			}
 		}
 		break;
@@ -419,14 +420,12 @@ LRESULT MemoSelectView::OnNotify(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		{
 			NMTREEVIEW *p = (LPNMTREEVIEW)lParam;
 			TreeViewItem *tvi = (TreeViewItem*)((p->itemOld).lParam);
+
 			MemoNote *pNote;
-
-			if (tvi) {
-				pNote = tvi->pNote;
-			} else {
-				pNote = NULL;
+			pNote = NULL;
+			if (tvi && !tvi->HasMultiItem()) {
+				pNote = ((TreeViewFileItem*)tvi)->GetNote();
 			}
-
 			if (pNote == NULL) return FALSE;
 
 #if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
@@ -471,7 +470,13 @@ LRESULT MemoSelectView::OnNotify(HWND hWnd, WPARAM wParam, LPARAM lParam)
 			if (tvi == NULL) {
 				break;
 			}
-			MemoNote *pNote = tvi->pNote;
+
+			MemoNote *pNote;
+			if (tvi->HasMultiItem()) {
+				pNote = NULL;
+			} else {
+				pNote = ((TreeViewFileItem*)tvi)->GetNote();
+			}
 
 			// メニューの制御
 			pMemoMgr->SelectNote(pNote);
@@ -480,7 +485,9 @@ LRESULT MemoSelectView::OnNotify(HWND hWnd, WPARAM wParam, LPARAM lParam)
 				// ユーザ操作の場合、メモの切り替えを発生させる
 				// プログラムによるものの場合、切り替えは発生させない
 				pMemoMgr->SetMSSearchFlg(TRUE);
-				PostMessage(hWnd, MWM_OPEN_REQUEST, (WPARAM)OPEN_REQUEST_MDVIEW_ACTIVE, (LPARAM)pNote);
+				if (!tvi->HasMultiItem()) {
+					PostMessage(hWnd, MWM_OPEN_REQUEST, (WPARAM)OPEN_REQUEST_MDVIEW_ACTIVE, (LPARAM)(TreeViewFileItem*)tvi);
+				}
 			}
 		}
 		break;
@@ -665,7 +672,7 @@ void MemoSelectView::TreeCollapse(HTREEITEM hItem)
 ///////////////////////////////////////////////////////
 // メモの新規作成に対応してノードを追加する。
 
-BOOL MemoSelectView::NewMemoCreated(MemoNote *pNote, LPCTSTR pHeadLine, HTREEITEM hParent)
+TreeViewFileItem *MemoSelectView::NewMemoCreated(MemoNote *pNote, LPCTSTR pHeadLine, HTREEITEM hParent)
 {
 	TV_INSERTSTRUCT ti;
 	ti.hParent = hParent ? hParent : TVI_ROOT;
@@ -675,15 +682,15 @@ BOOL MemoSelectView::NewMemoCreated(MemoNote *pNote, LPCTSTR pHeadLine, HTREEITE
 	ti.item.pszText = (LPTSTR)pHeadLine;
 	ti.item.iImage = ti.item.iSelectedImage = pNote->GetMemoIcon();
 
-	TreeViewItem *tvi = new TreeViewFileItem();
+	TreeViewFileItem *tvi = new TreeViewFileItem();
 	if (tvi == NULL) return FALSE;
-	tvi->pNote = pNote;
+	tvi->SetNote(pNote);
 	ti.item.lParam = (LPARAM)tvi;
 
 	HTREEITEM hItem = ::InsertNode(hViewWnd, &ti);
 
 	pNote->SetViewItem(hItem);
-	return hItem != NULL;
+	return tvi;
 }
 
 ///////////////////////////////////////////
@@ -763,10 +770,10 @@ BOOL MemoSelectView::DeleteItem(TreeViewItem *p)
 void MemoSelectView::OnActionButton(HWND hWnd)
 {
 	HTREEITEM hItem;
-	MemoNote *pNote = GetNote(GetCurrentItem(&hItem));
-	if (pNote) {
+	TreeViewItem *p = GetCurrentItem(&hItem);
+	if (p && !p->HasMultiItem()) {
 		// メモの場合にはMainFrameに対してオープン要求を出す
-		SendMessage(hWnd, MWM_OPEN_REQUEST, (WPARAM)OPEN_REQUEST_MSVIEW_ACTIVE, (LPARAM)pNote);
+		SendMessage(hWnd, MWM_OPEN_REQUEST, (WPARAM)OPEN_REQUEST_MSVIEW_ACTIVE, (LPARAM)(TreeViewFileItem*)p);
 		return;
 	}
 	
@@ -784,7 +791,11 @@ HTREEITEM MemoSelectView::GetPathForNewItem(TString *pPath)
 	TCHAR buf[MAX_PATH];
 	HTREEITEM hItem = NULL;
 
-	MemoNote *pNote = GetNote(GetCurrentItem(&hItem));
+	TreeViewItem *pItem = GetCurrentItem(&hItem);
+	MemoNote *pNote = NULL;
+	if (pItem && !pItem->HasMultiItem()) {
+		pNote = ((TreeViewFileItem*)pItem)->GetNote();
+	}
 	if (hItem == NULL) {
 		if (!pPath->Alloc(1)) return NULL;
 		_tcscpy(pPath->Get(), TEXT(""));
@@ -859,7 +870,6 @@ static HTREEITEM InsertFolder(HWND hTree, HTREEITEM hParent, LPCTSTR pName)
 	ti.item.iImage = IMG_FOLDER;
 	ti.item.iSelectedImage = IMG_FOLDER;
 	TreeViewFolderItem *tvi = new TreeViewFolderItem();
-	tvi->pNote = NULL;
 	ti.item.lParam = (LPARAM)tvi;
 
 	HTREEITEM hItem = InsertNode(hTree, &ti);
@@ -898,9 +908,9 @@ BOOL MemoSelectView::UpdateHeadLine(MemoNote *pNote, LPCTSTR pHeadLine)
 	ti.item.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE | TVIF_PARAM;
 	ti.item.pszText = (LPTSTR)pHeadLine;
 	ti.item.iImage = ti.item.iSelectedImage = pNote->GetMemoIcon();
-	// TODO: Folderに対応するためにFactory Methodにする必要がありそう
-	TreeViewItem *tvi = new TreeViewFileItem();
-	tvi->pNote = pNote;
+
+	TreeViewFileItem *tvi = new TreeViewFileItem();
+	tvi->SetNote(pNote);
 	ti.item.lParam = (LPARAM)tvi;
 
 	if (IsExpand(hViewWnd, hParent)) {
@@ -1056,12 +1066,12 @@ void MemoSelectView::ToggleExpandFolder(HTREEITEM hItem, UINT status)
 ///////////////////////////////////////////
 // 
 ///////////////////////////////////////////
-
+#ifdef COMMENT
 MemoNote *MemoSelectView::GetNote(TreeViewItem *p) 
 { 
 	return p ? p->pNote : NULL; 
 }
-
+#endif
 /////////////////////////////////////////////
 //  HTREEITEMからTreeViewItem*の取得
 /////////////////////////////////////////////
@@ -1230,7 +1240,9 @@ BOOL MemoSelectView::Search(BOOL bFirstSearch, BOOL bForward)
 	BOOL bResult = SearchItems(hItem, bSearchEncryptMemo, bFileNameOnly, bForward);
 	if (bResult) {
 		TreeView_SelectItem(hViewWnd, hOrigItem);
-		pMemoMgr->GetMainFrame()->SendRequestOpen(pOrigItem->pNote, OPEN_REQUEST_NO_ACTIVATE_VIEW);
+		if (pOrigItem && !pOrigItem->HasMultiItem()) {
+			pMemoMgr->GetMainFrame()->SendRequestOpen((TreeViewFileItem*)pOrigItem, OPEN_REQUEST_NO_ACTIVATE_VIEW);
+		}
 		MessageBox(NULL, MSG_STRING_NOT_FOUND, TOMBO_APP_NAME, MB_OK | MB_ICONINFORMATION);
 	}
 
@@ -1251,7 +1263,6 @@ BOOL MemoSelectView::SearchOneItem(HTREEITEM hItem, BOOL bSearchEncryptedMemo, B
 	if (pItem) {
 		BOOL bMatch;
 		if (bFileNameOnly) {
-			// TODO: TreeViewからラベルを取ってきて検索をかける
 			TCHAR buf[MAX_PATH];
 			TV_ITEM ti;
 			ti.mask = TVIF_TEXT;
@@ -1269,9 +1280,13 @@ BOOL MemoSelectView::SearchOneItem(HTREEITEM hItem, BOOL bSearchEncryptedMemo, B
 #endif
 		} else {
 			// 暗号化メモが対象外の場合、検索しない
-			if (!bSearchEncryptedMemo && pItem->pNote->IsEncrypted()) return TRUE;
+			MemoNote *pNote = NULL;
+			if (pItem && !pItem->HasMultiItem()) {
+				pNote = ((TreeViewFileItem*)pItem)->GetNote();
+			}
+			if (!bSearchEncryptedMemo && pNote->IsEncrypted()) return TRUE;
 
-			char *pMemo = pItem->pNote->GetMemoBodyA(pMemoMgr->GetPasswordManager());
+			char *pMemo = pNote->GetMemoBodyA(pMemoMgr->GetPasswordManager());
 			if (pMemo == NULL) return TRUE;
 
 			bMatch = pMemoMgr->GetSearchEngine()->SearchForward(pMemo, 0, FALSE);
@@ -1280,7 +1295,9 @@ BOOL MemoSelectView::SearchOneItem(HTREEITEM hItem, BOOL bSearchEncryptedMemo, B
 
 		// ヒットしたら検索を打ち切る
 		if (bMatch) {
-			pMemoMgr->GetMainFrame()->SendRequestOpen(pItem->pNote, OPEN_REQUEST_MSVIEW_ACTIVE);
+			if (pItem && !pItem->HasMultiItem()) {
+				pMemoMgr->GetMainFrame()->SendRequestOpen((TreeViewFileItem*)pItem, OPEN_REQUEST_MSVIEW_ACTIVE);
+			}
 			if (!bFileNameOnly) pMemoMgr->SearchDetailsView(TRUE, TRUE, TRUE, TRUE);
 			return FALSE;
 		}

@@ -508,10 +508,27 @@ TOMBO 1.2 beta 1
 * #648 Add "Find" Button on toolbar(Win32/HPC/BE300/BE500/PocketPC)
   Because there are no space, BE-[35]00/PocketPC are place select view only.
 
+■ B067 2002/10/13
+
+PG: Add virtual folder Icon.
+PG: MainFrame::RequestOpenMemo's parameter changed: MemoNote to TreeViewFileItem.
+PG: lParam changed on message MWM_OPEN_REQUEST: MemoNote to TreeViewFileItem.
+PG: Change links MemoManager to MemoNote: Memomanager not points MemoNote but points TreeViewItem now.
+
+■
+
 TODO: 
+
+●TreeViewItem::GetViewItem, TreeViewItem::SetViewItemをTreeViewFileItem, TreeViewFolderItemから統一する
+	●MemoNoteからhItemを切り離す
+		○MemoSelectView::SelectNoteの引数をどーにかする→ 使用されていなかった...
+		●MemoSelectView::UpdateHeadLine引数をどーにかする
+		○MemoSelectView::GetHeadLineの引数をどーにかする → 使用されておらず...
+
+フォルダかどうかの判定をpMemoNoteがNULLかどうかでチェックしている部分の洗い出し・修正
 MemoInfoについてMemoManager管理からMemoNote管理になるように修正する
 ツリーオープン時のノードの列挙をMemoSelectViewからTreeViewItemに移動
-フォルダかどうかの判定をpMemoNoteがNULLかどうかでチェックしている部分の洗い出し・修正
+OpenRequestをMemoSelectViewからTreeViewItemに移動
 MemoManager::MakeNewFolderをどーにかする
-メニューから名前の変更を呼び出せるようにする
+
 OK/CANCELボタンをCE標準のものにする

@@ -293,7 +293,7 @@ static LRESULT CALLBACK MainFrameWndProc(HWND hWnd, UINT nMessage, WPARAM wParam
 		if (bRes != 0xFFFFFFFF) return bRes;
 		break;
 	case MWM_OPEN_REQUEST:
-		frm->RequestOpenMemo((MemoNote*)lParam, (BOOL)wParam);
+		frm->RequestOpenMemo((TreeViewFileItem*)lParam, (BOOL)wParam);
 		return 0;
 	case WM_SETFOCUS:
 		frm->SetFocus();
@@ -1420,14 +1420,14 @@ void MainFrame::OnList(BOOL bAskSave)
 		// 2Paneの場合、暗号化されたメモのみクリアする
 		if (nYNC == IDNO) {
 			// メモを破棄し、旧メモをリロード
-			RequestOpenMemo(mmMemoManager.CurrentNote(), OPEN_REQUEST_MDVIEW_ACTIVE);
+			RequestOpenMemo(mmMemoManager.CurrentItem(), OPEN_REQUEST_MDVIEW_ACTIVE);
 		} else {
 			MemoNote *pCurrent = mmMemoManager.CurrentNote();
 			if (pCurrent && pCurrent->IsEncrypted()) {
 				mmMemoManager.NewMemo();
 			} else {
 #if defined(PLATFORM_HPC)
-				RequestOpenMemo(mmMemoManager.CurrentNote(), OPEN_REQUEST_MDVIEW_ACTIVE);
+				RequestOpenMemo(mmMemoManager.CurrentItem(), OPEN_REQUEST_MDVIEW_ACTIVE);
 #endif
 			}
 		}
@@ -1460,15 +1460,17 @@ void MainFrame::About()
 ///////////////////////////////////////////////////
 // bSwitchViewがTRUEの場合には詳細ビューに切り替える
 
-void MainFrame::RequestOpenMemo(MemoNote *pNote, DWORD nSwitchView)
+void MainFrame::RequestOpenMemo(TreeViewFileItem *pItem, DWORD nSwitchView)
 {
+	MemoNote *pNote = pItem->GetNote();
+
 	if (pNote == NULL) return; // フォルダの場合
 	if (((nSwitchView & OPEN_REQUEST_MSVIEW_ACTIVE) == 0) && (pNote->IsEncrypted() && !pmPasswordMgr.IsRememberPassword())) {
 		// bSwitchViewがFALSEで、メモを開くためにパスワードを問い合わせる必要がある場合には
 		// メモは開かない
 		return;
 	}
-	mmMemoManager.SetMemo(pNote);
+	mmMemoManager.SetMemo(pItem);
 
 #if defined(PLATFORM_WIN32) || defined(PLATFORM_PKTPC)
 	LPCTSTR pPath = pNote->MemoPath();
@@ -1544,7 +1546,12 @@ void MainFrame::ActivateView(BOOL bList)
 		mdView.Show(SW_SHOW);
 		msView.Show(SW_SHOW);
 
-		mmMemoManager.SelectNote(msView.GetNote(msView.GetCurrentItem()));
+		TreeViewItem *pItem = msView.GetCurrentItem();
+		MemoNote *pNote = NULL;
+		if (pItem && !pItem->HasMultiItem()) {
+			pNote = ((TreeViewFileItem*)pItem)->GetNote();
+		}
+		mmMemoManager.SelectNote(pNote);
 	} else {
 		// CE版(& CEデバグ版 on Win32) ではビューの切り替えを行う
 		// ビューの表示・非表示の切り替え

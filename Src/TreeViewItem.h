@@ -15,7 +15,6 @@ public:
 	TreeViewItem(BOOL bMultiItem);
 	virtual ~TreeViewItem();
 
-	MemoNote *pNote;
 
 	virtual HTREEITEM GetViewItem() = 0;
 	virtual void SetViewItem(HTREEITEM h) = 0;
@@ -58,6 +57,8 @@ public:
 /////////////////////////////////////////////
 class TreeViewFileItem : public TreeViewItem {
 protected:
+	MemoNote *pNote;
+
 	BOOL DeleteWithoutAsk(MemoManager *pMgr, MemoSelectView *pView);
 public:
 	TreeViewFileItem();
@@ -76,6 +77,8 @@ public:
 
 	DWORD ItemOrder();
 
+	void SetNote(MemoNote *p) { pNote = p; }
+	MemoNote *GetNote() { return pNote; }
 };
 
 /////////////////////////////////////////////
