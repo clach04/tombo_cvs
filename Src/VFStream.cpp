@@ -1,8 +1,11 @@
 #include <windows.h>
 #include <tchar.h>
+#if defined(PLATFORM_WIN32)
 #include <wchar.h>
+#endif
 #include <commctrl.h>
 #include "Tombo.h"
+#include "Message.h"
 #include "UniConv.h"
 #include "TString.h"
 #include "File.h"
@@ -13,6 +16,10 @@
 #include "VFStream.h"
 #include "SearchEngine.h"
 #include "VarBuffer.h"
+
+#include "resource.h"
+#include "DialogTemplate.h"
+#include "FilterAddDlg.h"
 
 #define STORE_INIT_SIZE 100
 #define STORE_EXTEND_DELTA 50
@@ -237,11 +244,38 @@ BOOL VFDirectoryGenerator::GenerateXMLCloseTag(File *pFile)
 	return pNext->GenerateXMLCloseTag(pFile);
 }
 
+
+LPCTSTR VFDirectoryGenerator::GetFilterType()
+{
+	return NULL;
+}
+
+BOOL VFDirectoryGenerator::ToString(TString *p)
+{
+	return FALSE;
+}
+
+BOOL VFDirectoryGenerator::SetDirPath(LPCTSTR pPath)
+{
+	LPTSTR p = StringDup(pPath);
+	if (p == NULL) return FALSE;
+
+	delete[] pDirPath;
+	pDirPath = p;
+
+	return TRUE;
+}
+
+BOOL VFDirectoryGenerator::UpdateParamWithDialog(HINSTANCE hInst, HWND hParent)
+{
+	return FALSE;
+}
+
 ////////////////////////////////////
 // VFStore implimentation
 ////////////////////////////////////
 
-VFStore::VFStore(enum OrderInfo odr) : oiOrder(odr)
+VFStore::VFStore()
 {
 }
 
@@ -287,7 +321,7 @@ void VFStore::FreeArray()
 
 VFStream *VFStore::Clone(VFStore **ppTail)
 {
-	VFStore *p = new VFStore(oiOrder);
+	VFStore *p = new VFStore();
 	if (!p || !p->Init()) return NULL;
 	*ppTail = p;
 	return p;
@@ -303,11 +337,26 @@ BOOL VFStore::GenerateXMLCloseTag(File *pFile)
 	return TRUE;
 }
 
+LPCTSTR VFStore::GetFilterType()
+{
+	return NULL;
+}
+
+BOOL VFStore::ToString(TString *p)
+{
+	return FALSE;
+}
+
+BOOL VFStore::UpdateParamWithDialog(HINSTANCE hInst, HWND hParent)
+{
+	return FALSE;
+}
+
 ////////////////////////////////////
 //  VFRegexFilter
 ////////////////////////////////////
 
-VFRegexFilter::VFRegexFilter() : pRegex(NULL)
+VFRegexFilter::VFRegexFilter() : pRegex(NULL), pPassMgr(NULL)
 {
 }
 
@@ -316,13 +365,19 @@ VFRegexFilter::~VFRegexFilter()
 	delete pRegex;
 }
 
-BOOL VFRegexFilter::Init(LPCTSTR pPat, BOOL bCase, BOOL bEnc, BOOL bFileName, BOOL bNeg, PasswordManager *pPassMgr)
+BOOL VFRegexFilter::Init(LPCTSTR pPat, BOOL bCase, BOOL bEnc, BOOL bFileName, BOOL bNeg, PasswordManager *pPMgr)
 {
 	pPattern = new TString();
 	if (!pPattern) {
 		SetLastError(ERROR_NOT_ENOUGH_MEMORY);
 		return FALSE;
 	}
+	pPassMgr = pPMgr;
+	return Reset(pPat, bCase, bEnc, bFileName, bNeg);
+}
+
+BOOL VFRegexFilter::Reset(LPCTSTR pPat, BOOL bCase, BOOL bEnc, BOOL bFileName, BOOL bNeg)
+{
 	if (!pPattern->Set(pPat)) return FALSE;
 
 	bCaseSensitive = bCase;
@@ -416,6 +471,29 @@ BOOL VFRegexFilter::GenerateXMLCloseTag(File *pFile)
 	return TRUE;
 }
 
+LPCTSTR VFRegexFilter::GetFilterType()
+{
+	return MSG_STREAM_NAME_REGEXP;
+}
+
+BOOL VFRegexFilter::ToString(TString *p)
+{
+	return p->Set(pPattern->Get());
+}
+
+BOOL VFRegexFilter::UpdateParamWithDialog(HINSTANCE hInst, HWND hParent)
+{
+	RegexFilterAddDlg ad;
+	if (!ad.Init(pPattern->Get(), bCaseSensitive, FALSE, bFileNameOnly, bNegate)) return FALSE;
+	if (ad.Popup(hInst, hParent) == IDOK) {
+		Reset(ad.GetMatchString()->Get(), 
+				ad.IsCaseSensitive(), ad.IsCheckEncrypt(),
+				ad.IsCheckFileName(), ad.IsNegate());
+		return TRUE;
+	}
+	return FALSE;
+}
+
 ////////////////////////////////////
 //  VFLimitFilter
 ////////////////////////////////////
@@ -486,6 +564,29 @@ BOOL VFLimitFilter::GenerateXMLCloseTag(File *pFile)
 	return TRUE;
 }
 
+LPCTSTR VFLimitFilter::GetFilterType()
+{
+	return MSG_STREAM_NAME_LIMIT;
+}
+
+BOOL VFLimitFilter::ToString(TString *p)
+{
+	if (!p->Alloc(_tcslen(MSG_STREAM_VALUE_LIMIT) + 10)) return FALSE;
+	wsprintf(p->Get(), MSG_STREAM_VALUE_LIMIT, nLimit);
+	return TRUE;
+}
+
+BOOL VFLimitFilter::UpdateParamWithDialog(HINSTANCE hInst, HWND hParent)
+{
+	LimitFilterAddDlg ad;
+	if (!ad.Init(nLimit)) return FALSE;
+	if (ad.Popup(hInst, hParent) == IDOK) {
+		nLimit = ad.GetLimit();
+		return TRUE;
+	}
+	return FALSE;
+}
+
 ////////////////////////////////////
 //  VFTimestampFilter
 ////////////////////////////////////
@@ -498,7 +599,7 @@ VFTimestampFilter::~VFTimestampFilter()
 {
 }
 
-BOOL VFTimestampFilter::Init(DWORD nDelta, BOOL bNew)
+BOOL VFTimestampFilter::Reset(DWORD nDelta, BOOL bNew)
 {
 	SYSTEMTIME st;
 	GetLocalTime(&st);
@@ -533,6 +634,7 @@ VFStream *VFTimestampFilter::Clone(VFStore **ppTail)
 
 	p->bNewer = bNewer;
 	p->uBase = uBase;
+	p->nDeltaDays = nDeltaDays;
 	p->pNext = pNext->Clone(ppTail);
 	if (!p || p->pNext == NULL) {
 		delete p;
@@ -566,6 +668,34 @@ BOOL VFTimestampFilter::GenerateXMLCloseTag(File *pFile)
 	if (!pFile->WriteUnicodeString(L"</timestamp>\n")) return FALSE;
 	if (!pNext->GenerateXMLCloseTag(pFile)) return FALSE;
 	return TRUE;
+}
+
+LPCTSTR VFTimestampFilter::GetFilterType()
+{
+	return MSG_STREAM_NAME_TIMESTAMP;
+}
+
+BOOL VFTimestampFilter::ToString(TString *p)
+{
+	LPCTSTR pTmpl;
+	if (bNewer) {
+		pTmpl = MSG_STREAM_VALUE_TIMESTAMP_NEWER;
+	} else {
+		pTmpl = MSG_STREAM_VALUE_TIMESTAMP_OLDER;
+	}
+	if (!p->Alloc(_tcslen(pTmpl) + 10)) return FALSE;
+	wsprintf(p->Get(), pTmpl, nDeltaDays);
+	return TRUE;
+}
+
+BOOL VFTimestampFilter::UpdateParamWithDialog(HINSTANCE hInst, HWND hParent)
+{
+	TimestampFilterAddDlg ad;
+	if (!ad.Init(nDeltaDays, bNewer)) return FALSE;
+	if (ad.Popup(hInst, hParent) == IDOK) {
+		return Reset(ad.GetDeltaDay(), ad.IsNewer());
+	}
+	return FALSE;
 }
 
 ////////////////////////////////////
@@ -710,4 +840,43 @@ BOOL VFSortFilter::GenerateXMLCloseTag(File *pFile)
 	if (!pFile->WriteUnicodeString(L"</sort>\n")) return FALSE;
 	if (!pNext->GenerateXMLCloseTag(pFile)) return FALSE;
 	return TRUE;
+}
+
+LPCTSTR VFSortFilter::GetFilterType()
+{
+	return MSG_STREAM_NAME_SORT;
+}
+
+BOOL VFSortFilter::ToString(TString *p)
+{
+	LPCTSTR pTmpl;
+	switch(sfType) {
+	case SortFunc_FileNameAsc:
+		pTmpl = MSG_STREAM_VALUE_SORT_FNAME_ASC;
+		break;
+	case SortFunc_FileNameDsc:
+		pTmpl = MSG_STREAM_VALUE_SORT_FNAME_DSC;
+		break;
+	case SortFunc_LastUpdateAsc:
+		pTmpl = MSG_STREAM_VALUE_SORT_LASTUPD_ASC;
+		break;
+	case SortFunc_LastUpdateDsc:
+		pTmpl = MSG_STREAM_VALUE_SORT_LASTUPD_DSC;
+		break;
+	default:
+		SetLastError(ERROR_INVALID_DATA);
+		return FALSE;
+	}
+	return p->Set(pTmpl);
+}
+
+BOOL VFSortFilter::UpdateParamWithDialog(HINSTANCE hInst, HWND hParent)
+{
+	SortFilterAddDlg ad;
+	if (!ad.Init(sfType)) return FALSE;
+	if (ad.Popup(hInst, hParent) == IDOK) {
+		sfType = ad.GetType();
+		return TRUE;
+	}
+	return FALSE;
 }

@@ -15,6 +15,7 @@ public:
 
 	void Release();
 	BOOL WriteXML(File *p);
+	VFInfo *Clone();
 
 	LPTSTR pName;
 	BOOL bPersist;
@@ -66,6 +67,9 @@ public:
 	// Update folders
 	BOOL UpdateVirtualFolders(VFInfo **ppInfo, DWORD nNumFolders);
 
+	/////////////////////////////////
+
+	LPTSTR GetNodeName();
 };
 
 #endif

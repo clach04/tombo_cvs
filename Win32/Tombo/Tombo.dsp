@@ -141,6 +141,10 @@ SOURCE=..\..\Src\DetailsViewWndProc.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\Src\DialogTemplate.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\Src\DirectoryScanner.cpp
 # End Source File
 # Begin Source File
@@ -161,7 +165,15 @@ SOURCE=..\..\Src\FileSelector.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\Src\FilterAddDlg.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\Src\FilterCtlDlg.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\FilterDefDlg.cpp
 # End Source File
 # Begin Source File
 
@@ -345,6 +357,10 @@ SOURCE=..\..\Src\CryptManager.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\Src\DialogTemplate.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\Src\DirectoryScanner.h
 # End Source File
 # Begin Source File
@@ -369,7 +385,15 @@ SOURCE=..\..\Src\FileSelector.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\Src\FilterAddDlg.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\Src\FilterCtlDlg.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\FilterDefDlg.h
 # End Source File
 # Begin Source File
 

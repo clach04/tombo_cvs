@@ -66,7 +66,7 @@ const VFInfo *VFManager::GetGrepVFInfo(LPCTSTR pPath, LPCTSTR pRegex,
 
 	// Create template stream
 	VFDirectoryGenerator *pGen = new VFDirectoryGenerator();
-	VFStore *pStore = new VFStore(VFStore::ORDER_TITLE);
+	VFStore *pStore = new VFStore();
 	VFRegexFilter *pFilter = new VFRegexFilter();
 	if (!pGen || !pStore || !pFilter) {
 		SetLastError(ERROR_NOT_ENOUGH_MEMORY);
@@ -89,13 +89,8 @@ const VFInfo *VFManager::GetGrepVFInfo(LPCTSTR pPath, LPCTSTR pRegex,
 	vInfo.pGenerator = pGen;
 	vInfo.pStore = pStore;
 
-	// Name to this virtualfolder.
-	vInfo.pName = new TCHAR[_tcslen(MSG_GREP_NONAME_LABEL) + 10];
-	if (vInfo.pName == NULL) {
-		SetLastError(ERROR_NOT_ENOUGH_MEMORY);
-		return NULL;
-	}
-	wsprintf(vInfo.pName, TEXT("%s%03d"), MSG_GREP_NONAME_LABEL, ++nGrepCount);
+	vInfo.pName = GetNodeName();
+	if (vInfo.pName == NULL) return NULL;
 
 	// Regist data
 	if (!vbInfo.Add(&vInfo)) return FALSE;
@@ -199,6 +194,22 @@ BOOL VFManager::UpdateVirtualFolders(VFInfo **ppInfo, DWORD nNumFolders)
 }
 
 /////////////////////////////////////////////
+//  Assign name to node
+/////////////////////////////////////////////
+
+LPTSTR VFManager::GetNodeName()
+{
+	LPTSTR pName;
+	pName = new TCHAR[_tcslen(MSG_GREP_NONAME_LABEL) + 10];
+	if (pName == NULL) {
+		SetLastError(ERROR_NOT_ENOUGH_MEMORY);
+		return NULL;
+	}
+	wsprintf(pName, TEXT("%s%03d"), MSG_GREP_NONAME_LABEL, ++nGrepCount);
+	return pName;
+}
+
+/////////////////////////////////////////////
 //  VirtualFolderEnumListener implimentation
 /////////////////////////////////////////////
 
@@ -243,3 +254,26 @@ BOOL VFInfo::WriteXML(File *p)
 	if (!p->WriteUnicodeString(L"</vfolder>\n")) return FALSE;
 	return TRUE;
 }
+
+/////////////////////////////////////////////
+//  Clone VFInfo
+/////////////////////////////////////////////
+
+VFInfo *VFInfo::Clone()
+{
+	VFInfo *pNew = new VFInfo();
+	if (pNew == NULL) return NULL;
+
+	pNew->pGenerator = (VFDirectoryGenerator*)pGenerator->Clone(&(pNew->pStore));
+	if (pNew->pGenerator == NULL) return NULL;
+
+	pNew->bPersist = bPersist;
+	pNew->pName = StringDup(pName);
+	if (pNew->pName == NULL) {
+		pNew->Release();
+		delete pNew;
+		return NULL;
+	}
+	return pNew;
+}
+

@@ -279,7 +279,7 @@ BOOL TSVFolderTag::EndElement(ParseInfo *p)
 	if (pHead == NULL || pTail == NULL) return FALSE;
 
 	// add VFStore
-	VFStore *pStore = new VFStore(VFStore::ORDER_TITLE);
+	VFStore *pStore = new VFStore();
 	if (!pStore || !pStore->Init()) {
 		delete pStore;
 		return FALSE;

@@ -1411,3 +1411,10 @@ TreeViewVirtualFolderRoot *MemoSelectView::GetVirtualFolderRoot()
 	}
 	return (TreeViewVirtualFolderRoot*)GetTVItem(hSearchRoot);
 }
+
+void MemoSelectView::CloseVFRoot()
+{
+	if (IsExpand(hSearchRoot)) {
+		TreeCollapse(hSearchRoot);
+	}
+}

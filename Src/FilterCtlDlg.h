@@ -21,14 +21,15 @@ public:
 
 	BOOL OnOK(HWND hDlg);
 	BOOL OnNotify(HWND hDlg, WPARAM wParam, LPARAM lParam);
-	void OnToggleKeep(HWND hDlg);
 
-	BOOL OnUp(HWND hDlg);
-	BOOL OnDown(HWND hDlg);
+	BOOL Command_UpDown(HWND hDlg, int delta);
+	void Command_ToggleKeep(HWND hDlg);
+	void Command_New(HWND hDlg);
 
 	BOOL Notify_ItemChanged(HWND hDlg, LPARAM lParam);
 	BOOL Notify_EndLabelEdit(HWND hDlg, LPARAM lParam);
 	BOOL Notify_Keydown(HWND hDlg, LPARAM lParam);
+	BOOL Notify_DblClick(HWND hDlg, LPARAM lParam);
 };
 
 #endif

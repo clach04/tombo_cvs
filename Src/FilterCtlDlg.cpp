@@ -3,6 +3,7 @@
 #include <tchar.h>
 
 #include "resource.h"
+#include "Tombo.h"
 #include "Message.h"
 #include "TString.h"
 #include "UniConv.h"
@@ -10,6 +11,10 @@
 #include "MemoSelectView.h"
 #include "FilterCtlDlg.h"
 #include "VFManager.h"
+#include "VFStream.h"
+#include "FilterDefDlg.h"
+
+extern HINSTANCE g_hInstance;
 
 static LRESULT CALLBACK FilterCtlDlgProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 
@@ -67,12 +72,12 @@ BOOL FilterAddListener::ProcessStream(LPCTSTR pName, BOOL bPersist, VFDirectoryG
 	pItem->pszText = (LPTSTR)pName;
 	pItem->lParam = (LPARAM)pInfo;
 	if (bPersist) {
-		pItem->iImage = 8;
+		pItem->iImage = VFOLDER_IMAGE_PERSIST;
 	} else {
 		if (nNKPos == 0xFFFFFFFF) {
 			nNKPos = nCount - 1;
 		}
-		pItem->iImage = 6;
+		pItem->iImage = VFOLDER_IMAGE_TEMP;
 	}
 	ListView_InsertItem(hListView, pItem);
 	return TRUE;
@@ -182,7 +187,7 @@ BOOL FilterCtlDlg::OnOK(HWND hDlg)
 // "Save" checkbox
 /////////////////////////////////////////
 
-void FilterCtlDlg::OnToggleKeep(HWND hDlg)
+void FilterCtlDlg::Command_ToggleKeep(HWND hDlg)
 {
 	HWND hList = GetDlgItem(hDlg, IDC_FILTERCTL_LIST);
 	HWND hSave = GetDlgItem(hDlg, IDC_FILTERCTL_KEEP);
@@ -219,14 +224,15 @@ void FilterCtlDlg::OnToggleKeep(HWND hDlg)
 }
 
 /////////////////////////////////////////
-// "Up" button
+// "Up"/"Down" button
 /////////////////////////////////////////
-BOOL FilterCtlDlg::OnUp(HWND hDlg)
+
+BOOL FilterCtlDlg::Command_UpDown(HWND hDlg, int delta)
 {
 	HWND hList = GetDlgItem(hDlg, IDC_FILTERCTL_LIST);
 	int iSel = ListView_GetNextItem(hList, -1, LVNI_SELECTED);
 
-	if (iSel <= 0) return TRUE;
+	if (iSel < 0) return TRUE;
 
 	LVITEM li;
 	li.mask = LVIF_STATE | LVIF_IMAGE | LVIF_PARAM;
@@ -238,7 +244,7 @@ BOOL FilterCtlDlg::OnUp(HWND hDlg)
 
 	ListView_DeleteItem(hList, iSel);
 
-	li.iItem = iSel - 1;
+	li.iItem = iSel + delta;
 	li.mask |= LVIF_TEXT;
 	li.pszText = pInfo->pName;
 	li.cchTextMax = _tcslen(pInfo->pName);
@@ -250,32 +256,65 @@ BOOL FilterCtlDlg::OnUp(HWND hDlg)
 }
 
 /////////////////////////////////////////
-// "Down" button
+// "New" button
 /////////////////////////////////////////
-BOOL FilterCtlDlg::OnDown(HWND hDlg)
+
+void FilterCtlDlg::Command_New(HWND hDlg)
 {
-	HWND hList = GetDlgItem(hDlg, IDC_FILTERCTL_LIST);
-	int iSel = ListView_GetNextItem(hList, -1, LVNI_SELECTED);
+	// Create empty VFInfo
+	VFInfo *pInfo = new VFInfo();
+	LPTSTR pEmpty;
+	if (!pInfo ||
+		!(pEmpty = StringDup("")) ||
+		!(pInfo->pGenerator = new VFDirectoryGenerator()) ||
+		!pInfo->pGenerator->Init(pEmpty, FALSE) ||
+		!(pInfo->pStore = new VFStore()) ||
+		!pInfo->pStore->Init()) {
+		MessageBox(hDlg, MSG_NOT_ENOUGH_MEMORY, TOMBO_APP_NAME, MB_OK | MB_ICONERROR);
+		if (pInfo) {
+			delete pInfo->pGenerator;
+			delete pInfo->pStore;
 
-	LVITEM li;
-	li.mask = LVIF_STATE | LVIF_IMAGE | LVIF_PARAM;
-	li.iItem = iSel;
-	li.iSubItem = 0;
-	ListView_GetItem(hList, &li);
+		}
+		delete pInfo;
+		return;
+	}
+	pInfo->pGenerator->SetNext(pInfo->pStore);
 
-	VFInfo *pInfo = (VFInfo*)li.lParam;
+	// Popup dialog
+	FilterDefDlg fd;
+	fd.Init();
+	if (fd.Popup(g_hInstance, hDlg, pInfo, TRUE) == IDOK) {
+		// Assign name to virtual folder
+		pInfo->pName = pManager->GetNodeName();
+		if (pInfo->pName == NULL) {
+			MessageBox(hDlg, MSG_NOT_ENOUGH_MEMORY, TOMBO_APP_NAME, MB_OK | MB_ICONERROR);
+			pInfo->Release();
+			delete pInfo;
+			return;
+		}
+		pInfo->bPersist = TRUE;
 
-	ListView_DeleteItem(hList, iSel);
+		// Insert to list
+		HWND hList = GetDlgItem(hDlg, IDC_FILTERCTL_LIST);
+		LVITEM li;
+		li.mask = LVIF_STATE | LVIF_TEXT | LVIF_PARAM | LVIF_IMAGE;
+		li.iItem = ListView_GetItemCount(hList);
+		li.iSubItem = 0;
+		li.state = 	LVIS_FOCUSED | LVIS_SELECTED;
+		li.pszText = pInfo->pName;
+		li.cchTextMax = _tcslen(pInfo->pName);
+		li.lParam = (LPARAM)pInfo;
+		li.iImage = VFOLDER_IMAGE_PERSIST;
 
-	li.iItem = iSel + 1;
-	li.mask |= LVIF_TEXT;
-	li.pszText = pInfo->pName;
-	li.cchTextMax = _tcslen(pInfo->pName);
-	li.state = 	LVIS_FOCUSED | LVIS_SELECTED;
-	ListView_InsertItem(hList, &li);
+		int idx = ListView_InsertItem(hList, &li);
+		BOOL bX = ListView_EnsureVisible(hList, idx, TRUE);
 
-	SetFocus(hList);
-	return TRUE;
+	} else {
+		pInfo->Release();
+		delete pInfo;
+	}
+
 }
 
 /////////////////////////////////////////
@@ -293,6 +332,9 @@ BOOL FilterCtlDlg::OnNotify(HWND hDlg, WPARAM wParam, LPARAM lParam)
 	}
 	if (pHdr->code == LVN_KEYDOWN) {
 		return Notify_Keydown(hDlg, lParam);
+	}
+	if (pHdr->code == NM_DBLCLK) {
+		return Notify_DblClick(hDlg, lParam);
 	}
 	return TRUE;
 }
@@ -369,6 +411,45 @@ BOOL FilterCtlDlg::Notify_Keydown(HWND hDlg, LPARAM lParam)
 }
 
 /////////////////////////////////////////
+// NMDBLCLK
+/////////////////////////////////////////
+
+BOOL FilterCtlDlg::Notify_DblClick(HWND hDlg, LPARAM lParam)
+{
+	NMLISTVIEW* pLv = (NMLISTVIEW*)lParam;
+	HWND hList = GetDlgItem(hDlg, IDC_FILTERCTL_LIST);
+
+	// get base info
+	int iSel = ListView_GetNextItem(hList, -1, LVNI_SELECTED);
+	if (iSel < 0 ) return TRUE;
+	LVITEM li;
+	li.mask = LVIF_PARAM;
+	li.iItem = iSel;
+	li.iSubItem = 0;
+	ListView_GetItem(hList, &li);
+	VFInfo *pInfoMaster = (VFInfo*)li.lParam;
+
+	// copy VFInfo for update
+	VFInfo *pInfoUpd = pInfoMaster->Clone();	
+	if (pInfoUpd == NULL) return FALSE;
+	// popup dialog
+	FilterDefDlg fd;
+	fd.Init();
+	if (fd.Popup(g_hInstance, hDlg, pInfoUpd, FALSE) == IDOK) {
+		li.lParam = (LPARAM)pInfoUpd;
+		ListView_SetItem(hList, &li);
+
+		pInfoMaster->Release();
+		delete pInfoMaster;
+
+	} else {
+		pInfoUpd->Release();
+		delete pInfoUpd;
+	}
+	return TRUE;
+}
+
+/////////////////////////////////////////
 // Dialog procedure
 /////////////////////////////////////////
 
@@ -397,13 +478,16 @@ static LRESULT CALLBACK FilterCtlDlgProc(HWND hDlg, UINT nMessage, WPARAM wParam
 			pDlg->DestroyDialog(hDlg, IDCANCEL);
 			break;
 		case IDC_FILTERCTL_KEEP:
-			pDlg->OnToggleKeep(hDlg);
+			pDlg->Command_ToggleKeep(hDlg);
 			break;
 		case IDC_FILTERCTL_UP:
-			pDlg->OnUp(hDlg);
+			pDlg->Command_UpDown(hDlg, -1);
 			break;
 		case IDC_FILTERCTL_DOWN:
-			pDlg->OnDown(hDlg);
+			pDlg->Command_UpDown(hDlg, 1);
+			break;
+		case IDC_FILTERCTL_NEW:
+			pDlg->Command_New(hDlg);
 			break;
 		}
 		return TRUE;

@@ -662,6 +662,61 @@ DEP_CPP_DETAI=\
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\Src\DialogTemplate.cpp
+
+!IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
+
+DEP_CPP_DIALO=\
+	"..\..\Src\DialogTemplate.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
+
+DEP_CPP_DIALO=\
+	"..\..\Src\DialogTemplate.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Release"
+
+DEP_CPP_DIALO=\
+	"..\..\Src\DialogTemplate.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Debug"
+
+DEP_CPP_DIALO=\
+	"..\..\Src\DialogTemplate.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Release"
+
+DEP_CPP_DIALO=\
+	"..\..\Src\DialogTemplate.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Debug"
+
+DEP_CPP_DIALO=\
+	"..\..\Src\DialogTemplate.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Release"
+
+DEP_CPP_DIALO=\
+	"..\..\Src\DialogTemplate.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Debug"
+
+DEP_CPP_DIALO=\
+	"..\..\Src\DialogTemplate.h"\
+	
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\Src\DirectoryScanner.cpp
 
 !IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
@@ -922,31 +977,36 @@ DEP_CPP_FILES=\
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\Src\FilterCtlDlg.cpp
+SOURCE=..\..\Src\FilterAddDlg.cpp
 
 !IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
 
 DEP_CPP_FILTE=\
-	"..\..\Src\FilterCtlDlg.h"\
-	"..\..\Src\MemoManager.h"\
-	"..\..\Src\MemoSelectView.h"\
+	"..\..\Src\DialogTemplate.h"\
+	"..\..\Src\File.h"\
+	"..\..\Src\FilterAddDlg.h"\
+	"..\..\Src\Logger.h"\
 	"..\..\Src\Message.h"\
-	"..\..\Src\TreeViewItem.h"\
+	"..\..\Src\Property.h"\
+	"..\..\Src\Tombo.h"\
 	"..\..\Src\TString.h"\
 	"..\..\Src\VarBuffer.h"\
-	"..\..\Src\VFManager.h"\
+	"..\..\Src\VFStream.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
 
 DEP_CPP_FILTE=\
-	"..\..\Src\FilterCtlDlg.h"\
-	"..\..\Src\MemoManager.h"\
-	"..\..\Src\MemoSelectView.h"\
+	"..\..\Src\DialogTemplate.h"\
+	"..\..\Src\File.h"\
+	"..\..\Src\FilterAddDlg.h"\
+	"..\..\Src\Logger.h"\
 	"..\..\Src\Message.h"\
-	"..\..\Src\TreeViewItem.h"\
+	"..\..\Src\Property.h"\
+	"..\..\Src\Tombo.h"\
 	"..\..\Src\TString.h"\
 	"..\..\Src\VarBuffer.h"\
+	"..\..\Src\VFStream.h"\
 	
 NODEP_CPP_FILTE=\
 	"..\..\Src\resource.h"\
@@ -955,13 +1015,16 @@ NODEP_CPP_FILTE=\
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Release"
 
 DEP_CPP_FILTE=\
-	"..\..\Src\FilterCtlDlg.h"\
-	"..\..\Src\MemoManager.h"\
-	"..\..\Src\MemoSelectView.h"\
+	"..\..\Src\DialogTemplate.h"\
+	"..\..\Src\File.h"\
+	"..\..\Src\FilterAddDlg.h"\
+	"..\..\Src\Logger.h"\
 	"..\..\Src\Message.h"\
-	"..\..\Src\TreeViewItem.h"\
+	"..\..\Src\Property.h"\
+	"..\..\Src\Tombo.h"\
 	"..\..\Src\TString.h"\
 	"..\..\Src\VarBuffer.h"\
+	"..\..\Src\VFStream.h"\
 	
 NODEP_CPP_FILTE=\
 	"..\..\Src\resource.h"\
@@ -970,13 +1033,16 @@ NODEP_CPP_FILTE=\
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Debug"
 
 DEP_CPP_FILTE=\
-	"..\..\Src\FilterCtlDlg.h"\
-	"..\..\Src\MemoManager.h"\
-	"..\..\Src\MemoSelectView.h"\
+	"..\..\Src\DialogTemplate.h"\
+	"..\..\Src\File.h"\
+	"..\..\Src\FilterAddDlg.h"\
+	"..\..\Src\Logger.h"\
 	"..\..\Src\Message.h"\
-	"..\..\Src\TreeViewItem.h"\
+	"..\..\Src\Property.h"\
+	"..\..\Src\Tombo.h"\
 	"..\..\Src\TString.h"\
 	"..\..\Src\VarBuffer.h"\
+	"..\..\Src\VFStream.h"\
 	
 NODEP_CPP_FILTE=\
 	"..\..\Src\resource.h"\
@@ -985,13 +1051,16 @@ NODEP_CPP_FILTE=\
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Release"
 
 DEP_CPP_FILTE=\
-	"..\..\Src\FilterCtlDlg.h"\
-	"..\..\Src\MemoManager.h"\
-	"..\..\Src\MemoSelectView.h"\
+	"..\..\Src\DialogTemplate.h"\
+	"..\..\Src\File.h"\
+	"..\..\Src\FilterAddDlg.h"\
+	"..\..\Src\Logger.h"\
 	"..\..\Src\Message.h"\
-	"..\..\Src\TreeViewItem.h"\
+	"..\..\Src\Property.h"\
+	"..\..\Src\Tombo.h"\
 	"..\..\Src\TString.h"\
 	"..\..\Src\VarBuffer.h"\
+	"..\..\Src\VFStream.h"\
 	
 NODEP_CPP_FILTE=\
 	"..\..\Src\resource.h"\
@@ -1000,13 +1069,16 @@ NODEP_CPP_FILTE=\
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Debug"
 
 DEP_CPP_FILTE=\
-	"..\..\Src\FilterCtlDlg.h"\
-	"..\..\Src\MemoManager.h"\
-	"..\..\Src\MemoSelectView.h"\
+	"..\..\Src\DialogTemplate.h"\
+	"..\..\Src\File.h"\
+	"..\..\Src\FilterAddDlg.h"\
+	"..\..\Src\Logger.h"\
 	"..\..\Src\Message.h"\
-	"..\..\Src\TreeViewItem.h"\
+	"..\..\Src\Property.h"\
+	"..\..\Src\Tombo.h"\
 	"..\..\Src\TString.h"\
 	"..\..\Src\VarBuffer.h"\
+	"..\..\Src\VFStream.h"\
 	
 NODEP_CPP_FILTE=\
 	"..\..\Src\resource.h"\
@@ -1015,13 +1087,16 @@ NODEP_CPP_FILTE=\
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Release"
 
 DEP_CPP_FILTE=\
-	"..\..\Src\FilterCtlDlg.h"\
-	"..\..\Src\MemoManager.h"\
-	"..\..\Src\MemoSelectView.h"\
+	"..\..\Src\DialogTemplate.h"\
+	"..\..\Src\File.h"\
+	"..\..\Src\FilterAddDlg.h"\
+	"..\..\Src\Logger.h"\
 	"..\..\Src\Message.h"\
-	"..\..\Src\TreeViewItem.h"\
+	"..\..\Src\Property.h"\
+	"..\..\Src\Tombo.h"\
 	"..\..\Src\TString.h"\
 	"..\..\Src\VarBuffer.h"\
+	"..\..\Src\VFStream.h"\
 	
 NODEP_CPP_FILTE=\
 	"..\..\Src\resource.h"\
@@ -1030,6 +1105,46 @@ NODEP_CPP_FILTE=\
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Debug"
 
 DEP_CPP_FILTE=\
+	"..\..\Src\DialogTemplate.h"\
+	"..\..\Src\File.h"\
+	"..\..\Src\FilterAddDlg.h"\
+	"..\..\Src\Logger.h"\
+	"..\..\Src\Message.h"\
+	"..\..\Src\Property.h"\
+	"..\..\Src\Tombo.h"\
+	"..\..\Src\TString.h"\
+	"..\..\Src\VarBuffer.h"\
+	"..\..\Src\VFStream.h"\
+	
+NODEP_CPP_FILTE=\
+	"..\..\Src\resource.h"\
+	
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\FilterCtlDlg.cpp
+
+!IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
+
+DEP_CPP_FILTER=\
+	"..\..\Src\FilterCtlDlg.h"\
+	"..\..\Src\FilterDefDlg.h"\
+	"..\..\Src\MemoManager.h"\
+	"..\..\Src\MemoSelectView.h"\
+	"..\..\Src\Message.h"\
+	"..\..\Src\TreeViewItem.h"\
+	"..\..\Src\TString.h"\
+	"..\..\Src\Uniconv.h"\
+	"..\..\Src\VarBuffer.h"\
+	"..\..\Src\VFManager.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
+
+DEP_CPP_FILTER=\
 	"..\..\Src\FilterCtlDlg.h"\
 	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoSelectView.h"\
@@ -1038,7 +1153,261 @@ DEP_CPP_FILTE=\
 	"..\..\Src\TString.h"\
 	"..\..\Src\VarBuffer.h"\
 	
-NODEP_CPP_FILTE=\
+NODEP_CPP_FILTER=\
+	"..\..\Src\resource.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Release"
+
+DEP_CPP_FILTER=\
+	"..\..\Src\FilterCtlDlg.h"\
+	"..\..\Src\MemoManager.h"\
+	"..\..\Src\MemoSelectView.h"\
+	"..\..\Src\Message.h"\
+	"..\..\Src\TreeViewItem.h"\
+	"..\..\Src\TString.h"\
+	"..\..\Src\VarBuffer.h"\
+	
+NODEP_CPP_FILTER=\
+	"..\..\Src\resource.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Debug"
+
+DEP_CPP_FILTER=\
+	"..\..\Src\FilterCtlDlg.h"\
+	"..\..\Src\MemoManager.h"\
+	"..\..\Src\MemoSelectView.h"\
+	"..\..\Src\Message.h"\
+	"..\..\Src\TreeViewItem.h"\
+	"..\..\Src\TString.h"\
+	"..\..\Src\VarBuffer.h"\
+	
+NODEP_CPP_FILTER=\
+	"..\..\Src\resource.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Release"
+
+DEP_CPP_FILTER=\
+	"..\..\Src\FilterCtlDlg.h"\
+	"..\..\Src\MemoManager.h"\
+	"..\..\Src\MemoSelectView.h"\
+	"..\..\Src\Message.h"\
+	"..\..\Src\TreeViewItem.h"\
+	"..\..\Src\TString.h"\
+	"..\..\Src\VarBuffer.h"\
+	
+NODEP_CPP_FILTER=\
+	"..\..\Src\resource.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Debug"
+
+DEP_CPP_FILTER=\
+	"..\..\Src\FilterCtlDlg.h"\
+	"..\..\Src\MemoManager.h"\
+	"..\..\Src\MemoSelectView.h"\
+	"..\..\Src\Message.h"\
+	"..\..\Src\TreeViewItem.h"\
+	"..\..\Src\TString.h"\
+	"..\..\Src\VarBuffer.h"\
+	
+NODEP_CPP_FILTER=\
+	"..\..\Src\resource.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Release"
+
+DEP_CPP_FILTER=\
+	"..\..\Src\FilterCtlDlg.h"\
+	"..\..\Src\MemoManager.h"\
+	"..\..\Src\MemoSelectView.h"\
+	"..\..\Src\Message.h"\
+	"..\..\Src\TreeViewItem.h"\
+	"..\..\Src\TString.h"\
+	"..\..\Src\VarBuffer.h"\
+	
+NODEP_CPP_FILTER=\
+	"..\..\Src\resource.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Debug"
+
+DEP_CPP_FILTER=\
+	"..\..\Src\FilterCtlDlg.h"\
+	"..\..\Src\MemoManager.h"\
+	"..\..\Src\MemoSelectView.h"\
+	"..\..\Src\Message.h"\
+	"..\..\Src\TreeViewItem.h"\
+	"..\..\Src\TString.h"\
+	"..\..\Src\VarBuffer.h"\
+	
+NODEP_CPP_FILTER=\
+	"..\..\Src\resource.h"\
+	
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\FilterDefDlg.cpp
+
+!IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
+
+DEP_CPP_FILTERD=\
+	"..\..\Src\DialogTemplate.h"\
+	"..\..\Src\File.h"\
+	"..\..\Src\FilterAddDlg.h"\
+	"..\..\Src\FilterDefDlg.h"\
+	"..\..\Src\Logger.h"\
+	"..\..\Src\Message.h"\
+	"..\..\Src\PropertyPage.h"\
+	"..\..\Src\Tombo.h"\
+	"..\..\Src\TString.h"\
+	"..\..\Src\VarBuffer.h"\
+	"..\..\Src\VFManager.h"\
+	"..\..\Src\VFStream.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
+
+DEP_CPP_FILTERD=\
+	"..\..\Src\DialogTemplate.h"\
+	"..\..\Src\File.h"\
+	"..\..\Src\FilterAddDlg.h"\
+	"..\..\Src\FilterDefDlg.h"\
+	"..\..\Src\Logger.h"\
+	"..\..\Src\Message.h"\
+	"..\..\Src\PropertyPage.h"\
+	"..\..\Src\Tombo.h"\
+	"..\..\Src\TString.h"\
+	"..\..\Src\VarBuffer.h"\
+	"..\..\Src\VFManager.h"\
+	"..\..\Src\VFStream.h"\
+	
+NODEP_CPP_FILTERD=\
+	"..\..\Src\resource.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Release"
+
+DEP_CPP_FILTERD=\
+	"..\..\Src\DialogTemplate.h"\
+	"..\..\Src\File.h"\
+	"..\..\Src\FilterAddDlg.h"\
+	"..\..\Src\FilterDefDlg.h"\
+	"..\..\Src\Logger.h"\
+	"..\..\Src\Message.h"\
+	"..\..\Src\PropertyPage.h"\
+	"..\..\Src\Tombo.h"\
+	"..\..\Src\TString.h"\
+	"..\..\Src\VarBuffer.h"\
+	"..\..\Src\VFManager.h"\
+	"..\..\Src\VFStream.h"\
+	
+NODEP_CPP_FILTERD=\
+	"..\..\Src\resource.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Debug"
+
+DEP_CPP_FILTERD=\
+	"..\..\Src\DialogTemplate.h"\
+	"..\..\Src\File.h"\
+	"..\..\Src\FilterAddDlg.h"\
+	"..\..\Src\FilterDefDlg.h"\
+	"..\..\Src\Logger.h"\
+	"..\..\Src\Message.h"\
+	"..\..\Src\PropertyPage.h"\
+	"..\..\Src\Tombo.h"\
+	"..\..\Src\TString.h"\
+	"..\..\Src\VarBuffer.h"\
+	"..\..\Src\VFManager.h"\
+	"..\..\Src\VFStream.h"\
+	
+NODEP_CPP_FILTERD=\
+	"..\..\Src\resource.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Release"
+
+DEP_CPP_FILTERD=\
+	"..\..\Src\DialogTemplate.h"\
+	"..\..\Src\File.h"\
+	"..\..\Src\FilterAddDlg.h"\
+	"..\..\Src\FilterDefDlg.h"\
+	"..\..\Src\Logger.h"\
+	"..\..\Src\Message.h"\
+	"..\..\Src\PropertyPage.h"\
+	"..\..\Src\Tombo.h"\
+	"..\..\Src\TString.h"\
+	"..\..\Src\VarBuffer.h"\
+	"..\..\Src\VFManager.h"\
+	"..\..\Src\VFStream.h"\
+	
+NODEP_CPP_FILTERD=\
+	"..\..\Src\resource.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Debug"
+
+DEP_CPP_FILTERD=\
+	"..\..\Src\DialogTemplate.h"\
+	"..\..\Src\File.h"\
+	"..\..\Src\FilterAddDlg.h"\
+	"..\..\Src\FilterDefDlg.h"\
+	"..\..\Src\Logger.h"\
+	"..\..\Src\Message.h"\
+	"..\..\Src\PropertyPage.h"\
+	"..\..\Src\Tombo.h"\
+	"..\..\Src\TString.h"\
+	"..\..\Src\VarBuffer.h"\
+	"..\..\Src\VFManager.h"\
+	"..\..\Src\VFStream.h"\
+	
+NODEP_CPP_FILTERD=\
+	"..\..\Src\resource.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Release"
+
+DEP_CPP_FILTERD=\
+	"..\..\Src\DialogTemplate.h"\
+	"..\..\Src\File.h"\
+	"..\..\Src\FilterAddDlg.h"\
+	"..\..\Src\FilterDefDlg.h"\
+	"..\..\Src\Logger.h"\
+	"..\..\Src\Message.h"\
+	"..\..\Src\PropertyPage.h"\
+	"..\..\Src\Tombo.h"\
+	"..\..\Src\TString.h"\
+	"..\..\Src\VarBuffer.h"\
+	"..\..\Src\VFManager.h"\
+	"..\..\Src\VFStream.h"\
+	
+NODEP_CPP_FILTERD=\
+	"..\..\Src\resource.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Debug"
+
+DEP_CPP_FILTERD=\
+	"..\..\Src\DialogTemplate.h"\
+	"..\..\Src\File.h"\
+	"..\..\Src\FilterAddDlg.h"\
+	"..\..\Src\FilterDefDlg.h"\
+	"..\..\Src\Logger.h"\
+	"..\..\Src\Message.h"\
+	"..\..\Src\PropertyPage.h"\
+	"..\..\Src\Tombo.h"\
+	"..\..\Src\TString.h"\
+	"..\..\Src\VarBuffer.h"\
+	"..\..\Src\VFManager.h"\
+	"..\..\Src\VFStream.h"\
+	
+NODEP_CPP_FILTERD=\
 	"..\..\Src\resource.h"\
 	
 
@@ -3854,12 +4223,15 @@ SOURCE=..\..\Src\VFStream.cpp
 !IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
 
 DEP_CPP_VFSTR=\
+	"..\..\Src\DialogTemplate.h"\
 	"..\..\Src\DirectoryScanner.h"\
 	"..\..\Src\File.h"\
+	"..\..\Src\FilterAddDlg.h"\
 	"..\..\Src\Logger.h"\
 	"..\..\Src\MemoManager.h"\
 	"..\..\Src\MemoNote.h"\
 	"..\..\Src\MemoSelectView.h"\
+	"..\..\Src\Message.h"\
 	"..\..\Src\Property.h"\
 	"..\..\Src\SearchEngine.h"\
 	"..\..\Src\Tombo.h"\
@@ -4008,6 +4380,10 @@ SOURCE=..\..\Src\CryptManager.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\Src\DialogTemplate.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\Src\DirectoryScanner.h
 # End Source File
 # Begin Source File
@@ -4024,7 +4400,15 @@ SOURCE=..\..\Src\FileSelector.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\Src\FilterAddDlg.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\Src\FilterCtlDlg.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\FilterDefDlg.h
 # End Source File
 # Begin Source File
 

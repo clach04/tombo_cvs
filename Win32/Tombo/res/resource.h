@@ -55,6 +55,12 @@
 #define IDD_GREPTAB_MAIN                135
 #define IDD_GREPTAB_PERSIST             136
 #define IDD_FILTERCTL                   137
+#define IDD_FILTERDEF_SRC               138
+#define IDD_FILTERDEF_FILTER            139
+#define IDD_FILTERDEF_ADD_REGEX         140
+#define IDD_FILTERDEF_ADD_LIMIT         141
+#define IDD_FILTERDEF_ADD_TIMESTAMP     142
+#define IDD_FILTERDEF_ADD_SORT          143
 #define IDC_PASS                        1000
 #define IDC_PROP_PASSWORD_DESC          1001
 #define IDC_PASS_TIMEOUT                1002
@@ -96,6 +102,24 @@
 #define IDC_FILTERCTL_DOWN              1040
 #define IDC_FILTERCTL_NEW               1041
 #define IDC_FILTERCTL_KEEP              1042
+#define IDC_FILTERDEF_SRC_PATH          1043
+#define IDC_FILTERDEF_FILTER_LIST       1044
+#define IDC_FILTERDEF_FILTER_UP         1045
+#define IDC_FILTERDEF_FILTER_DOWN       1046
+#define IDC_FILTERDEF_FILTER_REGEX      1047
+#define IDC_FILTERDEF_FILTER_LIMIT      1048
+#define IDC_FILTERDEF_REGEX_SEARCHSTR   1048
+#define IDC_FILTERDEF_FILTER_TIMESTAMP  1049
+#define IDC_FILTERDEF_REGEX_CASESENSITIVE 1049
+#define IDC_FILTERDEF_FILTER_SORT       1050
+#define IDC_FILTERDEF_REGEX_CRYPTMEMO   1050
+#define IDC_FILTERDEF_REGEX_FILENAME    1051
+#define IDC_FILTERDEF_REGEX_NEGATE      1052
+#define IDC_FILTERDEF_LIMIT_NUMLIMIT    1054
+#define IDC_FILTERDEF_TS_DELTADAY       1055
+#define IDC_FILTERDEF_TS_OLDER          1056
+#define IDC_FILTERDEF_TS_NEWER          1057
+#define IDC_FILTERDEF_SORT_TYPE         1058
 #define IDM_EXIT                        40001
 #define IDM_NEWMEMO                     40002
 #define IDM_RETURNLIST                  40003
@@ -134,9 +158,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        138
+#define _APS_NEXT_RESOURCE_VALUE        141
 #define _APS_NEXT_COMMAND_VALUE         40035
-#define _APS_NEXT_CONTROL_VALUE         1043
+#define _APS_NEXT_CONTROL_VALUE         1059
 #define _APS_NEXT_SYMED_VALUE           108
 #endif
 #endif

@@ -79,4 +79,8 @@ enum SearchResult {
 	SR_CANCELED
 };
 
+//
+#define VFOLDER_IMAGE_PERSIST	8
+#define VFOLDER_IMAGE_TEMP		6
+
 #endif

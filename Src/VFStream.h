@@ -7,6 +7,7 @@ class PasswordManager;
 class VFStore;
 class TString;
 class File;
+
 #include "VarBuffer.h"
 
 ////////////////////////////////////
@@ -81,6 +82,17 @@ public:
 	// generate XML
 	virtual BOOL GenerateXMLOpenTag(File *pFile) = 0;
 	virtual BOOL GenerateXMLCloseTag(File *pFile) = 0;
+
+	///////////////////////////
+	// for FilterDefDlg
+	virtual LPCTSTR GetFilterType() = 0;
+	virtual BOOL ToString(TString *p) = 0;
+
+	///////////////////////////
+	// for Setting parameter
+	virtual BOOL UpdateParamWithDialog(HINSTANCE hInst, HWND hParent) = 0;
+		// return TRUE if updated.
+		// FALSE if not updated(CANCELED) or failed.
 };
 
 ////////////////////////////////////
@@ -104,15 +116,22 @@ public:
 	BOOL Activate();
 	// void FreeObject(); inherit
 
-
-	// pDir's memory is controled under VFDirectoryGenerator.
-	// do not delete pDir after calling Init.
 	BOOL Init(LPTSTR pDir, BOOL bCheckEncrypt);
+		// pDir's memory is controled under VFDirectoryGenerator.
+		// do not delete pDir after calling Init.
 
 	VFStream *Clone(VFStore **ppTail);
 
 	BOOL GenerateXMLOpenTag(File *pFile);
 	BOOL GenerateXMLCloseTag(File *pFile);
+
+	LPCTSTR GetDirPath() { return pDirPath; }
+	BOOL SetDirPath(LPCTSTR pPath);
+
+	LPCTSTR GetFilterType();
+	BOOL ToString(TString *p);
+
+	BOOL UpdateParamWithDialog(HINSTANCE hInst, HWND hParent);
 };
 
 ////////////////////////////////////
@@ -131,7 +150,8 @@ protected:
 	TVector <VFNote*> vNotes;
 
 public:
-	VFStore(enum OrderInfo odr);
+//	VFStore(enum OrderInfo odr);
+	VFStore();
 	~VFStore();
 	BOOL Init();
 
@@ -148,8 +168,13 @@ public:
 	VFNote *GetNote(DWORD n) { return *vNotes.GetUnit(n); }
 
 	// free VFNote array. 
-	// VFNote in array is deleted, but MemoNote in each VFNote is not deleted.
 	void FreeArray();
+		// VFNote in array is deleted, but MemoNote in each VFNote is not deleted.
+
+	LPCTSTR GetFilterType();
+	BOOL ToString(TString *p);
+
+	BOOL UpdateParamWithDialog(HINSTANCE hInst, HWND hParent);
 };
 
 ////////////////////////////////////
@@ -166,10 +191,13 @@ public:
 	BOOL bFileNameOnly;
 	BOOL bNegate;
 
+	PasswordManager *pPassMgr;
+
 public:
 	VFRegexFilter();
 	~VFRegexFilter();
 	BOOL Init(LPCTSTR pPattern, BOOL bCase, BOOL bEnc, BOOL bFileName, BOOL bNeg, PasswordManager *pPassMgr);
+	BOOL Reset(LPCTSTR pPattern, BOOL bCase, BOOL bEnc, BOOL bFileName, BOOL bNeg);
 
 	////////////////////////////
 	// VFStream implimentation
@@ -183,6 +211,10 @@ public:
 	BOOL GenerateXMLOpenTag(File *pFile);
 	BOOL GenerateXMLCloseTag(File *pFile);
 
+	LPCTSTR GetFilterType();
+	BOOL ToString(TString *p);
+
+	BOOL UpdateParamWithDialog(HINSTANCE hInst, HWND hParent);
 };
 
 ////////////////////////////////////
@@ -206,6 +238,11 @@ public:
 	VFStream *Clone(VFStore **ppTail);
 	BOOL GenerateXMLOpenTag(File *pFile);
 	BOOL GenerateXMLCloseTag(File *pFile);
+
+	LPCTSTR GetFilterType();
+	BOOL ToString(TString *p);
+
+	BOOL UpdateParamWithDialog(HINSTANCE hInst, HWND hParent);
 };
 
 ////////////////////////////////////
@@ -222,7 +259,8 @@ public:
 public:
 	VFTimestampFilter();
 	~VFTimestampFilter();
-	BOOL Init(DWORD nDeltaDays, BOOL bNewer);
+	BOOL Reset(DWORD nDeltaDays, BOOL bNewer);
+	BOOL Init(DWORD nDelta = 0, BOOL bNew = FALSE) { return Reset(nDelta, bNew); }
 
 	// BOOL Prepare();
 	BOOL Store(VFNote *p);
@@ -230,6 +268,11 @@ public:
 	VFStream *Clone(VFStore **ppTail);
 	BOOL GenerateXMLOpenTag(File *pFile);
 	BOOL GenerateXMLCloseTag(File *pFile);
+
+	LPCTSTR GetFilterType();
+	BOOL ToString(TString *p);
+
+	BOOL UpdateParamWithDialog(HINSTANCE hInst, HWND hParent);
 };
 
 ////////////////////////////////////
@@ -262,6 +305,11 @@ public:
 	VFStream *Clone(VFStore **ppTail);
 	BOOL GenerateXMLOpenTag(File *pFile);
 	BOOL GenerateXMLCloseTag(File *pFile);
+
+	LPCTSTR GetFilterType();
+	BOOL ToString(TString *p);
+
+	BOOL UpdateParamWithDialog(HINSTANCE hInst, HWND hParent);
 };
 
 #endif

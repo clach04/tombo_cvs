@@ -106,6 +106,37 @@
 #define MSG_VFOLDER_NAME_TTL	MSG("仮想フォルダ名", "Virtual folder name")
 #define MSG_CONFIRM_DEL_VFOLDER	MSG("選択した仮想フォルダを削除します。よろしいですか？", "Delete selected virtual folder?")
 #define MSG_DEL_VFOLDER_TTL		MSG("仮想フォルダの削除", "Delete virtual folder")
+#define MSG_FILTERDEFDLG_TTL	MSG("フィルタの設定", "Filter settings")
+#define MSG_FILTERDEFPROPTTL_SRC \
+								MSG("フォルダ", "Folder")
+#define MSG_FILTERDEFPROPTTL_FILTER \
+								MSG("フィルタ", "Filter")
+#define MSG_FILTERDEFPROPTTL_FILTERTYPE_HDR \
+								MSG("フィルタ種別", "Filter ype")
+#define MSG_FILTERDEFPROPTTL_FILTERVAL_HDR \
+								MSG("条件", "Condition")
+#define MSG_STREAM_NAME_REGEXP	MSG("検索", "Find")
+#define MSG_STREAM_NAME_LIMIT	MSG("アイテム数", "Num of items")
+#define MSG_STREAM_NAME_TIMESTAMP \
+								MSG("最終更新日", "Last update")
+#define MSG_STREAM_NAME_SORT	MSG("ソート", "Sort")
+#define MSG_STREAM_VALUE_LIMIT	MSG("%d件", "%d item(s)")
+#define MSG_STREAM_VALUE_TIMESTAMP_NEWER \
+								MSG("%d日前より新しいもの", "Newer than %d day before")
+#define MSG_STREAM_VALUE_TIMESTAMP_OLDER \
+								MSG("%d日前より古いもの", "Older than %d day before")
+#define MSG_STREAM_VALUE_SORT_FNAME_ASC \
+								MSG("ファイル名の辞書順", "Dictionary order")
+#define MSG_STREAM_VALUE_SORT_FNAME_DSC \
+								MSG("ファイル名の逆辞書順", "Reverse dic order")
+#define MSG_STREAM_VALUE_SORT_LASTUPD_ASC \
+								MSG("最終更新日の古い順", "Old order of last update")
+#define MSG_STREAM_VALUE_SORT_LASTUPD_DSC \
+								MSG("最終更新日の新しい順", "New order of last update")
+#define MSG_DLG_INIT_FAIL		MSG("ダイアログの初期化に失敗しました", "Initialize dialog failed.")
+#define MSG_INVALID_REGEXP		MSG("正規表現の生成に失敗しました", "Generate pattern failed")
+#define MSG_SET_POSITIVE	MSG("0以上の数を指定してください", "Please set positive number")
+
 
 #endif
 

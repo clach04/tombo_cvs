@@ -156,6 +156,7 @@ public:
 	BOOL InsertVirtualFolder(const VFInfo *pInfo);
 
 	TreeViewVirtualFolderRoot *GetVirtualFolderRoot();
+	void CloseVFRoot();
 
 	/////////////////////////////
 	// Control menu
