@@ -202,15 +202,20 @@ void MemoDetailsView::OnGetFocus()
 
 	MainFrame *pMf = pMemoMgr->GetMainFrame();
 	if (pMf) {
+		// switch view
 		pMf->ActivateView(FALSE);
+
+		// menu control
 		pMf->EnableDelete(FALSE);
 		pMf->EnableRename(FALSE);
-	}
+		pMf->EnableEncrypt(FALSE);
+		pMf->EnableDecrypt(FALSE);
 
-#if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
-	// 詳細ビューにフォーカスが移った場合にはメニューのEncrypt/DecryptはDisableする
-	pMemoMgr->UpdateMenu(NULL);
-#endif
+		pMf->EnableCut(TRUE);
+		pMf->EnableCopy(TRUE);
+		pMf->EnablePaste(TRUE);
+
+	}
 	SetModifyStatus();
 }
 

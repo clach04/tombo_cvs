@@ -52,6 +52,12 @@ public:
 
 	virtual BOOL Encrypt(MemoManager *pMgr, MemoSelectView *pView) = 0;
 	virtual BOOL Decrypt(MemoManager *pMgr, MemoSelectView *pView) = 0;
+	virtual BOOL CanEncrypt(MemoSelectView *pView);
+	virtual BOOL CanDecrypt(MemoSelectView *pView);
+	virtual BOOL CanNewMemo(MemoSelectView *pView);
+	virtual BOOL CanCut(MemoSelectView *pView);
+	virtual BOOL CanCopy(MemoSelectView *pView);
+	virtual BOOL CanPaste(MemoSelectView *pView);
 
 	///////////////////////////////////////////////////////
 
@@ -89,6 +95,13 @@ public:
 	DWORD GetIcon(MemoSelectView *pView, DWORD nStatus);
 	virtual BOOL CanDelete(MemoSelectView *pView);
 
+	virtual BOOL CanEncrypt(MemoSelectView *pView);
+	virtual BOOL CanDecrypt(MemoSelectView *pView);
+	virtual BOOL CanNewMemo(MemoSelectView *pView);
+	virtual BOOL CanCut(MemoSelectView *pView);
+	virtual BOOL CanCopy(MemoSelectView *pView);
+	virtual BOOL CanPaste(MemoSelectView *pView);
+
 	DWORD ItemOrder();
 
 	void SetNote(MemoNote *p) { pNote = p; }
@@ -113,6 +126,13 @@ public:
 
 	BOOL Rename(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR pNewName);
 	virtual BOOL CanRename(MemoSelectView *pView);
+
+	virtual BOOL CanEncrypt(MemoSelectView *pView);
+	virtual BOOL CanDecrypt(MemoSelectView *pView);
+	virtual BOOL CanNewMemo(MemoSelectView *pView);
+	virtual BOOL CanCut(MemoSelectView *pView);
+	virtual BOOL CanCopy(MemoSelectView *pView);
+	virtual BOOL CanPaste(MemoSelectView *pView);
 
 	DWORD GetIcon(MemoSelectView *pView, DWORD nStatus);
 	DWORD ItemOrder();
@@ -149,6 +169,12 @@ class TreeViewFileLink : public TreeViewFileItem {
 public:
 	virtual BOOL CanDelete(MemoSelectView *pView);
 	virtual BOOL CanRename(MemoSelectView *pView);
+	virtual BOOL CanEncrypt(MemoSelectView *pView);
+	virtual BOOL CanDecrypt(MemoSelectView *pView);
+	virtual BOOL CanNewMemo(MemoSelectView *pView);
+	virtual BOOL CanCut(MemoSelectView *pView);
+	virtual BOOL CanCopy(MemoSelectView *pView);
+	virtual BOOL CanPaste(MemoSelectView *pView);
 };
 
 /////////////////////////////////////////////
@@ -173,6 +199,13 @@ public:
 	BOOL StreamObjectsFactory(VFInfo *pInfo, TreeViewVirtualFolder **ppVf, VFDirectoryGenerator **ppGen, VFStore **ppStore);
 	BOOL CanDelete(MemoSelectView *pView); 
 	BOOL CanRename(MemoSelectView *pView);
+	virtual BOOL CanEncrypt(MemoSelectView *pView);
+	virtual BOOL CanDecrypt(MemoSelectView *pView);
+	virtual BOOL CanNewMemo(MemoSelectView *pView);
+	virtual BOOL CanCut(MemoSelectView *pView);
+	virtual BOOL CanCopy(MemoSelectView *pView);
+	virtual BOOL CanPaste(MemoSelectView *pView);
+
 };
 
 /////////////////////////////////////////////
@@ -192,6 +225,12 @@ public:
 	BOOL Expand(MemoSelectView *pView);
 	BOOL CanDelete(MemoSelectView *pView);
 	BOOL CanRename(MemoSelectView *pView);
+	virtual BOOL CanEncrypt(MemoSelectView *pView);
+	virtual BOOL CanDecrypt(MemoSelectView *pView);
+	virtual BOOL CanNewMemo(MemoSelectView *pView);
+	virtual BOOL CanCut(MemoSelectView *pView);
+	virtual BOOL CanCopy(MemoSelectView *pView);
+	virtual BOOL CanPaste(MemoSelectView *pView);
 
 	// pGen's life scope is control under TreeViewVirtualFolder.
 	// don't delete pGen after calling SetGenerator.

@@ -149,6 +149,10 @@ public:
 	void EnableDelete(BOOL bEnable);
 	void EnableSaveButton(BOOL bEnable);
 	void EnableRename(BOOL bEnable);
+	void EnableNew(BOOL bEnable);
+	void EnableCut(BOOL bEnable);
+	void EnableCopy(BOOL bEnable);
+	void EnablePaste(BOOL bEnable);
 
 	// ウィンドウサイズの保存・復元
 	void LoadWinSize(HWND hWnd);

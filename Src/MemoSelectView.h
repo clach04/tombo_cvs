@@ -155,6 +155,10 @@ public:
 	/////////////////////////////
 	// Virtual folder
 	BOOL InsertVirtualFolder(GrepDialog *pGrepDlg);
+
+	/////////////////////////////
+	// Control menu
+	void ControlMenu();
 };
 
 /////////////////////////////////////////

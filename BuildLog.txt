@@ -235,6 +235,16 @@ PG: Change copyright dialog for expat.
 
 * Disable delete/rename button/menu when selecting virtual folder or root node.
 
+////////////////////////////////
+// B092
+////////////////////////////////
+
+* Disable buttons/menus when selecting virtual folder or root node.
+	encrypt/decrypt/newmemo/cut/copy/paste
+
+	PsPC, PktPC, BE-x00 is not fully supported.
+
+
 /////////////////////////////////////////////////////////////////////////
 // TODO
 /////////////////////////////////////////////////////////////////////////
@@ -247,5 +257,4 @@ Move method OpenRequest() from MemoSelectView to TreeViewItem.
 == around virtual folder
 
 * Change icon at virtual node ?
-* Disable Cut/Copy/Paste/Disable/Encrypt/Decrypt etc. when virtual node selected.
 * Impliment sorting.

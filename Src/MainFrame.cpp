@@ -1526,9 +1526,6 @@ void MainFrame::ActivateView(BOOL bList)
 		// 2-Pane版では両ビューを同時表示
 		mdView.Show(SW_SHOW);
 		msView.Show(SW_SHOW);
-
-		TreeViewItem *pItem = msView.GetCurrentItem();
-		mmMemoManager.UpdateMenu(pItem);
 	} else {
 		// CE版(& CEデバグ版 on Win32) ではビューの切り替えを行う
 		// ビューの表示・非表示の切り替え
@@ -1700,6 +1697,40 @@ void MainFrame::EnableRename(BOOL bEnable)
 	EnableMenu(IDM_RENAME, bEnable);
 #endif
 }
+
+void MainFrame::EnableNew(BOOL bEnable)
+{
+#if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
+	EnableMenu(IDM_NEWMEMO, bEnable);
+	SendMessage(GetMainToolBar(), TB_ENABLEBUTTON, IDM_NEWMEMO, MAKELONG(bEnable, 0));
+#endif
+
+}
+
+void MainFrame::EnableCut(BOOL bEnable)
+{
+#if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
+	EnableMenu(IDM_CUT, bEnable);
+	SendMessage(GetMainToolBar(), TB_ENABLEBUTTON, IDM_CUT, MAKELONG(bEnable, 0));
+#endif
+}
+
+void MainFrame::EnableCopy(BOOL bEnable)
+{
+#if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
+	EnableMenu(IDM_COPY, bEnable);
+	SendMessage(GetMainToolBar(), TB_ENABLEBUTTON, IDM_COPY, MAKELONG(bEnable, 0));
+#endif
+}
+
+void MainFrame::EnablePaste(BOOL bEnable)
+{
+#if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
+	EnableMenu(IDM_PASTE, bEnable);
+	SendMessage(GetMainToolBar(), TB_ENABLEBUTTON, IDM_PASTE, MAKELONG(bEnable, 0));
+#endif
+}
+
 
 ///////////////////////////////////////////////////
 // パスワード消去
@@ -2181,12 +2212,11 @@ void MainFrame::EnableSaveButton(BOOL bEnable)
 	} else {
 		nStat = 0;
 	}
-#if defined(PLATFORM_WIN32)
-	SendMessage(hToolBar, TB_SETSTATE, IDM_SAVE, MAKELONG(nStat, 0)); 
+#if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
+	EnableMenu(IDM_SAVE, bEnable);
+	SendMessage(GetMainToolBar(), TB_SETSTATE, IDM_SAVE, MAKELONG(nStat, 0)); 
 #endif
-#if defined(PLATFORM_HPC)
-	SendMessage(GetCommandBar(hMSCmdBar, ID_BUTTONBAND), TB_ENABLEBUTTON, IDM_SAVE, MAKELONG(nStat, 0)); 
-#endif
+
 #if defined(PLATFORM_PKTPC) || defined(PLATFORM_PSPC)
 	SendMessage(hMDCmdBar, TB_ENABLEBUTTON, IDM_SAVE, MAKELONG(nStat, 0)); 
 #endif

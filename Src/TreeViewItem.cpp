@@ -58,6 +58,36 @@ BOOL TreeViewItem::CanRename(MemoSelectView *pView)
 	return FALSE;
 }
 
+BOOL TreeViewItem::CanEncrypt(MemoSelectView *pView)
+{
+	return FALSE;
+}
+
+BOOL TreeViewItem::CanDecrypt(MemoSelectView *pView)
+{
+	return FALSE;
+}
+
+BOOL TreeViewItem::CanNewMemo(MemoSelectView *pView)
+{
+	return TRUE;
+}
+
+BOOL TreeViewItem::CanCut(MemoSelectView *pView)
+{
+	return TRUE;
+}
+
+BOOL TreeViewItem::CanCopy(MemoSelectView *pView)
+{
+	return TRUE;
+}
+
+BOOL TreeViewItem::CanPaste(MemoSelectView *pView)
+{
+	return TRUE;
+}
+
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 //  File
@@ -182,6 +212,40 @@ BOOL TreeViewFileItem::Decrypt(MemoManager *pMgr, MemoSelectView *pView)
 	if (!pView->UpdateItemStatusNotify(this, sHeadLine.Get())) {
 		return FALSE;
 	}
+	return TRUE;
+}
+
+BOOL TreeViewFileItem::CanEncrypt(MemoSelectView *pView)
+{
+	MemoNote *p = GetNote();
+	if (p == NULL) return FALSE;
+	return !p->IsEncrypted();
+}
+
+BOOL TreeViewFileItem::CanDecrypt(MemoSelectView *pView)
+{
+	MemoNote *p = GetNote();
+	if (p == NULL) return FALSE;
+	return p->IsEncrypted();
+}
+
+BOOL TreeViewFileItem::CanNewMemo(MemoSelectView *pView)
+{
+	return TRUE;
+}
+
+BOOL TreeViewFileItem::CanCut(MemoSelectView *pView)
+{
+	return TRUE;
+}
+
+BOOL TreeViewFileItem::CanCopy(MemoSelectView *pView)
+{
+	return TRUE;
+}
+
+BOOL TreeViewFileItem::CanPaste(MemoSelectView *pView)
+{
 	return TRUE;
 }
 
@@ -465,6 +529,21 @@ DWORD TreeViewFolderItem::GetIcon(MemoSelectView *pView, DWORD nStatus)
 	}
 }
 
+BOOL TreeViewFolderItem::CanDecrypt(MemoSelectView *pView)
+{
+	return TRUE;
+}
+
+BOOL TreeViewFolderItem::CanEncrypt(MemoSelectView *pView)
+{
+	return TRUE;
+}
+
+BOOL TreeViewFolderItem::CanNewMemo(MemoSelectView *pView)
+{
+	return TRUE;
+}
+
 /////////////////////////////////////////////
 //  ñºèÃïœçX
 /////////////////////////////////////////////
@@ -554,6 +633,21 @@ BOOL TreeViewFolderItem::CanRename(MemoSelectView *pView)
 	return CanDelete(pView);
 }
 
+BOOL TreeViewFolderItem::CanCut(MemoSelectView *pView)
+{
+	return CanDelete(pView);
+}
+
+BOOL TreeViewFolderItem::CanCopy(MemoSelectView *pView)
+{
+	return CanDelete(pView);
+}
+
+BOOL TreeViewFolderItem::CanPaste(MemoSelectView *pView)
+{
+	return CanDelete(pView);
+}
+
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 //  File link
@@ -566,6 +660,36 @@ BOOL TreeViewFileLink::CanDelete(MemoSelectView *pView)
 }
 
 BOOL TreeViewFileLink::CanRename(MemoSelectView *pView)
+{
+	return FALSE;
+}
+
+BOOL TreeViewFileLink::CanDecrypt(MemoSelectView *pView)
+{
+	return TRUE;
+}
+
+BOOL TreeViewFileLink::CanEncrypt(MemoSelectView *pView)
+{
+	return TRUE;
+}
+
+BOOL TreeViewFileLink::CanNewMemo(MemoSelectView *pView)
+{
+	return FALSE;
+}
+
+BOOL TreeViewFileLink::CanCut(MemoSelectView *pView)
+{
+	return FALSE;
+}
+
+BOOL TreeViewFileLink::CanCopy(MemoSelectView *pView)
+{
+	return FALSE;
+}
+
+BOOL TreeViewFileLink::CanPaste(MemoSelectView *pView)
 {
 	return FALSE;
 }
@@ -732,6 +856,36 @@ BOOL TreeViewVirtualFolderRoot::CanRename(MemoSelectView *pView)
 	return FALSE;
 }
 
+BOOL TreeViewVirtualFolderRoot::CanDecrypt(MemoSelectView *pView)
+{
+	return FALSE;
+}
+
+BOOL TreeViewVirtualFolderRoot::CanEncrypt(MemoSelectView *pView)
+{
+	return FALSE;
+}
+
+BOOL TreeViewVirtualFolderRoot::CanNewMemo(MemoSelectView *pView)
+{
+	return FALSE;
+}
+
+BOOL TreeViewVirtualFolderRoot::CanCut(MemoSelectView *pView)
+{
+	return FALSE;
+}
+
+BOOL TreeViewVirtualFolderRoot::CanCopy(MemoSelectView *pView)
+{
+	return FALSE;
+}
+
+BOOL TreeViewVirtualFolderRoot::CanPaste(MemoSelectView *pView)
+{
+	return FALSE;
+}
+
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 //  Virtual folder (non-root)
@@ -823,6 +977,36 @@ BOOL TreeViewVirtualFolder::CanDelete(MemoSelectView *pView)
 }
 
 BOOL TreeViewVirtualFolder::CanRename(MemoSelectView *pView)
+{
+	return FALSE;
+}
+
+BOOL TreeViewVirtualFolder::CanDecrypt(MemoSelectView *pView)
+{
+	return FALSE;
+}
+
+BOOL TreeViewVirtualFolder::CanEncrypt(MemoSelectView *pView)
+{
+	return FALSE;
+}
+
+BOOL TreeViewVirtualFolder::CanNewMemo(MemoSelectView *pView)
+{
+	return FALSE;
+}
+
+BOOL TreeViewVirtualFolder::CanCut(MemoSelectView *pView)
+{
+	return FALSE;
+}
+
+BOOL TreeViewVirtualFolder::CanCopy(MemoSelectView *pView)
+{
+	return FALSE;
+}
+
+BOOL TreeViewVirtualFolder::CanPaste(MemoSelectView *pView)
 {
 	return FALSE;
 }

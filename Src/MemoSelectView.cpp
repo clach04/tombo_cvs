@@ -511,11 +511,7 @@ LRESULT MemoSelectView::OnNotify(HWND hWnd, WPARAM wParam, LPARAM lParam)
 				break;
 			}
 			// Control menu item
-			pMemoMgr->UpdateMenu(tvi);
-			if (pMemoMgr && pMemoMgr->GetMainFrame() && tvi) {
-				pMemoMgr->GetMainFrame()->EnableDelete(tvi->CanDelete(this));
-				pMemoMgr->GetMainFrame()->EnableRename(tvi->CanRename(this));
-			}
+			ControlMenu();
 
 			if (g_Property.IsUseTwoPane() && (p->action == TVC_BYMOUSE || p->action == TVC_BYKEYBOARD)) {
 				// ユーザ操作の場合、メモの切り替えを発生させる
@@ -1163,6 +1159,41 @@ void MemoSelectView::OnPaste()
 }
 
 /////////////////////////////////////////
+// Control menu
+/////////////////////////////////////////
+
+void MemoSelectView::ControlMenu()
+{
+	MainFrame *pMf = pMemoMgr->GetMainFrame();
+	if (pMf == NULL) return;
+
+	TreeViewItem *pItem = GetCurrentItem();
+	if (pItem) {
+		pMf->EnableDelete(pItem->CanDelete(this));
+		pMf->EnableRename(pItem->CanRename(this));
+
+		pMf->EnableEncrypt(pItem->CanEncrypt(this));
+		pMf->EnableDecrypt(pItem->CanDecrypt(this));
+
+		pMf->EnableNew(pItem->CanNewMemo(this));
+
+		pMf->EnableCut(pItem->CanCut(this));
+		pMf->EnableCopy(pItem->CanCopy(this));
+		pMf->EnablePaste(pItem->CanPaste(this));
+
+	} else {
+		pMf->EnableDelete(FALSE);
+		pMf->EnableRename(FALSE);
+		pMf->EnableEncrypt(FALSE);
+		pMf->EnableDecrypt(FALSE);
+
+		pMf->EnableCut(FALSE);
+		pMf->EnableCopy(FALSE);
+		pMf->EnablePaste(FALSE);
+	}
+}
+
+/////////////////////////////////////////
 // フォーカスの取得
 /////////////////////////////////////////
 
@@ -1171,15 +1202,8 @@ void MemoSelectView::OnGetFocus()
 	MainFrame *pMf = pMemoMgr->GetMainFrame();
 	if (pMf) {
 		pMf->ActivateView(TRUE);
-		TreeViewItem *pItem = GetCurrentItem();
-		if (pItem) {
-			pMf->EnableDelete(pItem->CanDelete(this));
-			pMf->EnableRename(pItem->CanRename(this));
-		} else {
-			pMf->EnableDelete(FALSE);
-			pMf->EnableRename(FALSE);
-		}
 	}
+	ControlMenu();
 }
 
 /////////////////////////////////////////
