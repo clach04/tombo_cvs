@@ -1,6 +1,6 @@
 #
 
-$version = "Tombo1_6b2";
+$version = "Tombo1_6";
 
 use File::Glob ':glob';
 
