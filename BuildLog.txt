@@ -432,3 +432,10 @@ Changes
 		"DTD/xhtml1-transitional.dtd">
   <html xmlns="http://www.w3.org/1999/xhtml">
 
+////////////////////////////////
+// B112 (SNAPSHOT20040314)
+////////////////////////////////
+
+* Re-fix : When exit with minimize, can't restore window(#2878,#2879)
+* FIX: Move pane splitter when window moves(#4056,#4057)
+
