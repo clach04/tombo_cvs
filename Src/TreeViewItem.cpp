@@ -13,6 +13,8 @@
 #include "MemoFolder.h"
 #include "DirectoryScanner.h"
 #include "Message.h"
+#include "VFStream.h"
+#include "TSParser.h"
 
 #define ITEM_ORDER_FILE		1
 #define ITEM_ORDER_FOLDER	0
@@ -47,6 +49,11 @@ void TreeViewItem::SetViewItem(HTREEITEM h)
 
 TreeViewFileItem::TreeViewFileItem() : TreeViewItem(FALSE)
 {
+}
+
+TreeViewFileItem::~TreeViewFileItem()
+{
+	delete pNote;
 }
 
 BOOL TreeViewFileItem::Move(MemoManager *pMgr, MemoSelectView *pView)
@@ -201,6 +208,14 @@ BOOL TreeViewFileItem::Rename(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR 
 
 DWORD TreeViewFileItem::GetIcon(MemoSelectView *, DWORD nStatus)
 {
+	if (nStatus & MEMO_VIEW_STATE_INIT) {
+		if (pNote->IsEncrypted()) {
+			return IMG_ARTICLE_ENCRYPTED;
+		} else {
+			return IMG_ARTICLE;
+		}
+	}
+
 	if (nStatus & MEMO_VIEW_STATE_CLIPED_SET) {
 		if (pNote->IsEncrypted()) {
 			return IMG_ARTICLE_ENC_MASKED;
@@ -235,7 +250,8 @@ BOOL TreeViewFolderItem::Move(MemoManager *pMgr, MemoSelectView *pView)
 	// Srcパスの取得
 	TCHAR buf[MAX_PATH];
 	TString sCurrentPath;
-	LPTSTR pCurrentPath = pView->GeneratePath(this, buf, MAX_PATH);
+	HTREEITEM hItem = GetViewItem();
+	LPTSTR pCurrentPath = pView->GeneratePath(hItem, buf, MAX_PATH);
 	if (!sCurrentPath.AllocFullPath(pCurrentPath)) return FALSE;
 
 	// Dstパスの取得
@@ -268,7 +284,8 @@ BOOL TreeViewFolderItem::Copy(MemoManager *pMgr, MemoSelectView *pView)
 	// Srcパスの取得
 	TCHAR buf[MAX_PATH];
 	TString sCurrentPath;
-	LPTSTR pCurrentPath = pView->GeneratePath(this, buf, MAX_PATH);
+	HTREEITEM hItem = GetViewItem();
+	LPTSTR pCurrentPath = pView->GeneratePath(hItem, buf, MAX_PATH);
 	if (!sCurrentPath.AllocFullPath(pCurrentPath)) return FALSE;
 
 	// Dstパスの取得
@@ -307,7 +324,8 @@ BOOL TreeViewFolderItem::Delete(MemoManager *pMgr, MemoSelectView *pView)
 {
 	TCHAR buf[MAX_PATH];
 	TString sCurrentPath;
-	LPTSTR pCurrentPath = pView->GeneratePath(this, buf, MAX_PATH);
+	HTREEITEM hItem = GetViewItem();
+	LPTSTR pCurrentPath = pView->GeneratePath(hItem, buf, MAX_PATH);
 	if (!sCurrentPath.AllocFullPath(pCurrentPath)) return FALSE;
 
 	if (_tcslen(pCurrentPath) == 0 ||
@@ -346,6 +364,10 @@ BOOL TreeViewFolderItem::Decrypt(MemoManager *pMgr, MemoSelectView *pView)
 
 DWORD TreeViewFolderItem::GetIcon(MemoSelectView *pView, DWORD nStatus)
 {
+	if (nStatus & MEMO_VIEW_STATE_INIT) {
+		return IMG_FOLDER;
+	}
+
 	// ステータスの取得
 	TV_ITEM ti;
 	ti.mask = TVIF_STATE | TVIF_IMAGE;
@@ -392,7 +414,8 @@ BOOL TreeViewFolderItem::Rename(MemoManager *pMgr, MemoSelectView *pView, LPCTST
 {
 	TCHAR buf[MAX_PATH];
 	TString sCurrentPath;
-	LPTSTR pCurrentPath = pView->GeneratePath(this, buf, MAX_PATH);
+	HTREEITEM hItem = GetViewItem();
+	LPTSTR pCurrentPath = pView->GeneratePath(hItem, buf, MAX_PATH);
 
 	// If root node, disable changing.
 	if (_tcslen(pCurrentPath) == 0) return FALSE;
@@ -421,4 +444,196 @@ BOOL TreeViewFolderItem::Rename(MemoManager *pMgr, MemoSelectView *pView, LPCTST
 DWORD TreeViewFolderItem::ItemOrder()
 {
 	return ITEM_ORDER_FOLDER;
+}
+
+BOOL TreeViewFolderItem::Expand(MemoSelectView *pView)
+{
+	TCHAR buf[MAX_PATH];
+	HTREEITEM hParent = GetViewItem();
+
+	LPTSTR pPrefix = pView->GeneratePath(hParent, buf, MAX_PATH);
+
+	TCHAR buf2[MAX_PATH];
+	wsprintf(buf2, TEXT("%s\\%s*.*"), g_Property.TopDir(), pPrefix);
+	LPCTSTR pMatchPath = buf2;
+
+	WIN32_FIND_DATA wfd;
+	HANDLE hHandle = FindFirstFile(pMatchPath, &wfd);
+	if (hHandle != INVALID_HANDLE_VALUE) {
+		do {
+			if (_tcscmp(wfd.cFileName, TEXT(".")) == 0 || _tcscmp(wfd.cFileName, TEXT("..")) == 0) continue;
+
+			if (wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+				// フォルダ
+				TreeViewFolderItem *pItem = new TreeViewFolderItem();
+				pView->InsertFolder(hParent, wfd.cFileName, pItem);
+			} else {
+				if (!pView->InsertFile(hParent, pPrefix, wfd.cFileName)) {
+					FindClose(hHandle);
+					return FALSE;
+				}
+			}
+		} while(FindNextFile(hHandle, &wfd));
+		FindClose(hHandle);
+	}
+	return TRUE;
+}
+
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+//  Virtual folder(Root)
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+
+/////////////////////////////////////////////
+// ctor & dtor
+/////////////////////////////////////////////
+
+TreeViewVirtualFolderRoot::TreeViewVirtualFolderRoot()
+{
+}
+
+TreeViewVirtualFolderRoot::~TreeViewVirtualFolderRoot()
+{
+}
+
+
+DWORD TreeViewVirtualFolderRoot::GetIcon(MemoSelectView *pView, DWORD nStatus)
+{
+	if (nStatus & MEMO_VIEW_STATE_INIT) {
+		return IMG_VFOLDER;
+	}
+
+	// Get status
+	TV_ITEM ti;
+	ti.mask = TVIF_STATE | TVIF_IMAGE;
+	ti.hItem = GetViewItem();
+	ti.stateMask = TVIS_EXPANDED;
+	pView->GetItem(&ti);
+
+	BOOL bExpanded = ti.state & TVIS_EXPANDED;
+
+	if (nStatus & MEMO_VIEW_STATE_OPEN_SET) {
+		bExpanded = TRUE;
+	}
+	if (nStatus & MEMO_VIEW_STATE_OPEN_CLEAR) {
+		bExpanded = FALSE;
+	}
+
+	if (bExpanded) {
+		return IMG_VFOLDER_SEL;
+	} else {
+		return IMG_VFOLDER;
+	}
+}
+
+BOOL TreeViewVirtualFolderRoot::Expand(MemoSelectView *pView)
+{
+	HTREEITEM hParent = GetViewItem();
+
+	TString sVFpath;
+	if (!sVFpath.Join(g_Property.PropertyDir(), TEXT("\\"), TOMBO_VFOLDER_DEF_FILE)) return FALSE;
+
+	TSParser tp;
+	if (!tp.Init(sVFpath.Get(), pView, hParent)) return FALSE;
+	if (!tp.Compile()) return FALSE;
+
+	return TRUE;
+}
+
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+//  Virtual folder (non-root)
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+
+TreeViewVirtualFolder::TreeViewVirtualFolder() : pGenerator(NULL), pStore(NULL), pTail(NULL)
+{
+}
+
+TreeViewVirtualFolder::~TreeViewVirtualFolder()
+{
+	if (pGenerator) {
+		pGenerator->FreeObject();
+		delete pGenerator;
+	}
+}
+
+DWORD TreeViewVirtualFolder::GetIcon(MemoSelectView *pView, DWORD nStatus)
+{
+	if (nStatus & MEMO_VIEW_STATE_INIT) {
+		return IMG_VFOLDER;
+	}
+
+	// Get status
+	TV_ITEM ti;
+	ti.mask = TVIF_STATE | TVIF_IMAGE;
+	ti.hItem = GetViewItem();
+	ti.stateMask = TVIS_EXPANDED;
+	pView->GetItem(&ti);
+
+	BOOL bExpanded = ti.state & TVIS_EXPANDED;
+
+	if (nStatus & MEMO_VIEW_STATE_OPEN_SET) {
+		bExpanded = TRUE;
+	}
+	if (nStatus & MEMO_VIEW_STATE_OPEN_CLEAR) {
+		bExpanded = FALSE;
+	}
+
+	if (bExpanded) {
+		return IMG_VFOLDER_SEL;
+	} else {
+		return IMG_VFOLDER;
+	}
+}
+
+BOOL TreeViewVirtualFolder::SetGenerator(VFDirectoryGenerator *p)
+{
+	pGenerator = p;
+	pTail = p;
+	return TRUE;
+}
+
+BOOL TreeViewVirtualFolder::SetStore(VFStore *p)
+{
+	pStore = p;
+
+	if (!pTail) return FALSE;
+	pTail->SetNext(p);
+	pTail = NULL;
+
+	return TRUE;
+}
+
+BOOL TreeViewVirtualFolder::Expand(MemoSelectView *pView)
+{
+	HTREEITEM hItem = GetViewItem();
+
+	// set waiting cursor
+	HCURSOR hOrigCursor = SetCursor(LoadCursor(NULL, IDC_WAIT));
+
+	// scanning.
+	if (!pGenerator || !pStore || 
+		!pGenerator->Prepare() || 
+		!pGenerator->Activate() ||
+		!pGenerator->PostActivate()) {
+
+		SetCursor(hOrigCursor);
+		return FALSE;
+	}
+
+	// insert to tree
+	DWORD n = pStore->NumItem();
+	VFNote **ppNotes = pStore->GetNotes();
+	for (DWORD i = 0; i < n; i++) {
+		MemoNote *p = ppNotes[i]->GetNote();
+		LPCTSTR pTitle = ppNotes[i]->GetFileName();
+		pView->InsertFileToLast(hItem, p, pTitle);
+	}
+	pStore->FreeArray(); ppNotes = NULL;
+
+	// set normal cursor
+	SetCursor(hOrigCursor);
+	return TRUE;
 }
