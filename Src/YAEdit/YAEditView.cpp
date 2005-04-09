@@ -536,6 +536,7 @@ void YAEditView::SetCaretPos()
 		cf.ptCurrentPos.x = nCursorColPos - nColOffset;
 		cf.ptCurrentPos.y = (nCursorRow - nBaseLineNo) * nLineH;
 		ImmSetCompositionWindow(hIMC, &cf);
+		ImmSetCompositionFont(hIMC, &lfLogFont);
 		ImmReleaseContext(hViewWnd, hIMC);
 #endif
 
@@ -546,6 +547,16 @@ void YAEditView::SetCaretPos()
 			bShowCaret = FALSE;
 		}
 	}
+}
+
+void YAEditView::SetFont(HFONT h)
+{
+	if (h == NULL) return;
+	hFont = h;
+
+	GetObject(h, sizeof(LOGFONT), &lfLogFont);
+
+	ResetFontInfo();
 }
 
 /////////////////////////////////////////////////////////////////////////////

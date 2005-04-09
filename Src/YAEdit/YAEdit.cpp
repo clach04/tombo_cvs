@@ -225,7 +225,6 @@ void YAEdit::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	pView->OnCreate(hWnd, wParam, lParam);
 	pWrapper->SetViewWidth(pView->rClientRect.right - pView->rClientRect.left - pView->nMaxCharWidth);
 
-
 	// associate with default(empty) document.
 	// Since memory allocation check, object is created in Create(), and assoicated here.
 	SetDoc(pDoc);
@@ -933,10 +932,14 @@ BOOL YAEdit::UpdateNotify(PhysicalLineManager *pPhMgr, const Region *pOldRegion,
 
 void YAEdit::SetFont(HFONT hFont)
 {
-	if (hFont == NULL) return;
-	pView->hFont = hFont;
+	if (hFont == NULL) {
+		hFont = (HFONT)GetStockObject(SYSTEM_FONT);
+//		return;
+	}
+	pView->SetFont(hFont);
+//	pView->hFont = hFont;
 
-	pView->ResetFontInfo();
+//	pView->ResetFontInfo();
 	pWrapper->SetViewWidth(pView->rClientRect.right - pView->rClientRect.left - pView->nMaxCharWidth);
 
 	if (pLineMgr) delete pLineMgr;

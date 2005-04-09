@@ -262,6 +262,7 @@ BOOL TreeViewFileItem::Rename(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR 
 	}
 
 	loc.set(opt.pNewURI);
+	pView->GetManager()->ChangeURINotify(opt.pNewURI);
 	return TRUE;
 }
 

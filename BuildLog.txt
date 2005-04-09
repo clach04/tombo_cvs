@@ -952,3 +952,9 @@ Finding and encrypting to the folder may not work.
 * FIX: when changing property, repository's property is not updated
 * FIX: tdt is not renamed when encrypting/decrypting.
 
+////////////////////////////////
+// B181(TOMBO 1.14)
+////////////////////////////////
+
+* FIX: tdt is not renamed when renaming.
+

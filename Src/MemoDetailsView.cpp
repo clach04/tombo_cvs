@@ -58,6 +58,7 @@ const TomboURI* MemoDetailsView::GetCurrentURI()
 
 void MemoDetailsView::SetCurrentNote(const TomboURI *pURI)
 {
+	if (pCurrentURI == pURI) return;
 	delete pCurrentURI;
 	pCurrentURI = NULL;
 

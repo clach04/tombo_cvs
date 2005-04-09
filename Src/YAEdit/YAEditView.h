@@ -55,6 +55,7 @@ public:
 	DWORD nMaxWidthPixel; // max line width(pixels) in the document
 
 	HFONT hFont;
+	LOGFONT lfLogFont;
 
 	///////////////////////////////////////
 	// initializing
@@ -144,6 +145,7 @@ public:
 	void GetMaxLineWidth();
 
 	void ResetFontInfo();
+	void SetFont(HFONT hFont);
 };
 
 #endif

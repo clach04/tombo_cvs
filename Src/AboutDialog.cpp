@@ -12,8 +12,9 @@
 
 // version info
 
-//#define TOMBO_VERSION_INFO TEXT("Tombo version 1.14")
-#define TOMBO_VERSION_INFO TEXT("Tombo SNAPSHOT 20050330")
+#define TOMBO_VERSION_INFO TEXT("Tombo version 1.14")
+//#define TOMBO_VERSION_INFO TEXT("Tombo SNAPSHOT 20050403")
+//#define TOMBO_VERSION_INFO TEXT("Tombo 2.0 alpha 1")
 
 // copyrights and credits
 
@@ -21,7 +22,7 @@ LPCTSTR pCopyright =
 TOMBO_VERSION_INFO
 TEXT("\r\n")
 TEXT("  Copyright(C) 2000-2003 Tomohisa Hirami\r\n")
-TEXT("  Copyright(C) 2004 TOMBO maintainers\r\n")
+TEXT("  Copyright(C) 2004-2005 TOMBO maintainers\r\n")
 TEXT("\r\n")
 TEXT("MD5 library:\r\n")
 TEXT("  Copyright (C) 1995,1996,1998,1999 Free Software Foundation, Inc.\r\n")

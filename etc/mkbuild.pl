@@ -18,12 +18,12 @@ $zippg = "\"C:\\Program Files\\mzp\\mzp.exe\"";
 # File definition
 ##########################################################################
 
-$buildroot = "R:\\work2\\SF\\TOMBO";
-$docroot = "R:\\work2\\SF\\Docs";
-$builddir  = "R:\\temp\\Tombo-Rel";
+$buildroot = "E:\\work2\\SF\\TOMBO";
+$docroot = "E:\\work2\\SF\\Docs";
+$builddir  = "E:\\temp\\Tombo-Rel";
 
-$be500root = "R:\\work2\\BE500SDK\\Installer\\Japanese PC Tools";
-$be300root = "R:\\work2\\BE300SDK_1012\\Installer\\English PC Tools";
+$be500root = "E:\\work2\\BE500SDK\\Installer\\Japanese PC Tools";
+$be300root = "E:\\work2\\BE300SDK_1012\\Installer\\English PC Tools";
 
 @docsJP = (
 	["", "$docroot\\Jp\\COPYING-2_0.txt"],
