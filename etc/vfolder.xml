@@ -1,8 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-
 <!DOCTYPE folders SYSTEM "TOMBO_vfolder.dtd">
-
-
 <!-- 
 Sample file of virtual folder. 
 Place this file as same folder as Tombo.exe, you may be happy ;-)
@@ -26,8 +23,8 @@ In current version, encoding is allowed only UTF-8 or UTF-16.
     </grep>
   </vfolder>
   <vfolder name='Assigned'>
-    <Grep pattern='Ass: (.*)' >
+    <grep pattern='Ass: (.*)' >
       <src folder="\Todo"/>
-    </Grep>
+    </grep>
   </vfolder>
 </folders>
