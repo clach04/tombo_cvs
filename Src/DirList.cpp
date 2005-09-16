@@ -1,5 +1,6 @@
 #include <windows.h>
 #include <tchar.h>
+#include "Tombo.h"
 #include "DirList.h"
 #include "MemoNote.h"
 #include "TString.h"

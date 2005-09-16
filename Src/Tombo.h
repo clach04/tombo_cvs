@@ -84,6 +84,13 @@ enum SearchResult {
 	SR_CANCELED
 };
 
+// execution type
+enum ExeAppType {
+	ExecType_Assoc,
+	ExecType_ExtApp1,
+	ExecType_ExtApp2,
+};
+
 //
 #define VFOLDER_IMAGE_PERSIST	8
 #define VFOLDER_IMAGE_TEMP		6

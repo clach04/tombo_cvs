@@ -1,6 +1,7 @@
 #include <windows.h>
 #include <tchar.h>
 
+#include "Tombo.h"
 #include "Message.h"
 #include "UniConv.h"
 #include "TString.h"
@@ -179,7 +180,7 @@ BOOL LocalFileRepository::SaveIfHeadLineIsChanged(
 		TString sNewFile;
 
 		if (!sMemoDir.GetDirectoryPath(pNote->pPath)) return FALSE;
-		if (!MemoNote::GetHeadLinePath(sMemoDir.Get(), pHeadLine, pNote->GetExtension(),
+		if (!MemoNote::GetHeadLinePath(pTopDir, sMemoDir.Get(), pHeadLine, pNote->GetExtension(),
 							 &sNewFile, &pNotePath, pNewHeadLine)) return FALSE;
 
 		BOOL bResult = pNote->SaveData(g_pPassManager, pText, sNewFile.Get());
@@ -287,7 +288,7 @@ BOOL LocalFileRepository::GetHeadLine(const TomboURI *pURI, TString *pHeadLine)
 			if (!pURI->GetFilePath(&sPath)) return FALSE;
 			CryptedMemoNote cn;
 			cn.Init(sPath.Get());
-			LPTSTR p = cn.GetMemoBody(g_pPassManager);
+			LPTSTR p = cn.GetMemoBody(pTopDir, g_pPassManager);
 			if (p == NULL) return FALSE;
 			SecureBufferT sbt(p);
 			if (!MemoNote::GetHeadLineFromMemoText(p, pHeadLine)) return FALSE;
@@ -445,7 +446,7 @@ BOOL LocalFileRepository::NegotiateNewName(LPCTSTR pMemoPath, LPCTSTR pText, LPC
 			if (!MemoNote::GetHeadLineFromMemoText(pText, &sHeadLine)) return FALSE;
 		}
 	
-		if (!MemoNote::GetHeadLinePath(pMemoDir, sHeadLine.Get(), TEXT(".chi"), 
+		if (!MemoNote::GetHeadLinePath(pTopDir, pMemoDir, sHeadLine.Get(), TEXT(".chi"), 
 								pFullPath, ppNotePath, pNewHeadLine)) {
 			return FALSE;
 		}
@@ -464,7 +465,7 @@ TomboURI *LocalFileRepository::DoEncryptFile(const TomboURI *pOldURI, MemoNote *
 	if (!sMemoDir.GetDirectoryPath(pNote->MemoPath())) return NULL;
 
 	// Get plain memo data from file
-	LPTSTR pText = pNote->GetMemoBody(g_pPassManager);
+	LPTSTR pText = pNote->GetMemoBody(pTopDir, g_pPassManager);
 	if (pText == NULL) return NULL;
 	SecureBufferT sbt(pText);
 
@@ -516,7 +517,7 @@ BOOL LocalFileRepository::EncryptLeaf(const TomboURI *pPlainURI, URIOption *pOpt
 	pOption->pNewURI = DoEncryptFile(pPlainURI, pPlain, pOption->pNewHeadLine);
 	if (pOption->pNewURI == NULL) return FALSE;
 
-	if (!pPlain->DeleteMemoData()) {
+	if (!pPlain->DeleteMemoData(pTopDir)) {
 		SetLastError(ERROR_TOMBO_W_DELETEOLD_FAILED);
 		return FALSE;
 	}
@@ -532,7 +533,7 @@ BOOL LocalFileRepository::DecryptLeaf(const TomboURI *pCurrentURI, URIOption *pO
 
 	if ((pOption->pNewHeadLine = new TString()) == NULL) return FALSE;
 
-	MemoNote *p = pCur->Decrypt(g_pPassManager, pOption->pNewHeadLine, &b);
+	MemoNote *p = pCur->Decrypt(pTopDir, g_pPassManager, pOption->pNewHeadLine, &b);
 	if (p == NULL) return FALSE;
 	AutoPointer<MemoNote> ap2(p);
 
@@ -549,7 +550,7 @@ BOOL LocalFileRepository::DecryptLeaf(const TomboURI *pCurrentURI, URIOption *pO
 		MoveFile(sOrigTDT.Get(), sNewTDT.Get());
 	}
 
-	if (!pCur->DeleteMemoData()) {
+	if (!pCur->DeleteMemoData(pTopDir)) {
 		SetLastError(ERROR_TOMBO_W_DELETEOLD_FAILED);
 		return FALSE;
 	}
@@ -596,7 +597,7 @@ BOOL LocalFileRepository::Delete(const TomboURI *pURI, URIOption *pOption)
 		if (pNote == NULL) return FALSE;
 		AutoPointer<MemoNote> ap(pNote);
 
-		return pNote->DeleteMemoData();
+		return pNote->DeleteMemoData(pTopDir);
 	} else {
 		TString sFullPath;
 		if (!GetPhysicalPath(pURI, &sFullPath)) return FALSE;
@@ -722,7 +723,7 @@ BOOL LocalFileRepository::Copy(const TomboURI *pCopyFrom, const TomboURI *pCopyT
 
 			LPCTSTR pMemoPath = sToPath.Get() + _tcslen(pTopDir) + 1;
 
-			MemoNote *pNewNote = MemoNote::CopyMemo(pNote, pMemoPath, pOption->pNewHeadLine);
+			MemoNote *pNewNote = MemoNote::CopyMemo(pTopDir, pNote, pMemoPath, pOption->pNewHeadLine);
 			if (pNewNote == NULL) return FALSE;
 			AutoPointer<MemoNote> ap2(pNewNote);
 
@@ -775,7 +776,7 @@ BOOL LocalFileRepository::ChangeHeadLine(const TomboURI *pURI, LPCTSTR pReqNewHe
 		if (pNote == NULL) return FALSE;
 		AutoPointer<MemoNote> ap(pNote);
 
-		if (!pNote->Rename(pReqNewHeadLine)) return FALSE;
+		if (!pNote->Rename(pTopDir, pReqNewHeadLine)) return FALSE;
 
 		TomboURI *p = new TomboURI();
 		if (p == NULL || !pNote->GetURI(p)) {
@@ -840,7 +841,7 @@ BOOL LocalFileRepository::RequestAllocateURI(const TomboURI *pBaseURI, LPCTSTR p
 	LPTSTR pNotePath;
 
 	if (!MemoNote::GetHeadLineFromMemoText(pText, &sHeadLine)) return FALSE;
-	if (!MemoNote::GetHeadLinePath(pMemoPath, sHeadLine.Get(), pNote->GetExtension(), &sFullPath, &pNotePath, pHeadLine)) return FALSE;
+	if (!MemoNote::GetHeadLinePath(pTopDir, pMemoPath, sHeadLine.Get(), pNote->GetExtension(), &sFullPath, &pNotePath, pHeadLine)) return FALSE;
 	if (!pNote->Init(pNotePath)) return FALSE;
 
 	if (!pNote->GetURI(pURI)) return FALSE;
@@ -863,9 +864,19 @@ BOOL LocalFileRepository::GetAttribute(const TomboURI *pURI, NoteAttribute *pAtt
 
 	BOOL bReadOnly;
 	if (!g_Property.OpenReadOnly()) {
-		if (!pNote->IsReadOnly(&bReadOnly)) {
-			return FALSE;
-		}
+//		if (!pNote->IsReadOnly(&bReadOnly)) {
+//			return FALSE;
+//		}
+		TString sFullPath;
+		if (!sFullPath.Join(pTopDir, TEXT("\\"), pNote->MemoPath())) return FALSE;
+
+		WIN32_FIND_DATA wfd;
+		HANDLE h = FindFirstFile(sFullPath.Get(), &wfd);
+		if (h == INVALID_HANDLE_VALUE) return FALSE;
+		FindClose(h);
+
+		bReadOnly = (wfd.dwFileAttributes & FILE_ATTRIBUTE_READONLY) == FILE_ATTRIBUTE_READONLY;
+
 	} else {
 		bReadOnly = TRUE;
 	}
@@ -899,7 +910,7 @@ LPTSTR LocalFileRepository::GetNoteData(const TomboURI *pURI)
 
 	do {
 		bLoop = FALSE;
-		p = pNote->GetMemoBody(g_pPassManager);
+		p = pNote->GetMemoBody(pTopDir, g_pPassManager);
 		if (p == NULL) {
 			DWORD nError = GetLastError();
 			if (nError == ERROR_INVALID_PASSWORD) {
@@ -910,4 +921,126 @@ LPTSTR LocalFileRepository::GetNoteData(const TomboURI *pURI)
 		}
 	} while (bLoop);
 	return p;
+}
+
+BOOL LocalFileRepository::ExecuteAssoc(const TomboURI *pURI, ExeAppType nType)
+{
+	URIOption opt(NOTE_OPTIONMASK_VALID);
+	if (!GetOption(pURI, &opt)) return FALSE;
+	if (opt.bValid == FALSE) {
+		SetLastError(ERROR_TOMBO_E_INVALIDURI);
+		return FALSE;
+	}
+
+	if (opt.bFolder) {
+		if (nType != ExecType_Assoc) {
+			SetLastError(ERROR_NOT_SUPPORTED);
+			return FALSE;
+		}
+
+		TString sCurrentPath;
+		if (!GetPhysicalPath(pURI, &sCurrentPath)) return FALSE;
+
+#if defined(PLATFORM_PKTPC)
+		STARTUPINFO si;
+		PROCESS_INFORMATION pi;
+		memset(&si, 0, sizeof(si));
+		memset(&pi, 0, sizeof(pi));
+		si.cb = sizeof(si);
+
+		if (!CreateProcess(TEXT("\\windows\\iexplore.exe"), sCurrentPath.Get(), NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi)) return FALSE;
+		CloseHandle(pi.hProcess);
+		CloseHandle(pi.hThread);
+		return TRUE;
+#else
+		SHELLEXECUTEINFO se;
+		memset(&se, 0, sizeof(se));
+		se.cbSize = sizeof(se);
+		se.hwnd = NULL;
+		se.lpVerb = TEXT("explore");
+		se.lpFile = sCurrentPath.Get();
+		se.lpParameters = NULL;
+		se.lpDirectory = NULL;
+		se.nShow = SW_SHOWNORMAL;
+		ShellExecuteEx(&se);
+		return TRUE;
+#endif
+	} else {
+		TString sFullPath;
+		if (!GetPhysicalPath(pURI, &sFullPath)) return FALSE;
+
+		if (nType == ExecType_Assoc) {
+			SHELLEXECUTEINFO se;
+			memset(&se, 0, sizeof(se));
+			se.cbSize = sizeof(se);
+			se.hwnd = NULL;
+			se.lpVerb = TEXT("open");
+			se.lpFile = sFullPath.Get();
+			se.lpParameters = NULL;
+			se.lpDirectory = NULL;
+			se.nShow = SW_SHOWNORMAL;
+			ShellExecuteEx(&se);
+			if ((int)se.hInstApp < 32) return FALSE;
+			return TRUE;
+		} else if (nType == ExecType_ExtApp1 || nType == ExecType_ExtApp2) {
+			LPCTSTR pExeFile = nType == ExecType_ExtApp1 ? g_Property.GetExtApp1() : g_Property.GetExtApp2();
+			STARTUPINFO si;
+			PROCESS_INFORMATION pi;
+			memset(&si, 0, sizeof(si));
+			memset(&pi, 0, sizeof(pi));
+			si.cb = sizeof(si);
+
+			TString sExe;
+			TString sCmdLine;
+#if defined(PLATFORM_WIN32)
+			if (!sCmdLine.Join(TEXT("\""), pExeFile, TEXT("\" "))) return FALSE;
+			if (!sCmdLine.StrCat(TEXT("\""))) return FALSE;
+			if (!sCmdLine.StrCat(sFullPath.Get())) return FALSE;
+			if (!sCmdLine.StrCat(TEXT("\""))) return FALSE;
+			if (!CreateProcess(NULL, sCmdLine.Get(), NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi)) return FALSE;
+			CloseHandle(pi.hProcess);
+			CloseHandle(pi.hThread);
+			return TRUE;
+
+#endif
+#if defined(PLATFORM_HPC)
+			if (!sExe.Set(pExeFile)) return FALSE;
+			if (!sCmdLine.Join(TEXT("\""), sFullPath.Get(), TEXT("\""))) return FALSE;
+			if (!CreateProcess(sExe.Get(), sCmdLine.Get(), NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi)) return FALSE;
+			CloseHandle(pi.hProcess);
+			CloseHandle(pi.hThread);
+			return TRUE;
+
+#endif
+#if defined(PLATFORM_PKTPC)
+			if (!sExe.Set(pExeFile)) return FALSE;
+			if (!sCmdLine.Set(sFullPath.Get())) return FALSE;
+			if (!CreateProcess(sExe.Get(), sCmdLine.Get(), NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi)) return FALSE;
+			CloseHandle(pi.hProcess);
+			CloseHandle(pi.hThread);
+			return TRUE;
+#endif
+#if defined(PLATFORM_BE500)
+			return CoshExecute(pView->GetHWnd(), pExeFile, sFullPath.Get());
+#endif
+		} else {
+			SetLastError(ERROR_NOT_SUPPORTED);
+			return FALSE;
+		}
+	}
+}
+
+BOOL LocalFileRepository::MakeFolder(const TomboURI *pURI, LPCTSTR pFolderName)
+{
+	URIOption opt(NOTE_OPTIONMASK_VALID);
+	if (!GetOption(pURI, &opt)) return FALSE;
+	if (!opt.bValid) { SetLastError(ERROR_TOMBO_E_INVALIDURI); return FALSE; }
+	if (!opt.bFolder) { SetLastError(ERROR_NOT_SUPPORTED); return FALSE; }
+
+	TString sPath;
+	if (!GetPhysicalPath(pURI, &sPath)) return FALSE;
+	if (!sPath.StrCat(pFolderName)) return FALSE;
+	TrimRight(sPath.Get());
+	ChopFileSeparator(sPath.Get());
+	return CreateDirectory(sPath.Get(), NULL);
 }

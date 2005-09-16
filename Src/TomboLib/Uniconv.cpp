@@ -1180,7 +1180,7 @@ LPWSTR ConvUTF8ToUCS2(const char *pUTFData)
 			c = (w1 << 12) | (w2 << 6) | w3;
 			*q++ = c;
 			p+= 3;
-		} else if ((*p & 0xE0) == 0xC0 && (*(p+1) & 0xA0) == 0x80) {
+		} else if ((*p & 0xE0) == 0xC0 && (*(p+1) & 0x80) == 0x80) {
 			// 2byte code
 			w1 = *p & 0x1F;
 			w2 = *(p+1) & 0x3F;

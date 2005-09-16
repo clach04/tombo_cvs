@@ -962,5 +962,12 @@ Finding and encrypting to the folder may not work.
 // B182(TOMBO 2.0 ALPHA 2)
 ////////////////////////////////
 
-(none)
+Some bugs are fixed.
+
+////////////////////////////////
+// B183
+////////////////////////////////
+
+* FIX: invalid UTF-8 encoding
+- removing g_Property.TopDir() dependency.
 

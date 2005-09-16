@@ -1,6 +1,7 @@
 #include <windows.h>
 #include <tchar.h>
 
+#include "Tombo.h"
 #include "TString.h"
 #include "TomboURI.h"
 #include "Repository.h"
@@ -8,6 +9,9 @@
 #include "MemoNote.h"
 
 #include "RepositoryImpl.h"
+
+// At this time, Repository is only proxy to RepositoryImpl.
+// This class will choose repository implementations in future.
 
 /////////////////////////////////////////
 // Global definition
@@ -127,6 +131,16 @@ LPTSTR Repository::GetNoteData(const TomboURI *pURI)
 	return pDefaultImpl->GetNoteData(pURI);
 }
 
+BOOL Repository::ExecuteAssoc(const TomboURI *pURI, ExeAppType nType)
+{
+	return pDefaultImpl->ExecuteAssoc(pURI, nType);
+}
+
+BOOL Repository::MakeFolder(const TomboURI *pParent, LPCTSTR pFolderName)
+{
+	return pDefaultImpl->MakeFolder(pParent, pFolderName);
+}
+
 /////////////////////////////////////////
 // get attach URI
 /////////////////////////////////////////
@@ -140,6 +154,7 @@ BOOL Repository::GetAttachURI(const TomboURI *pBase, TomboURI *pAttached)
 	}
 	return TRUE;
 }
+
 
 /////////////////////////////////////////
 // URIOption implimentation

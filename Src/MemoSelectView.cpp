@@ -580,15 +580,15 @@ void MemoSelectView::OnNotify_RClick(POINT pt)
 		break;
 	case IDM_ASSOC:
 		TreeView_SelectItem(hViewWnd, hti.hItem);
-		pItem->ExecApp(pMemoMgr, this, TreeViewItem::ExecType_Assoc);
+		pItem->ExecApp(pMemoMgr, this, ExecType_Assoc);
 		break;
 	case IDM_EXTAPP1:
 		TreeView_SelectItem(hViewWnd, hti.hItem);
-		pItem->ExecApp(pMemoMgr, this, TreeViewItem::ExecType_ExtApp1);
+		pItem->ExecApp(pMemoMgr, this, ExecType_ExtApp1);
 		break;
 	case IDM_EXTAPP2:
 		TreeView_SelectItem(hViewWnd, hti.hItem);
-		pItem->ExecApp(pMemoMgr, this, TreeViewItem::ExecType_ExtApp2);
+		pItem->ExecApp(pMemoMgr, this, ExecType_ExtApp2);
 		break;
 	}
 }

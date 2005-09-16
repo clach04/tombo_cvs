@@ -95,25 +95,14 @@ BOOL MemoManager::MakeNewFolder(HWND hWnd, TreeViewItem *pItem)
 
 		LPCTSTR pFolder = dlg.FolderName();
 
-		TString sPartPath;
-		TString sPath;
+		TomboURI sBaseURI, sURI;
+		if (!pMemoSelectView->GetURI(&sBaseURI, pItem->GetViewItem())) return FALSE;
+		if (!g_Repository.GetAttachURI(&sBaseURI, &sURI)) return FALSE;
+		HTREEITEM hItem = pMemoSelectView->GetItemFromURI(sURI.GetFullURI());
 
-		HTREEITEM hItem;
-		hItem = pMemoSelectView->GetPathForNewItem(&sPartPath, pItem);
-		if (hItem == NULL) return FALSE;
+		if (!g_Repository.MakeFolder(&sURI, pFolder)) return FALSE;
+		pMemoSelectView->CreateNewFolder(hItem, pFolder);
 
-		if (!sPath.Join(g_Property.TopDir(), TEXT("\\"), sPartPath.Get())) return FALSE;		
-
-		if (!sPath.StrCat(pFolder)) return FALSE;
-		TrimRight(sPath.Get());
-		ChopFileSeparator(sPath.Get());
-
-		if (CreateDirectory(sPath.Get(), NULL)) {
-			// ƒtƒHƒ‹ƒ_‚Ì‘}“ü
-			pMemoSelectView->CreateNewFolder(hItem, pFolder);
-		} else {
-			return FALSE;
-		}
 	}
 	return TRUE;
 }

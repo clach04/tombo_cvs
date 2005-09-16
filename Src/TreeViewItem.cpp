@@ -330,62 +330,7 @@ BOOL TreeViewFileItem::LoadMemo(MemoSelectView *pView, BOOL bAskPass)
 
 BOOL TreeViewFileItem::ExecApp(MemoManager *pMgr, MemoSelectView *pView, ExeAppType nType)
 {
-	TString sFullPath;
-	if (!g_Repository.GetPhysicalPath(loc.getURI(), &sFullPath)) return FALSE;
-
-	if (nType == ExecType_Assoc) {
-		SHELLEXECUTEINFO se;
-		memset(&se, 0, sizeof(se));
-		se.cbSize = sizeof(se);
-		se.hwnd = pView->GetHWnd();
-		se.lpVerb = TEXT("open");
-		se.lpFile = sFullPath.Get();
-		se.lpParameters = NULL;
-		se.lpDirectory = NULL;
-		se.nShow = SW_SHOWNORMAL;
-		ShellExecuteEx(&se);
-		if ((int)se.hInstApp < 32) return FALSE;
-		return TRUE;
-	}
-	if (nType == ExecType_ExtApp1 || nType == ExecType_ExtApp2) {
-		LPCTSTR pExeFile = nType == ExecType_ExtApp1 ? g_Property.GetExtApp1() : g_Property.GetExtApp2();
-		STARTUPINFO si;
-		PROCESS_INFORMATION pi;
-		memset(&si, 0, sizeof(si));
-		memset(&pi, 0, sizeof(pi));
-		si.cb = sizeof(si);
-
-		TString sExe;
-		TString sCmdLine;
-#if defined(PLATFORM_WIN32)
-		if (!sCmdLine.Join(TEXT("\""), pExeFile, TEXT("\" "))) return FALSE;
-		if (!sCmdLine.StrCat(TEXT("\""))) return FALSE;
-		if (!sCmdLine.StrCat(sFullPath.Get())) return FALSE;
-		if (!sCmdLine.StrCat(TEXT("\""))) return FALSE;
-		if (!CreateProcess(NULL, sCmdLine.Get(), NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi)) return FALSE;
-		CloseHandle(pi.hProcess);
-		CloseHandle(pi.hThread);
-#endif
-#if defined(PLATFORM_HPC)
-		if (!sExe.Set(pExeFile)) return FALSE;
-		if (!sCmdLine.Join(TEXT("\""), sFullPath.Get(), TEXT("\""))) return FALSE;
-		if (!CreateProcess(sExe.Get(), sCmdLine.Get(), NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi)) return FALSE;
-		CloseHandle(pi.hProcess);
-		CloseHandle(pi.hThread);
-#endif
-#if defined(PLATFORM_PKTPC)
-		if (!sExe.Set(pExeFile)) return FALSE;
-		if (!sCmdLine.Set(sFullPath.Get())) return FALSE;
-		if (!CreateProcess(sExe.Get(), sCmdLine.Get(), NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi)) return FALSE;
-		CloseHandle(pi.hProcess);
-		CloseHandle(pi.hThread);
-#endif
-#if defined(PLATFORM_BE500)
-		return CoshExecute(pView->GetHWnd(), pExeFile, sFullPath.Get());
-#endif
-		return TRUE;
-	}
-
+	if(!g_Repository.ExecuteAssoc(loc.getURI(), nType)) return FALSE;
 	return TRUE;
 }
 
@@ -677,39 +622,10 @@ BOOL TreeViewFolderItem::Expand(MemoSelectView *pView)
 
 BOOL TreeViewFolderItem::ExecApp(MemoManager *pMgr, MemoSelectView *pView, ExeAppType nType)
 {
-	if (nType != ExecType_Assoc) return FALSE;
-
-	TCHAR buf[MAX_PATH];
-	TString sCurrentPath;
-	HTREEITEM hItem = GetViewItem();
-	LPTSTR pCurrentPath = pView->GeneratePath(hItem, buf, MAX_PATH);
-	if (!sCurrentPath.Join(g_Property.TopDir(), TEXT("\\"), pCurrentPath)) return FALSE;
-
-#if defined(PLATFORM_PKTPC)
-	STARTUPINFO si;
-	PROCESS_INFORMATION pi;
-	memset(&si, 0, sizeof(si));
-	memset(&pi, 0, sizeof(pi));
-	si.cb = sizeof(si);
-
-	if (!CreateProcess(TEXT("\\windows\\iexplore.exe"), sCurrentPath.Get(), NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi)) return FALSE;
-	CloseHandle(pi.hProcess);
-	CloseHandle(pi.hThread);
+	TomboURI sURI;
+	if (!pView->GetURI(&sURI)) return FALSE;
+	g_Repository.ExecuteAssoc(&sURI, nType);
 	return TRUE;
-#else
-
-	SHELLEXECUTEINFO se;
-	memset(&se, 0, sizeof(se));
-	se.cbSize = sizeof(se);
-	se.hwnd = pView->GetHWnd();
-	se.lpVerb = TEXT("explore");
-	se.lpFile = sCurrentPath.Get();
-	se.lpParameters = NULL;
-	se.lpDirectory = NULL;
-	se.nShow = SW_SHOWNORMAL;
-	ShellExecuteEx(&se);
-	return TRUE;
-#endif
 }
 
 /////////////////////////////////////////////

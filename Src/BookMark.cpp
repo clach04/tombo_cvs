@@ -1,5 +1,6 @@
 #include <windows.h>
 #include <tchar.h>
+#include "Tombo.h"
 #include "VarBuffer.h"
 #include "TString.h"
 #include "TomboURI.h"

@@ -44,12 +44,6 @@ public:
 		OpLink		= (1 << 10)
 	};
 
-	enum ExeAppType {
-		ExecType_Assoc,
-		ExecType_ExtApp1,
-		ExecType_ExtApp2,
-	};
-
 	///////////////////////////////////////////////////////
 	// TreeViewItem specific methods
 

@@ -8,6 +8,7 @@
 #include "TString.h"
 #include "UniConv.h"
 #include "MemoNote.h"
+#include "Property.h"
 
 extern "C" {
 void* Regex_Compile(const char *pPattern, BOOL bIgnoreCase, const char **ppReason);
@@ -181,7 +182,7 @@ SearchResult SearchEngineA::Search(MemoNote *pNote)
 		// skip crypted note if it is not search target.
 		if (!IsSearchEncryptMemo() && pNote->IsEncrypted()) return SR_NOTFOUND;
 
-		char *pMemo = pNote->GetMemoBodyA(g_pPasswordManager);
+		char *pMemo = pNote->GetMemoBodyA(g_Property.TopDir(), g_pPasswordManager);
 		if (pMemo == NULL) return SR_FAILED;
 
 		BOOL bMatch = SearchForward(pMemo, 0, FALSE);

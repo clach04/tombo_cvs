@@ -49,6 +49,8 @@ public:
 	virtual BOOL SetAttribute(const TomboURI *pURI, const NoteAttribute *pAttribute) = 0;
 
 	virtual LPTSTR GetNoteData(const TomboURI *pURI) = 0;
+	virtual BOOL ExecuteAssoc(const TomboURI *pURI, ExeAppType nType) = 0;
+	virtual BOOL MakeFolder(const TomboURI *pURI, LPCTSTR pFolderName) = 0;
 
 	////////////////////////////
 	// helper function
@@ -127,6 +129,8 @@ public:
 
 	LPTSTR GetNoteData(const TomboURI *pURI);
 
+	BOOL ExecuteAssoc(const TomboURI *pURI, ExeAppType nType);
+	BOOL MakeFolder(const TomboURI *pURI, LPCTSTR pFolderName);
 };
 
 #endif

@@ -62,13 +62,13 @@ BOOL MemoNote::Equal(MemoNote *pTarget)
 // メモ内容の取得(MemoNote)
 /////////////////////////////////////////////
 
-LPTSTR MemoNote::GetMemoBody(PasswordManager *pMgr) const
+LPTSTR MemoNote::GetMemoBody(LPCTSTR pTopDir, PasswordManager *pMgr) const
 {
 	SetLastError(ERROR_INVALID_FUNCTION);
 	return NULL;
 }
 
-char *MemoNote::GetMemoBodyA(PasswordManager *pMgr) const
+char *MemoNote::GetMemoBodyA(LPCTSTR pTopDir, PasswordManager *pMgr) const
 {
 	SetLastError(ERROR_INVALID_FUNCTION);
 	return NULL;
@@ -115,10 +115,10 @@ BOOL MemoNote::GetURI(TomboURI *pURI) const
 // メモ内容の取得(PlainMemoNote)
 /////////////////////////////////////////////
 
-char *PlainMemoNote::GetMemoBodyA(PasswordManager*) const
+char *PlainMemoNote::GetMemoBodyA(LPCTSTR pTopDir, PasswordManager*) const
 {
 	TString sFileName;
-	if (!sFileName.Join(g_Property.TopDir(), TEXT("\\"), pPath)) return NULL;
+	if (!sFileName.Join(pTopDir, TEXT("\\"), pPath)) return NULL;
 
 	File inf;
 	if (!inf.Open(sFileName.Get(), GENERIC_READ, FILE_SHARE_READ, OPEN_EXISTING)) return NULL;
@@ -133,9 +133,9 @@ char *PlainMemoNote::GetMemoBodyA(PasswordManager*) const
 	return pText;
 }
 
-LPTSTR PlainMemoNote::GetMemoBody(PasswordManager *p) const
+LPTSTR PlainMemoNote::GetMemoBody(LPCTSTR pTopDir, PasswordManager *p) const
 {
-	char *pText = GetMemoBodyA(p);
+	char *pText = GetMemoBodyA(pTopDir, p);
 	if (!pText) return NULL;
 
 	LPTSTR pMemo = ConvSJIS2Unicode(pText);
@@ -148,13 +148,13 @@ LPTSTR PlainMemoNote::GetMemoBody(PasswordManager *p) const
 /////////////////////////////////////////////
 // メモ内容の取得(CryptedMemoNote)
 /////////////////////////////////////////////
-LPBYTE CryptedMemoNote::GetMemoBodySub(PasswordManager *pMgr, LPDWORD pSize) const
+LPBYTE CryptedMemoNote::GetMemoBodySub(LPCTSTR pTopDir, PasswordManager *pMgr, LPDWORD pSize) const
 {
 	CryptManager cMgr;
 	BOOL bRegistedPassword = TRUE;
 
 	TString sFileName;
-	if (!sFileName.Join(g_Property.TopDir(), TEXT("\\"), pPath)) return NULL;
+	if (!sFileName.Join(pTopDir, TEXT("\\"), pPath)) return NULL;
 
 	BOOL bCancel;
 	const char *pPassword = pMgr->Password(&bCancel, FALSE);
@@ -182,16 +182,16 @@ LPBYTE CryptedMemoNote::GetMemoBodySub(PasswordManager *pMgr, LPDWORD pSize) con
 	return pPlain;
 }
 
-char *CryptedMemoNote::GetMemoBodyA(PasswordManager *pMgr) const
+char *CryptedMemoNote::GetMemoBodyA(LPCTSTR pTopDir, PasswordManager *pMgr) const
 {
 	DWORD nSize;
-	return (char*)GetMemoBodySub(pMgr, &nSize);
+	return (char*)GetMemoBodySub(pTopDir, pMgr, &nSize);
 }
 
-LPTSTR CryptedMemoNote::GetMemoBody(PasswordManager *pMgr) const
+LPTSTR CryptedMemoNote::GetMemoBody(LPCTSTR pTopDir, PasswordManager *pMgr) const
 {
 	DWORD nSize;
-	LPBYTE pPlain = GetMemoBodySub(pMgr, &nSize);
+	LPBYTE pPlain = GetMemoBodySub(pTopDir, pMgr, &nSize);
 	if (!pPlain) return NULL;
 
 	LPTSTR pMemo = ConvSJIS2Unicode((const char*)pPlain);
@@ -247,15 +247,15 @@ BOOL CryptedMemoNote::SaveData(PasswordManager *pMgr, const char *pText, LPCTSTR
 // 復号化
 /////////////////////////////////////////////
 
-MemoNote *MemoNote::Decrypt(PasswordManager *pMgr, TString *pHeadLine, BOOL *pIsModified) const
+MemoNote *MemoNote::Decrypt(LPCTSTR pTopDir, PasswordManager *pMgr, TString *pHeadLine, BOOL *pIsModified) const
 {
 	return NULL;
 }
 
-MemoNote *CryptedMemoNote::Decrypt(PasswordManager *pMgr, TString *pHeadLine, BOOL *pIsModified) const
+MemoNote *CryptedMemoNote::Decrypt(LPCTSTR pTopDir, PasswordManager *pMgr, TString *pHeadLine, BOOL *pIsModified) const
 {
 	// メモ本文取得
-	LPTSTR pText = GetMemoBody(pMgr);
+	LPTSTR pText = GetMemoBody(pTopDir, pMgr);
 	if (pText == NULL) return FALSE;
 	SecureBufferT sTextT(pText);
 
@@ -272,7 +272,7 @@ MemoNote *CryptedMemoNote::Decrypt(PasswordManager *pMgr, TString *pHeadLine, BO
 		if (!GetHeadLineFromMemoText(pText, &sHeadLine)) return FALSE;
 	}
 
-	if (!GetHeadLinePath(sMemoDir.Get(), sHeadLine.Get(), TEXT(".txt"), &sFullPath, &pNotePath, pHeadLine)) {
+	if (!GetHeadLinePath(pTopDir, sMemoDir.Get(), sHeadLine.Get(), TEXT(".txt"), &sFullPath, &pNotePath, pHeadLine)) {
 		return FALSE;
 	}
 
@@ -299,14 +299,14 @@ MemoNote *CryptedMemoNote::Decrypt(PasswordManager *pMgr, TString *pHeadLine, BO
 // データの削除
 /////////////////////////////////////////////
 
-BOOL MemoNote::DeleteMemoData() const 
+BOOL MemoNote::DeleteMemoData(LPCTSTR pTopDir) const 
 {
 	TString sFileName;
-	if (!sFileName.Join(g_Property.TopDir(), TEXT("\\"), pPath)) return FALSE;
+	if (!sFileName.Join(pTopDir, TEXT("\\"), pPath)) return FALSE;
 
 	// 付加情報を保持していた場合にはその情報も削除
 	if (MemoPath()) {
-		MemoInfo mi(g_Property.TopDir());
+		MemoInfo mi(pTopDir);
 		mi.DeleteInfo(MemoPath());
 	}
 
@@ -426,27 +426,27 @@ static BOOL IsFileExist(LPCTSTR pFileName)
 //					  必要なら"(n)"でディレクトリで一意となるように調整されている
 //		pNewHeadLine: 一覧表示用新ヘッドライン(必要に応じて"(n)"が付与されている)
 
-BOOL MemoNote::GetHeadLinePath(LPCTSTR pMemoPath, LPCTSTR pHeadLine, LPCTSTR pExt, 
+BOOL MemoNote::GetHeadLinePath(LPCTSTR pTopDir, LPCTSTR pMemoPath, LPCTSTR pHeadLine, LPCTSTR pExt, 
 							TString *pFullPath, LPTSTR *ppNotePath, TString *pNewHeadLine)
 {
 	DWORD n = _tcslen(pHeadLine);
 	if (n < _tcslen(DEFAULT_HEADLINE)) n = _tcslen(DEFAULT_HEADLINE);
 
 	DWORD nHeadLineLen = n + 20;
-	DWORD nFullPathLen = _tcslen(g_Property.TopDir()) + 1 + 
+	DWORD nFullPathLen = _tcslen(pTopDir) + 1 + 
 						 _tcslen(pMemoPath) + nHeadLineLen + _tcslen(pExt);
 	if (!pNewHeadLine->Alloc(nHeadLineLen + 1)) return FALSE;
 	if (!pFullPath->Alloc(nFullPathLen + 1)) return FALSE;
 
 	DropInvalidFileChar(pNewHeadLine->Get(), pHeadLine);
 	if (_tcslen(pNewHeadLine->Get()) == 0) _tcscpy(pNewHeadLine->Get(), DEFAULT_HEADLINE);
-	wsprintf(pFullPath->Get(), TEXT("%s\\%s%s"), g_Property.TopDir(), pMemoPath, pNewHeadLine->Get());
+	wsprintf(pFullPath->Get(), TEXT("%s\\%s%s"), pTopDir, pMemoPath, pNewHeadLine->Get());
 
 	LPTSTR p = pFullPath->Get();
 	LPTSTR q = p + _tcslen(p);
 	LPTSTR r = pNewHeadLine->Get() + _tcslen(pNewHeadLine->Get());
 
-	*ppNotePath = pFullPath->Get() + _tcslen(g_Property.TopDir()) + 1;
+	*ppNotePath = pFullPath->Get() + _tcslen(pTopDir) + 1;
 
 	// ファイル名の確定
 	// 同名のファイルが存在した場合には"(n)"を付加する
@@ -500,7 +500,7 @@ BOOL MemoNote::GetHeadLineFromFilePath(LPCTSTR pFilePath, TString *pHeadLine)
 // メモファイルをコピーしてインスタンスを生成
 ////////////////////////////////////////////////////////
 
-MemoNote *MemoNote::CopyMemo(const MemoNote *pOrig, LPCTSTR pMemoPath, TString *pHeadLine)
+MemoNote *MemoNote::CopyMemo(LPCTSTR pTopDir, const MemoNote *pOrig, LPCTSTR pMemoPath, TString *pHeadLine)
 {
 	MemoNote *pNote;
 	pNote = pOrig->GetNewInstance();
@@ -517,13 +517,13 @@ MemoNote *MemoNote::CopyMemo(const MemoNote *pOrig, LPCTSTR pMemoPath, TString *
 		delete pNote;
 		return NULL;
 	}
-	if (!GetHeadLinePath(pMemoPath, sHeadLine.Get(), pNote->GetExtension(), &sNewFullPath, &pNotePath, pHeadLine)) {
+	if (!GetHeadLinePath(pTopDir, pMemoPath, sHeadLine.Get(), pNote->GetExtension(), &sNewFullPath, &pNotePath, pHeadLine)) {
 		delete pNote;
 		return NULL;
 	}
 
 	TString sOrigPath;
-	if (!sOrigPath.Join(g_Property.TopDir(), TEXT("\\"), pOrig->MemoPath())) {
+	if (!sOrigPath.Join(pTopDir, TEXT("\\"), pOrig->MemoPath())) {
 		delete pNote;
 		return NULL;
 	}
@@ -545,7 +545,7 @@ MemoNote *MemoNote::CopyMemo(const MemoNote *pOrig, LPCTSTR pMemoPath, TString *
 // ファイル名変更
 /////////////////////////////////////////////
 
-BOOL MemoNote::Rename(LPCTSTR pNewName)
+BOOL MemoNote::Rename(LPCTSTR pTopDir, LPCTSTR pNewName)
 {
 	TString sPath;
 	if (!sPath.GetDirectoryPath(pPath)) return FALSE;
@@ -568,8 +568,8 @@ BOOL MemoNote::Rename(LPCTSTR pNewName)
 	// ファイル名リネーム用パス生成
 	TString sOldFullPath;
 	TString sNewFullPath;
-	if (!sOldFullPath.Join(g_Property.TopDir(), TEXT("\\"), pPath) ||
-		!sNewFullPath.Join(g_Property.TopDir(), TEXT("\\"), pNewPath)) {
+	if (!sOldFullPath.Join(pTopDir, TEXT("\\"), pPath) ||
+		!sNewFullPath.Join(pTopDir, TEXT("\\"), pNewPath)) {
 		delete [] pNewPath;
 		return FALSE;
 	}
@@ -581,32 +581,12 @@ BOOL MemoNote::Rename(LPCTSTR pNewName)
 	}
 
 	// *.tdtのリネームの実行
-	MemoInfo mi(g_Property.TopDir());
+	MemoInfo mi(pTopDir);
 	mi.RenameInfo(sOldFullPath.Get(), sNewFullPath.Get());
 
 	delete [] pPath;
 	pPath = pNewPath;
 
-	return TRUE;
-}
-
-/////////////////////////////////////////////
-// Check file is readonly
-/////////////////////////////////////////////
-
-BOOL MemoNote::IsReadOnly(BOOL *pReadOnly)
-{
-	if (!pReadOnly) return FALSE;
-
-	TString sFullPath;
-	if (!sFullPath.Join(g_Property.TopDir(), TEXT("\\"), pPath)) return FALSE;
-
-	WIN32_FIND_DATA wfd;
-	HANDLE h = FindFirstFile(sFullPath.Get(), &wfd);
-	if (h == INVALID_HANDLE_VALUE) return FALSE;
-	FindClose(h);
-
-	*pReadOnly = (wfd.dwFileAttributes & FILE_ATTRIBUTE_READONLY) == FILE_ATTRIBUTE_READONLY;
 	return TRUE;
 }
 

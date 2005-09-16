@@ -64,12 +64,16 @@ protected:
 	RepositoryOption roOption;
 
 public:
+
 	Repository();
 	~Repository();
 
 	BOOL Init(const RepositoryOption *pOpt);
 
 	BOOL SetRepositoryOption(const RepositoryOption *pOpt);
+
+	////////////////////////////
+	// Note/folder operations
 
 	BOOL Create(const TomboURI *pTemplate, LPCTSTR pData, TString *pRealHeadLine, TomboURI *pAllocedURI);
 
@@ -80,25 +84,14 @@ public:
 	BOOL Copy(const TomboURI *pCopyFrom, const TomboURI *pCopyTo, URIOption *pOption);
 	BOOL Move(const TomboURI *pMoveFrom, const TomboURI *pMoveTo, URIOption *pOption);
 
+	BOOL ExecuteAssoc(const TomboURI *pURI, ExeAppType nType);
+	BOOL MakeFolder(const TomboURI *pParent, LPCTSTR pFolderName);
+
 	// Rename headline
 	// Repository data is updated if necessary.
 	BOOL ChangeHeadLine(const TomboURI *pURI, LPCTSTR pReqNewHeadLine, URIOption *pOption);
 
-	// get option from URI
-	//
-	// if NOTE_OPTIONMASK_VALID is set by pOption, bValid and bFolder is effective.
-	// if NOTE_OPTIONMASK_ENCRYPTED is set, bEncrypt is effective.
-	// if NOTE_OPTIONMASK_SAFEFILE is set, bSafeFile is effective.
-	BOOL GetOption(const TomboURI *pURI, URIOption *pOption);
-
-	// set option from URI
-	//
-	// if NOTE_OPTIONMASK_ENCRYPTED is set and bEncrypt is TRUE and bSafeFile is FALSE, encrypt to the URI by normal mode.
-	// if NOTE_OPTIONMASK_ENCRYPTED is set and bEncrypt is TRUE and bSafeFile is TRUE, encrypt to the URI by safefile mode.
-	// if NOTE_OPTIONMASK_ENCRYPTED is set and bEncrypt is FALSE, decrypt to the URI.
-	//
-	// In current implimentation, change normal mode <-> safe file mode is not supported.
-	BOOL SetOption(const TomboURI *pCurrentURI, URIOption *pOption);
+	LPTSTR GetNoteData(const TomboURI *pURI);
 
 	// Get real physical path from URI.
 	//
@@ -116,13 +109,28 @@ public:
 	// Decide URI
 	BOOL RequestAllocateURI(const TomboURI *pBaseURI, LPCTSTR pText, TString *pHeadLine, TomboURI *pURI, const TomboURI *pTemplateURI);
 
+
 	////////////////////////////
 	// File attribute functions
 
+	// get option from URI
+	//
+	// if NOTE_OPTIONMASK_VALID is set by pOption, bValid and bFolder is effective.
+	// if NOTE_OPTIONMASK_ENCRYPTED is set, bEncrypt is effective.
+	// if NOTE_OPTIONMASK_SAFEFILE is set, bSafeFile is effective.
+	BOOL GetOption(const TomboURI *pURI, URIOption *pOption);
+
+	// set option from URI
+	//
+	// if NOTE_OPTIONMASK_ENCRYPTED is set and bEncrypt is TRUE and bSafeFile is FALSE, encrypt to the URI by normal mode.
+	// if NOTE_OPTIONMASK_ENCRYPTED is set and bEncrypt is TRUE and bSafeFile is TRUE, encrypt to the URI by safefile mode.
+	// if NOTE_OPTIONMASK_ENCRYPTED is set and bEncrypt is FALSE, decrypt to the URI.
+	//
+	// In current implimentation, change normal mode <-> safe file mode is not supported.
+	BOOL SetOption(const TomboURI *pCurrentURI, URIOption *pOption);
+
 	BOOL GetAttribute(const TomboURI *pURI, NoteAttribute *pAttribute);
 	BOOL SetAttribute(const TomboURI *pURI, const NoteAttribute *pAttribute);
-
-	LPTSTR GetNoteData(const TomboURI *pURI);
 
 	/////////////////////////////
 	// helper function
