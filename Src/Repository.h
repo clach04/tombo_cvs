@@ -92,6 +92,7 @@ public:
 	BOOL ChangeHeadLine(const TomboURI *pURI, LPCTSTR pReqNewHeadLine, URIOption *pOption);
 
 	LPTSTR GetNoteData(const TomboURI *pURI);
+	char *GetNoteDataA(const TomboURI *pURI);
 
 	// Get real physical path from URI.
 	//
@@ -102,6 +103,9 @@ public:
 	// ex. :  tombo://repo/a/b/c/ -> tombo://repo/a/b/c/
 	//     :  tombo://repo/a/b/c/d.txt -> tombo://repo/a/b/c/
 	BOOL GetAttachURI(const TomboURI *pBase, TomboURI *pAttached);
+
+	// for use search only.
+	BOOL GetFileName(const TomboURI *pURI, TString *pName);
 
 	// Get notes under the url.
 	BOOL GetList(const TomboURI *pFolder, DirList *pList, BOOL bSkipEncrypt);
@@ -131,6 +135,9 @@ public:
 
 	BOOL GetAttribute(const TomboURI *pURI, NoteAttribute *pAttribute);
 	BOOL SetAttribute(const TomboURI *pURI, const NoteAttribute *pAttribute);
+	// get note attributes.
+	// TODO:  merged to GetAttribute.
+	BOOL GetNoteAttribute(const TomboURI *pURI, UINT64 *pLastUpdate, UINT64 *pCreateDate, UINT64 *pFileSize);
 
 	/////////////////////////////
 	// helper function

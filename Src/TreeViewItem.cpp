@@ -87,8 +87,7 @@ TreeViewFileItem::Locator::~Locator()
 void TreeViewFileItem::Locator::set(const TomboURI *p)
 {
 	delete pURI;
-	pURI = new TomboURI();
-	pURI->Init(p->GetFullURI());
+	pURI = new TomboURI(*p);	// share string buffer
 }
 
 TreeViewFileItem::TreeViewFileItem() : TreeViewItem(FALSE)
@@ -838,13 +837,8 @@ BOOL TreeViewVirtualFolder::Expand(MemoSelectView *pView)
 	VFNote *pNote;
 	for (DWORD i = 0; i < n; i++) {
 		pNote = pStore->GetNote(i);
-		MemoNote *p = pNote->GetNote();
-		pNote->ClearNote(); // to prevent deleting p
 		LPCTSTR pTitle = pNote->GetFileName();
-
-		TomboURI sURI;
-		if (!p->GetURI(&sURI)) return FALSE;
-		pView->InsertFile(hItem, &sURI, pTitle, TRUE, TRUE);
+		pView->InsertFile(hItem, pNote->GetURI(), pTitle, TRUE, TRUE);
 	}
 	pStore->FreeArray();
 	return TRUE;

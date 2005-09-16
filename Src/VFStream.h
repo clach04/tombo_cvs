@@ -7,6 +7,7 @@ class PasswordManager;
 class VFStore;
 class TString;
 class File;
+class TomboURI;
 
 #include "VarBuffer.h"
 
@@ -21,23 +22,25 @@ class File;
 ////////////////////////////////////
 
 class VFNote {
-	MemoNote *pNote;
+	// The object lifecycle of *pURI is same as VFNote.
+	// do not point *pURI but use copy of the object. *pURI has smart pointer, so cost is not expensive.
+	TomboURI *pURI;
 	LPTSTR pFileName;
 	UINT64 uLastUpdate;
 	UINT64 uCreateDate;
 	UINT64 uFileSize;
 
 public:
-	VFNote() : pNote(NULL), pFileName(NULL) {}
+	VFNote() : pURI(NULL), pFileName(NULL) {}
 	~VFNote();
-	BOOL Init(MemoNote *p, LPCTSTR pFileName);
+	BOOL Init(const TomboURI *pURI, LPCTSTR pFileName);
 
-	MemoNote *GetNote() { return pNote; }
+	const TomboURI *GetURI() { return pURI; }
 
 	// If ClearNote() is not called and VFNote is deleted, 
 	// pNote is deleted, too. To prevent deleting, you should call ClearNote().
 	// In this case, deleting pNote is due to caller.
-	void ClearNote() { pNote = NULL; }
+
 	LPCTSTR GetFileName() { return pFileName; }
 
 	UINT64 GetLastUpdate() { return uLastUpdate; }

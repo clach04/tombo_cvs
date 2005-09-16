@@ -4,6 +4,7 @@
 class PasswordManager;
 class MemoNote;
 enum SearchResult;
+class TomboURI;
 
 ///////////////////////////////////////////////////////////
 // Regular expression pattern matching (MBCS)
@@ -23,6 +24,7 @@ protected:
 	void *pCompiledPattern;
 
 	PasswordManager *pPassMgr;
+
 public:
 
 	//////////////////////////////
@@ -42,7 +44,7 @@ public:
 	BOOL SearchForward(const char *pText, DWORD nStartPos, BOOL bShift);
 	BOOL SearchBackward(const char *pText, DWORD nStartPos, BOOL bShift);
 
-	SearchResult Search(MemoNote *pNote);
+	SearchResult Search(const TomboURI *pURI);
 
 	//////////////////////////////
 	// get result

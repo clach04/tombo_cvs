@@ -8,6 +8,8 @@
 #include "Message.h"
 #include "UniConv.h"
 #include "TString.h"
+#include "TomboURI.h"
+#include "Repository.h"
 #include "File.h"
 #include "Property.h"
 #include "MemoSelectView.h"
@@ -16,6 +18,7 @@
 #include "VFStream.h"
 #include "SearchEngine.h"
 #include "VarBuffer.h"
+#include "AutoPtr.h"
 
 #include "resource.h"
 #include "DialogTemplate.h"
@@ -31,31 +34,20 @@
 VFNote::~VFNote()
 {
 	delete [] pFileName;
-//	delete pNote;
+	delete pURI;
 }
 
-BOOL VFNote::Init(MemoNote *p, LPCTSTR pFile)
+BOOL VFNote::Init(const TomboURI *pu, LPCTSTR pFile)
 {
-	pNote = p;
+	pURI = new TomboURI(*pu);
+	if (pURI == NULL) { SetLastError(ERROR_NOT_ENOUGH_MEMORY); return FALSE; }
+
 	pFileName = StringDup(pFile);
 	if (pFileName == NULL) return FALSE;
 	*(pFileName + _tcslen(pFileName) - 4) = TEXT('\0');
 
-	// Get file update time
-	TString aFullPath;
-	if (!aFullPath.Join(g_Property.TopDir(), TEXT("\\"), pNote->MemoPath())) return FALSE;
-
-	WIN32_FIND_DATA wfd;
-	HANDLE h = FindFirstFile(aFullPath.Get(), &wfd);
-	if (h != INVALID_HANDLE_VALUE) {
-		uLastUpdate = ((UINT64)wfd.ftLastWriteTime.dwHighDateTime << 32) | (UINT64)wfd.ftLastWriteTime.dwLowDateTime ;
-		uCreateDate = ((UINT64)wfd.ftCreationTime.dwHighDateTime << 32) | (UINT64)wfd.ftCreationTime.dwLowDateTime;
-		uFileSize = ((UINT64)wfd.nFileSizeHigh << 32 ) | (UINT64)wfd.nFileSizeLow;
-		FindClose(h);
-		return TRUE;
-	} else {
-		return FALSE;
-	}
+	if (!g_Repository.GetNoteAttribute(pURI, &uLastUpdate, &uCreateDate, &uFileSize)) return FALSE;
+	return TRUE;
 }
 
 ////////////////////////////////////
@@ -149,19 +141,21 @@ void VirtualStreamFolderScanner::File(LPCTSTR p)
 		return;
 	}
 	if (pNote == NULL) return;
+	AutoPointer<MemoNote> ap(pNote);
+
+	TomboURI sURI;
+	if (!pNote->GetURI(&sURI)) return;
 
 	VFNote *pVF = new VFNote();
 	if (pVF == NULL) {
 		nError = ERROR_NOT_ENOUGH_MEMORY;
 		StopScan();
-		delete pNote;
 		return;
 	}
 
-	if (!pVF->Init(pNote, p)) {
+	if (!pVF->Init(&sURI, p)) {
 		nError = GetLastError();
 		StopScan();
-		delete pNote;
 		delete pVF;
 		return;
 	}
@@ -170,7 +164,6 @@ void VirtualStreamFolderScanner::File(LPCTSTR p)
 	if (!pNext->Store(pVF)) {
 		nError = GetLastError();
 		StopScan();
-		delete pNote;
 		delete pVF;
 	}
 }
@@ -401,9 +394,7 @@ BOOL VFRegexFilter::Reset(LPCTSTR pPat, BOOL bCase, BOOL bEnc, BOOL bFileName, B
 
 BOOL VFRegexFilter::Store(VFNote *p)
 {
-	MemoNote *pNote = p->GetNote();
-	if (pNote == NULL) return FALSE;
-	switch(pRegex->Search(pNote)) {
+	switch(pRegex->Search(p->GetURI())) {
 	case SR_NOTFOUND:
 		if (bNegate) {
 			return pNext->Store(p);
@@ -626,7 +617,6 @@ BOOL VFTimestampFilter::Reset(DWORD nDelta, BOOL bNew)
 
 BOOL VFTimestampFilter::Store(VFNote *pNote)
 {
-	MemoNote *pMemo = pNote->GetNote();
 	if (bNewer && pNote->GetLastUpdate() > uBase || (!bNewer && pNote->GetLastUpdate() < uBase)) {
 		return pNext->Store(pNote);
 	} else {

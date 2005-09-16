@@ -9,6 +9,7 @@
 #include "UniConv.h"
 #include "MemoNote.h"
 #include "Property.h"
+#include "Repository.h"
 
 extern "C" {
 void* Regex_Compile(const char *pPattern, BOOL bIgnoreCase, const char **ppReason);
@@ -163,11 +164,11 @@ BOOL SearchEngineA::SearchBackward(const char *pText, DWORD nStartPos, BOOL bShi
 // Matching to MemoNote
 ////////////////////////////////////////////////////////
 
-SearchResult SearchEngineA::Search(MemoNote *pNote)
+SearchResult SearchEngineA::Search(const TomboURI *pURI)
 {
 	if (bFileNameOnly) {
 		TString sPartName;
-		if (!GetBaseName(&sPartName, pNote->MemoPath())) return SR_FAILED;
+		if (!g_Repository.GetFileName(pURI, &sPartName)) return SR_FAILED;
 
 		BOOL bMatch;
 #ifdef _WIN32_WCE
@@ -179,10 +180,13 @@ SearchResult SearchEngineA::Search(MemoNote *pNote)
 #endif
 		return bMatch ? SR_FOUND : SR_NOTFOUND;
 	} else {
-		// skip crypted note if it is not search target.
-		if (!IsSearchEncryptMemo() && pNote->IsEncrypted()) return SR_NOTFOUND;
+		URIOption opt(NOTE_OPTIONMASK_ENCRYPTED);
+		if (!g_Repository.GetOption(pURI, &opt)) return SR_FAILED;
 
-		char *pMemo = pNote->GetMemoBodyA(g_Property.TopDir(), g_pPasswordManager);
+		// skip crypted note if it is not search target.
+		if (!IsSearchEncryptMemo() && opt.bEncrypt) return SR_NOTFOUND;
+
+		char *pMemo = g_Repository.GetNoteDataA(pURI);
 		if (pMemo == NULL) return SR_FAILED;
 
 		BOOL bMatch = SearchForward(pMemo, 0, FALSE);

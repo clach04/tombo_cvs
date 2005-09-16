@@ -684,10 +684,3 @@ MemoNote *MemoNote::MemoNoteFactory(const TomboURI *pURI)
 	delete [] pBuf;
 	return pNote;
 }
-
-MemoNote *MemoNote::MemoNoteFactory(LPCTSTR pURI)
-{
-	TomboURI uri;
-	if (!uri.Init(pURI)) return NULL;
-	return MemoNote::MemoNoteFactory(&uri);
-}

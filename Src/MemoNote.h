@@ -100,7 +100,6 @@ public:
 	// if pFile is not memo, return TRUE and *ppNote sets to NULL.
 	static BOOL MemoNoteFactory(LPCTSTR pFile, MemoNote **ppNote);
 	static MemoNote *MemoNoteFactory(const TomboURI *pURI);
-	static MemoNote *MemoNoteFactory(LPCTSTR pURI);
 
 	//////////////////////////////////
 	// Headline related funcs

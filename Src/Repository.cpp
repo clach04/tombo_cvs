@@ -121,6 +121,11 @@ BOOL Repository::GetAttribute(const TomboURI *pURI, NoteAttribute *pAttribute)
 	return pDefaultImpl->GetAttribute(pURI, pAttribute);
 }
 
+BOOL Repository::GetNoteAttribute(const TomboURI *pURI, UINT64 *pLastUpdate, UINT64 *pCreateDate, UINT64 *pFileSize)
+{
+	return pDefaultImpl->GetNoteAttribute(pURI, pLastUpdate, pCreateDate, pFileSize);
+}
+
 BOOL Repository::SetAttribute(const TomboURI *pURI, const NoteAttribute *pAttribute)
 {
 	return pDefaultImpl->SetAttribute(pURI, pAttribute);
@@ -131,6 +136,18 @@ LPTSTR Repository::GetNoteData(const TomboURI *pURI)
 	return pDefaultImpl->GetNoteData(pURI);
 }
 
+char* Repository::GetNoteDataA(const TomboURI *pURI)
+{
+#if defined(PLATFORM_WIN32)
+	return GetNoteData(pURI);
+#else
+	LPTSTR pT = GetNoteData(pURI);
+	char *pA = ConvUnicode2SJIS(pT);
+	MemoNote::WipeOutAndDelete(pT);
+	return pA;
+#endif
+}
+
 BOOL Repository::ExecuteAssoc(const TomboURI *pURI, ExeAppType nType)
 {
 	return pDefaultImpl->ExecuteAssoc(pURI, nType);
@@ -139,6 +156,11 @@ BOOL Repository::ExecuteAssoc(const TomboURI *pURI, ExeAppType nType)
 BOOL Repository::MakeFolder(const TomboURI *pParent, LPCTSTR pFolderName)
 {
 	return pDefaultImpl->MakeFolder(pParent, pFolderName);
+}
+
+BOOL Repository::GetFileName(const TomboURI *pURI, TString *pName)
+{
+	return pURI->GetBaseName(pName);
 }
 
 /////////////////////////////////////////

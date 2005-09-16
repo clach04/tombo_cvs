@@ -971,3 +971,8 @@ Some bugs are fixed.
 * FIX: invalid UTF-8 encoding
 - removing g_Property.TopDir() dependency.
 
+////////////////////////////////
+// B184
+////////////////////////////////
+
+- removing g_Property.TopDir() dependency.

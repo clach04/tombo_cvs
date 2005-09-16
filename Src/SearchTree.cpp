@@ -242,7 +242,10 @@ SearchResult SearchTree::SearchOneItem()
 	if (!MemoNote::MemoNoteFactory(p, &pNote)) return SR_FAILED;
 	if (pNote == NULL) return SR_NOTFOUND;
 
-	SearchResult result = pRegex->Search(pNote);
+	TomboURI sURI;
+	if (!pNote->GetURI(&sURI)) return SR_FAILED;
+
+	SearchResult result = pRegex->Search(&sURI);
 	delete pNote;
 	return result;
 }

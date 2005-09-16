@@ -885,6 +885,29 @@ BOOL LocalFileRepository::GetAttribute(const TomboURI *pURI, NoteAttribute *pAtt
 	return TRUE;
 }
 
+BOOL LocalFileRepository::GetNoteAttribute(const TomboURI *pURI, UINT64 *pLastUpdate, UINT64 *pCreateDate, UINT64 *pFileSize)
+{
+	URIOption opt(NOTE_OPTIONMASK_VALID);
+	if (!GetOption(pURI, &opt)) return FALSE;
+	if (!opt.bValid) { SetLastError(ERROR_TOMBO_E_INVALIDURI); return FALSE; }
+	if (opt.bFolder) { SetLastError(ERROR_NOT_SUPPORTED); return FALSE; }
+
+	TString sFullPath;
+	if (!GetPhysicalPath(pURI, &sFullPath)) return FALSE;
+
+	WIN32_FIND_DATA wfd;
+	HANDLE h = FindFirstFile(sFullPath.Get(), &wfd);
+	if (h != INVALID_HANDLE_VALUE) {
+		*pLastUpdate = ((UINT64)wfd.ftLastWriteTime.dwHighDateTime << 32) | (UINT64)wfd.ftLastWriteTime.dwLowDateTime ;
+		*pCreateDate = ((UINT64)wfd.ftCreationTime.dwHighDateTime << 32) | (UINT64)wfd.ftCreationTime.dwLowDateTime;
+		*pFileSize = ((UINT64)wfd.nFileSizeHigh << 32 ) | (UINT64)wfd.nFileSizeLow;
+		FindClose(h);
+		return TRUE;
+	} else {
+		return FALSE;
+	}
+}
+
 BOOL LocalFileRepository::SetAttribute(const TomboURI *pURI, const NoteAttribute *pAttribute)
 {
 	MemoNote *pNote = MemoNote::MemoNoteFactory(pURI);
