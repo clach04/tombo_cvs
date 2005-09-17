@@ -2,22 +2,8 @@
 #define LIST_H
 
 ////////////////////////////////
-// リスト
+// LinkedList
 ////////////////////////////////
-
-// 単方向の汎用リスト
-
-// 保持する要素についてはオブジェクト生成時にサイズ指定できる。
-//
-//
-//  struct Val { DWORD a, b; }
-//
-//  List lst(sizeof(Val));
-//  h = lst.Add();
-//
-//  Val *p = (Val*)lst.Value(h);
-//  p->a = ...
-//
 
 class List {
 	struct Item {
@@ -36,7 +22,6 @@ public:
 
 	HANDLE Add(LPVOID val);
 
-	// 指定した要素を削除する
 	LPVOID Remove(HANDLE h);
 
 	HANDLE First();

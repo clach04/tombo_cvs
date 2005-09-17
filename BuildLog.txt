@@ -975,4 +975,12 @@ Some bugs are fixed.
 // B184
 ////////////////////////////////
 
-- removing g_Property.TopDir() dependency.
+- removing g_Property.TopDir() dependency still.
+
+////////////////////////////////
+// B185
+////////////////////////////////
+
+- removing g_Property.TopDir() dependency still.
+- add unittest proj
+- implement URIScanner class but not integrated yet.

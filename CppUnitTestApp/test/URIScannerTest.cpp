@@ -1,0 +1,477 @@
+#include <cppunit/extensions/HelperMacros.h>
+#include <cppunit/TestAssert.h>
+
+#include <windows.h>
+#include <tchar.h>
+#include "Tombo.h"
+#include "TString.h"
+#include "TomboURI.h"
+#include "Repository.h"
+#include "VarBuffer.h"
+#include "URIScanner.h"
+
+#define TEST_CLASS_NAME URIScannerTest
+
+class TEST_CLASS_NAME : public CppUnit::TestFixture {
+	CPPUNIT_TEST_SUITE(TEST_CLASS_NAME);
+	CPPUNIT_TEST(URIListTest1);
+
+	CPPUNIT_TEST(URIScanTest1);
+	CPPUNIT_TEST(URIScanTest2);
+	CPPUNIT_TEST(URIScanTest3);
+	CPPUNIT_TEST(URIScanTest4);
+	CPPUNIT_TEST(URIScanTest5);
+	CPPUNIT_TEST_SUITE_END();
+
+public:
+	TEST_CLASS_NAME() {}
+	~TEST_CLASS_NAME() {}
+
+	virtual void setUp() {}
+	virtual void tearDown() {}
+
+	void URIListTest1();
+
+	void URIScanTest1();
+	void URIScanTest2();
+	void URIScanTest3();
+	void URIScanTest4();
+	void URIScanTest5();
+};
+
+CPPUNIT_TEST_SUITE_REGISTRATION(TEST_CLASS_NAME);
+
+////////////////////////////////////////////////
+
+void TEST_CLASS_NAME::URIListTest1() {
+	URIList list;
+	CPPUNIT_ASSERT(list.Init());
+
+	CPPUNIT_ASSERT(list.Add(NULL, NULL));
+
+	TomboURI uri;
+	uri.Init("tombo://default/test");
+	CPPUNIT_ASSERT(list.Add(&uri, NULL));
+
+	{	// the case of when uri2 released first.
+		TomboURI uri2;
+		uri2.Init("tombo://default/test2");
+		CPPUNIT_ASSERT(list.Add(&uri2, NULL));
+	}
+
+	CPPUNIT_ASSERT(list.Add(NULL, "test"));
+
+	CPPUNIT_ASSERT(list.GetSize() == 4);
+
+	CPPUNIT_ASSERT(list.GetURI(0) == NULL);
+	CPPUNIT_ASSERT(list.GetTitle(0) == NULL);
+	CPPUNIT_ASSERT(strcmp(list.GetURI(1)->GetFullURI(), "tombo://default/test") == 0);
+	CPPUNIT_ASSERT(list.GetTitle(1) == NULL);
+	CPPUNIT_ASSERT(strcmp(list.GetURI(2)->GetFullURI(), "tombo://default/test2") == 0);
+	CPPUNIT_ASSERT(list.GetTitle(2) == NULL);
+	CPPUNIT_ASSERT(list.GetURI(3) == NULL);
+	CPPUNIT_ASSERT(strcmp(list.GetTitle(3), "test") == 0);
+}
+
+////////////////////////////////////////////////
+// dummy repository
+class DummyRepoBase : public IEnumRepository {
+public:
+	BOOL GetOption(const TomboURI *pURI, URIOption *pOption);
+};
+
+BOOL DummyRepoBase::GetOption(const TomboURI *pURI, URIOption *pOption)
+{
+	LPCTSTR p = pURI->GetFullURI();
+	if (*(p + strlen(p) - 1) == '/') {
+		pOption->bFolder = TRUE;
+	} else {
+		pOption->bFolder = FALSE;
+	}
+	return TRUE;
+}
+
+
+////////////////////////////////////////////////
+// dummy repo sample
+
+class RepoX : public DummyRepoBase {
+	URIList *GetChild(const TomboURI *pFolderURI, BOOL bSkipEncrypt);
+};
+
+URIList *RepoX::GetChild(const TomboURI *pFolderURI, BOOL bSkipEncrypt)
+{
+	if (strcmp(pFolderURI->GetFullURI(), "tombo://default/aaa/") == 0) {
+		URIList *pList = new URIList();
+		pList->Init();
+		TomboURI uri1; uri1.Init("tombo://default/aaa/bbb/"); pList->Add(&uri1, "bbb");
+		TomboURI uri2; uri2.Init("tombo://default/aaa/test/"); pList->Add(&uri2, "test");
+		TomboURI uri3; uri3.Init("tombo://default/aaa/hello.txt"); pList->Add(&uri3, "hello");
+		TomboURI uri4; uri4.Init("tombo://default/aaa/zzz.txt"); pList->Add(&uri4, "zzz");
+		return pList;
+	} 
+	if (strcmp(pFolderURI->GetFullURI(), "tombo://default/aaa/bbb/") == 0) {
+		URIList *pList = new URIList();
+		pList->Init();
+		return pList;
+	}
+	if (strcmp(pFolderURI->GetFullURI(), "tombo://default/aaa/test/") == 0) {
+		URIList *pList = new URIList();
+		pList->Init();
+		TomboURI uri3; uri3.Init("tombo://default/aaa/test/sub.txt"); pList->Add(&uri3, "sub");
+		return pList;
+	}
+	return NULL;
+}
+
+
+////////////////////////////////////////////////
+// Generic test scanner
+
+// at result, calling hisory is stored to sbuf.
+
+class TestScanner1 : public URIScanner {
+public:
+	StringBufferA sbuf;
+
+	int nInitialScan;
+	int nAfterScan;
+	int nPreFolder;
+	int nPostFolder;
+	int nNote;
+
+	TestScanner1();
+
+	void InitialScan();
+	void AfterScan();
+
+	void PreFolder();
+	void PostFolder();
+
+	void Node();
+
+	BOOL Check(LPCTSTR pMsg, LPCTSTR pCorrect);
+};
+
+TestScanner1::TestScanner1() 
+{
+	nInitialScan = nAfterScan = nPreFolder = nPostFolder = nNote = 0;
+	sbuf.Init(100, 20);
+}
+
+void TestScanner1::InitialScan() 
+{
+	DWORD n;
+	sbuf.Add("IS", 2, &n);
+}
+
+void TestScanner1::AfterScan() 
+{
+	DWORD n;
+	sbuf.Add("AS", 2+1, &n);
+}
+
+void TestScanner1::PreFolder() 
+{
+	DWORD n;
+
+	sbuf.Add("BF", 2, &n);
+
+	LPCTSTR pFull = CurrentURI()->GetFullURI();
+	sbuf.Add(pFull, strlen(pFull), &n);
+}
+
+void TestScanner1::PostFolder() 
+{
+	DWORD n;
+	sbuf.Add("AF", 2, &n);
+
+	LPCTSTR pFull = CurrentURI()->GetFullURI();
+	sbuf.Add(pFull, strlen(pFull), &n);
+}
+
+void TestScanner1::Node()
+{
+	DWORD n;
+	sbuf.Add("ND", 2, &n);
+
+	LPCTSTR pFull = CurrentURI()->GetFullURI();
+	sbuf.Add(pFull, strlen(pFull), &n);
+}
+
+BOOL TestScanner1::Check(LPCTSTR pMsg, LPCTSTR pCorrect)
+{
+	LPCTSTR pResult = sbuf.Get(0);
+
+	DWORD n1 = strlen(pResult);
+	DWORD n2 = strlen(pCorrect);
+
+	for (DWORD i = 0; i < n1; i++) {
+		if (pResult[i] != pCorrect[i]) {
+			Sleep(1);
+		}
+	}
+	Sleep(1);
+
+	return strcmp(sbuf.Get(0), pCorrect) == 0;
+}
+
+////////////////////////////////////////////////
+// TEST
+//
+// Test the root is empty
+
+// test data
+class Repo1 : public DummyRepoBase {
+	URIList *GetChild(const TomboURI *pFolderURI, BOOL bSkipEncrypt);
+};
+
+URIList *Repo1::GetChild(const TomboURI *pFolderURI, BOOL bSkipEncrypt)
+{
+	URIList *pList = new URIList();
+	pList->Init();
+	return pList;
+}
+
+// test runner
+void TEST_CLASS_NAME::URIScanTest1() 
+{
+	LPCTSTR pTest = "TEST1";
+	LPCTSTR pCorrect = 
+		"IS"
+		"BF" "tombo://default/aaa/"
+		"AF" "tombo://default/aaa/"
+		"AS";
+	Repo1 rep;
+
+
+	TomboURI base;
+	base.Init("tombo://default/aaa/");
+
+	TestScanner1 s1;
+
+	CPPUNIT_ASSERT(s1.Init(&rep, &base));
+
+	BOOL bResult = s1.Scan();
+	CPPUNIT_ASSERT_EQUAL(bResult, TRUE);
+	LPCTSTR pResultStr = s1.sbuf.Get(0);
+	CPPUNIT_ASSERT(s1.Check(pTest, pCorrect));
+}
+
+////////////////////////////////////////////////
+// TEST
+//
+// 2 nodes under the root
+
+// test data
+class Repo2 : public DummyRepoBase {
+	URIList *GetChild(const TomboURI *pFolderURI, BOOL bSkipEncrypt);
+};
+
+URIList *Repo2::GetChild(const TomboURI *pFolderURI, BOOL bSkipEncrypt)
+{
+	URIList *pList = new URIList();
+	pList->Init();
+
+	TomboURI uri1; uri1.Init("tombo://default/aaa/bbb.txt"); pList->Add(&uri1, "bbb");
+	TomboURI uri2; uri2.Init("tombo://default/aaa/ccc.txt"); pList->Add(&uri2, "ccc");
+
+	return pList;
+}
+
+void TEST_CLASS_NAME::URIScanTest2() 
+{
+	LPCTSTR pTest = "TEST3";
+	LPCTSTR pCorrect = 
+		"IS"
+		"BF" "tombo://default/aaa/"
+		"ND" "tombo://default/aaa/bbb.txt"
+		"ND" "tombo://default/aaa/ccc.txt"
+		"AF" "tombo://default/aaa/"
+		"AS";
+	Repo2 rep;
+
+
+	TomboURI base;
+	base.Init("tombo://default/aaa/");
+
+	TestScanner1 s1;
+
+	CPPUNIT_ASSERT(s1.Init(&rep, &base));
+
+	BOOL bResult = s1.Scan();
+	CPPUNIT_ASSERT_EQUAL(bResult, TRUE);
+	LPCTSTR pResultStr = s1.sbuf.Get(0);
+	CPPUNIT_ASSERT(s1.Check(pTest, pCorrect));
+}
+
+////////////////////////////////////////////////
+// TEST
+//
+// there are a folder and a node under the root.
+
+// test data
+class Repo3 : public DummyRepoBase {
+	URIList *GetChild(const TomboURI *pFolderURI, BOOL bSkipEncrypt);
+};
+
+URIList *Repo3::GetChild(const TomboURI *pFolderURI, BOOL bSkipEncrypt)
+{
+	URIList *pList = new URIList();
+	pList->Init();
+
+	if (strcmp(pFolderURI->GetFullURI(), "tombo://default/aaa/") == 0) {
+		TomboURI uri1; uri1.Init("tombo://default/aaa/bbb/"); pList->Add(&uri1, "bbb");
+		TomboURI uri2; uri2.Init("tombo://default/aaa/ccc.txt"); pList->Add(&uri2, "ccc");
+	}
+	if (strcmp(pFolderURI->GetFullURI(), "tombo://default/aaa/bbb/") == 0) {
+		URIList *pList = new URIList();
+		pList->Init();
+		return pList;
+	}
+	return pList;
+}
+
+void TEST_CLASS_NAME::URIScanTest3() 
+{
+	LPCTSTR pTest = "TEST3";
+	LPCTSTR pCorrect = 
+		"IS"
+		"BF" "tombo://default/aaa/"
+		"BF" "tombo://default/aaa/bbb/"
+		"AF" "tombo://default/aaa/bbb/"
+		"ND" "tombo://default/aaa/ccc.txt"
+		"AF" "tombo://default/aaa/"
+		"AS";
+	Repo3 rep;
+
+
+	TomboURI base;
+	base.Init("tombo://default/aaa/");
+
+	TestScanner1 s1;
+
+	CPPUNIT_ASSERT(s1.Init(&rep, &base));
+
+	BOOL bResult = s1.Scan();
+	CPPUNIT_ASSERT_EQUAL(bResult, TRUE);
+	LPCTSTR pResultStr = s1.sbuf.Get(0);
+	CPPUNIT_ASSERT(s1.Check(pTest, pCorrect));
+}
+
+////////////////////////////////////////////////
+// TEST
+//
+// nested folder
+
+// test data
+class Repo4 : public DummyRepoBase {
+	URIList *GetChild(const TomboURI *pFolderURI, BOOL bSkipEncrypt);
+};
+
+URIList *Repo4::GetChild(const TomboURI *pFolderURI, BOOL bSkipEncrypt)
+{
+	URIList *pList = new URIList();
+	pList->Init();
+
+	if (strcmp(pFolderURI->GetFullURI(), "tombo://default/aaa/") == 0) {
+		TomboURI uri1; uri1.Init("tombo://default/aaa/bbb/"); pList->Add(&uri1, "bbb");
+		TomboURI uri2; uri2.Init("tombo://default/aaa/ddd.txt"); pList->Add(&uri2, "ddd");
+	}
+	if (strcmp(pFolderURI->GetFullURI(), "tombo://default/aaa/bbb/") == 0) {
+		URIList *pList = new URIList();
+		pList->Init();
+		TomboURI uri1; uri1.Init("tombo://default/aaa/bbb/ccc/"); pList->Add(&uri1, "ccc");
+		TomboURI uri2; uri2.Init("tombo://default/aaa/bbb/eee.txt"); pList->Add(&uri2, "eee");
+		return pList;
+	}
+	if (strcmp(pFolderURI->GetFullURI(), "tombo://default/aaa/bbb/ccc/") == 0) {
+		URIList *pList = new URIList();
+		pList->Init();
+		TomboURI uri1; uri1.Init("tombo://default/aaa/bbb/ccc/fff.txt"); pList->Add(&uri1, "fff");
+		TomboURI uri2; uri2.Init("tombo://default/aaa/bbb/ccc/ggg.txt"); pList->Add(&uri2, "ggg");
+		return pList;
+	}
+
+	return pList;
+}
+
+void TEST_CLASS_NAME::URIScanTest4() 
+{
+	LPCTSTR pTest = "TEST4";
+	LPCTSTR pCorrect = 
+		"IS"
+		"BF" "tombo://default/aaa/"
+		"BF" "tombo://default/aaa/bbb/"
+		"BF" "tombo://default/aaa/bbb/ccc/"
+		"ND" "tombo://default/aaa/bbb/ccc/fff.txt"
+		"ND" "tombo://default/aaa/bbb/ccc/ggg.txt"
+		"AF" "tombo://default/aaa/bbb/ccc/"
+		"ND" "tombo://default/aaa/bbb/eee.txt"
+		"AF" "tombo://default/aaa/bbb/"
+		"ND" "tombo://default/aaa/ddd.txt"
+		"AF" "tombo://default/aaa/"
+		"AS";
+	Repo4 rep;
+
+
+	TomboURI base;
+	base.Init("tombo://default/aaa/");
+
+	TestScanner1 s1;
+
+	CPPUNIT_ASSERT(s1.Init(&rep, &base));
+
+	BOOL bResult = s1.Scan();
+	CPPUNIT_ASSERT_EQUAL(bResult, TRUE);
+	LPCTSTR pResultStr = s1.sbuf.Get(0);
+	CPPUNIT_ASSERT(s1.Check(pTest, pCorrect));
+}
+
+////////////////////////////////////////////////
+// TEST
+//
+// stop scan test
+// Data is same as URIScanTest4
+
+class TestScanner2 : public TestScanner1 {
+public:
+	void Node();
+};
+
+void TestScanner2::Node() 
+{
+	TestScanner1::Node();
+	LPCTSTR pFull = CurrentURI()->GetFullURI();
+	if (strcmp(pFull, "tombo://default/aaa/bbb/ccc/fff.txt") == 0) {
+		StopScan();
+	}
+}
+
+void TEST_CLASS_NAME::URIScanTest5() 
+{
+	LPCTSTR pTest = "TEST5";
+	LPCTSTR pCorrect = 
+		"IS"
+		"BF" "tombo://default/aaa/"
+		"BF" "tombo://default/aaa/bbb/"
+		"BF" "tombo://default/aaa/bbb/ccc/"
+		"ND" "tombo://default/aaa/bbb/ccc/fff.txt"
+		"AF" "tombo://default/aaa/bbb/ccc/"
+		"AF" "tombo://default/aaa/bbb/"
+		"AF" "tombo://default/aaa/"
+		"AS";
+	Repo4 rep;
+
+	TomboURI base;
+	base.Init("tombo://default/aaa/");
+
+	TestScanner2 s1;
+
+	CPPUNIT_ASSERT(s1.Init(&rep, &base));
+
+	BOOL bResult = s1.Scan();
+	CPPUNIT_ASSERT_EQUAL(bResult, TRUE);
+	LPCTSTR pResultStr = s1.sbuf.Get(0);
+	CPPUNIT_ASSERT(s1.Check(pTest, pCorrect));
+}

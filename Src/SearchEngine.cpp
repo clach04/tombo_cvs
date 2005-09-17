@@ -9,6 +9,7 @@
 #include "UniConv.h"
 #include "MemoNote.h"
 #include "Property.h"
+#include "TomboURI.h"
 #include "Repository.h"
 
 extern "C" {

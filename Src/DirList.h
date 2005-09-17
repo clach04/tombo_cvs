@@ -2,16 +2,6 @@
 #define DIRLIST_H
 
 #include "VarBuffer.h"
-class TomboURI;
-
-//////////////////////////////////////////////////////
-// option definition
-//////////////////////////////////////////////////////
-
-#define DIRLIST_OPT_NONE          0
-//#define DIRLIST_OPT_ALLOCURI      1
-//#define DIRLIST_OPT_ALLOCHEADLINE 2
-#define DIRLIST_OPT_ALLOCFILENAME 4
 
 //////////////////////////////////////////////////////
 // Directory item information
@@ -29,8 +19,6 @@ struct DirListItem {
 //////////////////////////////////////////////////////
 
 class DirList {
-	DWORD nOption;
-
 	LPCTSTR pURIBase;
 public:
 	TVector<DirListItem> vDirList;

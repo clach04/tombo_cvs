@@ -8,6 +8,7 @@ class RepositoryImpl;
 class URIOption;
 class RepositoryOption;
 class DirList;
+class URIList;
 
 class NoteAttribute;
 
@@ -53,11 +54,22 @@ public:
 };
 
 //////////////////////////////////////////////////////////////
+// Repository enumeration interface
+//////////////////////////////////////////////////////////////
+
+class IEnumRepository {
+public:
+	virtual URIList *GetChild(const TomboURI *pFolderURI, BOOL bSkipEncrypt) = 0;
+	virtual BOOL GetOption(const TomboURI *pURI, URIOption *pOption) = 0;
+
+};
+
+//////////////////////////////////////////////////////////////
 // Repository
 //////////////////////////////////////////////////////////////
 // Repository is an abstraction of TOMBO's notes/folder tree.
 
-class Repository {
+class Repository : public IEnumRepository {
 
 protected:
 	RepositoryImpl *pDefaultImpl;
@@ -109,10 +121,10 @@ public:
 
 	// Get notes under the url.
 	BOOL GetList(const TomboURI *pFolder, DirList *pList, BOOL bSkipEncrypt);
+	URIList *GetChild(const TomboURI *pFolderURI, BOOL bSkipEncrypt);
 
 	// Decide URI
 	BOOL RequestAllocateURI(const TomboURI *pBaseURI, LPCTSTR pText, TString *pHeadLine, TomboURI *pURI, const TomboURI *pTemplateURI);
-
 
 	////////////////////////////
 	// File attribute functions
@@ -153,7 +165,7 @@ public:
 class URIOption {
 public:
 	URIOption(DWORD flg = 0) : nFlg(flg), pNewURI(NULL), pNewHeadLine(NULL) {}
-	~URIOption();
+	~URIOption() { delete pNewURI; delete pNewHeadLine; }
 
 	// request section
 	DWORD nFlg;

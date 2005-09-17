@@ -16,6 +16,7 @@
 #include "MemoInfo.h"
 
 #include "DirList.h"
+#include "URIScanner.h"
 #include "DirectoryScanner.h"
 #include "MemoFolder.h"
 
@@ -810,6 +811,28 @@ BOOL LocalFileRepository::GetList(const TomboURI *pFolder, DirList *pList, BOOL 
 
 	return TRUE;
 }
+
+URIList *LocalFileRepository::GetChild(const TomboURI *pFolder, BOOL bSkipEncrypt)
+{
+	URIList *pList = new URIList();
+	if (pList == NULL || !pList->Init()) { return FALSE; }
+
+	DirList dlist;
+	if (!GetList(pFolder, &dlist, bSkipEncrypt)) return NULL;
+
+	for (DWORD i = 0; i < dlist.NumItems(); i++) {
+		DirListItem *pItem = dlist.GetItem(i);
+		LPCTSTR pFN = dlist.GetFileName(pItem->nFileNamePos);
+		LPCTSTR pHL = dlist.GetFileName(pItem->nHeadLinePos);
+		LPCTSTR pURI = dlist.GetFileName(pItem->nURIPos);
+
+		TomboURI sURI;
+		if (!sURI.Init(pURI)) return NULL;
+		if (!pList->Add(&sURI, dlist.GetFileName(pItem->nHeadLinePos))) return NULL;
+	}
+	return pList;
+}
+
 
 /////////////////////////////////////////
 // 

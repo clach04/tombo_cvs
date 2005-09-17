@@ -1735,7 +1735,6 @@ void MainFrame::OnSearchNext(BOOL bForward)
 		BOOL bMatched = pDetailsView->Search(mmMemoManager.MDSearchFlg(), bForward, !bSearchStartFromTreeView, FALSE);
 		mmMemoManager.SetMDSearchFlg(FALSE);
 		if (bSearchStartFromTreeView && !bMatched) {
-//			ActivateView(TRUE);
 			ActivateView(VT_SelectView);
 			DoSearchTree(mmMemoManager.MSSearchFlg(), bForward);
 			mmMemoManager.SetMSSearchFlg(FALSE);

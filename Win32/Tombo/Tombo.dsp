@@ -280,6 +280,10 @@ SOURCE=..\..\Src\TSParser.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\Src\URIScanner.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\Src\regex\util.c
 # End Source File
 # Begin Source File
@@ -489,6 +493,10 @@ SOURCE=..\..\Src\TreeViewItem.h
 # Begin Source File
 
 SOURCE=..\..\Src\TSParser.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\URIScanner.h
 # End Source File
 # Begin Source File
 

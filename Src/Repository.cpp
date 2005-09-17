@@ -111,6 +111,11 @@ BOOL Repository::GetList(const TomboURI *pFolder, DirList *pList, BOOL bSkipEncr
 	return pDefaultImpl->GetList(pFolder, pList, bSkipEncrypt);
 }
 
+URIList *Repository::GetChild(const TomboURI *pFolder, BOOL bSkipEncrypt)
+{
+	return pDefaultImpl->GetChild(pFolder, bSkipEncrypt);
+}
+
 BOOL Repository::RequestAllocateURI(const TomboURI *pBaseURI, LPCTSTR pText, TString *pHeadLine, TomboURI *pURI, const TomboURI *pTemplateURI)
 {
 	return pDefaultImpl->RequestAllocateURI(pBaseURI, pText, pHeadLine, pURI, pTemplateURI);
@@ -177,13 +182,3 @@ BOOL Repository::GetAttachURI(const TomboURI *pBase, TomboURI *pAttached)
 	return TRUE;
 }
 
-
-/////////////////////////////////////////
-// URIOption implimentation
-/////////////////////////////////////////
-
-URIOption::~URIOption()
-{
-	delete pNewURI;
-	delete pNewHeadLine;
-}

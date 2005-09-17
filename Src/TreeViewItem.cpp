@@ -17,8 +17,8 @@
 #include "VFStream.h"
 #include "TSParser.h"
 #include "VarBuffer.h"
-#include "DirList.h"
 #include "VFManager.h"
+#include "AutoPtr.h"
 
 #include "Repository.h"
 
@@ -588,6 +588,8 @@ DWORD TreeViewFolderItem::ItemOrder()
 	return ITEM_ORDER_FOLDER;
 }
 
+#include "URIScanner.h"
+
 BOOL TreeViewFolderItem::Expand(MemoSelectView *pView)
 {
 	HTREEITEM hParent = GetViewItem();
@@ -595,27 +597,22 @@ BOOL TreeViewFolderItem::Expand(MemoSelectView *pView)
 	TomboURI sURI;
 	if (!pView->GetURI(&sURI, hParent)) return FALSE;
 
-	DirList dlDirList;
-	if (!g_Repository.GetList(&sURI, &dlDirList, FALSE)) return FALSE;
+	URIList *pURIList = g_Repository.GetChild(&sURI, FALSE);
+	if (pURIList == NULL) return FALSE;
+	AutoPointer<URIList> ap(pURIList);
 
-	// Insert to folder
-	DWORD n = dlDirList.NumItems();
+	DWORD n = pURIList->GetSize();
 	for (DWORD i = 0; i < n; i++) {
-		struct DirListItem *p = dlDirList.GetItem(i);
-		LPCTSTR q = dlDirList.GetFileName(p->nHeadLinePos);
-		if (p->bFolder) {
-			// folder
+		URIOption opt(NOTE_OPTIONMASK_VALID);
+		if (!g_Repository.GetOption(pURIList->GetURI(i), &opt)) return FALSE;
+		if (opt.bFolder) {
 			TreeViewFolderItem *pItem = new TreeViewFolderItem();
-			pView->InsertFolder(hParent, q, pItem, TRUE);
+			pView->InsertFolder(hParent, pURIList->GetTitle(i), pItem, TRUE);
 		} else {
-			// note
-			LPCTSTR pURI = dlDirList.GetFileName(p->nURIPos);
-
-			TomboURI sURI;
-			if (!sURI.Init(pURI)) return FALSE;
-			if (!pView->InsertFile(hParent, &sURI, q, TRUE, FALSE)) return FALSE;
+			if (!pView->InsertFile(hParent, pURIList->GetURI(i), pURIList->GetTitle(i), TRUE, FALSE)) return FALSE;
 		}
 	}
+
 	return TRUE;
 }
 
