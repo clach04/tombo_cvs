@@ -75,7 +75,7 @@ const VFInfo *VFManager::GetGrepVFInfo(LPCTSTR pPath, LPCTSTR pRegex,
 		delete pFilter;
 		return NULL;
 	}
-	if (!pGen->Init(StringDup(pPath), bCheckCrypt) ||
+	if (!pGen->Init(pPath, bCheckCrypt) ||
 		!pFilter->Init(pRegex, bIsCaseSensitive, bCheckCrypt, bCheckFileName, bNegate, g_pPasswordManager) ||
 		!pStore->Init()) {
 		delete pGen;

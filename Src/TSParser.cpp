@@ -159,8 +159,12 @@ BOOL TSSrcTag::EndElement(ParseInfo *p)
 	if (!conv.Convert(pSrc)) return FALSE;
 	LPTSTR pConved = StringDup(conv.Get());
 #endif
-	if (!pGen->Init(pConved, bCheckEncrypt)) return FALSE;
-	
+	if (!pGen->Init(pConved, bCheckEncrypt)) {
+		delete [] pConved;
+		return FALSE;
+	}
+	delete pConved;
+
 	// Pass create object to parent item
 	TSParseTagItem *pParent = pNext;
 	pParent->pHead = pParent->pTail = pGen;
@@ -176,6 +180,7 @@ class TSGrepTag : public TSParseTagItem {
 	BOOL bCaseSensitive;
 	BOOL bFileNameOnly;
 	BOOL bNegate;
+	BOOL bCheckEncrypt;
 public:
 	TSGrepTag() : TSParseTagItem(TAGID_GREP), pPattern(NULL) {}
 	~TSGrepTag();
@@ -191,7 +196,7 @@ TSGrepTag::~TSGrepTag()
 
 BOOL TSGrepTag::StartElement(ParseInfo *p, const XML_Char **atts)
 {
-	bCaseSensitive = bFileNameOnly = bNegate = FALSE;
+	bCaseSensitive = bFileNameOnly = bNegate = bCheckEncrypt = FALSE;
 	DWORD i = 0;
 	while(atts[i] != NULL) {
 		if (wcsicmp(atts[i], L"pattern") == 0) {
@@ -204,6 +209,8 @@ BOOL TSGrepTag::StartElement(ParseInfo *p, const XML_Char **atts)
 			bFileNameOnly = TRUE;
 		} else if (wcsicmp(atts[i], L"not") == 0) {
 			bNegate = TRUE;
+		} else if (wcsicmp(atts[i], L"checkencrypt") == 0) {
+			bCheckEncrypt = TRUE;
 		}
 		i += 2;
 	}
@@ -228,7 +235,7 @@ BOOL TSGrepTag::EndElement(ParseInfo *p)
 	if (!conv.Convert(pPattern)) return FALSE;
 	LPTSTR pConved = conv.Get();
 #endif
-	if (!pFilter || !pFilter->Init(pConved, bCaseSensitive, TRUE, bFileNameOnly, bNegate, g_pPasswordManager)) return FALSE;
+	if (!pFilter || !pFilter->Init(pConved, bCaseSensitive, bCheckEncrypt, bFileNameOnly, bNegate, g_pPasswordManager)) return FALSE;
 
 	// Pass create object to parent item
 	TSParseTagItem *pParent = pNext;

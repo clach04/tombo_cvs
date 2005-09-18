@@ -4,7 +4,6 @@
 #include "Tombo.h"
 #include "TreeViewItem.h"
 #include "MemoSelectView.h"
-#include "MemoNote.h"
 #include "TString.h"
 #include "TomboURI.h"
 #include "UniConv.h"
@@ -12,13 +11,13 @@
 #include "MemoManager.h"
 #include "MainFrame.h"
 #include "DirectoryScanner.h"
-#include "MemoFolder.h"
 #include "Message.h"
 #include "VFStream.h"
 #include "TSParser.h"
 #include "VarBuffer.h"
 #include "VFManager.h"
 #include "AutoPtr.h"
+#include "URIScanner.h"
 
 #include "Repository.h"
 
@@ -175,7 +174,7 @@ BOOL TreeViewFileItem::Encrypt(MemoManager *pMgr, MemoSelectView *pView)
 		}
 		return FALSE;
 	}
-	// replace MemoNote that TreeViewItem have
+	// replace URI that TreeViewItem have
 	loc.set(opt.pNewURI);
 	bIsEncrypted = TRUE;
 	pView->GetManager()->ChangeURINotify(opt.pNewURI);
@@ -213,7 +212,7 @@ BOOL TreeViewFileItem::Decrypt(MemoManager *pMgr, MemoSelectView *pView)
 		return FALSE;
 	}
 
-	// replace MemoNote that TreeViewItem have
+	// replace URI that TreeViewItem have
 	loc.set(opt.pNewURI);
 	bIsEncrypted = FALSE;
 	pView->GetManager()->ChangeURINotify(opt.pNewURI);
@@ -588,7 +587,6 @@ DWORD TreeViewFolderItem::ItemOrder()
 	return ITEM_ORDER_FOLDER;
 }
 
-#include "URIScanner.h"
 
 BOOL TreeViewFolderItem::Expand(MemoSelectView *pView)
 {
@@ -834,7 +832,7 @@ BOOL TreeViewVirtualFolder::Expand(MemoSelectView *pView)
 	VFNote *pNote;
 	for (DWORD i = 0; i < n; i++) {
 		pNote = pStore->GetNote(i);
-		LPCTSTR pTitle = pNote->GetFileName();
+		LPCTSTR pTitle = pNote->GetTitle();
 		pView->InsertFile(hItem, pNote->GetURI(), pTitle, TRUE, TRUE);
 	}
 	pStore->FreeArray();

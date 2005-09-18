@@ -14,7 +14,6 @@
 #include "resource.h"
 #include "FileSelector.h"
 #include "UniConv.h"
-#include "MemoNote.h"
 #include "PasswordManager.h"
 #include "Message.h"
 #include "DialogTemplate.h"

@@ -158,8 +158,10 @@ LPBYTE CryptedMemoNote::GetMemoBodySub(LPCTSTR pTopDir, PasswordManager *pMgr, L
 
 	BOOL bCancel;
 	const char *pPassword = pMgr->Password(&bCancel, FALSE);
-	if (pPassword == NULL) return NULL;
-
+	if (pPassword == NULL) {
+		if (bCancel) SetLastError(ERROR_CANCELLED);
+		return NULL;
+	}
 	if (g_Property.FingerPrint()) {
 		if (!CheckFingerPrint(g_Property.FingerPrint(), pPassword)) {
 			if (TomboMessageBox(NULL, MSG_PASS_NOT_MATCH2, MSG_PASS_MISMATCH_TTL, MB_ICONQUESTION | MB_YESNO) == IDNO) {

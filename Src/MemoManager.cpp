@@ -8,7 +8,6 @@
 #include "MemoSelectView.h"
 #include "VarBuffer.h"
 #include "MainFrame.h"
-#include "MemoNote.h"
 #include "UniConv.h"
 #include "File.h"
 #include "Property.h"
@@ -195,7 +194,7 @@ BOOL MemoManager::AllocNewMemo(LPCTSTR pText, BOOL bCopy)
 	if (!pMemoSelectView->GetURI(&sSelected)) return FALSE;
 	if (!sSelected.GetAttachFolder(&sAttachFolder)) return FALSE;
 
-	// allocate new MemoNote instance and associate to tree view
+	// allocate new instance and associate to tree view
 	TString sHeadLine;
 	TomboURI sNewURI;
 

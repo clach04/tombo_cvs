@@ -5,6 +5,7 @@
 #include "Message.h"
 #include "Tombo.h"
 #include "TString.h"
+#include "TomboURI.h"
 #include "FilterDefDlg.h"
 #include "PropertyPage.h"
 #include "VarBuffer.h"
@@ -39,7 +40,7 @@ public:
 void FilterDlgSrcTab::Init(HWND hDlg)
 {
 	HWND hSrcPath = GetDlgItem(hDlg, IDC_FILTERDEF_SRC_PATH);
-	SetWindowText(hSrcPath, pDialog->pInfo->pGenerator->GetDirPath());
+	SetWindowText(hSrcPath, pDialog->pInfo->pGenerator->GetURI()->GetFullURI());
 }
 
 BOOL FilterDlgSrcTab::Apply(HWND hDlg)
@@ -52,7 +53,10 @@ BOOL FilterDlgSrcTab::Apply(HWND hDlg)
 	if (!sPath.Alloc(nLen + 1)) return FALSE;
 	GetWindowText(hEdit, sPath.Get(), nLen + 1);
 
-	return pDialog->pInfo->pGenerator->SetDirPath(sPath.Get());
+	TomboURI sURI;
+	if (!sURI.Init(sPath.Get())) return FALSE;
+
+	return pDialog->pInfo->pGenerator->SetURI(&sURI);
 }
 
 /////////////////////////////////////////

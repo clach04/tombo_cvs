@@ -14,11 +14,11 @@
 #include "Property.h"
 #include "MemoSelectView.h"
 #include "DirectoryScanner.h"
-#include "MemoNote.h"
 #include "VFStream.h"
 #include "SearchEngine.h"
 #include "VarBuffer.h"
 #include "AutoPtr.h"
+#include "URIScanner.h"
 
 #include "resource.h"
 #include "DialogTemplate.h"
@@ -33,18 +33,17 @@
 
 VFNote::~VFNote()
 {
-	delete [] pFileName;
+	delete [] pTitle;
 	delete pURI;
 }
 
-BOOL VFNote::Init(const TomboURI *pu, LPCTSTR pFile)
+BOOL VFNote::Init(const TomboURI *pu, LPCTSTR title)
 {
 	pURI = new TomboURI(*pu);
 	if (pURI == NULL) { SetLastError(ERROR_NOT_ENOUGH_MEMORY); return FALSE; }
 
-	pFileName = StringDup(pFile);
-	if (pFileName == NULL) return FALSE;
-	*(pFileName + _tcslen(pFileName) - 4) = TEXT('\0');
+	pTitle = StringDup(title);
+	if (pTitle == NULL) return FALSE;
 
 	if (!g_Repository.GetNoteAttribute(pURI, &uLastUpdate, &uCreateDate, &uFileSize)) return FALSE;
 	return TRUE;
@@ -86,65 +85,44 @@ BOOL VFStream::PostActivate()
 	return TRUE;
 }
 
+BOOL VFStream::NeedEncryptedNote()
+{
+	return FALSE;
+}
+
 ////////////////////////////////////
 // Traverse directory
 ////////////////////////////////////
 // VFDirectoryGenerator's helper class
 
-class VirtualStreamFolderScanner : public DirectoryScanner {
-	DWORD nTopDirLen;
+class VFolderScanner : public URIScanner {
 	VFStream *pNext;
 	BOOL bCheckEncrypt;
 
 	DWORD nError;
-public:
-	void Init(LPCTSTR pPath, VFStream *pStream, BOOL bCe);
-	void InitialScan() { nError = ERROR_SUCCESS; }
-	void AfterScan() {}
-	void PreDirectory(LPCTSTR p){}
-	void PostDirectory(LPCTSTR p){}
-	void File(LPCTSTR p);
 
+	void InitialScan() { nError = ERROR_SUCCESS; }
+	void Node();
+
+public:
+
+	BOOL Init(const TomboURI *pURI, VFStream *pNext, BOOL bCheckEncrypt);
 	DWORD GetError() { return nError; }
 };
 
-void VirtualStreamFolderScanner::Init(LPCTSTR pPath, VFStream *p, BOOL bCe)
+BOOL VFolderScanner::Init(const TomboURI *pURI, VFStream *pN, BOOL bce)
 {
-	TCHAR buf[MAX_PATH];
-
-	pNext = p;
-	bCheckEncrypt = bCe;
-
-	LPCTSTR pDir = g_Property.TopDir();
-	if (*pPath != TEXT('\\')) {
-		wsprintf(buf, TEXT("%s\\%s"), pDir, pPath);
-	} else {
-		wsprintf(buf, TEXT("%s%s"), pDir, pPath);
-	}
-
-	nTopDirLen = _tcslen(pDir);
-
-	DirectoryScanner::Init(buf, 0);
+	bCheckEncrypt = bce;
+	pNext = pN;
+	return URIScanner::Init(&g_Repository, pURI, !bCheckEncrypt);
 }
 
-void VirtualStreamFolderScanner::File(LPCTSTR p)
+void VFolderScanner::Node() 
 {
-	// if encrypted memo is not search target and the note is encrypted, ignore it
-	DWORD nt = MemoNote::IsNote(p);
-	if (nt == NOTE_TYPE_NO || nt == NOTE_TYPE_TDT) return;
-	if (!bCheckEncrypt && nt == NOTE_TYPE_CRYPTED) return;
-
-	// create MemoNote object
-	MemoNote *pNote = NULL;
-	if (!MemoNote::MemoNoteFactory(CurrentPath() + nTopDirLen, &pNote)) {
-		StopScan();
-		return;
-	}
-	if (pNote == NULL) return;
-	AutoPointer<MemoNote> ap(pNote);
-
-	TomboURI sURI;
-	if (!pNote->GetURI(&sURI)) return;
+	const TomboURI *pCur = CurrentURI();
+	LPCTSTR pTitle = GetTitle();
+	
+	if (!bCheckEncrypt && g_Repository.IsEncrypted(pCur)) return;
 
 	VFNote *pVF = new VFNote();
 	if (pVF == NULL) {
@@ -152,8 +130,7 @@ void VirtualStreamFolderScanner::File(LPCTSTR p)
 		StopScan();
 		return;
 	}
-
-	if (!pVF->Init(&sURI, p)) {
+	if (!pVF->Init(pCur, pTitle)) {
 		nError = GetLastError();
 		StopScan();
 		delete pVF;
@@ -172,19 +149,42 @@ void VirtualStreamFolderScanner::File(LPCTSTR p)
 // VFDirectoryGenerator
 ////////////////////////////////////
 
-VFDirectoryGenerator::VFDirectoryGenerator() : pDirPath(NULL)
+VFDirectoryGenerator::VFDirectoryGenerator() : pURI(NULL)
 {
 }
 
 VFDirectoryGenerator::~VFDirectoryGenerator()
 {
-	delete [] pDirPath;
+	delete pURI;
 }
 
-BOOL VFDirectoryGenerator::Init(LPTSTR p, BOOL bCe)
+BOOL VFDirectoryGenerator::Init(LPCTSTR pDirPath, BOOL bCe)
 {
 	bCheckEncrypt = bCe;
-	pDirPath = p;
+	SetDirPath(pDirPath);
+	return TRUE;
+}
+
+BOOL VFDirectoryGenerator::Init(const TomboURI *pURI, BOOL bCe)
+{
+	bCheckEncrypt = bCe;
+	return SetURI(pURI);
+}
+
+BOOL VFDirectoryGenerator::SetDirPath(LPCTSTR pPath)
+{
+	delete pURI;
+	pURI = new TomboURI();
+	if (pURI == NULL) { SetLastError(ERROR_NOT_ENOUGH_MEMORY); return FALSE; }
+	if (!pURI->InitByNotePath(pPath)) return FALSE;
+	return TRUE;
+}
+
+BOOL VFDirectoryGenerator::SetURI(const TomboURI *p)
+{
+	delete pURI;
+	pURI = new TomboURI(*p);
+	if (pURI == NULL) { SetLastError(ERROR_NOT_ENOUGH_MEMORY); return FALSE; }
 	return TRUE;
 }
 
@@ -192,8 +192,22 @@ BOOL VFDirectoryGenerator::Activate()
 {
 	if (!pNext) return FALSE;
 
-	VirtualStreamFolderScanner vfs;
-	vfs.Init(pDirPath, pNext, bCheckEncrypt);
+	BOOL bCE;
+	if (bCheckEncrypt) {
+		bCE = TRUE;
+	} else {
+		bCE = FALSE;
+		VFStream *p = pNext;
+		while(p) {
+			Sleep(1);
+			if (p->NeedEncryptedNote()) {
+				bCE = TRUE;
+			}
+			p = p->GetNext();
+		}
+	}
+	VFolderScanner vfs;
+	if (!vfs.Init(pURI, pNext, bCE)) return FALSE;
 	return vfs.Scan();
 }
 
@@ -209,13 +223,13 @@ VFStream *VFDirectoryGenerator::Clone(VFStore **ppTail)
 	if (p == NULL) return NULL;
 	
 	p->bCheckEncrypt = bCheckEncrypt;
-	p->pDirPath = StringDup(pDirPath);
 	p->pNext = pNext->Clone(ppTail);
-	if (!p || p->pDirPath == NULL ||
-		p->pNext == NULL) {
+	if (!p || p->pNext == NULL) {
 		delete p;
 		return NULL;
 	}
+	p->pURI = new TomboURI(*pURI);
+
 	return p;
 }
 
@@ -223,8 +237,11 @@ BOOL VFDirectoryGenerator::GenerateXMLOpenTag(File *pFile)
 {
 	pNext->GenerateXMLOpenTag(pFile);
 
+	TString sDirPath;
+	if (!pURI->GetFilePath(&sDirPath)) return FALSE;
+
 	if (!pFile->WriteUnicodeString(L"<src folder=\"")) return FALSE;
-	LPWSTR pDirW = ConvTCharToWChar(pDirPath);
+	LPWSTR pDirW = ConvTCharToWChar(sDirPath.Get());
 	if (!pDirW) return FALSE;
 	if (!pFile->WriteUnicodeString(pDirW)) {
 		delete [] pDirW;
@@ -256,16 +273,6 @@ BOOL VFDirectoryGenerator::ToString(TString *p)
 	return FALSE;
 }
 
-BOOL VFDirectoryGenerator::SetDirPath(LPCTSTR pPath)
-{
-	LPTSTR p = StringDup(pPath);
-	if (p == NULL) return FALSE;
-
-	delete[] pDirPath;
-	pDirPath = p;
-
-	return TRUE;
-}
 
 BOOL VFDirectoryGenerator::UpdateParamWithDialog(HINSTANCE hInst, HWND hParent)
 {
@@ -458,6 +465,11 @@ BOOL VFRegexFilter::GenerateXMLOpenTag(File *pFile)
 	if (bNegate) {
 		if (!pFile->WriteUnicodeString(L" not='True'")) return FALSE;
 	}
+
+	if (pRegex->IsSearchEncryptMemo()) {
+		if (!pFile->WriteUnicodeString(L" checkencrypt='True'")) return FALSE;
+	}
+
 	if (!pFile->WriteUnicodeString(L">\n")) return FALSE;
 
 	return TRUE;
@@ -483,7 +495,7 @@ BOOL VFRegexFilter::ToString(TString *p)
 BOOL VFRegexFilter::UpdateParamWithDialog(HINSTANCE hInst, HWND hParent)
 {
 	RegexFilterAddDlg ad;
-	if (!ad.Init(pPattern->Get(), bCaseSensitive, FALSE, bFileNameOnly, bNegate)) return FALSE;
+	if (!ad.Init(pPattern->Get(), bCaseSensitive, pRegex->IsSearchEncryptMemo(), bFileNameOnly, bNegate)) return FALSE;
 	if (ad.Popup(hInst, hParent) == IDOK) {
 		Reset(ad.GetMatchString()->Get(), 
 				ad.IsCaseSensitive(), ad.IsCheckEncrypt(),
@@ -491,6 +503,11 @@ BOOL VFRegexFilter::UpdateParamWithDialog(HINSTANCE hInst, HWND hParent)
 		return TRUE;
 	}
 	return FALSE;
+}
+
+BOOL VFRegexFilter::NeedEncryptedNote()
+{
+	return pRegex->IsSearchEncryptMemo();
 }
 
 ////////////////////////////////////
@@ -734,14 +751,14 @@ extern "C" static int SortNotes_FileNameAsc(const void *e1, const void *e2)
 {
 	VFNote *p1 = *(VFNote**)e1;
 	VFNote *p2 = *(VFNote**)e2;
-	return _tcsicmp(p1->GetFileName(), p2->GetFileName());
+	return _tcsicmp(p1->GetTitle(), p2->GetTitle());
 }
 
 extern "C" static int SortNotes_FileNameDesc(const void *e1, const void *e2)
 {
 	VFNote *p1 = *(VFNote**)e1;
 	VFNote *p2 = *(VFNote**)e2;
-	return _tcsicmp(p2->GetFileName(), p1->GetFileName());
+	return _tcsicmp(p2->GetTitle(), p1->GetTitle());
 }
 
 extern "C" static int SortNotes_LastUpdateOlder(const void *e1, const void *e2)

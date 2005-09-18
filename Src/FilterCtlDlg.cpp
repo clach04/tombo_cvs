@@ -301,11 +301,9 @@ void FilterCtlDlg::Command_New(HWND hDlg)
 {
 	// Create empty VFInfo
 	VFInfo *pInfo = new VFInfo();
-	LPTSTR pEmpty;
 	if (!pInfo ||
-		!(pEmpty = StringDup(TEXT(""))) ||
 		!(pInfo->pGenerator = new VFDirectoryGenerator()) ||
-		!pInfo->pGenerator->Init(pEmpty, FALSE) ||
+		!pInfo->pGenerator->Init(TEXT(""), FALSE) ||
 		!(pInfo->pStore = new VFStore()) ||
 		!pInfo->pStore->Init()) {
 		MessageBox(hDlg, MSG_NOT_ENOUGH_MEMORY, TOMBO_APP_NAME, MB_OK | MB_ICONERROR);

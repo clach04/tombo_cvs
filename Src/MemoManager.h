@@ -4,7 +4,6 @@
 class MemoDetailsView;
 class MemoSelectView;
 class MainFrame;
-class MemoNote;
 class PasswordManager;
 class SearchEngineA;
 class TreeViewItem;

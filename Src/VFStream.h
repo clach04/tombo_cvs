@@ -1,7 +1,6 @@
 #ifndef VFSTREAM_H
 #define VFSTREAM_H
 
-class MemoNote;
 class SearchEngineA;
 class PasswordManager;
 class VFStore;
@@ -25,15 +24,15 @@ class VFNote {
 	// The object lifecycle of *pURI is same as VFNote.
 	// do not point *pURI but use copy of the object. *pURI has smart pointer, so cost is not expensive.
 	TomboURI *pURI;
-	LPTSTR pFileName;
+	LPTSTR pTitle;
 	UINT64 uLastUpdate;
 	UINT64 uCreateDate;
 	UINT64 uFileSize;
 
 public:
-	VFNote() : pURI(NULL), pFileName(NULL) {}
+	VFNote() : pURI(NULL), pTitle(NULL) {}
 	~VFNote();
-	BOOL Init(const TomboURI *pURI, LPCTSTR pFileName);
+	BOOL Init(const TomboURI *pURI, LPCTSTR pTitle);
 
 	const TomboURI *GetURI() { return pURI; }
 
@@ -41,7 +40,7 @@ public:
 	// pNote is deleted, too. To prevent deleting, you should call ClearNote().
 	// In this case, deleting pNote is due to caller.
 
-	LPCTSTR GetFileName() { return pFileName; }
+	LPCTSTR GetTitle() { return pTitle; }
 
 	UINT64 GetLastUpdate() { return uLastUpdate; }
 	UINT64 GetCreateDate() { return uCreateDate; }
@@ -101,6 +100,9 @@ public:
 	virtual BOOL UpdateParamWithDialog(HINSTANCE hInst, HWND hParent) = 0;
 		// return TRUE if updated.
 		// FALSE if not updated(CANCELED) or failed.
+
+	virtual BOOL NeedEncryptedNote();
+
 };
 
 ////////////////////////////////////
@@ -109,7 +111,7 @@ public:
 // In current version, VFDirectoryGenerator is only generator.
 
 class VFDirectoryGenerator : public VFStream {
-	LPTSTR pDirPath;
+	TomboURI *pURI;
 	BOOL bCheckEncrypt;
 public:
 	VFDirectoryGenerator();
@@ -124,17 +126,18 @@ public:
 	BOOL Activate();
 	// void FreeObject(); inherit
 
-	BOOL Init(LPTSTR pDir, BOOL bCheckEncrypt);
-		// pDir's memory is controled under VFDirectoryGenerator.
-		// do not delete pDir after calling Init.
+	BOOL Init(LPCTSTR pDir, BOOL bCheckEncrypt);
+	BOOL Init(const TomboURI *pURI, BOOL bCheckEncrypt);
 
 	VFStream *Clone(VFStore **ppTail);
 
 	BOOL GenerateXMLOpenTag(File *pFile);
 	BOOL GenerateXMLCloseTag(File *pFile);
 
-	LPCTSTR GetDirPath() { return pDirPath; }
+	const TomboURI *GetURI() { return pURI; }
+
 	BOOL SetDirPath(LPCTSTR pPath);
+	BOOL SetURI(const TomboURI *pURI);
 
 	LPCTSTR GetFilterType();
 	BOOL ToString(TString *p);
@@ -177,7 +180,6 @@ public:
 
 	// free VFNote array. 
 	void FreeArray();
-		// VFNote in array is deleted, but MemoNote in each VFNote is not deleted.
 
 	LPCTSTR GetFilterType();
 	BOOL ToString(TString *p);
@@ -223,6 +225,7 @@ public:
 	BOOL ToString(TString *p);
 
 	BOOL UpdateParamWithDialog(HINSTANCE hInst, HWND hParent);
+	BOOL NeedEncryptedNote();
 };
 
 ////////////////////////////////////

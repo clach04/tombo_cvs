@@ -807,7 +807,7 @@ BOOL LocalFileRepository::GetList(const TomboURI *pFolder, DirList *pList, BOOL 
 	}
 
 	if (!pList->Init(pFolder->GetFullURI())) return FALSE;
-	if (!pList->GetList(sFullPath.Get(), FALSE)) return FALSE;
+	if (!pList->GetList(sFullPath.Get(), bSkipEncrypt)) return FALSE;
 
 	return TRUE;
 }
@@ -828,6 +828,15 @@ URIList *LocalFileRepository::GetChild(const TomboURI *pFolder, BOOL bSkipEncryp
 
 		TomboURI sURI;
 		if (!sURI.Init(pURI)) return NULL;
+
+		URIOption opt(NOTE_OPTIONMASK_VALID);
+		if (!GetOption(&sURI, &opt)) return NULL;
+
+		if (!opt.bFolder) {
+			DWORD dirType = MemoNote::IsNote(pFN);
+			if (dirType != NOTE_TYPE_PLAIN && dirType != NOTE_TYPE_CRYPTED) continue;
+		}
+
 		if (!pList->Add(&sURI, dlist.GetFileName(pItem->nHeadLinePos))) return NULL;
 	}
 	return pList;

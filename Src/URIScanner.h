@@ -22,7 +22,7 @@ protected:
 	TVector<URIListItem> liList;
 public:
 	URIList();
-	~URIList();
+	virtual ~URIList();
 
 	BOOL Init();
 
@@ -46,10 +46,14 @@ private:
 		StackFrame *pNext;
 	};
 	StackFrame *pTop;
-
 	IEnumRepository *pRepository;
 	TomboURI *pBaseURI;
+	TString *pBaseTitle;
+	BOOL bSkipEncrypt;
+
 	const TomboURI *pCurrentURI;
+	LPCTSTR pTitle;
+
 	BOOL bStopScan;
 
 	BOOL PushFrame(const TomboURI *pURI);
@@ -59,6 +63,7 @@ private:
 protected:
 	// The URI now scanning. You can use this value in 5 customizable methods.
 	const TomboURI* CurrentURI() { return pCurrentURI; }
+	LPCTSTR GetTitle() { return pTitle; }
 
 	// Request to stop scanning. 
 	// even if this flag is set, 5 methods are not interrupted and done at finish the method.
@@ -78,7 +83,7 @@ public:
 	URIScanner();
 	~URIScanner();
 
-	BOOL Init(IEnumRepository *pEnumIF, const TomboURI *pURI);
+	BOOL Init(IEnumRepository *pEnumIF, const TomboURI *pURI, BOOL bSkipEncrypt);
 
 	BOOL Scan();
 };

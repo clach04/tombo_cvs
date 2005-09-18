@@ -61,6 +61,7 @@ class IEnumRepository {
 public:
 	virtual URIList *GetChild(const TomboURI *pFolderURI, BOOL bSkipEncrypt) = 0;
 	virtual BOOL GetOption(const TomboURI *pURI, URIOption *pOption) = 0;
+	virtual BOOL GetHeadLine(const TomboURI *pURI, TString *pHeadLine) = 0;
 
 };
 

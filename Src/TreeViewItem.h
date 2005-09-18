@@ -65,7 +65,6 @@ public:
 	virtual BOOL Copy(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR *ppErr) = 0;
 	virtual BOOL Rename(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR pNewName) = 0;
 	virtual BOOL Delete(MemoManager *pMgr, MemoSelectView *pView) = 0;
-		// MemoNote object that has TreeViewItem is also deleted.
 		// "this" object is not deleted, so delete manually if return value is TRUE.
 	virtual BOOL Encrypt(MemoManager *pMgr, MemoSelectView *pView) = 0;
 	virtual BOOL Decrypt(MemoManager *pMgr, MemoSelectView *pView) = 0;

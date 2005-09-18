@@ -984,3 +984,10 @@ Some bugs are fixed.
 - removing g_Property.TopDir() dependency still.
 - add unittest proj
 - implement URIScanner class but not integrated yet.
+
+////////////////////////////////
+// B186
+////////////////////////////////
+
+* Change value format note path to uri at virtual folder's "Filter settings" source tab.
+* FIX: Encrypted not is not checked on vfolder
