@@ -168,4 +168,20 @@ LPCTSTR GetNextDirSeparator(LPCTSTR pStart);
 // ex. C:\foo\bar\baz.txt -> C:\foo\bar\ 
 void GetFilePath(LPTSTR pPath, LPCTSTR pFullPath);
 
+//////////////////////////////////
+// Release buffer
+
+// These function clear buffer to zero before release memory.
+
+void WipeOutAndDelete(LPTSTR pMemo);
+#ifdef _WIN32_WCE
+void WipeOutAndDelete(char *pMemo);
+#endif
+
+//////////////////////////////////
+// Delete file
+// before deleting, write contents to zero.
+
+BOOL WipeOutAndDeleteFile(LPCTSTR pFile);
+
 #endif

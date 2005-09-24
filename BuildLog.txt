@@ -991,3 +991,12 @@ Some bugs are fixed.
 
 * Change value format note path to uri at virtual folder's "Filter settings" source tab.
 * FIX: Encrypted not is not checked on vfolder
+
+- replace VFolder directory scan implementation.
+
+////////////////////////////////
+// B187
+////////////////////////////////
+
+- replace tree search scan implementation.
+

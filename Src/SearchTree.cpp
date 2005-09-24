@@ -5,32 +5,88 @@
 #include "UniConv.h"
 #include "SearchEngine.h"
 #include "SearchTree.h"
-#include "DirList.h"
 #include "MemoNote.h"
 #include "TString.h"
 #include "TomboURI.h"
 #include "DialogTemplate.h"
 #include "Message.h"
+#include "Property.h"
+#include "Repository.h"
+#include "DirList.h"
+#include "URIScanner.h"
 
-static DWORD FindList(DirList *pDl, LPCTSTR pString);
+////////////////////////////////
+////////////////////////////////
+
+class SearchTreeScanner : public URIScanner {
+public:
+	BOOL bFound;
+	TomboURI *pMatchedURI;
+
+	SearchEngineA *pRegex;
+	BOOL bSkipOne;
+
+	BOOL Init(SearchEngineA *p, const TomboURI *pBase, BOOL bSkipOne, BOOL bSkipEncrypt);
+	SearchTreeScanner();
+
+	void Node();
+
+};
+
+SearchTreeScanner::SearchTreeScanner() : bFound(FALSE), pMatchedURI(NULL)
+{
+}
+
+BOOL SearchTreeScanner::Init(SearchEngineA *p, const TomboURI *pBase, BOOL bSOne, BOOL bSEncrypt)
+{
+	pRegex = p;
+	bSkipOne = bSOne;
+	return URIScanner::Init(&g_Repository, pBase, bSEncrypt);
+}
+
+void SearchTreeScanner::Node()
+{
+	if (bSkipOne) {
+		bSkipOne = FALSE;
+		return;
+	}
+
+	SearchResult result = pRegex->Search(CurrentURI());
+	switch(result) {
+	case SR_FOUND:
+		bFound = TRUE;
+		pMatchedURI = new TomboURI(*CurrentURI());
+		StopScan();
+		break;
+	case SR_NOTFOUND:
+		break;
+	case SR_FAILED:
+		StopScan();
+		break;
+	}
+}
 
 ////////////////////////////////
 // ctor & dtor
 ////////////////////////////////
 
-BOOL SearchTree::Init(SearchEngineA *p, LPCTSTR path, DWORD offset, BOOL bDirection, BOOL skip, BOOL skipEncrypt)
+BOOL SearchTree::Init(SearchEngineA *p, const TomboURI *pURI,  BOOL bDForward, BOOL bSOne, BOOL bSkipEncrypt)
 {
-	pStartPath = path;
+	pStartURI = new TomboURI(*pURI);
+	if (pStartURI == NULL) { SetLastError(ERROR_NOT_ENOUGH_MEMORY); return FALSE; }
 	pRegex = p;
-	nBaseOffset = offset;
-	bSearchDirectionForward = bDirection;
-	bSkipOne = skip;
-	bSearchEncryptedMemo = !skipEncrypt;
+	bSearchDirectionForward = bDForward;
+	bSkipOne = bSOne;
+	bSearchEncryptedMemo = !bSkipEncrypt;
 	return TRUE;
 }
 
+
 SearchTree::~SearchTree()
 {
+	delete pScanner;
+	delete pStartURI;
+	delete pMatchedURI;
 }
 
 ////////////////////////////////
@@ -74,7 +130,7 @@ extern "C" static DWORD WINAPI SearchThreadFunc(LPVOID p)
 	SearchTree *pSt = (SearchTree*)p;
 
 	// Do search work
-	pSt->Search();
+	pSt->SetResult(pSt->Search());
 
 	PostMessage(pSt->GetWnd(), WM_COMMAND, MAKEWPARAM(IDOK, 0), NULL);
 	return 0;
@@ -104,7 +160,6 @@ void SearchTree::InitDialog(HWND hDlg)
 	DWORD nThreadId;
 
 	hDlgWnd = hDlg;
-	bStopFlag = FALSE;
 	srResult = SR_NOTFOUND;
 	hSearchThread = CreateThread(NULL, 0, SearchThreadFunc, (LPVOID)this, 0, &nThreadId);
 }
@@ -131,7 +186,22 @@ void SearchTree::CancelRequest()
 {
 	HWND hWnd = GetDlgItem(hDlgWnd, IDC_SEARCHMSG);
 	SetWindowText(hWnd, MSG_SEARCH_CANCELING);
-	bStopFlag = TRUE;
+	if (pScanner) {
+		pScanner->StopScan();
+	}
+}
+
+/////////////////////////////////////////
+// get current URI
+/////////////////////////////////////////
+
+const TomboURI* SearchTree::CurrentURI()
+{
+	if (pScanner) {
+		return pScanner->CurrentURI();
+	} else {
+		return NULL;
+	}
 }
 
 /////////////////////////////////////////
@@ -140,129 +210,21 @@ void SearchTree::CancelRequest()
 
 SearchResult SearchTree::Search()
 {
-	_tcscpy(aPath, pStartPath);
-	LPTSTR pBase = aPath + nBaseOffset + 1;
-	*pBase= TEXT('\0');
+	TomboURI sRoot;
+	sRoot.Init("tombo://default/");
 
-	srResult = SearchTreeRec(pStartPath + nBaseOffset + 1, pBase);
-	return srResult;
-}
-
-SearchResult SearchTree::SearchTreeRec(LPCTSTR pNextParse, LPTSTR pBase)
-{
-	TomboURI sBaseURI;
-	if (!sBaseURI.InitByNotePath(aPath + nBaseOffset)) return SR_FAILED;
-
-	// expand directory list
-	DirList dl;
-	if (!dl.Init(sBaseURI.GetFullURI())) return SR_FAILED;
-	_tcscpy(pBase, TEXT("*.*"));
-	if (!dl.GetList(aPath, !bSearchEncryptedMemo)) return SR_FAILED;
-
-	// check current selecting path
-	DWORD nCurrentSelP;
-	if (pNextParse && *pNextParse) {
-		LPCTSTR p = GetNextDirSeparator(pNextParse);
-		if (p) {
-			// folder
-			DWORD n = p - pNextParse;
-			_tcsncpy(pBase, pNextParse, n);
-			*(pBase + n) = TEXT('\0');
-			nCurrentSelP = FindList(&dl, pBase);
-			if (nCurrentSelP == 0xFFFFFFFF) return SR_FAILED;
-			_tcscpy(pBase + n, TEXT("\\\0"));
-			SearchResult sr = SearchTreeRec(p + 1, pBase + n + 1);
-			if (sr != SR_NOTFOUND) return sr;
-			if (bSearchDirectionForward) {
-				nCurrentSelP++;
-			} else {
-				nCurrentSelP--;
-			}
-		} else {
-			// file
-			_tcscpy(pBase, pNextParse);
-			nCurrentSelP = FindList(&dl, pNextParse);
-			if (nCurrentSelP == 0xFFFFFFFF) return SR_FAILED;
-		}
-	} else {
-		// expire folder
-		if (bSearchDirectionForward) {
-			nCurrentSelP = 0;
-		} else {
-			nCurrentSelP = dl.NumItems() - 1;
-		}
+	pScanner = new SearchTreeScanner();
+	if (!pScanner->Init(pRegex, &sRoot, bSkipOne, !bSearchEncryptedMemo)) return SR_FAILED;
+	if (!pScanner->Scan(pStartURI, !bSearchDirectionForward)) {
+		return SR_FAILED;
 	}
 
-	// iteration
-	DWORD n = dl.NumItems();
-	DWORD i = nCurrentSelP;
-	while(i >= 0 && i < n) {
-		if (bStopFlag) {
-			return SR_CANCELED;
-		}
-
-		DirListItem *pItem = dl.GetItem(i);
-		LPCTSTR pFileName = dl.GetFileName(pItem->nFileNamePos);
-
-		_tcscpy(pBase, pFileName);
-		if (pItem->bFolder) {
-			// directory
-			DWORD l = _tcslen(pFileName);
-			_tcscpy(pBase + l, TEXT("\\\0"));
-			SearchResult sr;
-			sr = SearchTreeRec(NULL, pBase + _tcslen(pFileName) + 1);
-			if (sr != SR_NOTFOUND) return sr;
-		} else {
-			// file
-			SearchResult sr = SearchOneItem();
-			if (sr != SR_NOTFOUND) return sr;
-		}
-		if (bSearchDirectionForward) {
-			i++;
-		} else {
-			i--;
-		}
+	if (pScanner->bFound) {
+		pMatchedURI = new TomboURI(*(pScanner->pMatchedURI));
+		return SR_FOUND;
+	}
+	if (pScanner->IsStopScan()) {
+		return SR_CANCELED;
 	}
 	return SR_NOTFOUND;
-}
-
-/////////////////////////////////////////
-// search one file
-/////////////////////////////////////////
-
-SearchResult SearchTree::SearchOneItem()
-{
-	if (bSkipOne) {
-		bSkipOne = FALSE;
-		return SR_NOTFOUND;
-	}
-
-	LPCTSTR p = aPath + nBaseOffset + 1;
-	MemoNote *pNote = NULL;
-	if (!MemoNote::MemoNoteFactory(p, &pNote)) return SR_FAILED;
-	if (pNote == NULL) return SR_NOTFOUND;
-
-	TomboURI sURI;
-	if (!pNote->GetURI(&sURI)) return SR_FAILED;
-
-	SearchResult result = pRegex->Search(&sURI);
-	delete pNote;
-	return result;
-}
-
-/////////////////////////////////////////
-// sub functions
-/////////////////////////////////////////
-
-// TODO: use binary search
-static DWORD FindList(DirList *pDl, LPCTSTR pString)
-{
-	DWORD n = pDl->NumItems();
-	for (DWORD i = 0; i < n; i++) {
-		DirListItem *p = pDl->GetItem(i);
-		LPCTSTR q = pDl->GetFileName(p->nFileNamePos);
-
-		if (_tcscmp(q, pString) == 0) return i;
-	}
-	return 0xFFFFFFFF;
 }

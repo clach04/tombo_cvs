@@ -2,7 +2,6 @@
 #define SEARCHENGINE_H
 
 class PasswordManager;
-class MemoNote;
 enum SearchResult;
 class TomboURI;
 

@@ -36,7 +36,6 @@ public:
 
 	virtual MemoNote *GetNewInstance() const = 0;
 	virtual LPCTSTR GetExtension() = 0;
-	virtual DWORD GetMemoIcon() = 0;
 
 	MemoNote *Clone() const;
 	BOOL Equal(MemoNote *pTarget);
@@ -76,20 +75,6 @@ public:
 	//////////////////////////////////
 	// notes attributes
 
-	virtual BOOL IsEncrypted() const { return FALSE; }
-
-	//////////////////////////////////
-	// Release buffer
-
-	// Release buffer that is allocated by GetMemoBody()
-	// This function clears buffer to zero before release
-	// so we should use this func for security reasons.
-	static void WipeOutAndDelete(LPTSTR pMemo);
-#ifdef _WIN32_WCE
-	static void WipeOutAndDelete(char *pMemo);
-#endif
-	static BOOL WipeOutAndDeleteFile(LPCTSTR pFile);
-
 	static DWORD IsNote(LPCTSTR pFile);
 
 	//////////////////////////////////
@@ -120,7 +105,6 @@ class PlainMemoNote : public MemoNote {
 public:
 	MemoNote *GetNewInstance() const ;
 	LPCTSTR GetExtension();
-	DWORD GetMemoIcon();
 
 	LPTSTR GetMemoBody(LPCTSTR pTopDir, PasswordManager *pMgr) const;
 	char *GetMemoBodyA(LPCTSTR pTopDir, PasswordManager *pMgr) const;
@@ -138,14 +122,11 @@ protected:
 public:
 	MemoNote *GetNewInstance() const ;
 	LPCTSTR GetExtension();
-	DWORD GetMemoIcon();
 
 	LPTSTR GetMemoBody(LPCTSTR pTopDir, PasswordManager *pMgr) const;
 	char *GetMemoBodyA(LPCTSTR pTopDIr, PasswordManager *pMgr) const;
 
 	BOOL SaveData(PasswordManager *pMgr, const char *pMemo, LPCTSTR pWriteFile);
-
-	BOOL IsEncrypted() const { return TRUE; }
 
 	MemoNote *Decrypt(LPCTSTR pTopDir, PasswordManager *pMgr, TString *pHeadLine, BOOL *pIsModified) const;
 };

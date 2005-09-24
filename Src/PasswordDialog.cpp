@@ -142,7 +142,7 @@ BOOL PasswordDialog::OnOK(HWND hDlg)
 	LPTSTR pPass1 = GetPass(hEdit);
 	if (!pPass1) return FALSE;
 	if (_tcslen(pPass1) == 0) {
-		MemoNote::WipeOutAndDelete(pPass1);
+		WipeOutAndDelete(pPass1);
 		return FALSE;
 	}
 
@@ -151,19 +151,19 @@ BOOL PasswordDialog::OnOK(HWND hDlg)
 	if (bVerify) {
 		pPass2 = GetPass(hEdit2);
 		if (!pPass2) {
-			MemoNote::WipeOutAndDelete(pPass1);
+			WipeOutAndDelete(pPass1);
 			return FALSE;
 		}
 		if (_tcscmp(pPass1, pPass2) != 0) {
 			TomboMessageBox(hDlg, MSG_PASS_NOT_MATCH, TEXT("Warning"), MB_ICONEXCLAMATION | MB_OK);
-			MemoNote::WipeOutAndDelete(pPass1);
-			MemoNote::WipeOutAndDelete(pPass2);
+			WipeOutAndDelete(pPass1);
+			WipeOutAndDelete(pPass2);
 			return FALSE;
 		}
-		MemoNote::WipeOutAndDelete(pPass2);
+		WipeOutAndDelete(pPass2);
 	}
 	pPassword = ConvUnicode2SJIS(pPass1);
 
-	MemoNote::WipeOutAndDelete(pPass1);
+	WipeOutAndDelete(pPass1);
 	return (pPassword != NULL);
 }

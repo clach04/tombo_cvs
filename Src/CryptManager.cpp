@@ -288,35 +288,16 @@ LPBYTE CryptManager::DecryptBuffer(const LPBYTE pCrypted, int nSize)
 void WipeOutAndDelete(LPTSTR p, DWORD len)
 {
 	for (DWORD i = 0; i < len; i++) p[i] = TEXT('\0');
-}
-
-
-void WipeOutAndDelete(LPTSTR p)
-{
-	if (p == NULL) return;
-
-	LPTSTR q = p;
-	while (*q) {
-		*q++ = TEXT('\0');
-	}
 	delete [] p;
 }
+
 
 #ifdef _WIN32_WCE
 void WipeOutAndDelete(char *p, DWORD len)
 {
 	for (DWORD i = 0; i < len; i++) p[i] = TEXT('\0');
-}
-
-void WipeOutAndDelete(char *p)
-{
-	if (p == NULL) return;
-
-	char *q = p;
-	while (*q) {
-		*q++ = TEXT('\0');
-	}
 	delete [] p;
 }
+
 #endif
 

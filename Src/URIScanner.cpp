@@ -70,9 +70,23 @@ URIScanner::URIScanner() : pBaseURI(NULL), pCurrentURI(NULL), pTop(NULL), pBaseT
 
 BOOL URIScanner::Init(IEnumRepository *pRepo, const TomboURI *pURI, BOOL bSKE)
 {
-	pBaseURI = new TomboURI(*pURI);
+	// initialize value
 	pRepository = pRepo;
 	bSkipEncrypt = bSKE;
+	iDirection = 1;
+
+	// check URI
+	URIOption opt(NOTE_OPTIONMASK_VALID);
+	if (!pRepository->GetOption(pURI, &opt)) return FALSE;
+
+	if (!opt.bFolder) {
+		SetLastError(ERROR_INVALID_PARAMETER);
+		return FALSE;
+	}
+
+	// set URI
+	pBaseURI = new TomboURI(*pURI);
+
 	return TRUE;
 }
 
@@ -88,7 +102,7 @@ URIScanner::~URIScanner()
 }
 
 //////////////////////////////////////////////////
-// Clear stack frame
+// treat stack frame
 //////////////////////////////////////////////////
 
 void URIScanner::ClearStack()
@@ -106,6 +120,34 @@ void URIScanner::LeaveFrame()
 	delete pSF->pList;
 	delete pSF;
 }
+
+BOOL URIScanner::PushFrame(const TomboURI *pURI)
+{
+	StackFrame *pSF = new StackFrame();
+	if (pSF == NULL) { SetLastError(ERROR_NOT_ENOUGH_MEMORY); return FALSE; }
+
+	pSF->pList = pRepository->GetChild(pCurrentURI, bSkipEncrypt);
+	if (pSF->pList == NULL) {
+		DWORD n = GetLastError();
+		if (GetLastError() == ERROR_CANCELLED) {
+			StopScan();
+			delete pSF;
+			return TRUE;
+		}
+		return FALSE;
+	}
+	if (iDirection == 1) {
+		pSF->nPos = 0;
+	} else {
+		pSF->nPos = pSF->pList->GetSize() - 1;
+	}
+
+	pSF->pNext = pTop;
+	pTop = pSF;
+
+	return TRUE;
+}
+
 //////////////////////////////////////////////////
 // cutomisable methods
 //////////////////////////////////////////////////
@@ -120,39 +162,51 @@ void URIScanner::Node() {}
 // Scan repository
 //////////////////////////////////////////////////
 
-BOOL URIScanner::Scan()
+BOOL URIScanner::FullScan()
 {
-	bStopScan = FALSE;
+	return Scan(NULL, FALSE);
+}
 
+//////////////////////////////////////////////////
+// Scan repository
+//////////////////////////////////////////////////
+
+BOOL URIScanner::Scan(const TomboURI *pStartURI, BOOL bReverse)
+{
+	// Initialize 
+	if (bReverse) {
+		iDirection = -1;
+	} else {
+		iDirection = 1;
+	}
+	bStopScan = FALSE;
 	pBaseTitle = new TString();
 	if (!pRepository->GetHeadLine(pBaseURI, pBaseTitle)) return FALSE;
 
-	// set marker
+	// set marker and call initialize method
 	pCurrentURI = pBaseURI;
 	pTitle = pBaseTitle->Get();
-
-	// check URI
-	URIOption opt(NOTE_OPTIONMASK_VALID);
-	if (!pRepository->GetOption(pCurrentURI, &opt)) return FALSE;
-
-	if (!opt.bFolder) {
-		SetLastError(ERROR_INVALID_PARAMETER);
-		return FALSE;
-	}
-
-	// call initialize method
 	InitialScan();
 
-	if (!PushFrame(pCurrentURI)) return FALSE;
-	if (bStopScan) {
-		AfterScan();
-		return TRUE;
+
+	// create stack frame
+	if (pStartURI == NULL || _tcscmp(pStartURI->GetFullURI(), pBaseURI->GetFullURI()) == 0) {
+		if (!PushFrame(pCurrentURI)) return FALSE;
+		if (bStopScan) {
+			AfterScan();
+			return TRUE;
+		}
+		PreFolder();
+	} else {
+		// if pStartURI is passed, traverse the tree to create stack frame.
+		if (!MakeFrame(pStartURI)) {
+			return FALSE;
+		}
 	}
-	PreFolder();
 
 	while(pTop) {
 		// enum current frame
-		while (pTop->nPos < pTop->pList->GetSize()) {
+		while (pTop->nPos >= 0 && pTop->nPos < pTop->pList->GetSize()) {
 
 			if (bStopScan) break;
 
@@ -173,7 +227,7 @@ BOOL URIScanner::Scan()
 			} else {
 				Node();
 			}
-			pTop->nPos++;
+			pTop->nPos += iDirection;
 		}
 
 		// when enumeration finished, 
@@ -187,7 +241,7 @@ BOOL URIScanner::Scan()
 		}
 		PostFolder();
 		if (pTop) {
-			pTop->nPos++;
+			pTop->nPos += iDirection;
 		}
 	}
 
@@ -201,26 +255,85 @@ BOOL URIScanner::Scan()
 //
 //////////////////////////////////////////////////
 
-BOOL URIScanner::PushFrame(const TomboURI *pURI)
+BOOL URIScanner::MakeFrame(const TomboURI *pStartURI)
 {
-	StackFrame *pSF = new StackFrame();
-	if (pSF == NULL) { SetLastError(ERROR_NOT_ENOUGH_MEMORY); return FALSE; }
+	// check base uri and start uri
+	TString repB, repS;
+	if (!pBaseURI->GetRepositoryName(&repB) || !pStartURI->GetRepositoryName(&repS) ||
+		_tcscmp(repB.Get(), repS.Get()) != 0) return FALSE;
 
-	pSF->pList = pRepository->GetChild(pCurrentURI, bSkipEncrypt);
-	if (pSF->pList == NULL) {
-		DWORD n = GetLastError();
-		if (GetLastError() == ERROR_CANCELLED) {
-			StopScan();
-			delete pSF;
-			return TRUE;
+	TomboURIItemIterator itrB(pBaseURI);
+	TomboURIItemIterator itrS(pStartURI);
+	if (!itrB.Init() || !itrS.Init()) return FALSE;
+	itrB.First(); itrS.First();
+	while(TRUE) {
+		LPCTSTR pB = itrB.Current();
+		LPCTSTR pS = itrS.Current();
+
+		if (pB == NULL || pS == NULL) {
+			if (pS == NULL && pB != NULL) return FALSE;
+			break;
 		}
-		return FALSE;
-	}
-	pSF->nPos = 0;
 
-	pSF->pNext = pTop;
-	pTop = pSF;
+		if (_tcscmp(pB, pS) != 0) return FALSE;
+
+		itrB.Next();
+		itrS.Next();
+	}
+
+	// OK, stack frames.
+
+	const TomboURI *pURI = pCurrentURI;
+
+	pTitle = pBaseTitle->Get();
+
+	// stack first frame
+	if (!PushFrame(pURI)) return FALSE;
+	PreFolder();
+
+	TString shl;
+
+	LPCTSTR pElement = itrS.Current();
+	LPCTSTR pHeadLine;
+
+	do {
+		// get each element
+		if (itrS.IsLeaf()) {
+			if (!pRepository->GetHeadLine(pStartURI, &shl)) return FALSE;
+			pHeadLine = shl.Get();
+
+		} else {
+			pHeadLine = pElement;
+
+		}
+
+		while (pTop->nPos >= 0 && pTop->nPos < pTop->pList->GetSize()) {
+			LPCTSTR pElem = pTop->pList->GetTitle(pTop->nPos);
+
+			if (_tcscmp(pHeadLine, pElem) == 0) {
+				// path is matched.
+
+				pCurrentURI = pTop->pList->GetURI(pTop->nPos);
+				pTitle = pElem;
+
+				URIOption opt(NOTE_OPTIONMASK_VALID);
+				if (!pRepository->GetOption(pCurrentURI, &opt)) return FALSE;
+				if (opt.bFolder) {
+					if (!PushFrame(pCurrentURI)) return FALSE;
+					if (bStopScan) break;
+					PreFolder();
+					break;
+				} else {
+					break;
+				}
+			}
+
+			pTop->nPos += iDirection;
+		}
+
+		itrS.Next();
+	} while((pElement = itrS.Current()) != NULL);
+
 
 	return TRUE;
 }
-

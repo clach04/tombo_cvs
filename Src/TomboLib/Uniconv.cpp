@@ -1419,3 +1419,51 @@ void GetFilePath(LPTSTR pFilePath, LPCTSTR pFileName)
 	_tcsncpy(pFilePath, pFileName, q - pFileName + 1);
 	*(pFilePath + (q - pFileName + 1)) = TEXT('\0');
 }
+
+////////////////////////////////////////////////////////////////////
+// Get file path
+////////////////////////////////////////////////////////////////////
+
+void WipeOutAndDelete(LPTSTR p)
+{
+	if (p == NULL) return;
+
+	LPTSTR q = p;
+	while (*q) {
+		*q++ = TEXT('\0');
+	}
+	delete [] p;
+}
+
+#ifdef _WIN32_WCE
+void WipeOutAndDelete(char *p)
+{
+	if (p == NULL) return;
+
+	char *q = p;
+	while (*q) {
+		*q++ = TEXT('\0');
+	}
+	delete [] p;
+}
+#endif
+
+/////////////////////////////////////////////
+// Clear file contents and delete it
+/////////////////////////////////////////////
+
+BOOL WipeOutAndDeleteFile(LPCTSTR pFile)
+{
+	File delf;
+	if (!delf.Open(pFile, GENERIC_WRITE, 0, OPEN_ALWAYS)) return FALSE;
+
+	DWORD nSize = delf.FileSize() / 64 + 1;
+	BYTE buf[64];
+	for (DWORD i = 0; i < 64; i++) buf[i] = 0;
+
+	for (i = 0; i < nSize; i++) {
+		delf.Write(buf, 64);
+	}
+	delf.Close();
+	return DeleteFile(pFile);
+}

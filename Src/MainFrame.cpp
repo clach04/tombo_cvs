@@ -1684,31 +1684,31 @@ void MainFrame::DoSearchTree(BOOL bFirst, BOOL bForward)
 
 	TomboURI sURI;
 	if (!msView.GetURI(&sURI)) return;
-	TString sFullPath;
-	if (!g_Repository.GetPhysicalPath(&sURI, &sFullPath)) return;
 
 	// Create dialog and do search.
 	SearchTree st;
-	st.Init(pSE, sFullPath.Get(), _tcslen(g_Property.TopDir()), bForward, !bFirst, !pSE->IsSearchEncryptMemo());
+	st.Init(pSE, &sURI, bForward, !bFirst, !pSE->IsSearchEncryptMemo());
 	st.Popup(g_hInstance, hMainWnd);
+
+	const TomboURI *pMatched = st.GetMatchedURI();
 
 	switch(st.GetResult()) {
 	case SR_FOUND:
-		msView.ShowItem(st.GetPartPath());
+		msView.ShowItemByURI(st.GetMatchedURI());
 		pDetailsView->Search(TRUE, TRUE, TRUE, TRUE); 
 		break;
 	case SR_NOTFOUND:
 		MessageBox(MSG_STRING_NOT_FOUND, TOMBO_APP_NAME, MB_OK | MB_ICONINFORMATION);
 		break;
 	case SR_CANCELED:
-		msView.ShowItem(st.GetPartPath());
+		if (st.CurrentURI()) msView.ShowItemByURI(st.CurrentURI());
 		MessageBox(MSG_STRING_SEARCH_CANCELED, TOMBO_APP_NAME, MB_OK | MB_ICONINFORMATION);
 		break;
 	case SR_FAILED:
 		{
+			if (st.CurrentURI()) msView.ShowItemByURI(st.CurrentURI());
 			TCHAR buf[1024];
 			wsprintf(buf, MSG_SEARCH_FAILED, GetLastError());
-			msView.ShowItem(st.GetPartPath());
 			MessageBox(buf, TOMBO_APP_NAME, MB_OK | MB_ICONERROR);
 		}
 		break;

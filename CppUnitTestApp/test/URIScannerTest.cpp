@@ -24,6 +24,15 @@ class TEST_CLASS_NAME : public CppUnit::TestFixture {
 	CPPUNIT_TEST(URIScanTest5);
 	CPPUNIT_TEST(URIScanTest6);
 	CPPUNIT_TEST(URIScanTest7);
+	CPPUNIT_TEST(URIScanTest8);
+	CPPUNIT_TEST(PartialScanTest1);
+	CPPUNIT_TEST(PartialScanTest2);
+
+	CPPUNIT_TEST(InterruptTest1);
+	CPPUNIT_TEST(InterruptTest2);
+	CPPUNIT_TEST(InterruptTest3);
+	CPPUNIT_TEST(InterruptTest4);
+
 	CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -42,6 +51,13 @@ public:
 	void URIScanTest5();
 	void URIScanTest6();
 	void URIScanTest7();
+	void URIScanTest8();
+	void PartialScanTest1();
+	void PartialScanTest2();
+	void InterruptTest1();
+	void InterruptTest2();
+	void InterruptTest3();
+	void InterruptTest4();
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION(TEST_CLASS_NAME);
@@ -100,10 +116,22 @@ BOOL DummyRepoBase::GetOption(const TomboURI *pURI, URIOption *pOption)
 BOOL DummyRepoBase::GetHeadLine(const TomboURI *pURI, TString *pHeadLine)
 {
 	LPTSTR p = StringDup(pURI->GetFullURI());
-	*(p + strlen(p) - 1) = '\0';	// folder only
-	LPCTSTR pTop = strrchr(p, '/') + 1;
-	pHeadLine->Set(pTop);
-	return TRUE;
+	if (*(p + strlen(p) -1) == '/') {
+		*(p + strlen(p) - 1) = '\0';	// folder only
+		LPCTSTR pTop = strrchr(p, '/') + 1;
+		pHeadLine->Set(pTop);
+		return TRUE;
+	} else {
+		LPTSTR q = p;
+		LPTSTR r;
+		while(*q) {
+			if (*q == '/') r = q;
+			q++;
+		}
+		*(r + strlen(r) - 4) = '\0';
+		pHeadLine->Set(r + 1);
+		return TRUE;
+	}
 }
 
 ////////////////////////////////////////////////
@@ -165,6 +193,8 @@ public:
 	void Node();
 
 	BOOL Check(LPCTSTR pMsg, LPCTSTR pCorrect);
+	static void FullScanTest(LPCTSTR pTestName, LPCTSTR pCorrect, DummyRepoBase *pRepo);
+	static void ScanTest(LPCTSTR pTestName, LPCTSTR pCorrect, DummyRepoBase *pRepo, const TomboURI *pURI, BOOL bReverse);
 };
 
 TestScanner1::TestScanner1() 
@@ -216,6 +246,36 @@ void TestScanner1::Node()
 	sbuf.Add(GetTitle(), strlen(GetTitle()), &n);
 }
 
+void TestScanner1::FullScanTest(LPCTSTR pTestName, LPCTSTR pCorrect, DummyRepoBase *pRepo)
+{
+	TomboURI base;
+	base.Init("tombo://default/aaa/");
+
+	TestScanner1 s1;
+
+	CPPUNIT_ASSERT(s1.Init(pRepo, &base, FALSE));
+
+	BOOL bResult = s1.FullScan();
+	CPPUNIT_ASSERT_EQUAL(bResult, TRUE);
+	LPCTSTR pResultStr = s1.sbuf.Get(0);
+	CPPUNIT_ASSERT(s1.Check(pTestName, pCorrect));
+}
+
+void TestScanner1::ScanTest(LPCTSTR pTestName, LPCTSTR pCorrect, DummyRepoBase *pRepo, const TomboURI *pURI, BOOL bReverse)
+{
+	TomboURI base;
+	base.Init("tombo://default/aaa/");
+
+	TestScanner1 s1;
+
+	CPPUNIT_ASSERT(s1.Init(pRepo, &base, FALSE));
+
+	BOOL bResult = s1.Scan(pURI, bReverse);
+	CPPUNIT_ASSERT_EQUAL(bResult, TRUE);
+	LPCTSTR pResultStr = s1.sbuf.Get(0);
+	CPPUNIT_ASSERT(s1.Check(pTestName, pCorrect));
+}
+
 BOOL TestScanner1::Check(LPCTSTR pMsg, LPCTSTR pCorrect)
 {
 	LPCTSTR pResult = sbuf.Get(0);
@@ -261,18 +321,7 @@ void TEST_CLASS_NAME::URIScanTest1()
 		"AS";
 	Repo1 rep;
 
-
-	TomboURI base;
-	base.Init("tombo://default/aaa/");
-
-	TestScanner1 s1;
-
-	CPPUNIT_ASSERT(s1.Init(&rep, &base, FALSE));
-
-	BOOL bResult = s1.Scan();
-	CPPUNIT_ASSERT_EQUAL(bResult, TRUE);
-	LPCTSTR pResultStr = s1.sbuf.Get(0);
-	CPPUNIT_ASSERT(s1.Check(pTest, pCorrect));
+	TestScanner1::FullScanTest(pTest, pCorrect, &rep);
 }
 
 ////////////////////////////////////////////////
@@ -308,18 +357,7 @@ void TEST_CLASS_NAME::URIScanTest2()
 		"AS";
 	Repo2 rep;
 
-
-	TomboURI base;
-	base.Init("tombo://default/aaa/");
-
-	TestScanner1 s1;
-
-	CPPUNIT_ASSERT(s1.Init(&rep, &base, FALSE));
-
-	BOOL bResult = s1.Scan();
-	CPPUNIT_ASSERT_EQUAL(bResult, TRUE);
-	LPCTSTR pResultStr = s1.sbuf.Get(0);
-	CPPUNIT_ASSERT(s1.Check(pTest, pCorrect));
+	TestScanner1::FullScanTest(pTest, pCorrect, &rep);
 }
 
 ////////////////////////////////////////////////
@@ -362,18 +400,7 @@ void TEST_CLASS_NAME::URIScanTest3()
 		"AS";
 	Repo3 rep;
 
-
-	TomboURI base;
-	base.Init("tombo://default/aaa/");
-
-	TestScanner1 s1;
-
-	CPPUNIT_ASSERT(s1.Init(&rep, &base, FALSE));
-
-	BOOL bResult = s1.Scan();
-	CPPUNIT_ASSERT_EQUAL(bResult, TRUE);
-	LPCTSTR pResultStr = s1.sbuf.Get(0);
-	CPPUNIT_ASSERT(s1.Check(pTest, pCorrect));
+	TestScanner1::FullScanTest(pTest, pCorrect, &rep);
 }
 
 ////////////////////////////////////////////////
@@ -383,14 +410,28 @@ void TEST_CLASS_NAME::URIScanTest3()
 
 // test data
 class Repo4 : public DummyRepoBase {
+	const TomboURI *pStopURI;
 protected:
 	URIList *GetChild(const TomboURI *pFolderURI, BOOL bSkipEncrypt);
+public:
+	Repo4() : DummyRepoBase(), pStopURI(NULL) {}
+	Repo4(const TomboURI *pURI);
 };
+
+Repo4::Repo4(const TomboURI *pURI)
+{
+	pStopURI = new TomboURI(*pURI);
+}
 
 URIList *Repo4::GetChild(const TomboURI *pFolderURI, BOOL bSkipEncrypt)
 {
 	URIList *pList = new URIList();
 	pList->Init();
+
+	if (pStopURI != NULL && strcmp(pStopURI->GetFullURI(), pFolderURI->GetFullURI()) == 0) {
+		SetLastError(ERROR_CANCELLED);
+		return NULL;
+	}
 
 	if (strcmp(pFolderURI->GetFullURI(), "tombo://default/aaa/") == 0) {
 		TomboURI uri1; uri1.Init("tombo://default/aaa/bbb/"); pList->Add(&uri1, "bbb");
@@ -432,18 +473,7 @@ void TEST_CLASS_NAME::URIScanTest4()
 		"AS";
 	Repo4 rep;
 
-
-	TomboURI base;
-	base.Init("tombo://default/aaa/");
-
-	TestScanner1 s1;
-
-	CPPUNIT_ASSERT(s1.Init(&rep, &base, FALSE));
-
-	BOOL bResult = s1.Scan();
-	CPPUNIT_ASSERT_EQUAL(bResult, TRUE);
-	LPCTSTR pResultStr = s1.sbuf.Get(0);
-	CPPUNIT_ASSERT(s1.Check(pTest, pCorrect));
+	TestScanner1::FullScanTest(pTest, pCorrect, &rep);
 }
 
 ////////////////////////////////////////////////
@@ -488,7 +518,7 @@ void TEST_CLASS_NAME::URIScanTest5()
 
 	CPPUNIT_ASSERT(s1.Init(&rep, &base, FALSE));
 
-	BOOL bResult = s1.Scan();
+	BOOL bResult = s1.FullScan();
 	CPPUNIT_ASSERT_EQUAL(bResult, TRUE);
 	LPCTSTR pResultStr = s1.sbuf.Get(0);
 	CPPUNIT_ASSERT(s1.Check(pTest, pCorrect));
@@ -526,18 +556,7 @@ void TEST_CLASS_NAME::URIScanTest6()
 		"AS";
 	Repo6 rep;
 
-
-	TomboURI base;
-	base.Init("tombo://default/aaa/");
-
-	TestScanner1 s1;
-
-	CPPUNIT_ASSERT(s1.Init(&rep, &base, FALSE));
-
-	BOOL bResult = s1.Scan();
-	CPPUNIT_ASSERT_EQUAL(bResult, TRUE);
-	LPCTSTR pResultStr = s1.sbuf.Get(0);
-	CPPUNIT_ASSERT(s1.Check(pTest, pCorrect));
+	TestScanner1::FullScanTest(pTest, pCorrect, &rep);
 }
 
 ////////////////////////////////////////////////
@@ -564,16 +583,181 @@ void TEST_CLASS_NAME::URIScanTest7()
 		"AS";
 	Repo7 rep;
 
-
-	TomboURI base;
-	base.Init("tombo://default/aaa/");
-
-	TestScanner1 s1;
-
-	CPPUNIT_ASSERT(s1.Init(&rep, &base, FALSE));
-
-	BOOL bResult = s1.Scan();
-	CPPUNIT_ASSERT_EQUAL(bResult, TRUE);
-	LPCTSTR pResultStr = s1.sbuf.Get(0);
-	CPPUNIT_ASSERT(s1.Check(pTest, pCorrect));
+	TestScanner1::FullScanTest(pTest, pCorrect, &rep);
 }
+
+////////////////////////////////////////////////
+// TEST
+//
+// reverse order of URIScanTest4()
+
+void TEST_CLASS_NAME::URIScanTest8() 
+{
+	LPCTSTR pTest = "TEST8";
+	LPCTSTR pCorrect = 
+		"IS"
+		"BF" "tombo://default/aaa/" "aaa"
+		"ND" "tombo://default/aaa/ddd.txt" "ddd"
+		"BF" "tombo://default/aaa/bbb/" "bbb"		
+		"ND" "tombo://default/aaa/bbb/eee.txt" "eee"
+		"BF" "tombo://default/aaa/bbb/ccc/" "ccc"
+		"ND" "tombo://default/aaa/bbb/ccc/ggg.txt" "ggg"
+		"ND" "tombo://default/aaa/bbb/ccc/fff.txt" "fff"
+		"AF" "tombo://default/aaa/bbb/ccc/" "ccc"		
+		"AF" "tombo://default/aaa/bbb/" "bbb"
+		"AF" "tombo://default/aaa/" "aaa"
+		"AS";
+	Repo4 rep;	// Repo4 is correct.
+
+	TestScanner1::ScanTest(pTest, pCorrect, &rep, NULL, TRUE);
+}
+
+////////////////////////////////////////////////
+// TEST
+//
+// partial scan test
+
+void TEST_CLASS_NAME::PartialScanTest1() 
+{
+	LPCTSTR pTest = "TEST-P1";
+	LPCTSTR pCorrect = 
+		"IS"
+		"BF" "tombo://default/aaa/" "aaa"
+		"BF" "tombo://default/aaa/bbb/" "bbb"
+		"BF" "tombo://default/aaa/bbb/ccc/" "ccc"
+		"ND" "tombo://default/aaa/bbb/ccc/ggg.txt" "ggg"
+		"AF" "tombo://default/aaa/bbb/ccc/" "ccc"
+		"ND" "tombo://default/aaa/bbb/eee.txt" "eee"
+		"AF" "tombo://default/aaa/bbb/" "bbb"
+		"ND" "tombo://default/aaa/ddd.txt" "ddd"
+		"AF" "tombo://default/aaa/" "aaa"
+		"AS";
+	Repo4 rep;
+
+	TomboURI part;
+	part.Init("tombo://default/aaa/bbb/ccc/ggg.txt");
+
+	TestScanner1::ScanTest(pTest, pCorrect, &rep, &part, FALSE);
+
+}
+
+////////////////////////////////////////////////
+// TEST
+//
+// baseURI and startURI is same
+
+void TEST_CLASS_NAME::PartialScanTest2() 
+{
+	LPCTSTR pTest = "PSTEST2";
+	LPCTSTR pCorrect = 
+		"IS"
+		"BF" "tombo://default/aaa/" "aaa"
+		"BF" "tombo://default/aaa/bbb/" "bbb"
+		"BF" "tombo://default/aaa/bbb/ccc/" "ccc"
+		"ND" "tombo://default/aaa/bbb/ccc/fff.txt" "fff"
+		"ND" "tombo://default/aaa/bbb/ccc/ggg.txt" "ggg"
+		"AF" "tombo://default/aaa/bbb/ccc/" "ccc"
+		"ND" "tombo://default/aaa/bbb/eee.txt" "eee"
+		"AF" "tombo://default/aaa/bbb/" "bbb"
+		"ND" "tombo://default/aaa/ddd.txt" "ddd"
+		"AF" "tombo://default/aaa/" "aaa"
+		"AS";
+	Repo4 rep;
+
+	TomboURI part;
+	part.Init("tombo://default/aaa/");
+
+	TestScanner1::ScanTest(pTest, pCorrect, &rep, &part, FALSE);
+}
+
+////////////////////////////////////////////////
+// TEST
+//
+// cancelled at root
+
+void TEST_CLASS_NAME::InterruptTest1() 
+{
+	LPCTSTR pTest = "IRTEST1";
+	LPCTSTR pCorrect = 
+		"IS"
+		"AS";
+	TomboURI sStopURI;
+	sStopURI.Init("tombo://default/aaa/");
+	Repo4 rep(&sStopURI);
+
+	TestScanner1::ScanTest(pTest, pCorrect, &rep, NULL, FALSE);
+}
+
+////////////////////////////////////////////////
+// TEST
+//
+// cancelled at sub folder
+
+void TEST_CLASS_NAME::InterruptTest2() 
+{
+	LPCTSTR pTest = "IRTEST1";
+	LPCTSTR pCorrect = 
+		"IS"
+		"BF" "tombo://default/aaa/" "aaa"
+		"BF" "tombo://default/aaa/bbb/" "bbb"
+		"AF" "tombo://default/aaa/bbb/" "bbb"
+		"AF" "tombo://default/aaa/" "aaa"
+		"AS";
+
+	TomboURI sStopURI;
+	sStopURI.Init("tombo://default/aaa/bbb/ccc/");
+	Repo4 rep(&sStopURI);
+
+	TestScanner1::ScanTest(pTest, pCorrect, &rep, NULL, FALSE);
+}
+
+////////////////////////////////////////////////
+// TEST
+//
+// cancelled at sub folder
+
+void TEST_CLASS_NAME::InterruptTest3() 
+{
+	LPCTSTR pTest = "IRTEST1";
+	LPCTSTR pCorrect = 
+		"IS"
+		"BF" "tombo://default/aaa/" "aaa"
+		"BF" "tombo://default/aaa/bbb/" "bbb"
+		"AF" "tombo://default/aaa/bbb/" "bbb"
+		"AF" "tombo://default/aaa/" "aaa"
+		"AS";
+
+	TomboURI sStopURI;
+	sStopURI.Init("tombo://default/aaa/bbb/ccc/");
+	Repo4 rep(&sStopURI);
+
+	TomboURI part;
+	part.Init("tombo://default/aaa/bbb/ccc/ggg.txt");
+
+	TestScanner1::ScanTest(pTest, pCorrect, &rep, &part, FALSE);
+}
+
+////////////////////////////////////////////////
+// TEST
+//
+// cancelled at sub folder
+
+void TEST_CLASS_NAME::InterruptTest4() 
+{
+	LPCTSTR pTest = "IRTEST1";
+	LPCTSTR pCorrect = 
+		"IS"
+		"BF" "tombo://default/aaa/" "aaa"
+		"AF" "tombo://default/aaa/" "aaa"
+		"AS";
+
+	TomboURI sStopURI;
+	sStopURI.Init("tombo://default/aaa/bbb/");
+	Repo4 rep(&sStopURI);
+
+	TomboURI part;
+	part.Init("tombo://default/aaa/bbb/ccc/ggg.txt");
+
+	TestScanner1::ScanTest(pTest, pCorrect, &rep, &part, FALSE);
+}
+

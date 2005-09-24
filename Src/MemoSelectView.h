@@ -168,7 +168,6 @@ public:
 	BOOL GetURINodeName(HTREEITEM h, LPTSTR pBuf, DWORD nBufLen);
 
 	// Choose specified notes. if tree is collapsed, expand one.
-	HTREEITEM ShowItem(LPCTSTR pPath, BOOL bSelChange = TRUE, BOOL bOpenNotes = TRUE);
 	HTREEITEM ShowItemByURI(const TomboURI *pURI, BOOL bSelChange = TRUE, BOOL bOpenNotes = TRUE);
 
 	/////////////////////////////

@@ -208,7 +208,7 @@ BOOL VFDirectoryGenerator::Activate()
 	}
 	VFolderScanner vfs;
 	if (!vfs.Init(pURI, pNext, bCE)) return FALSE;
-	return vfs.Scan();
+	return vfs.FullScan();
 }
 
 BOOL VFDirectoryGenerator::Store(VFNote *p)

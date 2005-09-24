@@ -19,6 +19,7 @@ class NoteAttribute;
 #define NOTE_OPTIONMASK_ENCRYPTED  1
 #define NOTE_OPTIONMASK_SAFEFILE   2
 #define NOTE_OPTIONMASK_VALID      4
+#define NOTE_OPTIONMASK_ICON       8
 
 /////////////////////////////////////////
 // Custom error code
@@ -62,7 +63,6 @@ public:
 	virtual URIList *GetChild(const TomboURI *pFolderURI, BOOL bSkipEncrypt) = 0;
 	virtual BOOL GetOption(const TomboURI *pURI, URIOption *pOption) = 0;
 	virtual BOOL GetHeadLine(const TomboURI *pURI, TString *pHeadLine) = 0;
-
 };
 
 //////////////////////////////////////////////////////////////
@@ -75,6 +75,11 @@ class Repository : public IEnumRepository {
 protected:
 	RepositoryImpl *pDefaultImpl;
 	RepositoryOption roOption;
+
+	// Get real physical path from URI.
+	//
+	// This method may be not supported by some RepositoryImpl type.
+	BOOL GetPhysicalPath(const TomboURI *pURI, TString *pFullPath);
 
 public:
 
@@ -107,10 +112,6 @@ public:
 	LPTSTR GetNoteData(const TomboURI *pURI);
 	char *GetNoteDataA(const TomboURI *pURI);
 
-	// Get real physical path from URI.
-	//
-	// This method may be not supported by some RepositoryImpl type.
-	BOOL GetPhysicalPath(const TomboURI *pURI, TString *pFullPath);
 
 	// Get URI the a item attached to.
 	// ex. :  tombo://repo/a/b/c/ -> tombo://repo/a/b/c/
@@ -174,6 +175,8 @@ public:
 	BOOL bSafeFileName;
 	BOOL bValid;
 	BOOL bFolder;
+
+	int iIcon;
 
 	// result info section
 	// if these value is not set by NULL, delete when NoteOption is deleted.

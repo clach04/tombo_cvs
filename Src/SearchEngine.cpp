@@ -162,7 +162,7 @@ BOOL SearchEngineA::SearchBackward(const char *pText, DWORD nStartPos, BOOL bShi
 }
 
 ////////////////////////////////////////////////////////
-// Matching to MemoNote
+// Matching
 ////////////////////////////////////////////////////////
 
 SearchResult SearchEngineA::Search(const TomboURI *pURI)
@@ -191,7 +191,7 @@ SearchResult SearchEngineA::Search(const TomboURI *pURI)
 		if (pMemo == NULL) return SR_FAILED;
 
 		BOOL bMatch = SearchForward(pMemo, 0, FALSE);
-		MemoNote::WipeOutAndDelete(pMemo);
+		WipeOutAndDelete(pMemo);
 		return bMatch ? SR_FOUND : SR_NOTFOUND;
 	}
 }

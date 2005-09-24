@@ -51,6 +51,8 @@ private:
 	TString *pBaseTitle;
 	BOOL bSkipEncrypt;
 
+	int iDirection;	// 1 or -1
+
 	const TomboURI *pCurrentURI;
 	LPCTSTR pTitle;
 
@@ -60,16 +62,14 @@ private:
 	void ClearStack();
 	void LeaveFrame();
 
+	BOOL MakeFrame(const TomboURI *pStartPos);
+
 protected:
-	// The URI now scanning. You can use this value in 5 customizable methods.
-	const TomboURI* CurrentURI() { return pCurrentURI; }
 	LPCTSTR GetTitle() { return pTitle; }
 
 	// Request to stop scanning. 
 	// even if this flag is set, 5 methods are not interrupted and done at finish the method.
 	// Notice PostFolder() and AfterScan() is called even if flag is set.
-	void StopScan() { bStopScan = TRUE; }
-	BOOL IsStopScan() { return bStopScan; }
 
 	virtual void InitialScan();
 	virtual void AfterScan();
@@ -83,9 +83,16 @@ public:
 	URIScanner();
 	~URIScanner();
 
-	BOOL Init(IEnumRepository *pEnumIF, const TomboURI *pURI, BOOL bSkipEncrypt);
+	BOOL Init(IEnumRepository *pEnumIF, const TomboURI *pTopURI, BOOL bSkipEncrypt);
 
-	BOOL Scan();
+	void StopScan() { bStopScan = TRUE; }
+	BOOL IsStopScan() { return bStopScan; }
+
+	// The URI now scanning. You can use this value in 5 customizable methods.
+	const TomboURI* CurrentURI() { return pCurrentURI; }
+
+	BOOL FullScan();
+	BOOL Scan(const TomboURI *pStartURL, BOOL bReverse);
 };
 
 #endif

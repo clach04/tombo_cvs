@@ -150,14 +150,14 @@ static HTREEITEM InsertNode(HWND hTree, TV_INSERTSTRUCT *ti)
 HTREEITEM MemoSelectView::InsertFile(HTREEITEM hParent, const TomboURI *pURI, 
 								LPCTSTR pTitle, BOOL bInsertToLast, BOOL bLink)
 {
-	MemoNote *pNote = MemoNote::MemoNoteFactory(pURI);
+	URIOption opt(NOTE_OPTIONMASK_ICON);
+	if (!g_Repository.GetOption(pURI, &opt)) return NULL;
 
 	TV_INSERTSTRUCT ti;
 	ti.hParent = hParent;
 	ti.hInsertAfter = TVI_LAST;
 	ti.item.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE | TVIF_PARAM;
-	ti.item.iImage = ti.item.iSelectedImage = pNote->GetMemoIcon();
-	delete pNote;
+	ti.item.iImage = ti.item.iSelectedImage = opt.iIcon;
 
 	TreeViewFileItem *tvi;
 	if (bLink) {
@@ -1307,15 +1307,6 @@ LRESULT MemoSelectView::EditLabel(TVITEM *pItem)
 /////////////////////////////////////////////
 // Expand tree and show note
 /////////////////////////////////////////////
-// ex.
-//	msView.ShowItem(TEXT("temp\\Hello.txt"));
-
-HTREEITEM MemoSelectView::ShowItem(LPCTSTR pPath, BOOL bSelChange, BOOL bOpenNotes)
-{
-	TomboURI sURI;
-	if (!sURI.InitByNotePath(pPath)) return NULL;
-	return ShowItemByURI(&sURI, bSelChange, bOpenNotes);
-}
 
 static HTREEITEM FindItem2(HWND hWnd, HTREEITEM hParent, LPCTSTR pStr, DWORD nLen)
 {

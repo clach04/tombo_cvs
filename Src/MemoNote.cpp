@@ -75,34 +75,6 @@ char *MemoNote::GetMemoBodyA(LPCTSTR pTopDir, PasswordManager *pMgr) const
 }
 
 /////////////////////////////////////////////
-// メモ本体用領域の開放
-/////////////////////////////////////////////
-
-void MemoNote::WipeOutAndDelete(LPTSTR p)
-{
-	if (p == NULL) return;
-
-	LPTSTR q = p;
-	while (*q) {
-		*q++ = TEXT('\0');
-	}
-	delete [] p;
-}
-
-#ifdef _WIN32_WCE
-void MemoNote::WipeOutAndDelete(char *p)
-{
-	if (p == NULL) return;
-
-	char *q = p;
-	while (*q) {
-		*q++ = TEXT('\0');
-	}
-	delete [] p;
-}
-#endif
-
-/////////////////////////////////////////////
 // get note's URI
 /////////////////////////////////////////////
 
@@ -281,7 +253,7 @@ MemoNote *CryptedMemoNote::Decrypt(LPCTSTR pTopDir, PasswordManager *pMgr, TStri
 	// 新しいMemoNoteインスタンスを生成
 	PlainMemoNote *p = new PlainMemoNote();
 	if (!p->Init(pNotePath)) {
-		MemoNote::WipeOutAndDeleteFile(sFullPath.Get());
+		WipeOutAndDeleteFile(sFullPath.Get());
 		return NULL;
 	}
 
@@ -312,7 +284,7 @@ BOOL MemoNote::DeleteMemoData(LPCTSTR pTopDir) const
 		mi.DeleteInfo(MemoPath());
 	}
 
-	return MemoNote::WipeOutAndDeleteFile(sFileName.Get());
+	return WipeOutAndDeleteFile(sFileName.Get());
 }
 
 /////////////////////////////////////////////
@@ -341,20 +313,6 @@ LPCTSTR PlainMemoNote::GetExtension()
 LPCTSTR CryptedMemoNote::GetExtension()
 {
 	return TEXT(".chi");
-}
-
-/////////////////////////////////////////////
-// アイコン番号の取得
-/////////////////////////////////////////////
-
-DWORD PlainMemoNote::GetMemoIcon()
-{
-	return IMG_ARTICLE;
-}
-
-DWORD CryptedMemoNote::GetMemoIcon()
-{
-	return IMG_ARTICLE_ENCRYPTED;
 }
 
 /////////////////////////////////////////////
@@ -618,25 +576,6 @@ DWORD MemoNote::IsNote(LPCTSTR pFile)
 	return nType;
 }
 
-/////////////////////////////////////////////
-// Clear file contents and delete it
-/////////////////////////////////////////////
-
-BOOL MemoNote::WipeOutAndDeleteFile(LPCTSTR pFile)
-{
-	File delf;
-	if (!delf.Open(pFile, GENERIC_WRITE, 0, OPEN_ALWAYS)) return FALSE;
-
-	DWORD nSize = delf.FileSize() / 64 + 1;
-	BYTE buf[64];
-	for (DWORD i = 0; i < 64; i++) buf[i] = 0;
-
-	for (i = 0; i < nSize; i++) {
-		delf.Write(buf, 64);
-	}
-	delf.Close();
-	return DeleteFile(pFile);
-}
 
 /////////////////////////////////////////////
 // MemoNote object factory

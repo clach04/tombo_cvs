@@ -320,7 +320,7 @@ BOOL LocalFileRepository::GetHeadLine(const TomboURI *pURI, TString *pHeadLine)
 
 BOOL LocalFileRepository::GetOption(const TomboURI *pURI, URIOption *pOption) const
 {
-	if (pOption->nFlg & NOTE_OPTIONMASK_VALID) {
+	if ((pOption->nFlg & NOTE_OPTIONMASK_VALID) || (pOption->nFlg & NOTE_OPTIONMASK_ICON)) {
 		LPCTSTR p = pURI->GetFullURI();
 		DWORD len = _tcslen(p);
 		if (_tcscmp(p + len - 1, TEXT("/")) == 0) {
@@ -341,7 +341,7 @@ BOOL LocalFileRepository::GetOption(const TomboURI *pURI, URIOption *pOption) co
 			}
 		}
 	}
-	if (pOption->nFlg & NOTE_OPTIONMASK_ENCRYPTED) {
+	if ((pOption->nFlg & NOTE_OPTIONMASK_ENCRYPTED) || (pOption->nFlg & NOTE_OPTIONMASK_ICON)) {
 		LPCTSTR p = pURI->GetFullURI();
 		DWORD n = _tcslen(p);
 		if (n > 4) {
@@ -360,6 +360,17 @@ BOOL LocalFileRepository::GetOption(const TomboURI *pURI, URIOption *pOption) co
 			pOption->bSafeFileName = TRUE;
 		} else {
 			pOption->bSafeFileName = FALSE;
+		}
+	}
+	if (pOption->nFlg & NOTE_OPTIONMASK_ICON) {
+		if (pOption->bFolder) {
+			pOption->iIcon = IMG_FOLDER;
+		} else {
+			if (pOption->bEncrypt) {
+				pOption->iIcon = IMG_ARTICLE_ENCRYPTED;
+			} else {
+				pOption->iIcon = IMG_ARTICLE;
+			}
 		}
 	}
 	return TRUE;
