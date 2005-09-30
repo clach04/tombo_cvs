@@ -44,6 +44,9 @@ public:
 
 	// 新規メモの作成
 	BOOL NewMemo();
+	// メモのクリア
+	BOOL ClearMemo();
+
 
 	// メモが更新されていたらセーブする
 	//	pYNCにはIDOK,IDYES,IDNO,IDCANCELのいずれかが入る。
@@ -54,8 +57,6 @@ public:
 	//				  bDupModeがFALSEの場合には通常動作
 	BOOL SaveIfModify(LPDWORD pYNC, BOOL bDupMode);
 
-	// メモのクリア
-	BOOL ClearMemo();
 
 	BOOL MakeNewFolder(HWND hWnd, TreeViewItem *pItem);	// フォルダの新規作成
 

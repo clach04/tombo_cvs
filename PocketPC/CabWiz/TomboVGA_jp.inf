@@ -1,0 +1,46 @@
+[Version]
+Signature = "$Windows NT$"
+Provider = "FlatFish"
+CESignature = "$Windows CE$"
+
+[CEDevice]
+VersionMin=3.00     ; allow install on Pocket PC 2002
+VersionMax=99.99
+BuildMax=0xE0000000 ; support for square screens and screen rotation
+
+[DefaultInstall]
+AddReg=RegSettings.All
+CEShortcuts = Shortcuts.All
+
+[DefaultInstall.ARM]
+CopyFiles = Files.ARM
+
+[SourceDisksNames]
+1 = ,"Common Files",,E:\work2\SF\Tombo\Src\MsgRes\TomboMsg\jp
+
+[SourceDisksNames.ARM]
+2 = ,"ARM files",,E:\work2\SF\Tombo\PocketPC\Tombo\ARMReleaseVGA
+
+[SourceDisksFiles]
+TomboMsg.txt = 1
+
+[SourceDisksFiles.ARM]
+Tombo.exe = 2
+
+[DestinationDirs]
+Files.ARM = 0,%InstallDir%
+Shortcuts.All = ,%CE11%
+
+[CEStrings]
+AppName = TOMBO
+InstallDir = %CE1%
+
+[Shortcuts.All]
+Tombo,0,tombo.exe
+
+[Files.ARM]
+Tombo.exe,,,0
+TomboMsg.txt,,,0
+
+[RegSettings.All]
+

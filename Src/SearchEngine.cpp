@@ -7,7 +7,6 @@
 #include "SearchEngine.h"
 #include "TString.h"
 #include "UniConv.h"
-#include "MemoNote.h"
 #include "Property.h"
 #include "TomboURI.h"
 #include "Repository.h"

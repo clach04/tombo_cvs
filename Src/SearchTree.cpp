@@ -5,14 +5,13 @@
 #include "UniConv.h"
 #include "SearchEngine.h"
 #include "SearchTree.h"
-#include "MemoNote.h"
 #include "TString.h"
 #include "TomboURI.h"
 #include "DialogTemplate.h"
 #include "Message.h"
 #include "Property.h"
 #include "Repository.h"
-#include "DirList.h"
+#include "VarBuffer.h"
 #include "URIScanner.h"
 
 ////////////////////////////////
@@ -211,7 +210,7 @@ const TomboURI* SearchTree::CurrentURI()
 SearchResult SearchTree::Search()
 {
 	TomboURI sRoot;
-	sRoot.Init("tombo://default/");
+	sRoot.Init(TEXT("tombo://default/"));
 
 	pScanner = new SearchTreeScanner();
 	if (!pScanner->Init(pRegex, &sRoot, bSkipOne, !bSearchEncryptedMemo)) return SR_FAILED;

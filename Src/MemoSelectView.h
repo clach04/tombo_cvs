@@ -2,7 +2,6 @@
 #define MEMOSELECTVIEW_H
 
 class MemoManager;
-class MemoNote;
 class TString;
 class TreeViewItem;
 class MemoLocator;

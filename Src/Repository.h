@@ -3,11 +3,9 @@
 
 class TString;
 class TomboURI;
-class MemoNote;
 class RepositoryImpl;
 class URIOption;
 class RepositoryOption;
-class DirList;
 class URIList;
 
 class NoteAttribute;
@@ -122,7 +120,6 @@ public:
 	BOOL GetFileName(const TomboURI *pURI, TString *pName);
 
 	// Get notes under the url.
-	BOOL GetList(const TomboURI *pFolder, DirList *pList, BOOL bSkipEncrypt);
 	URIList *GetChild(const TomboURI *pFolderURI, BOOL bSkipEncrypt);
 
 	// Decide URI

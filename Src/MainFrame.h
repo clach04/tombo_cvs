@@ -7,7 +7,6 @@
 #include "PasswordManager.h"
 #include "MemoManager.h"
 
-class MemoNote;
 class TreeViewItem;
 class VFManager;
 class BookMark;

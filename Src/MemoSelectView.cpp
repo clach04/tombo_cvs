@@ -15,7 +15,6 @@
 #include "MemoManager.h"
 #include "VarBuffer.h"
 #include "MainFrame.h"
-#include "MemoNote.h"
 #include "Property.h"
 #include "TreeViewItem.h"
 #include "Message.h"

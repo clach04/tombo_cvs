@@ -3,6 +3,7 @@
 
 #include "Tombo.h"
 #include "TString.h"
+#include "Uniconv.h"
 #include "TomboURI.h"
 #include "Repository.h"
 
@@ -106,10 +107,6 @@ BOOL Repository::ChangeHeadLine(const TomboURI *pURI, LPCTSTR pReqNewHeadLine, U
 	return pDefaultImpl->ChangeHeadLine(pURI, pReqNewHeadLine, pOption);
 }
 
-BOOL Repository::GetList(const TomboURI *pFolder, DirList *pList, BOOL bSkipEncrypt)
-{
-	return pDefaultImpl->GetList(pFolder, pList, bSkipEncrypt);
-}
 
 URIList *Repository::GetChild(const TomboURI *pFolder, BOOL bSkipEncrypt)
 {
@@ -148,7 +145,7 @@ char* Repository::GetNoteDataA(const TomboURI *pURI)
 #else
 	LPTSTR pT = GetNoteData(pURI);
 	char *pA = ConvUnicode2SJIS(pT);
-	MemoNote::WipeOutAndDelete(pT);
+	WipeOutAndDelete(pT);
 	return pA;
 #endif
 }

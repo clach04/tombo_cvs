@@ -6,7 +6,6 @@
 #include "PasswordDialog.h"
 #include "resource.h"
 #include "UniConv.h"
-#include "MemoNote.h"
 #include "SipControl.h"
 #include "Message.h"
 
