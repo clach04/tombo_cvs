@@ -23,6 +23,8 @@ static HINSTANCE hInst;
 static HWND hParentWnd;
 static MemoSelectView *pView;
 
+#include "Logger.h"
+
 void SelectViewSetWndProc(SUPER_WND_PROC wp, HWND hParent, HINSTANCE h, MemoSelectView *p)
 {
 	gSuperProc = wp;
@@ -34,6 +36,14 @@ void SelectViewSetWndProc(SUPER_WND_PROC wp, HWND hParent, HINSTANCE h, MemoSele
 LRESULT CALLBACK NewSelectViewProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch(msg) {
+#ifdef SEPVIEW_DEBUG
+	case WM_LBUTTONDOWN:
+		g_Logger.WriteLog("WM_LBUTTONDOWN\r\n");
+		break;
+	case WM_LBUTTONUP:
+		g_Logger.WriteLog("WM_LBUTTONUP\r\n");
+		break;
+#endif
 #if defined(PLATFORM_HPC)
 	case WM_LBUTTONDOWN:
 		{

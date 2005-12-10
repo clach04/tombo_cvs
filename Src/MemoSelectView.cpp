@@ -19,6 +19,8 @@
 #include "TreeViewItem.h"
 #include "Message.h"
 
+#include "NewFolderDialog.h"
+
 #include "AutoPtr.h"
 #include "Repository.h"
 
@@ -357,6 +359,7 @@ static void ControlSubMenu(HMENU hMenu, UINT nID, BOOL bEnable)
 	}
 }
 
+#include "Logger.h"
 ///////////////////////////////////////////
 // OnNotify Handler
 ///////////////////////////////////////////
@@ -377,8 +380,12 @@ LRESULT MemoSelectView::OnNotify(HWND hWnd, WPARAM wParam, LPARAM lParam)
 #endif
 
 	switch(pHdr->hdr.code) {
+//	case NM_CLICK:
+//		g_Logger.WriteLog("NM_CLICK\r\n");
+//		return 0;
 	case NM_DBLCLK:
 		{
+//			g_Logger.WriteLog("NM_DBLCLK\r\n");
 			HTREEITEM hItem = TreeView_GetSelection(hViewWnd);
 			TV_ITEM it;
 			it.mask = TVIF_PARAM;
@@ -389,8 +396,9 @@ LRESULT MemoSelectView::OnNotify(HWND hWnd, WPARAM wParam, LPARAM lParam)
 			if (!tvi) break;
 
 			if (!tvi->HasMultiItem()) {
-				tvi->LoadMemo(this, TRUE);
-				pMemoMgr->GetMainFrame()->PostSwitchView(OPEN_REQUEST_MDVIEW_ACTIVE);
+				const TomboURI *pURI = ((TreeViewFileItem*)tvi)->GetRealURI();
+				GetManager()->GetMainFrame()->LoadMemo(pURI, TRUE);
+				pMemoMgr->GetMainFrame()->PostSwitchView();
 				return 0;
 			}
 			// 暗黙でExpand/Collapseが発生
@@ -424,6 +432,32 @@ LRESULT MemoSelectView::OnNotify(HWND hWnd, WPARAM wParam, LPARAM lParam)
 			// 2-Pane Viewの場合には メモの切り替えが発生し、かつ
 			// 保存確認でキャンセルを押した場合、アイテムの切り替えを
 			// 認めてはならない
+#ifdef COMMENT
+			{
+				NMTREEVIEW *p = (LPNMTREEVIEW)lParam;
+				HTREEITEM hOld = p->itemOld.hItem;
+				HTREEITEM hNew = p->itemNew.hItem;
+				TString info;
+
+				if (hOld != NULL) {
+					TString sOldURI;
+					GetURI(&sOldURI, hOld);
+					info.Join(sOldURI.Get(), "->");
+				} else {
+					info.Set("-- ->");
+				}
+				if (hNew != NULL) {
+					TString sNewURI;
+					GetURI(&sNewURI, hNew);
+					info.StrCat(sNewURI.Get());
+				} else {
+					info.StrCat("--");
+				}
+				g_Logger.WriteLog("TVN_SELCHANGING ");
+				g_Logger.WriteLog(info.Get());
+				g_Logger.WriteLog("\r\n");
+			}
+#endif
 			if (!g_Property.IsUseTwoPane() || !pMemoMgr) return FALSE;
 
 			DWORD nYNC;
@@ -445,7 +479,7 @@ LRESULT MemoSelectView::OnNotify(HWND hWnd, WPARAM wParam, LPARAM lParam)
 				return FALSE;
 			case IDNO:
 				// celar note
-				pMemoMgr->ClearMemo();
+				pMemoMgr->GetDetailsView()->DiscardMemo();
 				return FALSE;
 			}
 #endif
@@ -454,6 +488,32 @@ LRESULT MemoSelectView::OnNotify(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 	case TVN_SELCHANGED:
 		{
+#ifdef COMMENT
+			{
+				NMTREEVIEW *p = (LPNMTREEVIEW)lParam;
+				HTREEITEM hOld = p->itemOld.hItem;
+				HTREEITEM hNew = p->itemNew.hItem;
+				TString info;
+
+				if (hOld != NULL) {
+					TString sOldURI;
+					GetURI(&sOldURI, hOld);
+					info.Join(sOldURI.Get(), "->");
+				} else {
+					info.Set("-- ->");
+				}
+				if (hNew != NULL) {
+					TString sNewURI;
+					GetURI(&sNewURI, hNew);
+					info.StrCat(sNewURI.Get());
+				} else {
+					info.StrCat("--");
+				}
+				g_Logger.WriteLog("TVN_SELCHANGED ");
+				g_Logger.WriteLog(info.Get());
+				g_Logger.WriteLog("\r\n");
+			}
+#endif
 			NMTREEVIEW *p = (LPNMTREEVIEW)lParam;
 			TreeViewItem *tvi = (TreeViewItem*)((p->itemNew).lParam);
 			if (tvi == NULL) {
@@ -1003,6 +1063,29 @@ BOOL MemoSelectView::CreateNewFolder(HTREEITEM hItem, LPCTSTR pFolder)
 		if (TreeView_GetChild(hViewWnd, hItem) != NULL) {
 			TreeView_Expand(hViewWnd, hItem, TVE_EXPAND);
 		}
+	}
+	return TRUE;
+}
+
+BOOL MemoSelectView::MakeNewFolder(HWND hWnd, TreeViewItem *pItem)
+{
+	NewFolderDialog dlg;
+	BOOL bPrev = bDisableHotKey;
+	bDisableHotKey = TRUE;
+	DWORD nResult = dlg.Popup(g_hInstance, hWnd);
+	bDisableHotKey = bPrev;
+	if (nResult == IDOK) {
+
+		LPCTSTR pFolder = dlg.FolderName();
+
+		TomboURI sBaseURI, sURI;
+		if (!GetURI(&sBaseURI, pItem->GetViewItem())) return FALSE;
+		if (!g_Repository.GetAttachURI(&sBaseURI, &sURI)) return FALSE;
+		HTREEITEM hItem = GetItemFromURI(sURI.GetFullURI());
+
+		if (!g_Repository.MakeFolder(&sURI, pFolder)) return FALSE;
+		CreateNewFolder(hItem, pFolder);
+
 	}
 	return TRUE;
 }

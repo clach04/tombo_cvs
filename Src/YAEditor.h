@@ -5,19 +5,21 @@
 
 class YAEdit;
 class MemoManager;
+class YAEDetailsViewCallback;
 
 class YAEditor : public MemoDetailsView {
 	YAEdit *pEdit;
-	MemoManager *pMemoMgr;
 	DWORD nID;
+
+	YAEDetailsViewCallback *pYAECallback;
 
 	BOOL SetMemo(LPCTSTR pMemo, DWORD nPos, BOOL bReadOnly);
 
 public:
 
-	YAEditor(MemoDetailsViewCallback *pCB);
+	YAEditor(MemoManager *pMgr);
 	virtual ~YAEditor();
-	BOOL Init(MemoManager *pMemoMgr, DWORD nID);
+	BOOL Init(DWORD nID);
 
 
 	BOOL Create(LPCTSTR pName, RECT &r, HWND hParent, HINSTANCE hInst, HFONT hFont);
@@ -59,6 +61,7 @@ public:
 
 	BOOL Search(BOOL bFirstSearch, BOOL bForward, BOOL bNFMsg, BOOL bSearchFromTop) { return FALSE; }
 
+	void ChangeModifyStatusNotify(BOOL bStatus);
 };
 
 #endif

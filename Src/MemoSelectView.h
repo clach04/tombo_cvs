@@ -143,6 +143,7 @@ public:
 	HTREEITEM GetParentItem(HTREEITEM hItem) { return TreeView_GetParent(hViewWnd, hItem); }
 
 	BOOL CreateNewFolder(HTREEITEM hItem, LPCTSTR pFolder);
+	BOOL MakeNewFolder(HWND hWnd, TreeViewItem *pItem);
 
 
 	// Search tree and get HTREEITEM

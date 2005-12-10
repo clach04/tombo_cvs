@@ -146,12 +146,13 @@ public:
 
 	void OpenDetailsView(const TomboURI *pURI, DWORD nSwitchView);
 	void LeaveDetailsView(BOOL bAskSave);
-	void PostSwitchView(DWORD nView) { PostMessage(hMainWnd, MWM_SWITCH_VIEW, (WPARAM)nView, (LPARAM)0); }
+	void PostSwitchView();
 //	void PopupEditViewDlg();
 
 	void ActivateView(ViewType vt);	// change windows layout and focus
 	void SetFocus(ViewType vt = VT_Unknown);
 									// change focus only.
+	void NotifyDetailsViewFocused();
 	void SetLayout();
 
 	BOOL SelectViewActive() { return vtFocusedView == VT_SelectView; }

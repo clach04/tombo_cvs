@@ -167,11 +167,7 @@ static LRESULT CALLBACK MainFrameWndProc(HWND hWnd, UINT nMessage, WPARAM wParam
 		if (bRes != 0xFFFFFFFF) return bRes;
 		break;
 	case MWM_SWITCH_VIEW:
-		if (wParam == OPEN_REQUEST_MDVIEW_ACTIVE) {
-			frm->ActivateView(MainFrame::VT_DetailsView);
-		} else if (wParam == OPEN_REQUEST_MSVIEW_ACTIVE) {
-			frm->ActivateView(MainFrame::VT_SelectView);
-		}
+		frm->ActivateView(MainFrame::VT_DetailsView);
 		return 0;
 	case WM_SETFOCUS:
 		frm->SetFocus();
@@ -324,78 +320,25 @@ int MainFrame::MainLoop() {
 	return msg.wParam;
 }
 
-///////////////////////////////////////////////////
-// DetailsView callback
-///////////////////////////////////////////////////
-
-class MFDetailsViewCallback : public MemoDetailsViewCallback {
-	MainFrame *pMainFrame;
-public:
-	MFDetailsViewCallback(MainFrame *p) : pMainFrame(p) {}
-	void GetFocusCallback(MemoDetailsView *pView);
-	void SetModifyStatusCallback(MemoDetailsView *pView);
-	SearchEngineA *GetSearchEngine(MemoDetailsView *pView);
-	void SetReadOnlyStatusCallback(MemoDetailsView *pView);
-	void GetCurrentSelectedPath(MemoDetailsView *pView, TString *pPath);
-
-	void SetSearchFlg(BOOL bFlg);
-
-	void SetModifyStatus(BOOL bFlg);
-};
-
-void MFDetailsViewCallback::GetFocusCallback(MemoDetailsView *pView)
+void MainFrame::NotifyDetailsViewFocused()
 {
 	if (!g_Property.IsUseTwoPane()) return;
 
-	MainFrame *pMf = pMainFrame;
-	if (pMf) {
-		pMf->SetFocus(MainFrame::VT_DetailsView);
+	SetFocus(MainFrame::VT_DetailsView);
 
-		// menu control
-		pMf->EnableDelete(FALSE);
-		pMf->EnableRename(FALSE);
-		pMf->EnableEncrypt(FALSE);
-		pMf->EnableDecrypt(FALSE);
-		pMf->EnableNewFolder(FALSE);
-		pMf->EnableGrep(FALSE);
+	// menu control
+	EnableDelete(FALSE);
+	EnableRename(FALSE);
+	EnableEncrypt(FALSE);
+	EnableDecrypt(FALSE);
+	EnableNewFolder(FALSE);
+	EnableGrep(FALSE);
 
-		pMf->EnableCut(TRUE);
-		pMf->EnableCopy(TRUE);
-		pMf->EnablePaste(TRUE);
-	}
-	pView->SetModifyStatus();
+	EnableCut(TRUE);
+	EnableCopy(TRUE);
+	EnablePaste(TRUE);
+	if (pDetailsView) pDetailsView->SetModifyStatus();
 }
-
-void MFDetailsViewCallback::SetModifyStatusCallback(MemoDetailsView *pView)
-{
-	pMainFrame->SetModifyStatus(pView->IsModify());
-}
-
-void MFDetailsViewCallback::SetReadOnlyStatusCallback(MemoDetailsView *pView)
-{
-	pMainFrame->SetReadOnlyStatus(pView->IsReadOnly());
-}
-
-SearchEngineA *MFDetailsViewCallback::GetSearchEngine(MemoDetailsView *pView)
-{
-	return pMainFrame->GetManager()->GetSearchEngine();
-}
-
-void MFDetailsViewCallback::GetCurrentSelectedPath(MemoDetailsView *pView, TString *pPath)
-{
-	pMainFrame->GetManager()->GetCurrentSelectedPath(pPath);
-}
-
-void MFDetailsViewCallback::SetSearchFlg(BOOL bFlg)
-{
-	pMainFrame->GetManager()->SetMDSearchFlg(bFlg);
-}
-
-void MFDetailsViewCallback::SetModifyStatus(BOOL bFlg)
-{
-	pMainFrame->SetModifyStatus(bFlg);
-}
-
 
 ///////////////////////////////////////////////////
 // Create main window
@@ -405,19 +348,17 @@ BOOL MainFrame::Create(LPCTSTR pWndName, HINSTANCE hInst, int nCmdShow)
 {
 	hInstance = hInst;
 
-	MFDetailsViewCallback *pCb = new MFDetailsViewCallback(this);
-
 	YAEditor *pYAE;
 	SimpleEditor *pSe;
 	if (g_Property.UseYAEdit()) {
 		YAEdit::RegisterClass(hInst);
 
-		pYAE = new YAEditor(pCb);
+		pYAE = new YAEditor(&mmMemoManager);
 		pDetailsView = pYAE;
 	} else {
 		SimpleEditor::RegisterClass(hInst);
 
-		pSe = new SimpleEditor(pCb);
+		pSe = new SimpleEditor(&mmMemoManager);
 		pDetailsView = pSe;
 	}
 
@@ -425,7 +366,7 @@ BOOL MainFrame::Create(LPCTSTR pWndName, HINSTANCE hInst, int nCmdShow)
 	msView.Init(&mmMemoManager);
 
 	if (g_Property.UseYAEdit()) {
-		pYAE->Init(&mmMemoManager, IDC_TOMBOEDIT);
+		pYAE->Init(IDC_TOMBOEDIT);
 	} else {
 		pSe->Init(IDC_MEMODETAILSVIEW, IDC_MEMODETAILSVIEW_NF);
 	}
@@ -590,16 +531,12 @@ void MainFrame::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	}
 
 	LoadWinSize(hWnd);
-	pDetailsView->ClearMemo();
+	pDetailsView->DiscardMemo();
 
 	if (!EnableApplicationButton(hWnd)) {
 		TomboMessageBox(hMainWnd, MSG_INITAPPBTN_FAIL, TEXT("Warning"), MB_ICONEXCLAMATION | MB_OK);
 	}
 
-	if (g_Property.IsUseTwoPane()) {
-		// set new notes
-		mmMemoManager.NewMemo();
-	}
 #if defined(PLATFORM_WIN32)
 	SetTopMost();
 #endif
@@ -1019,7 +956,7 @@ void MainFrame::NewMemo()
 		LeaveDetailsView(TRUE);
 	}
 	SetNewMemoStatus(TRUE);
-	mmMemoManager.NewMemo();
+	pDetailsView->DiscardMemo();
 
 //	ActivateView(FALSE);
 	ActivateView(VT_DetailsView);
@@ -1031,7 +968,7 @@ void MainFrame::NewMemo()
 
 void MainFrame::NewFolder(TreeViewItem *pItem)
 {
-	if (!mmMemoManager.MakeNewFolder(hMainWnd, pItem)) {
+	if (!msView.MakeNewFolder(hMainWnd, pItem)) {
 		TomboMessageBox(hMainWnd, MSG_CREATEFOLDER_FAILED, TEXT("ERROR"), MB_ICONSTOP | MB_OK);
 	}
 }
@@ -1066,8 +1003,6 @@ void MainFrame::SetWindowTitle(const TomboURI *pURI)
 		LPCTSTR pPrefix = TEXT("Tombo - ");
 		LPCTSTR pBase;
 		TString sHeadLine;
-//		Repository *pRepo = g_RepositoryFactory.GetRepository(pURI);
-//		if (pRepo != NULL && pRepo->GetHeadLine(pURI, &sHeadLine)) {
 		if (g_Repository.GetHeadLine(pURI, &sHeadLine)) {
 			pBase = sHeadLine.Get();
 		} else {
@@ -1109,6 +1044,11 @@ void MainFrame::PopupEditViewDlg()
 }
 #endif
 
+void MainFrame::PostSwitchView() 
+{
+	PostMessage(hMainWnd, MWM_SWITCH_VIEW, (WPARAM)0, (LPARAM)0); 
+}
+
 ///////////////////////////////////////////////////
 // Request open the note
 ///////////////////////////////////////////////////
@@ -1116,9 +1056,6 @@ void MainFrame::PopupEditViewDlg()
 
 void MainFrame::OpenDetailsView(const TomboURI *pURI, DWORD nSwitchView)
 {
-//	TomboURI uri;
-//	if (!uri.Init(pURI)) return;
-
 	URIOption opt(NOTE_OPTIONMASK_ENCRYPTED);
 	if (!g_Repository.GetOption(pURI, &opt)) return;
 
@@ -1204,7 +1141,7 @@ void MainFrame::LeaveDetailsView(BOOL bAskSave)
 			if (pDetailsView->GetCurrentURI()) {
 				OpenDetailsView(pDetailsView->GetCurrentURI(), OPEN_REQUEST_MDVIEW_ACTIVE);
 			} else {
-				mmMemoManager.NewMemo();
+				pDetailsView->DiscardMemo();
 			}
 		} else {
 			// nYNC == YES so note has been saved.
@@ -1212,12 +1149,13 @@ void MainFrame::LeaveDetailsView(BOOL bAskSave)
 				URIOption opt(NOTE_OPTIONMASK_ENCRYPTED);
 				if (!g_Repository.GetOption(pDetailsView->GetCurrentURI(), &opt)) return;
 				if (opt.bEncrypt) {
-					mmMemoManager.NewMemo();
+					pDetailsView->DiscardMemo();
 				}
 			}
 		}
 	} else {
-		mmMemoManager.NewMemo();
+		// User's choise is not "CANCEL", and saved if he/she choose "YES", so discard note.
+		pDetailsView->DiscardMemo();
 		SetNewMemoStatus(FALSE);
 	}
 
@@ -1420,7 +1358,8 @@ void MainFrame::OnForgetPass()
 
 	pmPasswordMgr.ForgetPassword();
 	TomboMessageBox(hMainWnd, MSG_ERASE_PW, MSG_ERASE_PW_TITLE, MB_ICONINFORMATION | MB_OK);
-	mmMemoManager.NewMemo();
+	pDetailsView->DiscardMemo();
+
 }
 
 ///////////////////////////////////////////////////
@@ -1432,7 +1371,8 @@ void MainFrame::OnProperty()
 	BOOL bPrev = bDisableHotKey;
 	bDisableHotKey = TRUE;
 
-	mmMemoManager.NewMemo();
+	// when calling OnProperty, select view is activated and saving check is finished.
+	pDetailsView->DiscardMemo();
 
 	TString sPath;
 	if (!msView.GetURI(&sPath)) {

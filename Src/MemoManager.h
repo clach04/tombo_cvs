@@ -35,18 +35,9 @@ public:
 	MemoManager();
 	~MemoManager();
 
-	/////////////////////////////////////
-	// 初期化関連
-
 	BOOL Init(MainFrame *p, MemoDetailsView *md, MemoSelectView *ms);
 
 	/////////////////////////////////////
-
-	// 新規メモの作成
-	BOOL NewMemo();
-	// メモのクリア
-	BOOL ClearMemo();
-
 
 	// メモが更新されていたらセーブする
 	//	pYNCにはIDOK,IDYES,IDNO,IDCANCELのいずれかが入る。
@@ -56,16 +47,6 @@ public:
 	//		この場合、bDupModeがTRUEの場合にはメモは常に別ファイルとして保存される。
 	//				  bDupModeがFALSEの場合には通常動作
 	BOOL SaveIfModify(LPDWORD pYNC, BOOL bDupMode);
-
-
-	BOOL MakeNewFolder(HWND hWnd, TreeViewItem *pItem);	// フォルダの新規作成
-
-	// Is the note displayed in details view?
-	BOOL IsNoteDisplayed(const TomboURI *pURI);
-
-	// 詳細ビューに表示されている場合に必要なら保存し、一覧ビューにフォーカスを移す
-	// TODO: 保存依頼に置き換えられる気がする
-	void InactiveDetailsView();
 
 	/////////////////////////////////////
 	// 検索関連
@@ -77,8 +58,8 @@ public:
 	// data accessor
 
 	MainFrame *GetMainFrame() { return pMainFrame; }
-
-	BOOL GetCurrentSelectedPath(TString *pPath);
+	MemoSelectView *GetSelectView() { return pMemoSelectView; }
+	MemoDetailsView *GetDetailsView() { return pMemoDetailsView; }
 
 	/////////////////////////////////////
 	// searching
@@ -94,6 +75,12 @@ public:
 	/////////////////////////////////////
 	// 
 	void ChangeURINotify(const TomboURI *pNewURI);
+
+	// 詳細ビューに表示されている場合に必要なら保存し、一覧ビューにフォーカスを移す
+	// TODO: 保存依頼に置き換えられる気がする
+	void InactiveDetailsView();
+
+	BOOL GetCurrentSelectedPath(TString *pPath);
 
 };
 

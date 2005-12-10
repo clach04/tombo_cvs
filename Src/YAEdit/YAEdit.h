@@ -19,6 +19,9 @@ class YAEditCallback {
 public:
 	// called when get screen forcus
 	virtual void OnGetFocus() = 0;
+
+	// called from YAEditDoc when the document is modified.
+	virtual void ChangeModifyStatusNotify(BOOL bStatus) = 0;
 };
 
 //////////////////////////////////////////////////
@@ -64,10 +67,6 @@ protected:
 	Region rSelRegion;
 	BOOL bForwardDrag;
 
-	///////////////////////////////////////
-	// callback handler
-	YAECallbackHandler *pHandler;
-
 protected:
 	///////////////////////////////////////
 	// select region
@@ -92,7 +91,7 @@ public:
 	// ctor & initialize
 	YAEdit(YAEditCallback *pCb);
 	~YAEdit();
-	BOOL Create(HINSTANCE hInst, HWND hWnd, DWORD nId, RECT &r, YAECallbackHandler *pViewCB, YAEDocCallbackHandler* pDocCB);
+	BOOL Create(HINSTANCE hInst, HWND hWnd, DWORD nId, RECT &r);
 	void SetFocus();
 
 	///////////////////////////////////////
@@ -188,13 +187,4 @@ public:
 	// font
 	void SetFont(HFONT hFont);
 };
-
-//////////////////////////////////////////////////
-// YAE callbacks
-//////////////////////////////////////////////////
-
-class YAECallbackHandler {
-public:
-};
-
 #endif

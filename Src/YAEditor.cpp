@@ -17,6 +17,7 @@
 // TomboDoc callback
 /////////////////////////////////////////////////////////////////////////////
 
+#ifdef COMMENT
 class TomboDocCallback : public YAEDocCallbackHandler {
 	MemoManager *pMgr;
 public:
@@ -34,6 +35,7 @@ void TomboDocCallback::OnModifyStatusChanged(YAEditDoc *pDoc, BOOL bOld, BOOL bN
 {
 	pMgr->GetMainFrame()->SetModifyStatus(pDoc->IsModify());
 }
+#endif
 
 /////////////////////////////////////////////////////////////////////////////
 // TomboDoc callback
@@ -45,6 +47,7 @@ public:
 	YAEDetailsViewCallback(YAEditor *pSelf) : pEditor(pSelf) {}
 
 	void OnGetFocus();
+	void ChangeModifyStatusNotify(BOOL bStatus);
 };
 
 void YAEDetailsViewCallback::OnGetFocus()
@@ -52,31 +55,37 @@ void YAEDetailsViewCallback::OnGetFocus()
 	pEditor->OnGetFocus();
 }
 
+void YAEDetailsViewCallback::ChangeModifyStatusNotify(BOOL bStatus)
+{
+	pEditor->ChangeModifyStatusNotify(bStatus);
+}
+
 /////////////////////////////////////////////////////////////////////////////
 // YAEditor implimentation 
 /////////////////////////////////////////////////////////////////////////////
 
 
-YAEditor::YAEditor(MemoDetailsViewCallback *pCB) : MemoDetailsView(pCB), pEdit(NULL), pMemoMgr(NULL)
+YAEditor::YAEditor(MemoManager *pMgr) : MemoDetailsView(pMgr), pEdit(NULL), pYAECallback(NULL)
 {
 }
 
 YAEditor::~YAEditor()
 {
 	delete pEdit;
+	delete pYAECallback;
 }
 
 BOOL YAEditor::Create(LPCTSTR pName, RECT &r, HWND hParent, HINSTANCE hInst, HFONT hFont)
 {
-	pEdit = new YAEdit(new YAEDetailsViewCallback(this));
-	pEdit->Create(hInst, hParent, nID, r, NULL, new TomboDocCallback(pMemoMgr));
+	pYAECallback = new YAEDetailsViewCallback(this);
+	pEdit = new YAEdit(pYAECallback);
+	pEdit->Create(hInst, hParent, nID, r);
 	pEdit->SetFont(hFont);
 	return TRUE;
 }
 
-BOOL YAEditor::Init(MemoManager *pMgr, DWORD n)
+BOOL YAEditor::Init(DWORD n)
 {
-	pMemoMgr = pMgr;
 	nID = n;
 	return TRUE;
 }
@@ -88,7 +97,7 @@ void YAEditor::SetFocus()
 
 void YAEditor::OnGetFocus()
 {
-	pCallback->GetFocusCallback(this);
+	pManager->GetMainFrame()->NotifyDetailsViewFocused();
 }
 
 
@@ -118,7 +127,7 @@ BOOL YAEditor::SetMemo(LPCTSTR pMemoW, DWORD nPos, BOOL bReadOnly)
 #else
 	char *pMemo = ConvUnicode2SJIS(pMemoW);
 #endif
-	if (!pDoc->Init(pMemo, pEdit, new TomboDocCallback(pMemoMgr))) return FALSE;
+	if (!pDoc->Init(pMemo, pEdit, pYAECallback)) return FALSE;
 
 #if !defined(PLATFORM_WIN32)
 	delete [] pMemo;
@@ -151,7 +160,7 @@ BOOL YAEditor::OnCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 void YAEditor::SetMDSearchFlg(BOOL bFlg)
 {
-	pCallback->SetSearchFlg(bFlg);
+	pManager->SetMDSearchFlg(bFlg);
 }
 
 void YAEditor::SetFont(HFONT hFont)
@@ -163,3 +172,9 @@ DWORD YAEditor::GetCursorPos()
 {
 	return pEdit->GetCaretPos();
 }
+
+void YAEditor::ChangeModifyStatusNotify(BOOL bStatus)
+{
+	pManager->GetMainFrame()->SetModifyStatus(bStatus);
+}
+

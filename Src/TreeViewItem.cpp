@@ -138,9 +138,9 @@ BOOL TreeViewFileItem::Delete(MemoManager *pMgr, MemoSelectView *pView)
 	// Confirm
 	if (TomboMessageBox(NULL, MSG_CONFIRM_DELETE, MSG_DELETE_TTL, MB_ICONQUESTION | MB_OKCANCEL) != IDOK) return FALSE;
 
-	if (g_Property.IsUseTwoPane() && pMgr->IsNoteDisplayed(loc.getURI())) {
+	if (g_Property.IsUseTwoPane() && pMgr->GetDetailsView()->IsNoteDisplayed(loc.getURI())) {
 		// close current note
-		pMgr->NewMemo();
+		pMgr->GetDetailsView()->DiscardMemo();
 	}
 
 	URIOption opt;
@@ -157,7 +157,7 @@ BOOL TreeViewFileItem::Encrypt(MemoManager *pMgr, MemoSelectView *pView)
 	if (g_Repository.IsEncrypted(loc.getURI())) return TRUE;
 
 	// if the note is opened, close it.
-	if (g_Property.IsUseTwoPane() && pMgr->IsNoteDisplayed(loc.getURI())) {
+	if (g_Property.IsUseTwoPane() && pMgr->GetDetailsView()->IsNoteDisplayed(loc.getURI())) {
 		pMgr->InactiveDetailsView();
 	}
 
@@ -193,7 +193,7 @@ BOOL TreeViewFileItem::Decrypt(MemoManager *pMgr, MemoSelectView *pView)
 	if (!g_Repository.IsEncrypted(loc.getURI())) return TRUE;
 
 	// if the note is opened, close it.
-	if (g_Property.IsUseTwoPane() && pMgr->IsNoteDisplayed(loc.getURI())) {
+	if (g_Property.IsUseTwoPane() && pMgr->GetDetailsView()->IsNoteDisplayed(loc.getURI())) {
 		pMgr->InactiveDetailsView();
 	}
 
@@ -312,17 +312,13 @@ TreeViewFileItem::IsUseDetailsView()
 
 BOOL TreeViewFileItem::OpenMemo(MemoSelectView *pView, DWORD nOption)
 {
-	TomboURI sURI;
-	if (!pView->GetURI(&sURI, GetViewItem())) return FALSE;
-	pView->GetManager()->GetMainFrame()->OpenDetailsView(&sURI, nOption);
+	pView->GetManager()->GetMainFrame()->OpenDetailsView(loc.getURI(), nOption);
 	return TRUE;
 }
 
 BOOL TreeViewFileItem::LoadMemo(MemoSelectView *pView, BOOL bAskPass)
 {
-	TomboURI sURI;
-	if (!pView->GetURI(&sURI, GetViewItem())) return FALSE;
-	pView->GetManager()->GetMainFrame()->LoadMemo(&sURI, bAskPass);
+	pView->GetManager()->GetMainFrame()->LoadMemo(loc.getURI(), bAskPass);
 	return TRUE;
 }
 
@@ -634,17 +630,7 @@ BOOL TreeViewFileLink::IsOperationEnabled(MemoSelectView *pView, OpType op)
 	return (nOpMatrix & op) != 0;
 }
 
-BOOL TreeViewFileLink::OpenMemo(MemoSelectView *pView, DWORD nOption)
-{
-	pView->GetManager()->GetMainFrame()->OpenDetailsView(GetRealURI(), nOption);
-	return TRUE;
-}
 
-BOOL TreeViewFileLink::LoadMemo(MemoSelectView *pView, BOOL bAskPass)
-{
-	pView->GetManager()->GetMainFrame()->LoadMemo(GetRealURI(), bAskPass);
-	return TRUE;
-}
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////

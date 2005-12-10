@@ -16,7 +16,7 @@
 // ctor & dtor
 /////////////////////////////////////////////////////////////////////////////
 
-YAEditDoc::YAEditDoc() : pView(NULL), pPhLineMgr(NULL), pHandler(NULL)
+YAEditDoc::YAEditDoc() : pView(NULL), pPhLineMgr(NULL), pCallback(NULL)
 {
 }
 
@@ -25,9 +25,9 @@ YAEditDoc::~YAEditDoc()
 	if (pPhLineMgr) delete pPhLineMgr;
 }
 
-BOOL YAEditDoc::Init(const char *pStr, YAEdit *pV, YAEDocCallbackHandler *pCb)
+BOOL YAEditDoc::Init(const char *pStr, YAEdit *pV, YAEditCallback*pCb)
 {
-	pHandler = pCb;
+	pCallback = pCb;
 	pView = pV;
 	if (!ReleaseDoc()) return FALSE;
 	return LoadDoc(pStr);
@@ -157,8 +157,8 @@ void YAEditDoc::SetModify(BOOL b)
 {
 	if (bModified == b) return;
 	BOOL bOld = bModified;
-	bModified = b; 
-	if (pHandler) pHandler->OnModifyStatusChanged(this, bOld, bModified);
+	bModified = b;
+	if (pCallback) pCallback->ChangeModifyStatusNotify(bModified);
 }
 
 /////////////////////////////////////////////////////////////////////////////

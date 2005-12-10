@@ -6,6 +6,7 @@ class LineChunk;
 class Region;
 class PhysicalLineManager;
 class YAEDocCallbackHandler;
+class YAEditCallback;
 
 ////////////////////////////////////////////////////
 // Document container for YAE
@@ -16,7 +17,7 @@ protected:
 	PhysicalLineManager *pPhLineMgr;
 	YAEdit *pView;
 
-	YAEDocCallbackHandler *pHandler;
+	YAEditCallback *pCallback;
 
 	// this member should not to edit directry. use SetModify().
 	BOOL bModified;
@@ -29,7 +30,7 @@ public:
 	YAEditDoc();
 	~YAEditDoc();
 
-	BOOL Init(const char *pStr, YAEdit *pView, YAEDocCallbackHandler *pCb);
+	BOOL Init(const char *pStr, YAEdit *pView, YAEditCallback*pCb);
 
 	PhysicalLineManager *GetPhMgr() { return pPhLineMgr; }
 
@@ -55,12 +56,4 @@ public:
 	void ConvertBytesToCoordinate(DWORD nPos, Coordinate *pPos);
 };
 
-////////////////////////////////////////////////////
-// Document callback for YAE
-////////////////////////////////////////////////////
-
-class YAEDocCallbackHandler {
-public:
-	virtual void OnModifyStatusChanged(YAEditDoc *pDoc, BOOL bOld, BOOL bNew) = 0;
-};
 #endif

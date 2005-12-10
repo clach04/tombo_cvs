@@ -1006,3 +1006,13 @@ Some bugs are fixed.
 
 - remove dependencies to MemoNote
 - add inf and bat files for PocketPC VGA
+
+////////////////////////////////
+// B189
+////////////////////////////////
+
+- merge YAEDocCallbackHandler class and YAEditCallback class, so YAEDocCallbackHandler is no longer exists.
+- remove MemoDetailsViewCallback
+
+* Restriction: find when "Find to file name" option is checked, *.chs file is not checked.
+

@@ -9,17 +9,13 @@
 #include "VarBuffer.h"
 #include "MainFrame.h"
 #include "UniConv.h"
-#include "File.h"
 #include "Property.h"
-#include "NewFolderDialog.h"
 #include "TreeViewItem.h"
 #include "SearchEngine.h"
 #include "Message.h"
 #include "TomboURI.h"
 
 #include "Repository.h"
-
-#include "AutoPtr.h"
 
 /////////////////////////////////////////////
 // ctor & dtor
@@ -76,33 +72,6 @@ BOOL MemoManager::GetCurrentSelectedPath(TString *pPath)
 	}
 	ChopFileSeparator(pPath->Get());
 
-	return TRUE;
-}
-
-////////////////////////////////////////////////////////
-// フォルダの新規作成
-////////////////////////////////////////////////////////
-
-BOOL MemoManager::MakeNewFolder(HWND hWnd, TreeViewItem *pItem)
-{
-	NewFolderDialog dlg;
-	BOOL bPrev = bDisableHotKey;
-	bDisableHotKey = TRUE;
-	DWORD nResult = dlg.Popup(g_hInstance, hWnd);
-	bDisableHotKey = bPrev;
-	if (nResult == IDOK) {
-
-		LPCTSTR pFolder = dlg.FolderName();
-
-		TomboURI sBaseURI, sURI;
-		if (!pMemoSelectView->GetURI(&sBaseURI, pItem->GetViewItem())) return FALSE;
-		if (!g_Repository.GetAttachURI(&sBaseURI, &sURI)) return FALSE;
-		HTREEITEM hItem = pMemoSelectView->GetItemFromURI(sURI.GetFullURI());
-
-		if (!g_Repository.MakeFolder(&sURI, pFolder)) return FALSE;
-		pMemoSelectView->CreateNewFolder(hItem, pFolder);
-
-	}
 	return TRUE;
 }
 
@@ -213,27 +182,6 @@ BOOL MemoManager::AllocNewMemo(LPCTSTR pText, BOOL bCopy)
 }
 
 ////////////////////////////////////////////////////////
-// 新規メモの作成
-////////////////////////////////////////////////////////
-
-BOOL MemoManager::NewMemo()
-{
-	ClearMemo();
-	pMainFrame->SetNewMemoStatus(TRUE);
-	pMainFrame->SetWindowTitle(NULL);
-	return TRUE;
-}
-
-////////////////////////////////////////////////////////
-// メモのクリア
-////////////////////////////////////////////////////////
-
-BOOL MemoManager::ClearMemo()
-{
-	return pMemoDetailsView->ClearMemo();
-}
-
-////////////////////////////////////////////////////////
 // 
 ////////////////////////////////////////////////////////
 
@@ -252,16 +200,6 @@ void MemoManager::SetSearchEngine(SearchEngineA *p)
 		delete pSearchEngineA;
 	}
 	pSearchEngineA = p;
-}
-
-////////////////////////////////////////////////////////
-// Is this note are displayed in detailsview?
-////////////////////////////////////////////////////////
-
-BOOL MemoManager::IsNoteDisplayed(const TomboURI *pURI)
-{
-	if (pMemoDetailsView->GetCurrentURI() == NULL) return FALSE;
-	return _tcsicmp(pURI->GetFullURI(), pMemoDetailsView->GetCurrentURI()->GetFullURI()) == 0;
 }
 
 void MemoManager::ChangeURINotify(const TomboURI *pNewURI)

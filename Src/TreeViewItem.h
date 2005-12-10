@@ -112,6 +112,7 @@ public:
 	// class specific methods
 
 	void SetNote(const TomboURI *p);
+	const TomboURI *GetRealURI() const { return loc.getURI(); }
 
 	////////////////////////////////
 	// inherited methods
@@ -178,16 +179,11 @@ public:
 /////////////////////////////////////////////
 class TreeViewFileLink : public TreeViewFileItem {
 public:
-	const TomboURI *GetRealURI() const { return loc.getURI(); }
 
 	////////////////////////////////
 	// inherited methods
 
 	BOOL IsOperationEnabled(MemoSelectView *pView, OpType op);
-
-	BOOL OpenMemo(MemoSelectView *pView, DWORD nOption);
-	BOOL LoadMemo(MemoSelectView *pView, BOOL bAskPass);
-
 };
 
 /////////////////////////////////////////////

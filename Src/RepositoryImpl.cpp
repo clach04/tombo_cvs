@@ -275,6 +275,10 @@ static BOOL IsFileExist(LPCTSTR pFileName)
 /////////////////////////////////////////
 // Get Headline string
 /////////////////////////////////////////
+// HEADLINE is 
+//   
+//
+// This method ask password if it need.
 
 BOOL LocalFileRepository::GetHeadLine(const TomboURI *pURI, TString *pHeadLine)
 {

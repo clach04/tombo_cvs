@@ -5,24 +5,7 @@ class MemoDetailsView;
 class SearchEngineA;
 class TString;
 class TomboURI;
-
-///////////////////////////////////////
-// Callback handler
-///////////////////////////////////////
-
-class MemoDetailsViewCallback {
-public:
-	virtual void GetFocusCallback(MemoDetailsView *pView) = 0;
-	virtual void SetModifyStatusCallback(MemoDetailsView *pView) = 0;
-	virtual void SetReadOnlyStatusCallback(MemoDetailsView *pView) = 0;
-
-	virtual void SetSearchFlg(BOOL bFlg) = 0;
-
-	virtual void SetModifyStatus(BOOL bFlg) = 0;
-
-	virtual SearchEngineA *GetSearchEngine(MemoDetailsView *pView) = 0;
-	virtual void GetCurrentSelectedPath(MemoDetailsView *pView, TString *pPath) = 0;
-};
+class MemoManager;
 
 ///////////////////////////////////////
 // Edit view abstraction
@@ -30,11 +13,11 @@ public:
 
 class MemoDetailsView {
 protected:
-	MemoDetailsViewCallback *pCallback;
 	TomboURI *pCurrentURI;
+	MemoManager *pManager;
 public:
 
-	MemoDetailsView(MemoDetailsViewCallback *p);
+	MemoDetailsView(MemoManager *pMgr);
 	virtual ~MemoDetailsView();
 
 	virtual BOOL Create(LPCTSTR pName, RECT &r, HWND hParent, HINSTANCE hInst, HFONT hFont) = 0;
@@ -74,8 +57,13 @@ public:
 	const TomboURI *GetCurrentURI();
 	void SetCurrentNote(const TomboURI *pURI);
 
+	// Is the note displayed in details view?
+	BOOL IsNoteDisplayed(const TomboURI *pURI);
+
+
 	BOOL StoreCursorPos();
-	BOOL ClearMemo();
+	BOOL DiscardMemo();
+
 	BOOL LoadNote(const TomboURI *pURI);
 };
 
@@ -103,7 +91,7 @@ public:
 	///////////////////////
 	// Initialize
 
-	SimpleEditor(MemoDetailsViewCallback *p);
+	SimpleEditor(MemoManager *pMgr);
 	BOOL Init(DWORD nID, DWORD nID_nf);
 	BOOL Create(LPCTSTR pName, RECT &r, HWND hParent, HINSTANCE hInst, HFONT hFont);
 

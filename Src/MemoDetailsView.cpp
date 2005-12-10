@@ -17,6 +17,7 @@
 #include "Message.h"
 #include "TomboURI.h"
 #include "Repository.h"
+#include "MemoManager.h"
 
 static BOOL GetDateText(TString *pInsStr, LPCTSTR pFormat, TString *pPath);
 
@@ -41,13 +42,12 @@ LPCTSTR pWeekE[7] = {
 // 
 ///////////////////////////////////////////
 
-MemoDetailsView::MemoDetailsView(MemoDetailsViewCallback *p) : pCallback(p), pCurrentURI(NULL)
+MemoDetailsView::MemoDetailsView(MemoManager *pMgr) : pCurrentURI(NULL), pManager(pMgr)
 {
 }
 
 MemoDetailsView::~MemoDetailsView()
 {
-	delete pCallback;
 	delete pCurrentURI;
 }
 
@@ -67,12 +67,22 @@ void MemoDetailsView::SetCurrentNote(const TomboURI *pURI)
 	}
 }
 
-BOOL MemoDetailsView::ClearMemo()
+///////////////////////////////////////////
+// Discard current note
+///////////////////////////////////////////
+//
+// note is discarded even if it is modifying.
+
+BOOL MemoDetailsView::DiscardMemo()
 {
 	SetMemo(TEXT(""), 0, FALSE);
 	SetCurrentNote(NULL);
+	SetReadOnly(FALSE);
+	pManager->GetMainFrame()->SetNewMemoStatus(TRUE);
+	pManager->GetMainFrame()->SetWindowTitle(NULL);
 	return TRUE;
 }
+
 
 BOOL MemoDetailsView::StoreCursorPos()
 {
@@ -94,7 +104,7 @@ BOOL MemoDetailsView::Save(const TomboURI *pCurrentURI, TomboURI *pNewURI, TStri
 {
 	if (!g_Repository.Update(pCurrentURI, pText, pNewURI, pNewHeadLine)) return FALSE;
 	ResetModify();
-	pCallback->SetModifyStatus(FALSE);
+	pManager->GetMainFrame()->SetModifyStatus(FALSE);
 	SetCurrentNote(pNewURI);
 	return TRUE;
 }
@@ -119,11 +129,21 @@ BOOL MemoDetailsView::LoadNote(const TomboURI *pURI)
 	return TRUE;
 }
 
+////////////////////////////////////////////////////////
+// Is this note are displayed in detailsview?
+////////////////////////////////////////////////////////
+
+BOOL MemoDetailsView::IsNoteDisplayed(const TomboURI *pURI)
+{
+	if (GetCurrentURI() == NULL) return FALSE;
+	return _tcsicmp(pURI->GetFullURI(), GetCurrentURI()->GetFullURI()) == 0;
+}
+
 ///////////////////////////////////////////
 // initializer
 ///////////////////////////////////////////
 
-SimpleEditor::SimpleEditor(MemoDetailsViewCallback *p) : MemoDetailsView(p), hViewWnd(NULL)
+SimpleEditor::SimpleEditor(MemoManager *pMgr) : MemoDetailsView(pMgr), hViewWnd(NULL)
 {
 }
 
@@ -309,7 +329,7 @@ BOOL SimpleEditor::OnHotKey(HWND hWnd, WPARAM wParam)
 
 void SimpleEditor::OnGetFocus()
 {
-	pCallback->GetFocusCallback(this);
+	pManager->GetMainFrame()->NotifyDetailsViewFocused();
 }
 
 ///////////////////////////////////////////
@@ -619,7 +639,7 @@ static BOOL GetDateText(TString *pInsStr, LPCTSTR pFormat, TString *pPath)
 
 void SimpleEditor::SetModifyStatus()
 {
-	pCallback->SetModifyStatusCallback(this);
+	pManager->GetMainFrame()->SetModifyStatus(IsModify());
 }
 
 /////////////////////////////////////////
@@ -701,7 +721,7 @@ void SimpleEditor::SetTabstop() {
 BOOL SimpleEditor::Search(BOOL bFirstSearch, BOOL bForward, BOOL bNFMsg, BOOL bSearchFromTop)
 {
 	SearchEngineA *pSE;
-	pSE = pCallback->GetSearchEngine(this);
+	pSE = pManager->GetSearchEngine();
 	if (pSE == NULL) return FALSE;
 
 	LPTSTR pT = GetMemo();
@@ -774,7 +794,7 @@ BOOL SimpleEditor::Search(BOOL bFirstSearch, BOOL bForward, BOOL bNFMsg, BOOL bS
 void SimpleEditor::SetReadOnly(BOOL bro)
 {
 	bReadOnly = bro;
-	pCallback->SetReadOnlyStatusCallback(this);
+	pManager->GetMainFrame()->SetReadOnlyStatus(IsReadOnly());
 }
 
 /////////////////////////////////////////
@@ -783,7 +803,7 @@ void SimpleEditor::SetReadOnly(BOOL bro)
 
 void SimpleEditor::SetMDSearchFlg(BOOL bFlg)
 {
-	pCallback->SetSearchFlg(bFlg);
+	pManager->SetMDSearchFlg(bFlg);
 }
 
 /////////////////////////////////////////
@@ -795,7 +815,7 @@ void SimpleEditor::InsertDate1()
 	TString sDate;
 
 	TString sPathStr;
-	pCallback->GetCurrentSelectedPath(this, &sPathStr);
+	pManager->GetCurrentSelectedPath(&sPathStr);
 
 	if (!GetDateText(&sDate, g_Property.DateFormat1(), &sPathStr)) {
 		TomboMessageBox(NULL, MSG_GET_DATE_FAILED, TEXT("ERROR"), MB_ICONERROR | MB_OK);
@@ -809,7 +829,7 @@ void SimpleEditor::InsertDate2()
 	TString sDate;
 
 	TString sPathStr;
-	pCallback->GetCurrentSelectedPath(this, &sPathStr);
+	pManager->GetCurrentSelectedPath(&sPathStr);
 
 	if (!GetDateText(&sDate, g_Property.DateFormat2(), &sPathStr)) {
 		TomboMessageBox(NULL, MSG_GET_DATE_FAILED, TEXT("ERROR"), MB_ICONERROR | MB_OK);

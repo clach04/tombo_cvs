@@ -72,7 +72,7 @@ BOOL YAEdit::RegisterClass(HINSTANCE hInst)
 // ctor & dtor
 /////////////////////////////////////////////////////////////////////////////
 
-YAEdit::YAEdit(YAEditCallback *pCB) : pWrapper(NULL), bScrollTimerOn(FALSE), pView(NULL), bMouseDown(FALSE), pLineMgr(NULL), pHandler(NULL), pCallback(pCB)
+YAEdit::YAEdit(YAEditCallback *pCB) : pWrapper(NULL), bScrollTimerOn(FALSE), pView(NULL), bMouseDown(FALSE), pLineMgr(NULL), pCallback(pCB)
 {
 }
 
@@ -157,9 +157,8 @@ LRESULT CALLBACK YAEditWndProc(HWND hWnd, UINT nMessage, WPARAM wParam, LPARAM l
 // Create window
 /////////////////////////////////////////////////////////////////////////////
 
-BOOL YAEdit::Create(HINSTANCE hInst, HWND hParent, DWORD nId, RECT &r, YAECallbackHandler *pCb, YAEDocCallbackHandler *pDocCb)
+BOOL YAEdit::Create(HINSTANCE hInst, HWND hParent, DWORD nId, RECT &r)
 {
-	pHandler = pCb;
 	hInstance = hInst;
 	pDoc = NULL;
 
@@ -174,7 +173,7 @@ BOOL YAEdit::Create(HINSTANCE hInst, HWND hParent, DWORD nId, RECT &r, YAECallba
 	pWrapper = pWw;
 
 	pDoc = new YAEditDoc(); 
-	if (!pDoc->Init("", this, pDocCb)) return FALSE;
+	if (!pDoc->Init("", this, pCallback)) return FALSE;
 
 	
 #if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
