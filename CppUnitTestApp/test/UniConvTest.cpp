@@ -22,6 +22,14 @@ class TEST_CLASS_NAME : public CppUnit::TestFixture {
 	CPPUNIT_TEST(Base64DecodeTest1);
 	CPPUNIT_TEST(Base64DecodeTest2);
 
+	CPPUNIT_TEST(ConvUTF8ToUCS2Test1);
+	CPPUNIT_TEST(ConvUTF8ToUCS2Test2);
+	CPPUNIT_TEST(ConvUTF8ToUCS2Test3);
+
+	CPPUNIT_TEST(ConvUCS2ToUTF8Test1);
+	CPPUNIT_TEST(ConvUCS2ToUTF8Test2);
+	CPPUNIT_TEST(ConvUCS2ToUTF8Test3);
+
 	CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -45,6 +53,13 @@ public:
 	void Base64DecodeTest1();
 	void Base64DecodeTest2();
 
+	void ConvUTF8ToUCS2Test1();
+	void ConvUTF8ToUCS2Test2();
+	void ConvUTF8ToUCS2Test3();
+
+	void ConvUCS2ToUTF8Test1();
+	void ConvUCS2ToUTF8Test2();
+	void ConvUCS2ToUTF8Test3();
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION(TEST_CLASS_NAME);
@@ -149,4 +164,67 @@ void TEST_CLASS_NAME::Base64DecodeTest2()
 	DWORD n;
 	LPBYTE p = Base64Decode("SGVsbG8", &n);
 	CPPUNIT_ASSERT(p == NULL);
+}
+
+// UTF-8 1 byte conversion
+void TEST_CLASS_NAME::ConvUTF8ToUCS2Test1()
+{
+	char aInput[] = { 0x54, 0x45, 0x53, 0x54, 0x00};	// "TEST"
+	WCHAR aExpect[] = {0x0054, 0x0045, 0x0053, 0x0054, 0x0000};
+
+	LPWSTR pResult = ConvUTF8ToUCS2(aInput);
+	CPPUNIT_ASSERT(wcscmp(aExpect, pResult) == 0);
+}
+
+// UTF-8 2 byte conversion
+void TEST_CLASS_NAME::ConvUTF8ToUCS2Test2()
+{
+	char aInput[] = { (char)0xce, (char)0xb8, (char)0xcf, (char)0x80, 0x00};	//  #GREEK SMALL LETTER THETA, #GREEK SMALL LETTER PI
+	WCHAR aExpect[] = {0x03b8, 0x03c0, 0x0000};
+
+	LPWSTR pResult = ConvUTF8ToUCS2(aInput);
+	CPPUNIT_ASSERT(wcscmp(aExpect, pResult) == 0);
+}
+
+// UTF-8 3 byte conversion
+void TEST_CLASS_NAME::ConvUTF8ToUCS2Test3()
+{
+	char aInput[] = {	(char)0xe3, (char)0x81, (char)0xa8, (char)0xe3,	// TOMBO by Hira-gana and Kanji
+						(char)0x82, (char)0x93, (char)0xe3, (char)0x81,
+						(char)0xbc, (char)0xe8, (char)0x9c, (char)0xbb,
+						(char)0xe8, (char)0x9b, (char)0x89, (char)0x00};
+	WCHAR aExpect[] = {0x3068, 0x3093, 0x307c, 0x873b, 0x86c9, 0x0000};
+
+	LPWSTR pResult = ConvUTF8ToUCS2(aInput);
+	CPPUNIT_ASSERT(wcscmp(aExpect, pResult) == 0);
+}
+
+void TEST_CLASS_NAME::ConvUCS2ToUTF8Test1()
+{
+	WCHAR aInput[] = {0x0054, 0x0045, 0x0053, 0x0054, 0x0000};	// "TEST"
+	char aExpect[] = { 0x54, 0x45, 0x53, 0x54, 0x00};
+
+	char *pResult = ConvUCS2ToUTF8(aInput);
+	CPPUNIT_ASSERT(strcmp(aExpect, pResult) == 0);
+}
+
+void TEST_CLASS_NAME::ConvUCS2ToUTF8Test2()
+{
+	WCHAR aInput[] = {0x03b8, 0x03c0, 0x0000};
+	char aExpect[] = { (char)0xce, (char)0xb8, (char)0xcf, (char)0x80, 0x00};	//  #GREEK SMALL LETTER THETA, #GREEK SMALL LETTER PI
+
+	char *pResult = ConvUCS2ToUTF8(aInput);
+	CPPUNIT_ASSERT(strcmp(aExpect, pResult) == 0);
+}
+
+void TEST_CLASS_NAME::ConvUCS2ToUTF8Test3()
+{
+	WCHAR aInput[] = {0x3068, 0x3093, 0x307c, 0x873b, 0x86c9, 0x0000};
+	char aExpect[] = {	(char)0xe3, (char)0x81, (char)0xa8, (char)0xe3,	// TOMBO by Hira-gana and Kanji
+						(char)0x82, (char)0x93, (char)0xe3, (char)0x81,
+						(char)0xbc, (char)0xe8, (char)0x9c, (char)0xbb,
+						(char)0xe8, (char)0x9b, (char)0x89, (char)0x00};
+
+	char *pResult = ConvUCS2ToUTF8(aInput);
+	CPPUNIT_ASSERT(strcmp(aExpect, pResult) == 0);
 }
