@@ -12,7 +12,7 @@ char *ConvUnicode2SJIS(LPCTSTR p);
 LPTSTR ConvSJIS2UnicodeWithByte(const char *p, DWORD nByte);
 
 // TCHAR version of strdup
-// allocation does new[], so use delete[] for free memoy. 
+// allocation is used by new[], so use delete[] for free memoy. 
 LPTSTR StringDup(LPCTSTR pStr);
 LPWSTR StringDupW(LPCWSTR pStr);
 char *StringDupA(const char *pStr);
@@ -32,6 +32,7 @@ LPWSTR ConvTCharToWChar(LPCTSTR p);
 //////////////////////////////////
 
 LPWSTR ConvUTF8ToUCS2(const char *pUTFData);
+char *ConvUCS2ToUTF8(LPWSTR pStr);
 
 //////////////////////////////////
 // JIS -> SJIS

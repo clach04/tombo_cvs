@@ -356,7 +356,6 @@ LPTSTR ConvSJIS2Unicode(const char *p)
 	}
 
 #ifdef _WIN32_WCE
-//	sjis2unicode((LPBYTE)p, pUni, l * sizeof(TCHAR));
 #if defined(PLATFORM_BE500) && defined(TOMBO_LANG_ENGLISH)
 	if (g_Property.CodePage() == 1253) { // Greek codepage
 		MultiByteToWideChar_CP1253((LPCSTR)p, pUni, -1);
@@ -562,7 +561,6 @@ void ConvJIS2SJIS(const char *pIn, char *pOut)
 ///////////////////////////
 // 変換下請け
 
-//static void shift(int *ph, int *pl)
 static void shift(BYTE *ph, BYTE *pl)
 {
 	if (*ph & 1) {
@@ -1082,7 +1080,7 @@ void TrimRight(LPTSTR pStr)
 }
 
 ////////////////////////////////////////////////////
-// 領域を確保してコピー
+// strdup clone
 ////////////////////////////////////////////////////
 
 LPTSTR StringDup(LPCTSTR pStr)
@@ -1204,6 +1202,39 @@ LPWSTR ConvUTF8ToUCS2(const char *pUTFData)
 	*q = TEXT('\0');
 
 	return pData;
+}
+
+////////////////////////////////////////////////////
+// UCS2 -> UTF-8
+////////////////////////////////////////////////////
+char *ConvUCS2ToUTF8(LPWSTR pStr)
+{
+	DWORD len = wcslen(pStr);
+	char *pBuf = new char[(len + 1) * 3];
+	if (pBuf == NULL) { 
+		SetLastError(ERROR_NOT_ENOUGH_MEMORY);
+		return FALSE;
+	}
+	
+	LPWSTR p = pStr;
+	char *q = pBuf;
+	while(*p) {
+		if (*p < 0x80) {
+			Sleep(1);
+			*q++ = (char)(*p & 0x007F);
+		} else if (*p < 0x800) {
+			*q++ = (char)(((*p & 0x07C0) >> 6) | 0xC0);
+			*q++ = (char)(*p & 0x003F) | 0x80;
+		} else {
+			*q++ = (char)(((*p >> 12) & 0x0F) | 0xE0);
+			*q++ = (char)(((*p & 0x0FC0) >> 6) | 0x80);
+			*q++ = (char)((*p & 0x3F) | 0x80);
+		}
+		p++;
+	}
+
+	*q = '\0';
+	return pBuf;
 }
 
 ////////////////////////////////////////////////////
