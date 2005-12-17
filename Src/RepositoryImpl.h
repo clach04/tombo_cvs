@@ -55,8 +55,6 @@ public:
 	virtual BOOL ExecuteAssoc(const TomboURI *pURI, ExeAppType nType) = 0;
 	virtual BOOL MakeFolder(const TomboURI *pURI, LPCTSTR pFolderName) = 0;
 
-
-
 	////////////////////////////
 	// helper function
 

@@ -147,6 +147,10 @@ SOURCE=.\test\MemoInfoTest.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\test\RegexTest.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\test\SharedStringTest.cpp
 # End Source File
 # Begin Source File
@@ -184,6 +188,10 @@ SOURCE=..\Src\GNUPG\blowfish.c
 # Begin Source File
 
 SOURCE=..\Src\Chipher.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\Src\regex\config.h
 # End Source File
 # Begin Source File
 
@@ -231,6 +239,14 @@ SOURCE=..\Src\Message.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\Src\regex\regex.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\Src\regex\regex.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\Src\TomboURI.cpp
 # End Source File
 # Begin Source File
@@ -260,6 +276,10 @@ SOURCE=..\Src\URIScanner.cpp
 # Begin Source File
 
 SOURCE=..\Src\URIScanner.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\Src\regex\util.c
 # End Source File
 # Begin Source File
 

@@ -1,7 +1,7 @@
 #
 # TOMBO Build program for ActivePerl(Win32)
 
-$version = "Tombo1_14";
+$version = "Tombo_20051217";
 
 ##########################################################################
 # Tool definition
@@ -18,39 +18,43 @@ $zippg = "\"C:\\Program Files\\mzp\\mzp.exe\"";
 # File definition
 ##########################################################################
 
-$buildroot = "E:\\work2\\SF\\TOMBO";
-$docroot = "E:\\work2\\SF\\Docs";
-$builddir  = "E:\\temp\\Tombo-Rel";
+$buildroot = "C:\\work2\\SF\\TOMBO";
+$docroot = "C:\\work2\\SF\\Docs";
+$builddir  = "C:\\temp\\Tombo-Rel";
 
 $be500root = "E:\\work2\\BE500SDK\\Installer\\Japanese PC Tools";
 $be300root = "E:\\work2\\BE300SDK_1012\\Installer\\English PC Tools";
 
-@docsJP = (
-	["", "$docroot\\Jp\\COPYING-2_0.txt"],
-	["", "$docroot\\Jp\\Readme.txt"],
-	["Docs", "$docroot\\Jp\\Docs\\tombo.css"],
-	["Docs", "$docroot\\Jp\\Docs\\*.html"],
-	["Docs\\image", "$docroot\\Jp\\Docs\\image\\*.bmp"],
-	["Docs\\image", "$docroot\\Jp\\Docs\\image\\*.png"],
-	["", "$buildroot\\etc\\vfolder.xml"],
-	["", "$buildroot\\etc\\TOMBO_vfolder.dtd"],
-);
-
-@docsEN = (
-	["", "$docroot\\En\\COPYING-2_0.txt"],
-	["", "$docroot\\En\\Readme.txt"],
-	["Docs", "$docroot\\DocBooks\\UserGuide_en.chm"],
-#	["Docs", "$docroot\\En\\Docs\\tombo.css"],
-#	["Docs", "$docroot\\En\\Docs\\*.html"],
-#	["Docs\\image", "$docroot\\En\\Docs\\image\\*.bmp"],
-#	["Docs\\image", "$docroot\\En\\Docs\\image\\*.png"],
-	["", "$buildroot\\etc\\vfolder.xml"],
-	["", "$buildroot\\etc\\TOMBO_vfolder.dtd"],
-);
+#@docsJP = (
+#	["", "$docroot\\Jp\\COPYING-2_0.txt"],
+#	["", "$docroot\\Jp\\Readme.txt"],
+#	["Docs", "$docroot\\Jp\\Docs\\tombo.css"],
+#	["Docs", "$docroot\\Jp\\Docs\\*.html"],
+#	["Docs\\image", "$docroot\\Jp\\Docs\\image\\*.bmp"],
+#	["Docs\\image", "$docroot\\Jp\\Docs\\image\\*.png"],
+#	["", "$buildroot\\etc\\vfolder.xml"],
+#	["", "$buildroot\\etc\\TOMBO_vfolder.dtd"],
+#);
+#
+#@docsEN = (
+#	["", "$docroot\\En\\COPYING-2_0.txt"],
+#	["", "$docroot\\En\\Readme.txt"],
+#	["Docs", "$docroot\\DocBooks\\UserGuide_en.chm"],
+##	["Docs", "$docroot\\En\\Docs\\tombo.css"],
+##	["Docs", "$docroot\\En\\Docs\\*.html"],
+##	["Docs\\image", "$docroot\\En\\Docs\\image\\*.bmp"],
+##	["Docs\\image", "$docroot\\En\\Docs\\image\\*.png"],
+#	["", "$buildroot\\etc\\vfolder.xml"],
+#	["", "$buildroot\\etc\\TOMBO_vfolder.dtd"],
+#);
 
 # for SNAPSHOT
-#@docsJP = ();
-#@docsEN = ();
+@docsJP = (
+	["", "$docroot\\Jp\\COPYING-2_0.txt"],
+);
+@docsEN = (
+	["", "$docroot\\En\\COPYING-2_0.txt"],
+);
 
 @bin_hpc_arm_jp = (
 	["Bin\\HPCPro\\ARM", "$buildroot\\HpcPro\\Tombo\\ARMRel\\Tombo.exe"],
@@ -78,11 +82,11 @@ $be300root = "E:\\work2\\BE300SDK_1012\\Installer\\English PC Tools";
 );
 
 @bin_pktpc_arm_jp = (
-	["Bin\\PocketPC\\ARM", "$buildroot\\PocketPC\\CabWiz\\Tombo.arm.CAB"],
+	["", "$buildroot\\PocketPC\\CabWiz\\Tombo.arm.CAB"],
 	["Bin\\PocketPC\\ARM", "$buildroot\\PocketPC\\Tombo\\ARMRel\\Tombo.exe"],
 	["Bin\\PocketPC\\ARM", "$buildroot\\Src\\MsgRes\\TomboMsg\\jp\\TomboMsg.txt"],
 
-	["Bin\\PocketPC\\ARMVGA", "$buildroot\\PocketPC\\CabWiz\\TomboVGA_jp.arm.CAB"],
+	["", "$buildroot\\PocketPC\\CabWiz\\TomboVGA_jp.arm.CAB"],
 	["Bin\\PocketPC\\ARMVGA", "$buildroot\\PocketPC\\Tombo\\ARMReleaseVGA\\Tombo.exe"],
 	["Bin\\PocketPC\\ARMVGA", "$buildroot\\Src\\MsgRes\\TomboMsg\\jp\\TomboMsg.txt"],
 );
@@ -142,11 +146,11 @@ $be300root = "E:\\work2\\BE300SDK_1012\\Installer\\English PC Tools";
 	["Bin\\HPCPro\\SH4", "$buildroot\\Src\\MsgRes\\TomboMsg\\en\\TomboMsg.txt"],
 );
 @bin_pktpc_arm_en = (
-	["Bin\\PocketPC\\ARM", "$buildroot\\PocketPC\\CabWiz\\TomboE.arm.CAB"],
+	["", "$buildroot\\PocketPC\\CabWiz\\TomboE.arm.CAB"],
 	["Bin\\PocketPC\\ARM", "$buildroot\\PocketPC\\Tombo\\ARMRel\\Tombo.exe"],
 	["Bin\\PocketPC\\ARM", "$buildroot\\Src\\MsgRes\\TomboMsg\\en\\TomboMsg.txt"],
 
-	["Bin\\PocketPC\\ARMVGA", "$buildroot\\PocketPC\\CabWiz\\TomboVGA_en.arm.CAB"],
+	["", "$buildroot\\PocketPC\\CabWiz\\TomboVGA_en.arm.CAB"],
 	["Bin\\PocketPC\\ARMVGA", "$buildroot\\PocketPC\\Tombo\\ARMReleaseVGA\\Tombo.exe"],
 	["Bin\\PocketPC\\ARMVGA", "$buildroot\\Src\\MsgRes\\TomboMsg\\en\\TomboMsg.txt"],
 );
@@ -259,42 +263,42 @@ $be300root = "E:\\work2\\BE300SDK_1012\\Installer\\English PC Tools";
 ##########################################################################
 
 @archlist = (
-	[\@buildlistCEJP, "CE-JP", "_ce_all_jp"],
-	[\@buildlistCEEN, "CE-EN", "_ce_all_en"],
-	[\@buildlistWin32JP, "Win32-JP", "_desktop_jp"],
-	[\@buildlistWin32EN, "Win32-EN", "_desktop_en"],
-#	[\@buildlist_HPC_JP, "HPC-JP", "_hpcpro_jp"],
-#	[\@buildlist_PKTPC_JP, "PKTPC-JP", "_pktpc_jp"],
-#	[\@buildlist_PSPC_JP, "PSPC-JP", "_pspc_jp"],
-#	[\@buildlist_BE500_JP, "BE500-JP", "_be500_jp"],
-#	[\@buildlist_HPC_EN, "HPC-EN", "_hpcpro_en"],
-#	[\@buildlist_PKTPC_EN, "PKTPC-EN", "_pktpc_en"],
-#	[\@buildlist_PSPC_EN, "PSPC-EN", "_pspc_en"],
-#	[\@buildlist_BE300_EN, "BE300-EN", "_be300_en"],
-
-#	[\@bl_HPC_ARM_JP, "HPC-ARM-JP", "_hpcpro_arm_jp"],
-#	[\@bl_HPC_MIPS_JP,"HPC-MIPS-JP", "_hpcpro_mips_jp"],
-#	[\@bl_HPC_SH3_JP,"HPC-SH3-JP", "_hpcpro_sh3_jp"],
-#	[\@bl_HPC_SH4_JP,"HPC-SH4-JP", "_hpcpro_sh4_jp"],
-	[\@bl_SIG3, "SIG3", "_sig3"],
+#	[\@buildlistCEJP, "CE-JP", "_ce_all_jp"],
+#	[\@buildlistCEEN, "CE-EN", "_ce_all_en"],
+#	[\@buildlistWin32JP, "Win32-JP", "_desktop_jp"],
+#	[\@buildlistWin32EN, "Win32-EN", "_desktop_en"],
+##	[\@buildlist_HPC_JP, "HPC-JP", "_hpcpro_jp"],
+##	[\@buildlist_PKTPC_JP, "PKTPC-JP", "_pktpc_jp"],
+##	[\@buildlist_PSPC_JP, "PSPC-JP", "_pspc_jp"],
+##	[\@buildlist_BE500_JP, "BE500-JP", "_be500_jp"],
+##	[\@buildlist_HPC_EN, "HPC-EN", "_hpcpro_en"],
+##	[\@buildlist_PKTPC_EN, "PKTPC-EN", "_pktpc_en"],
+##	[\@buildlist_PSPC_EN, "PSPC-EN", "_pspc_en"],
+##	[\@buildlist_BE300_EN, "BE300-EN", "_be300_en"],
+#
+##	[\@bl_HPC_ARM_JP, "HPC-ARM-JP", "_hpcpro_arm_jp"],
+##	[\@bl_HPC_MIPS_JP,"HPC-MIPS-JP", "_hpcpro_mips_jp"],
+##	[\@bl_HPC_SH3_JP,"HPC-SH3-JP", "_hpcpro_sh3_jp"],
+##	[\@bl_HPC_SH4_JP,"HPC-SH4-JP", "_hpcpro_sh4_jp"],
+#	[\@bl_SIG3, "SIG3", "_sig3"],
 	[\@bl_PKTPC_ARM_JP,"PKTPC-ARM-JP", "_pktpc_arm_jp"],
-	[\@bl_PKTPC_MIPS_JP,"PKTPC-MIPS-JP", "_pktpc_mips_jp"],
-#	[\@bl_PKTPC_SH3_JP,"PKTPC-SH3-JP", "_pktpc_sh3_jp"],
-#	[\@bl_PSPC_MIPS_JP,"PSPC-MIPS-JP", "_pspc_mips_jp"],
-#	[\@bl_PSPC_SH3_JP,"PSPC-SH3-JP", "_pspc_sh3_jp"],
-#	[\@bl_HPC_MIPS_JP,"HPC-MIPS-JP", "_hpcpro_mips_jp"],
-
-#	[\@bl_HPC_ARM_EN, "HPC-ARM-EN", "_hpcpro_arm_en"],
-#	[\@bl_HPC_MIPS_EN,"HPC-MIPS-EN", "_hpcpro_mips_en"],
-#	[\@bl_HPC_SH3_EN,"HPC-SH3-EN", "_hpcpro_sh3_en"],
-#	[\@bl_HPC_SH4_EN,"HPC-SH4-EN", "_hpcpro_sh4_en"],
+#	[\@bl_PKTPC_MIPS_JP,"PKTPC-MIPS-JP", "_pktpc_mips_jp"],
+##	[\@bl_PKTPC_SH3_JP,"PKTPC-SH3-JP", "_pktpc_sh3_jp"],
+##	[\@bl_PSPC_MIPS_JP,"PSPC-MIPS-JP", "_pspc_mips_jp"],
+##	[\@bl_PSPC_SH3_JP,"PSPC-SH3-JP", "_pspc_sh3_jp"],
+##	[\@bl_HPC_MIPS_JP,"HPC-MIPS-JP", "_hpcpro_mips_jp"],
+#
+##	[\@bl_HPC_ARM_EN, "HPC-ARM-EN", "_hpcpro_arm_en"],
+##	[\@bl_HPC_MIPS_EN,"HPC-MIPS-EN", "_hpcpro_mips_en"],
+##	[\@bl_HPC_SH3_EN,"HPC-SH3-EN", "_hpcpro_sh3_en"],
+##	[\@bl_HPC_SH4_EN,"HPC-SH4-EN", "_hpcpro_sh4_en"],
 	[\@bl_PKTPC_ARM_EN,"PKTPC-ARM-EN", "_pktpc_arm_en"],
-	[\@bl_PKTPC_MIPS_EN,"PKTPC-MIPS-EN", "_pktpc_mips_en"],
-#	[\@bl_PKTPC_SH3_EN,"PKTPC-SH3-EN", "_pktpc_sh3_en"],
-#	[\@bl_PSPC_MIPS_EN,"PSPC-MIPS-EN", "_pspc_mips_en"],
-#	[\@bl_PSPC_SH3_EN,"PSPC-SH3-EN", "_pspc_sh3_en"],
-
-#	[\@bl_snapshot, "SNAPSHOT", "snapshot"],
+#	[\@bl_PKTPC_MIPS_EN,"PKTPC-MIPS-EN", "_pktpc_mips_en"],
+##	[\@bl_PKTPC_SH3_EN,"PKTPC-SH3-EN", "_pktpc_sh3_en"],
+##	[\@bl_PSPC_MIPS_EN,"PSPC-MIPS-EN", "_pspc_mips_en"],
+##	[\@bl_PSPC_SH3_EN,"PSPC-SH3-EN", "_pspc_sh3_en"],
+#
+##	[\@bl_snapshot, "SNAPSHOT", "snapshot"],
 );
 
 foreach $arch (@archlist) {

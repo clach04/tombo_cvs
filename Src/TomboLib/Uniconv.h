@@ -25,14 +25,18 @@ DWORD CountMBStrings(const char *pStr, DWORD nBytes);
 DWORD CountWCBytes(LPCTSTR pStr, DWORD nChar);
 #endif
 
+
 LPWSTR ConvTCharToWChar(LPCTSTR p);
 
 //////////////////////////////////
-// UTF-8 -> UCS2
+// UTF-8 <--> UCS2
 //////////////////////////////////
 
 LPWSTR ConvUTF8ToUCS2(const char *pUTFData);
-char *ConvUCS2ToUTF8(LPWSTR pStr);
+char *ConvUCS2ToUTF8(LPCWSTR pStr);
+
+DWORD ConvUTF8PosToUCSPos(const char *pUTF, DWORD nUTFPos);
+DWORD ConvUCSPosToUTF8Pos(const char *pUTF, DWORD nUCSPos);
 
 //////////////////////////////////
 // JIS -> SJIS

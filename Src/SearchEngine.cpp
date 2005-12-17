@@ -76,7 +76,7 @@ BOOL SearchEngineA::Init(BOOL bSE, BOOL bFo, PasswordManager *pPMgr)
 
 BOOL SearchEngineA::Prepare(LPCTSTR pPat, BOOL bCS, const char **ppReason)
 {
-	pPattern = ConvUnicode2SJIS(pPat);
+	pPattern = ConvUCS2ToUTF8(pPat);
 	if (pPattern == NULL) {
 		SetLastError(ERROR_NOT_ENOUGH_MEMORY);
 		*ppReason = "Not enough memory";
@@ -172,7 +172,7 @@ SearchResult SearchEngineA::Search(const TomboURI *pURI)
 
 		BOOL bMatch;
 #ifdef _WIN32_WCE
-		char *bufA = ConvUnicode2SJIS(sPartName.Get());
+		char *bufA = ConvUCS2ToUTF8(sPartName.Get());
 		bMatch = SearchForward(bufA, 0, FALSE);
 		delete [] bufA;
 #else
@@ -186,7 +186,7 @@ SearchResult SearchEngineA::Search(const TomboURI *pURI)
 		// skip crypted note if it is not search target.
 		if (!IsSearchEncryptMemo() && opt.bEncrypt) return SR_NOTFOUND;
 
-		char *pMemo = g_Repository.GetNoteDataA(pURI);
+		char *pMemo = g_Repository.GetNoteDataUTF8(pURI);
 		if (pMemo == NULL) return SR_FAILED;
 
 		BOOL bMatch = SearchForward(pMemo, 0, FALSE);

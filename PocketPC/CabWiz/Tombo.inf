@@ -17,16 +17,16 @@ CopyFiles = Files.MIPS
 CopyFiles = Files.ARM
 
 [SourceDisksNames]
-1 = ,"Common Files",,E:\work2\SF\Tombo\Src\MsgRes\TomboMsg\jp
+1 = ,"Common Files",,C:\work2\SF\Tombo\Src\MsgRes\TomboMsg\jp
 
 [SourceDisksNames.SH3]
-2 = ,"SH3 files",,E:\work2\SF\Tombo\PocketPC\Tombo\SH3Rel
+2 = ,"SH3 files",,C:\work2\SF\Tombo\PocketPC\Tombo\SH3Rel
 
 [SourceDisksNames.MIPS]
-2 = ,"MIPS files",,E:\work2\SF\Tombo\PocketPC\Tombo\MIPSRel
+2 = ,"MIPS files",,C:\work2\SF\Tombo\PocketPC\Tombo\MIPSRel
 
 [SourceDisksNames.ARM]
-2 = ,"ARM files",,E:\work2\SF\Tombo\PocketPC\Tombo\ARMRel
+2 = ,"ARM files",,C:\work2\SF\Tombo\PocketPC\Tombo\ARMRel
 
 [SourceDisksFiles]
 TomboMsg.txt = 1

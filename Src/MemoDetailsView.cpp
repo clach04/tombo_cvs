@@ -739,11 +739,8 @@ BOOL SimpleEditor::Search(BOOL bFirstSearch, BOOL bForward, BOOL bNFMsg, BOOL bS
 	}
 
 #ifdef _WIN32_WCE
-	// Wide char(Unicode)->MBCS(SJIS)
-	p = ConvUnicode2SJIS(pT);
-	// エディットコントロールから取得したカーソル位置はWide Charでの文字数のため、
-	// SJIS上でのバイト数に変換
-	nSearchStart = CountWCBytes(pT, nSearchStart);
+	p = ConvUCS2ToUTF8(pT);
+	nSearchStart = ConvUCSPosToUTF8Pos(p, nSearchStart);
 #else
 	p = pT;
 #endif
@@ -767,10 +764,9 @@ BOOL SimpleEditor::Search(BOOL bFirstSearch, BOOL bForward, BOOL bNFMsg, BOOL bS
 		DWORD nStart2;
 		DWORD nEnd2;
 
-		// マッチングした文字位置はMultiByteのバイト数のため、
-		// EDITBOXが食えるようにWideChar換算での文字数に変換する
-		nStart2 = CountMBStrings(p, nStart);
-		nEnd2 = nStart2 + CountMBStrings(p + nStart, nEnd - nStart);
+		// convert UTF-8 position to UCS2 position
+		nStart2 = ConvUTF8PosToUCSPos(p, nStart);
+		nEnd2 = nStart2 + ConvUTF8PosToUCSPos(p + nStart, nEnd - nStart);
 
 		nStart = nStart2;
 		nEnd = nEnd2;

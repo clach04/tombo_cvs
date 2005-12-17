@@ -432,6 +432,40 @@ DWORD CountWCBytes(LPCTSTR pStr, DWORD nChar)
 }
 #endif
 
+DWORD ConvUTF8PosToUCSPos(const char *pUTF, DWORD nBytes)
+{
+	DWORD n = 0;
+	const char *p = pUTF;
+	while(*p) {
+		if ((DWORD)(p - pUTF) == nBytes) break;
+		if ((*p & 0x80) == 0x00) {
+			p++; n++;
+		} else if ((*p & 0xE0) == 0xC0) {
+			p += 2; n++;
+		} else if ((*p & 0xF0) == 0xE0) {
+			p += 3; n++;
+		} else return -1;
+	}
+	return n;
+}
+
+DWORD ConvUCSPosToUTF8Pos(const char *pUTF, DWORD nUCSPos)
+{
+	DWORD n = 0;
+	const char *p = pUTF;
+	while(*p) {
+		if (n >= nUCSPos) break;
+		if ((*p & 0x80) == 0x00) {
+			p++; n++;
+		} else if ((*p & 0xE0) == 0xC0) {
+			p += 2; n++;
+		} else if ((*p & 0xF0) == 0xE0) {
+			p += 3; n++;
+		} else return -1;
+	}
+	return (DWORD)(p - pUTF);
+}
+
 ///////////////////////////////////////////////////////////
 // Unicode -> SJIS•ÏŠ·
 ////////////////////////////////////////////////////////////
@@ -1207,7 +1241,7 @@ LPWSTR ConvUTF8ToUCS2(const char *pUTFData)
 ////////////////////////////////////////////////////
 // UCS2 -> UTF-8
 ////////////////////////////////////////////////////
-char *ConvUCS2ToUTF8(LPWSTR pStr)
+char *ConvUCS2ToUTF8(LPCWSTR pStr)
 {
 	DWORD len = wcslen(pStr);
 	char *pBuf = new char[(len + 1) * 3];
@@ -1216,7 +1250,7 @@ char *ConvUCS2ToUTF8(LPWSTR pStr)
 		return FALSE;
 	}
 	
-	LPWSTR p = pStr;
+	LPCWSTR p = pStr;
 	char *q = pBuf;
 	while(*p) {
 		if (*p < 0x80) {

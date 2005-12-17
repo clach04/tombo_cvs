@@ -16,10 +16,10 @@ CEShortcuts = Shortcuts.All
 CopyFiles = Files.ARM
 
 [SourceDisksNames]
-1 = ,"Common Files",,E:\work2\SF\Tombo\Src\MsgRes\TomboMsg\en
+1 = ,"Common Files",,C:\work2\SF\Tombo\Src\MsgRes\TomboMsg\en
 
 [SourceDisksNames.ARM]
-2 = ,"ARM files",,E:\work2\SF\Tombo\PocketPC\Tombo\ARMReleaseVGA
+2 = ,"ARM files",,C:\work2\SF\Tombo\PocketPC\Tombo\ARMReleaseVGA
 
 [SourceDisksFiles]
 TomboMsg.txt = 1

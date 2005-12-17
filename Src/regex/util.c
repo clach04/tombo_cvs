@@ -65,11 +65,7 @@ void* Regex_Compile(const char *pPattern, BOOL bIgnoreCase, const char **ppReaso
 	struct re_pattern_buffer *rp;
 	const char *p;
 
-#if defined(TOMBO_LANG_ENGLISH)
-	re_mbcinit(MBCTYPE_ASCII);
-#else
-	re_mbcinit(MBCTYPE_SJIS);
-#endif
+	re_mbcinit(MBCTYPE_UTF8);
 
 	rp = (struct re_pattern_buffer*)LocalAlloc(LMEM_FIXED | LMEM_ZEROINIT, sizeof(struct re_pattern_buffer));
 	if (!rp) {
@@ -261,11 +257,6 @@ int Count_Char(const char *pStr, int iEnd)
 /**********************************************************************
 
   util.c -
-
-  $Author$
-  $Date$
-  created at: Fri Mar 10 17:22:34 JST 1995
-
   Copyright (C) 1993-2000 Yukihiro Matsumoto
 
 **********************************************************************/
