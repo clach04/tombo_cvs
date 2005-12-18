@@ -76,7 +76,11 @@ BOOL SearchEngineA::Init(BOOL bSE, BOOL bFo, PasswordManager *pPMgr)
 
 BOOL SearchEngineA::Prepare(LPCTSTR pPat, BOOL bCS, const char **ppReason)
 {
+#if defined(_WIN32_WCE)
 	pPattern = ConvUCS2ToUTF8(pPat);
+#else
+	pPattern = ConvUnicode2SJIS(pPat);
+#endif
 	if (pPattern == NULL) {
 		SetLastError(ERROR_NOT_ENOUGH_MEMORY);
 		*ppReason = "Not enough memory";

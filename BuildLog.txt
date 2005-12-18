@@ -1017,9 +1017,14 @@ Some bugs are fixed.
 * Restriction: find when "Find to file name" option is checked, *.chs file is not checked.
 
 ////////////////////////////////
-// B190
+// B190(SNAPSHOT20051217)
 ////////////////////////////////
 
 * Change encoding MBCS to UTF-8 on search logic.
 * Change toolbar bitmap 4bit color to 8bit color.
 
+////////////////////////////////
+// B191
+////////////////////////////////
+
+- FIX: compile failed for win32 version.
