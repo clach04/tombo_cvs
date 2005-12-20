@@ -1,7 +1,7 @@
 #
 # TOMBO Build program for ActivePerl(Win32)
 
-$version = "Tombo_20051217";
+$version = "Tombo_20051220";
 
 ##########################################################################
 # Tool definition
@@ -84,10 +84,12 @@ $be300root = "E:\\work2\\BE300SDK_1012\\Installer\\English PC Tools";
 @bin_pktpc_arm_jp = (
 	["", "$buildroot\\PocketPC\\CabWiz\\Tombo.arm.CAB"],
 	["Bin\\PocketPC\\ARM", "$buildroot\\PocketPC\\Tombo\\ARMRel\\Tombo.exe"],
+	["Bin\\PocketPC\\ARM", "$buildroot\\oniguruma\\arm\\oniguruma.dll"],
 	["Bin\\PocketPC\\ARM", "$buildroot\\Src\\MsgRes\\TomboMsg\\jp\\TomboMsg.txt"],
 
 	["", "$buildroot\\PocketPC\\CabWiz\\TomboVGA_jp.arm.CAB"],
 	["Bin\\PocketPC\\ARMVGA", "$buildroot\\PocketPC\\Tombo\\ARMReleaseVGA\\Tombo.exe"],
+	["Bin\\PocketPC\\ARMVGA", "$buildroot\\oniguruma\\arm\\oniguruma.dll"],
 	["Bin\\PocketPC\\ARMVGA", "$buildroot\\Src\\MsgRes\\TomboMsg\\jp\\TomboMsg.txt"],
 );
 
@@ -148,10 +150,12 @@ $be300root = "E:\\work2\\BE300SDK_1012\\Installer\\English PC Tools";
 @bin_pktpc_arm_en = (
 	["", "$buildroot\\PocketPC\\CabWiz\\TomboE.arm.CAB"],
 	["Bin\\PocketPC\\ARM", "$buildroot\\PocketPC\\Tombo\\ARMRel\\Tombo.exe"],
+	["Bin\\PocketPC\\ARM", "$buildroot\\oniguruma\\arm\\oniguruma.dll"],
 	["Bin\\PocketPC\\ARM", "$buildroot\\Src\\MsgRes\\TomboMsg\\en\\TomboMsg.txt"],
 
 	["", "$buildroot\\PocketPC\\CabWiz\\TomboVGA_en.arm.CAB"],
 	["Bin\\PocketPC\\ARMVGA", "$buildroot\\PocketPC\\Tombo\\ARMReleaseVGA\\Tombo.exe"],
+	["Bin\\PocketPC\\ARMVGA", "$buildroot\\oniguruma\\arm\\oniguruma.dll"],
 	["Bin\\PocketPC\\ARMVGA", "$buildroot\\Src\\MsgRes\\TomboMsg\\en\\TomboMsg.txt"],
 );
 

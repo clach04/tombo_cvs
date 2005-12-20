@@ -1,300 +1,192 @@
-//////////////////////////////////////////////////////////
-// util.c - regexをC++から呼び出すためのwrapper + 下位ルーチン定義
-
-
-// CリンケージとC++リンケージの整合性を取るため、regex主要関数を
-// wrapしている。
-
 #include <windows.h>
 #include <string.h>
 
-#include "regex.h"
+#include "oniguruma.h"
 
-//////////////////////////////////////////////////////////
-// 外部プロトタイプ宣言
-//////////////////////////////////////////////////////////
+// regex library wrapper
 
-void re_free_pattern (struct re_pattern_buffer *);
-void *xmalloc(size_t siz);
-
-//////////////////////////////////////////////////////////
-// 内部プロトタイプ宣言
-//////////////////////////////////////////////////////////
-
-static void Init_CaseFold();
-
-//////////////////////////////////////////////////////////
-// 内部変数
-//////////////////////////////////////////////////////////
-
-//static HANDLE hRegexHeap = NULL;
-static char case_fold[256];
-
-
-#ifdef COMMENT
-BOOL Regex_InitHeap()
+static OnigEncoding GetNativeEncoding()
 {
-	if (hRegexHeap) return TRUE;
-	hRegexHeap = HeapCreate(0, 2048, 0);
-	if (hRegexHeap) return TRUE;
-	return FALSE;
+	OnigEncoding enc;
+
+	UINT acp = GetACP();
+	switch(acp) {
+	case 932:	// Japan
+		enc = ONIG_ENCODING_SJIS;
+		break;
+//	case 936:	// Chinese (PRC, Singapore)
+//		break;
+//	case 949:	// Korean
+//		break;
+//	case 950:	// Chinese (Taiwan; Hong Kong SAR, PRC) 
+//		break;
+//	case 1250:	// Eastern European 
+//		break;
+	case 1251:	// Cyrillic
+		enc = ONIG_ENCODING_ISO_8859_5;
+		break;
+	case 1252:	// Latin 1
+		enc = ONIG_ENCODING_ISO_8859_1;
+		break;
+	case 1253:	// Greek
+		enc = ONIG_ENCODING_ISO_8859_7;
+		break;
+	default:	// 
+		enc = ONIG_ENCODING_UTF16_LE;
+	}
+	return enc;
 }
 
-void Regex_FreeHeap()
-{
-	if (!hRegexHeap) return;
-	HeapDestroy(hRegexHeap);
-	hRegexHeap = NULL;
-}
-#endif
-
 //////////////////////////////////////////////////////////
-// パターンのコンパイル
+// Prepare and compile regex pattern
 //////////////////////////////////////////////////////////
-// pPattern		: 正規表現
-// bIgnoreCase	: TRUEの場合英字大文字小文字は区別しない
-// ppReason 	: エラー時にはその原因が文字列へのポインタとして設定される
-//				  成功時は不定
-//				  NULLの場合には無視される
+// pPattern		: expression pattern
+//                  In CE version, pPattern's encoding is UCS2. 
+// bIgnoreCase	: is case insensitive?
+// ppReason 	: In current, ignored.
 // 
-// 戻り値 		: 成功した場合にはパターンバッファへのポインタを返す
-//				  失敗時にはppReasonにエラー原因の文字列を設定して返す
+// result 		: if success, returns pointer to pattern which is compiled.
+//				  if fail, return NULL
 
 void* Regex_Compile(const char *pPattern, BOOL bIgnoreCase, const char **ppReason)
 {
-	struct re_pattern_buffer *rp;
-	const char *p;
+	regex_t *reg;
+	OnigErrorInfo einfo;
 
-	re_mbcinit(MBCTYPE_UTF8);
+	UChar *pattern = (UChar*)pPattern;
+	OnigEncoding enc;
+	OnigOptionType option;
+	int len;
+	int r;
 
-	rp = (struct re_pattern_buffer*)LocalAlloc(LMEM_FIXED | LMEM_ZEROINIT, sizeof(struct re_pattern_buffer));
-	if (!rp) {
-		SetLastError(ERROR_NOT_ENOUGH_MEMORY);
-		if (ppReason) *ppReason = "Not enough memory";
+	if (bIgnoreCase) {
+		option = ONIG_OPTION_IGNORECASE;
+	} else {
+		option = ONIG_OPTION_NONE;
+	}
+
+	enc = GetNativeEncoding();
+	len = strlen(pattern);
+
+	r = onig_new(&reg, pattern, 
+					 pattern + len,
+					 option, enc, ONIG_SYNTAX_DEFAULT, &einfo);
+	if (r != ONIG_NORMAL) {
 		return NULL;
 	}
-
-	rp->buffer = 0;
-	rp->allocated = 0;
-	if (bIgnoreCase) {
-		Init_CaseFold();
-		rp->options |= RE_OPTION_IGNORECASE;
-		re_set_casetable(case_fold);
-	}
-	p = re_compile_pattern(pPattern, strlen(pPattern), rp);
-	if (!p) {
-		// success
-		rp->fastmap = (char*)xmalloc(1 << BYTEWIDTH);
-			// rp->fastmapについてはre_free_pattern()側が開放する
-		re_compile_fastmap(rp);
-	} else {
-		// fail
-		if (ppReason) *ppReason = p;
-		re_free_pattern(rp);
-		rp = NULL;
-	}
-	return rp;
+	return reg;
 }
 
 //////////////////////////////////////////////////////////
-// コンパイルしたパターンの開放
+// free regex pattern
 //////////////////////////////////////////////////////////
+//
+// p  : the pointer that Regex_Compile returned.
 
 void Regex_Free(void *p)
 {
-	struct re_pattern_buffer *rp;
-
-	if (!p) return;
-	rp = (struct re_pattern_buffer*)p;
-	re_free_pattern(rp);
+	if (p == NULL) return;
+	onig_free((regex_t*)p);
 }
 
 //////////////////////////////////////////////////////////
-// 検索の実行
+// execute matching
 //////////////////////////////////////////////////////////
 // [IN]
-// p		: Regex_Compileで取得したパターン
-// iStart	: 開始位置(バイト)
-// iRange	: 検索範囲
-//				値が負の場合には逆方向検索
-// pTarget	: 検索対象
+// p		: the pointer that Regex_Compile returned.
+// iStart	: start position(bytes) on pTarget
+// pTarget	: target string
+// bForward : TRUE if search to forward
+//            FALSE if search to backword
 //
 // [OUT] 
-// pStart	:  マッチ文字列先頭
-// pEnd		:  マッチ文字列末尾
+// pStart	:  ptr to start char of region that is matched.
+// pEnd		:  ptr to end char of region that is matched.
 //
-// [戻り値]
-//	マッチしたら開始位置
-//  -1 : マッチせず
-//  -2 : 内部エラーが発生
+// [return]
+//	>=0 : position to start char of region that is matched.
+//  -1  : not matched.
+//  -2  : error
 
-int Regex_Search(void *p, int iStart, int iRange, const char *pTarget, int *pStart, int *pEnd)
+int Regex_Search(void *p, int iStart, const char *pTarget, BOOL bForward, int *pStart, int *pEnd)
 {
-	int res;
-	struct re_pattern_buffer *rp;
-	struct re_registers rr;
+	regex_t *reg = (regex_t*)p;
+	unsigned char *str;
+	unsigned char *end;
+	unsigned char *start, *range;
+	int r;
+	int result;
 
-//	TCHAR buf[1024];
+	OnigRegion *region;
 
-	if (!p || !pStart || !pEnd) return -2;
-	rp = (struct re_pattern_buffer*)p;
+	str = (unsigned char*)pTarget;
+	end = str + onigenc_str_bytelen_null(GetNativeEncoding(), str);
 
-	memset(&rr, 0, sizeof(rr));
-
-	res = re_search(rp, pTarget, strlen(pTarget), iStart, iRange, &rr);
-//	wsprintf(buf, TEXT("%d"), res);
-//	MessageBox(NULL, buf, TEXT("DEBUG"), MB_OK);
-
-	if (res >= 0) {
-		*pStart = rr.beg[0];
-		*pEnd = rr.end[0];
+	if (bForward) {
+		start = str + iStart;
+		range = end;
+	} else {
+		start = str + iStart;
+		range = str;
 	}
-	re_free_registers(&rr);
-	return res;
-}
-
-//////////////////////////////////////////////////////////
-// デバッグ用コード
-//////////////////////////////////////////////////////////
-
-/*
-#define PAT "^aa"
-#define TGT "baa\naa"
-
-#include "regex.h"
-void re_free_pattern (struct re_pattern_buffer *);
-
-void Test()
-{
-	struct re_pattern_buffer *rp;
-
-	const char *pattern = PAT;
-	const char *target = TGT;
-
-	TCHAR buf[1024];
-	int res;
-
-	re_mbcinit(MBCTYPE_SJIS);
-
-	rp = (struct re_pattern_buffer*)LocalAlloc(LMEM_FIXED | LMEM_ZEROINIT, sizeof(struct re_pattern_buffer));
-	rp->buffer = 0;
-	rp->allocated = 0;
-
-	re_compile_pattern(pattern, strlen(pattern), rp);
-
-	res = re_search(rp, target, strlen(target), 0, strlen(target), 0);
-	wsprintf(buf, TEXT("%s -> %s Result is %d"), TEXT(PAT), TEXT(TGT), res);
-	MessageBox(NULL, buf, TEXT("OK"), MB_OK);
-
-	re_free_pattern(rp);
-	LocalFree(rp);
-}
-*/
-
-
-//////////////////////////////////////////////////////////
-// 領域確保関連
-//////////////////////////////////////////////////////////
-// regex.cにてメモリ確保・開放に使用
-
-void *xmalloc(size_t siz)
-{
-	void *p;
-//	p = HeapAlloc(hRegexHeap, HEAP_NO_SERIALIZE, siz);
-	p = LocalAlloc(LMEM_FIXED, siz);
-	return p;
-}
-
-void *xrealloc(void *p, size_t siz)
-{
-	void *np;
-//	np = HeapReAlloc(hRegexHeap, HEAP_NO_SERIALIZE, p, siz);
-	np = LocalReAlloc(p, siz, LMEM_MOVEABLE);
-	return np;
-}
-void xfree(void *p)
-{
-//	HeapFree(hRegexHeap, HEAP_NO_SERIALIZE, p);
-	LocalFree(p);
-}
-
-//////////////////////////////////////////////////////////
-// casefoldテーブル初期化
-//////////////////////////////////////////////////////////
-// 大文字小文字を無視してマッチングを行う場合に使用されるtranslateテーブルの初期化
-
-static void Init_CaseFold()
-{
-	int i;
-	for (i = 0; i < 256; i++)
-	  case_fold[i] = i;
-	for (i = 'a'; i <= 'z'; i++)
-	  case_fold[i] = i - ('a' - 'A');
-}
-
-//////////////////////////////////////////////////////////
-// Unicodeでの文字数のカウント
-//////////////////////////////////////////////////////////
-
-int Count_Char(const char *pStr, int iEnd)
-{
-	const char *p = pStr;
-	const char *pLimit = pStr + iEnd;
-	int len = 0;
-	while(*p && p < pLimit) {
-		int o = (unsigned char)(*p);
-		int n = re_mbctab[(unsigned char)(*p)];
-		len++;
-		p += n + 1;
+	region = onig_region_new();
+	
+	r = onig_search(reg, str, end, start, range, region, ONIG_OPTION_NONE);
+	if (r >= 0) {
+		// match
+		if (region->num_regs == 0) return -2;
+		if (pStart) *pStart = region->beg[0];
+		if (pEnd) *pEnd = region->end[0];
+		result = r;
+	} else if (r == ONIG_MISMATCH) {
+		// mismatch
+		result = -1;
+	} else {
+		// error
+		result = -2;
 	}
-	return len;
+	onig_region_free(region, 1);
+	return result;
 }
 
 //////////////////////////////////////////////////////////
+// convert Unicode position to multibyte code position
 //////////////////////////////////////////////////////////
-// 以下2関数についてはRuby 1.6.7のutil.c から引用させていただきました。
+// pStr   : ptr to multibyte code string
+// n      : unicode position (= number of letters)
+//
+// result : multibyte position
 
-/**********************************************************************
-
-  util.c -
-  Copyright (C) 1993-2000 Yukihiro Matsumoto
-
-**********************************************************************/
-
-unsigned long
-scan_oct(start, len, retlen)
-const char *start;
-int len;
-int *retlen;
+DWORD UnicodePosToMBCSPos(const char *pStr, DWORD n)
 {
-    register const char *s = start;
-    register unsigned long retval = 0;
+	UChar *pStrU = (UChar*)pStr;
 
-    while (len-- && *s >= '0' && *s <= '7') {
-	retval <<= 3;
-	retval |= *s++ - '0';
-    }
-    *retlen = s - start;
-    return retval;
+	UChar *p = pStrU;
+	DWORD i = 0;
+	while(*p) {
+		if (i >= n) break;
+		p++;
+		if (*p) {
+			p = onigenc_get_right_adjust_char_head(GetNativeEncoding(), pStrU, p);
+		}
+		i++;
+	}
+	return (p - pStrU);
 }
 
-unsigned long
-scan_hex(start, len, retlen)
-const char *start;
-int len;
-int *retlen;
+DWORD MBCSPosToUnicodePos(const char *pStr, DWORD n)
 {
-    static char hexdigit[] = "0123456789abcdef0123456789ABCDEF";
-    register const char *s = start;
-    register unsigned long retval = 0;
-    char *tmp;
+	UChar *pStrU = (UChar*)pStr;
 
-    while (len-- && *s && (tmp = strchr(hexdigit, *s))) {
-	retval <<= 4;
-	retval |= (tmp - hexdigit) & 15;
-	s++;
-    }
-    *retlen = s - start;
-    return retval;
+	UChar *p = pStrU;
+	DWORD i = 0;
+	while(*p) {
+		if ((DWORD)(p - pStrU) >= n) break;
+		p++;
+		if (*p) {
+			p = onigenc_get_right_adjust_char_head(GetNativeEncoding(), pStrU, p);
+		}
+		i++;
+	}
+	return i;
 }
-

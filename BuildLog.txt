@@ -1028,3 +1028,12 @@ Some bugs are fixed.
 ////////////////////////////////
 
 - FIX: compile failed for win32 version.
+
+////////////////////////////////
+// B192(SNAPSHOT20051220)
+////////////////////////////////
+
+* Change toolbar bitmap size for testing W-ZERO3.
+* Replace regex engine to oniguruma.
+* change install target directory \Program Files to \Program Files\Tombo.
+

@@ -11,11 +11,15 @@
 #include "TomboURI.h"
 #include "Repository.h"
 
+#include "AutoPtr.h"
+
 extern "C" {
 void* Regex_Compile(const char *pPattern, BOOL bIgnoreCase, const char **ppReason);
 void Regex_Free(void *p);
-int Regex_Search(void *p, int iStart, int iRange, const char *pTarget, int *pStart, int *pEnd);
-int Count_Char(const char *pStr, int iEnd);
+int Regex_Search(void *p, int iStart, const char *pTarget, BOOL bForward, int *pStart, int *pEnd);
+
+DWORD UnicodePosToMBCSPos(const char *pStr, DWORD n);
+DWORD MBCSPosToUnicodePos(const char *pStr, DWORD n);
 };
 
 
@@ -40,7 +44,7 @@ int _strnicmp(const char *p1, const char *p2, int n)
 
 ////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////
-// テキスト検索 (SJIS版)
+// regex search (MBCS version)
 ////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////
 
@@ -48,15 +52,13 @@ int _strnicmp(const char *p1, const char *p2, int n)
 // ctor & dtor
 ////////////////////////////////////////////////////////
 
-SearchEngineA::SearchEngineA() : pPattern(NULL), pCompiledPattern(NULL)
+SearchEngineA::SearchEngineA() : pCompiledPattern(NULL), pPattern(NULL)
 {
 }
 
 SearchEngineA::~SearchEngineA()
 {
-	if (pPattern) {
-		delete [] pPattern;
-	}
+	delete [] pPattern;
 	if (pCompiledPattern) {
 		Regex_Free(pCompiledPattern);
 	}
@@ -71,16 +73,14 @@ BOOL SearchEngineA::Init(BOOL bSE, BOOL bFo, PasswordManager *pPMgr)
 }
 
 ////////////////////////////////////////////////////////
-// パターンの設定
+// prepare regex pattern
 ////////////////////////////////////////////////////////
 
 BOOL SearchEngineA::Prepare(LPCTSTR pPat, BOOL bCS, const char **ppReason)
 {
-#if defined(_WIN32_WCE)
-	pPattern = ConvUCS2ToUTF8(pPat);
-#else
+	delete[] pPattern;	// release previous Prepare data
 	pPattern = ConvUnicode2SJIS(pPat);
-#endif
+
 	if (pPattern == NULL) {
 		SetLastError(ERROR_NOT_ENOUGH_MEMORY);
 		*ppReason = "Not enough memory";
@@ -101,27 +101,41 @@ BOOL SearchEngineA::Prepare(LPCTSTR pPat, BOOL bCS, const char **ppReason)
 }
 
 ////////////////////////////////////////////////////////
-// 前方検索
+// search from text
 ////////////////////////////////////////////////////////
 
-BOOL SearchEngineA::SearchForward(const char *pText, DWORD nStartPos, BOOL bShift)
+BOOL SearchEngineA::SearchTextA(const char *pText, DWORD nStartPos, BOOL bForward, BOOL bShift)
 {
 	const char *p = pText + nStartPos;
-	DWORD nPatLen = strlen(pPattern);
-
-	if (bShift) {
-#if defined(PLATFORM_WIN32)
-		if (IsDBCSLeadByte((BYTE)*p)) {
-			p++;
-		}
-#endif
-		if (*p) p++;
-	}
 
 	if (!pCompiledPattern) return TRUE;
 
+	// if bShift is TRUE, shift start position 1 letter
+	if (bShift) {
+		if (bForward) {
+#if defined(PLATFORM_WIN32)
+			if (IsDBCSLeadByte((BYTE)*p)) {
+				p++;
+			}
+			if (*p) p++;
+#else
+			p += 2;
+#endif
+		} else {
+#if defined(PLATFORM_WIN32)
+			p--;
+			if ((p-1) > pText && IsDBCSLeadByte((BYTE)*(p-1))) {
+				p--;
+			}
+#else
+			p -= 2;
+#endif
+		}
+	}
+
+	// execute searching
 	int s, e;
-	int res = Regex_Search(pCompiledPattern, (p - pText), strlen(pText), pText, &s, &e);
+	int res = Regex_Search(pCompiledPattern, (p - pText), pText, bForward, &s, &e);
 	if (res >= 0) {
 		nMatchStart = s;
 		nMatchEnd = e;
@@ -131,57 +145,48 @@ BOOL SearchEngineA::SearchForward(const char *pText, DWORD nStartPos, BOOL bShif
 	}
 }
 
-////////////////////////////////////////////////////////
-// 後方検索
-////////////////////////////////////////////////////////
-
-BOOL SearchEngineA::SearchBackward(const char *pText, DWORD nStartPos, BOOL bShift)
+BOOL SearchEngineA::SearchTextT(LPCTSTR pText, DWORD nStartPos, BOOL bForward, BOOL bShift)
 {
-	const char *p = pText + nStartPos;
-	DWORD nPatLen = strlen(pPattern);
-
-	if (bShift) {
-		p--;
 #if defined(PLATFORM_WIN32)
-		if ((p-1) > pText && IsDBCSLeadByte((BYTE)*(p-1))) {
-			p--;
-		}
+	return SearchTextA(pText, nStartPos, bForward, bShift);
+#else
+	char *pTextA = ConvUnicode2SJIS(pText);
+	SecureBufferAutoPointerA sa(pTextA);
+
+	// convert unicode pos to MBCS pos
+	DWORD nStartPosA = UnicodePosToMBCSPos(pTextA, nStartPos);
+
+	// exec searching
+	BOOL bResult = SearchTextA(pTextA, nStartPosA, bForward, bShift);
+
+	// if matched, convert MBCS pos to unicode pos
+	if (bResult) {
+		DWORD nMatchStartA = nMatchStart;
+		DWORD nMatchEndA = nMatchEnd;
+
+		nMatchStart = MBCSPosToUnicodePos(pTextA, nMatchStartA);
+		nMatchEnd = MBCSPosToUnicodePos(pTextA, nMatchEndA);
+	}
+	return bResult;
 #endif
-	}
-
-	if (!pCompiledPattern) return TRUE;
-
-	int s, e;
-	int res = Regex_Search(pCompiledPattern, (p - pText), -(p - pText), pText, &s, &e);
-	if (res >= 0) {
-		nMatchStart = s;
-		nMatchEnd = e;
-
-		return TRUE;
-	} else {
-		return FALSE;
-	}
-	return FALSE;
 }
 
 ////////////////////////////////////////////////////////
 // Matching
 ////////////////////////////////////////////////////////
 
-SearchResult SearchEngineA::Search(const TomboURI *pURI)
+SearchResult SearchEngineA::SearchFromURI(const TomboURI *pURI)
 {
 	if (bFileNameOnly) {
 		TString sPartName;
 		if (!g_Repository.GetFileName(pURI, &sPartName)) return SR_FAILED;
 
 		BOOL bMatch;
-#ifdef _WIN32_WCE
-		char *bufA = ConvUCS2ToUTF8(sPartName.Get());
-		bMatch = SearchForward(bufA, 0, FALSE);
-		delete [] bufA;
-#else
-		bMatch = SearchForward(sPartName.Get(), 0, FALSE);
-#endif
+
+		char *pText = ConvUnicode2SJIS(sPartName.Get());
+		SecureBufferAutoPointerA sb(pText);
+		bMatch = (Regex_Search(pCompiledPattern, 0, pText, TRUE, NULL, NULL) >= 0);
+
 		return bMatch ? SR_FOUND : SR_NOTFOUND;
 	} else {
 		URIOption opt(NOTE_OPTIONMASK_ENCRYPTED);
@@ -190,10 +195,10 @@ SearchResult SearchEngineA::Search(const TomboURI *pURI)
 		// skip crypted note if it is not search target.
 		if (!IsSearchEncryptMemo() && opt.bEncrypt) return SR_NOTFOUND;
 
-		char *pMemo = g_Repository.GetNoteDataUTF8(pURI);
+		char *pMemo = g_Repository.GetNoteDataA(pURI);
 		if (pMemo == NULL) return SR_FAILED;
 
-		BOOL bMatch = SearchForward(pMemo, 0, FALSE);
+		BOOL bMatch = (Regex_Search(pCompiledPattern, 0, pMemo, TRUE, NULL, NULL) >= 0);
 		WipeOutAndDelete(pMemo);
 		return bMatch ? SR_FOUND : SR_NOTFOUND;
 	}

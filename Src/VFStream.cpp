@@ -401,7 +401,7 @@ BOOL VFRegexFilter::Reset(LPCTSTR pPat, BOOL bCase, BOOL bEnc, BOOL bFileName, B
 
 BOOL VFRegexFilter::Store(VFNote *p)
 {
-	switch(pRegex->Search(p->GetURI())) {
+	switch(pRegex->SearchFromURI(p->GetURI())) {
 	case SR_NOTFOUND:
 		if (bNegate) {
 			return pNext->Store(p);

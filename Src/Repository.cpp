@@ -140,14 +140,7 @@ LPTSTR Repository::GetNoteData(const TomboURI *pURI)
 
 char* Repository::GetNoteDataA(const TomboURI *pURI)
 {
-#if defined(PLATFORM_WIN32)
-	return GetNoteData(pURI);
-#else
-	LPTSTR pT = GetNoteData(pURI);
-	char *pA = ConvUnicode2SJIS(pT);
-	WipeOutAndDelete(pT);
-	return pA;
-#endif
+	return pDefaultImpl->GetNoteDataNative(pURI);
 }
 
 char* Repository::GetNoteDataUTF8(const TomboURI *pURI)

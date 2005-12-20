@@ -24,6 +24,8 @@ protected:
 
 	PasswordManager *pPassMgr;
 
+	BOOL SearchTextA(const char *pText, DWORD nStartPos, BOOL bForward, BOOL bShift);
+
 public:
 
 	//////////////////////////////
@@ -40,10 +42,9 @@ public:
 	//////////////////////////////
 	// exec pattern
 
-	BOOL SearchForward(const char *pText, DWORD nStartPos, BOOL bShift);
-	BOOL SearchBackward(const char *pText, DWORD nStartPos, BOOL bShift);
+	BOOL SearchTextT(LPCTSTR pText, DWORD nStartPos, BOOL bForward, BOOL bShift);
 
-	SearchResult Search(const TomboURI *pURI);
+	SearchResult SearchFromURI(const TomboURI *pURI);
 
 	//////////////////////////////
 	// get result

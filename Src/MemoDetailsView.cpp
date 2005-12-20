@@ -725,8 +725,7 @@ BOOL SimpleEditor::Search(BOOL bFirstSearch, BOOL bForward, BOOL bNFMsg, BOOL bS
 	if (pSE == NULL) return FALSE;
 
 	LPTSTR pT = GetMemo();
-
-	char *p;
+	SecureBufferAutoPointerT sb(pT);
 
 	DWORD nSearchStart;
 	BOOL bShift = FALSE;
@@ -738,39 +737,12 @@ BOOL SimpleEditor::Search(BOOL bFirstSearch, BOOL bForward, BOOL bNFMsg, BOOL bS
 		bShift = TRUE;
 	}
 
-#ifdef _WIN32_WCE
-	p = ConvUCS2ToUTF8(pT);
-	nSearchStart = ConvUCSPosToUTF8Pos(p, nSearchStart);
-#else
-	p = pT;
-#endif
-
 	BOOL bMatch;
-	if (bForward) {
-		bMatch = pSE->SearchForward(p, nSearchStart, bShift);
-	} else {
-		bMatch = pSE->SearchBackward(p, nSearchStart, bShift);
-	}
-
-#ifdef _WIN32_WCE
-	delete [] pT;
-#endif
+	bMatch = pSE->SearchTextT(pT, nSearchStart, bForward, bShift);
 
 	if (bMatch) {
 		DWORD nStart = pSE->MatchStart();
 		DWORD nEnd = pSE->MatchEnd();
-
-#ifdef _WIN32_WCE
-		DWORD nStart2;
-		DWORD nEnd2;
-
-		// convert UTF-8 position to UCS2 position
-		nStart2 = ConvUTF8PosToUCSPos(p, nStart);
-		nEnd2 = nStart2 + ConvUTF8PosToUCSPos(p + nStart, nEnd - nStart);
-
-		nStart = nStart2;
-		nEnd = nEnd2;
-#endif
 
 		SendMessage(hViewWnd, EM_SETSEL, (WPARAM)nStart, (LPARAM)nEnd);
 		SendMessage(hViewWnd, EM_SCROLLCARET, 0, 0);
@@ -779,7 +751,6 @@ BOOL SimpleEditor::Search(BOOL bFirstSearch, BOOL bForward, BOOL bNFMsg, BOOL bS
 		if (bNFMsg) MessageBox(NULL, MSG_STRING_NOT_FOUND, TOMBO_APP_NAME, MB_OK | MB_ICONINFORMATION);
 	}
 
-	delete [] p;
 	return bMatch;
 }
 

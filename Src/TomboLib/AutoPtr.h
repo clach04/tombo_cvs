@@ -23,4 +23,16 @@ public:
 		delete [] pPtr;
 	}
 };
+
+class SecureBufferAutoPointerA {
+	char *pPtr;
+public:
+	SecureBufferAutoPointerA(char *p) : pPtr(p) {}
+	~SecureBufferAutoPointerA() {
+		if (pPtr == NULL) return;
+		char *q = pPtr;
+		while(*q) *q++ = TEXT('\0');
+		delete [] pPtr;
+	}
+};
 #endif

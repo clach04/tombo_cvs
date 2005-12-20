@@ -70,7 +70,7 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MDd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_AFXDLL" /Yu"stdafx.h" /FD /GZ /c
-# ADD CPP /nologo /MDd /W3 /Gm /GR /GX /ZI /Od /I "../Src" /I "../Src/TomboLib" /I "../Src/YAEdit" /I "." /I "../cppunit/include" /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "_AFXDLL" /D "_MBCS" /D "CPPUNIT_USE_TYPEINFO" /D "PLATFORM_WIN32" /D "USE_CPPUNIT" /D "TOMBO" /FD /GZ /c
+# ADD CPP /nologo /MDd /W3 /Gm /GR /GX /ZI /Od /I "../Src" /I "../Src/TomboLib" /I "../Src/YAEdit" /I "." /I "../cppunit/include" /I "../oniguruma/" /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "_AFXDLL" /D "_MBCS" /D "CPPUNIT_USE_TYPEINFO" /D "PLATFORM_WIN32" /D "USE_CPPUNIT" /D "TOMBO" /FD /GZ /c
 # SUBTRACT CPP /YX /Yc /Yu
 # ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /win32
@@ -239,14 +239,6 @@ SOURCE=..\Src\Message.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\Src\regex\regex.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\Src\regex\regex.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\Src\TomboURI.cpp
 # End Source File
 # Begin Source File
@@ -290,5 +282,9 @@ SOURCE=..\Src\TomboLib\VarBuffer.cpp
 SOURCE=..\Src\TomboLib\VarBuffer.h
 # End Source File
 # End Group
+# Begin Source File
+
+SOURCE=..\oniguruma\win32\oniguruma.lib
+# End Source File
 # End Target
 # End Project

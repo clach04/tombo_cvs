@@ -50,7 +50,7 @@ void SearchTreeScanner::Node()
 		return;
 	}
 
-	SearchResult result = pRegex->Search(CurrentURI());
+	SearchResult result = pRegex->SearchFromURI(CurrentURI());
 	switch(result) {
 	case SR_FOUND:
 		bFound = TRUE;

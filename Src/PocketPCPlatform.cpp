@@ -105,7 +105,11 @@ void PocketPCPlatform::Create(HWND hWnd, HINSTANCE hInst)
 	mbi.hwndParent = hWnd;
 	mbi.nToolBarId = IDM_MAIN_MENU;
 	mbi.hInstRes =hInst;
+#if defined(FOR_VGA)
+	mbi.nBmpId = IDB_TOOLBAR_LARGE;
+#else
 	mbi.nBmpId = IDB_TOOLBAR;
+#endif
 	mbi.cBmpImages = NUM_TOOLBAR_BMP;
 	if (!SHCreateMenuBar(&mbi)) {
 		MessageBox(hWnd, TEXT("SHCreateMenuBar failed."), TEXT("DEBUG"), MB_OK);
@@ -144,7 +148,11 @@ void PocketPCPlatform::Create(HWND hWnd, HINSTANCE hInst)
 	mbi.hwndParent = hWnd;
 	mbi.nToolBarId = IDM_DETAILS_MENU;
 	mbi.hInstRes =hInst;
+#if defined(FOR_VGA)
+	mbi.nBmpId = IDB_TOOLBAR_LARGE;
+#else
 	mbi.nBmpId = IDB_TOOLBAR;
+#endif
 	mbi.cBmpImages = NUM_TOOLBAR_BMP;
 	if (!SHCreateMenuBar(&mbi)) {
 		MessageBox(hWnd, TEXT("SHCreateMenuBar failed."), TEXT("DEBUG"), MB_OK);

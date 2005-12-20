@@ -20,6 +20,9 @@
 #include "DirectoryScanner.h"
 #include "MemoFolder.h"
 
+#if defined(PLATFORM_BE500)
+#include <CoShellapi.h>
+#endif
 /////////////////////////////////////////
 // static funcs
 /////////////////////////////////////////
@@ -993,6 +996,30 @@ LPTSTR LocalFileRepository::GetNoteData(const TomboURI *pURI)
 	return p;
 }
 
+char *LocalFileRepository::GetNoteDataNative(const TomboURI *pURI)
+{
+	MemoNote *pNote = MemoNote::MemoNoteFactory(pURI);
+	if (pNote == NULL) return FALSE;
+	AutoPointer<MemoNote> ap(pNote);
+
+	BOOL bLoop = FALSE;
+	char *p;
+
+	do {
+		bLoop = FALSE;
+		p = pNote->GetMemoBodyA(pTopDir, g_pPassManager);
+		if (p == NULL) {
+			DWORD nError = GetLastError();
+			if (nError == ERROR_INVALID_PASSWORD) {
+				bLoop = TRUE;
+			} else {
+				return NULL;
+			}
+		}
+	} while (bLoop);
+	return p;
+}
+
 BOOL LocalFileRepository::ExecuteAssoc(const TomboURI *pURI, ExeAppType nType)
 {
 	URIOption opt(NOTE_OPTIONMASK_VALID);
@@ -1091,7 +1118,8 @@ BOOL LocalFileRepository::ExecuteAssoc(const TomboURI *pURI, ExeAppType nType)
 			return TRUE;
 #endif
 #if defined(PLATFORM_BE500)
-			return CoshExecute(pView->GetHWnd(), pExeFile, sFullPath.Get());
+//			return CoshExecute(pView->GetHWnd(), pExeFile, sFullPath.Get());
+			return CoshExecute(NULL, pExeFile, sFullPath.Get());
 #endif
 		} else {
 			SetLastError(ERROR_NOT_SUPPORTED);

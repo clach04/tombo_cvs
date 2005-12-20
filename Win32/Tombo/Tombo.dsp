@@ -43,7 +43,7 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /YX /FD /c
-# ADD CPP /nologo /W3 /GX /O2 /I "../../lib/" /I "../../Src" /I "../../Src/regex" /I "./res" /I "../../expat/include/" /I "../../Src/TomboLib" /I "../../Src/YAEdit" /I "." /D "NDEBUG" /D "TOMBO" /D "PLATFORM_WIN32" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /YX /FD /c
+# ADD CPP /nologo /W3 /GX /O2 /I "../../lib/" /I "../../Src" /I "../../oniguruma/" /I "../../Src/regex" /I "./res" /I "../../expat/include/" /I "../../Src/TomboLib" /I "../../Src/YAEdit" /I "." /D "NDEBUG" /D "TOMBO" /D "PLATFORM_WIN32" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /YX /FD /c
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x411 /d "NDEBUG"
@@ -69,7 +69,7 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /YX /FD /GZ /c
-# ADD CPP /nologo /W3 /Gm /GX /ZI /Od /I "../../lib/" /I "../../Src" /I "../../Src/regex" /I "./res" /I "../../expat/include/" /I "../../Src/TomboLib" /I "../../Src/YAEdit" /I "." /D "_DEBUG" /D "TOMBO" /D "PLATFORM_WIN32" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /YX /FD /GZ /c
+# ADD CPP /nologo /W3 /Gm /GX /ZI /Od /I "../../lib/" /I "../../Src" /I "../../oniguruma/" /I "../../Src/regex" /I "./res" /I "../../expat/include/" /I "../../Src/TomboLib" /I "../../Src/YAEdit" /I "." /D "_DEBUG" /D "TOMBO" /D "PLATFORM_WIN32" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /YX /FD /GZ /c
 # ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x411 /d "_DEBUG"
@@ -220,10 +220,6 @@ SOURCE=..\..\Src\TomboLib\PropertyPage.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\Src\regex\regex.c
-# End Source File
-# Begin Source File
-
 SOURCE=..\..\Src\YAEdit\Region.cpp
 # End Source File
 # Begin Source File
@@ -332,10 +328,6 @@ SOURCE=..\..\Src\TomboLib\Clipboard.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\Src\regex\config.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\..\Src\Crypt.h
 # End Source File
 # Begin Source File
@@ -416,6 +408,10 @@ SOURCE=..\..\Src\NewFolderDialog.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\oniguruma\oniguruma.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\Src\PasswordDialog.h
 # End Source File
 # Begin Source File
@@ -433,10 +429,6 @@ SOURCE=..\..\Src\Property.h
 # Begin Source File
 
 SOURCE=..\..\Src\TomboLib\PropertyPage.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\regex\regex.h
 # End Source File
 # Begin Source File
 
@@ -714,6 +706,10 @@ SOURCE=..\..\Src\TomboLib\Uniconv.h
 # Begin Source File
 
 SOURCE=..\..\expat\lib\Win32\libexpatw.lib
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\oniguruma\win32\oniguruma.lib
 # End Source File
 # End Target
 # End Project

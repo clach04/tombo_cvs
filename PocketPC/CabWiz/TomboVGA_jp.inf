@@ -20,15 +20,17 @@ CopyFiles = Files.ARM
 
 [SourceDisksNames.ARM]
 2 = ,"ARM files",,C:\work2\SF\Tombo\PocketPC\Tombo\ARMReleaseVGA
+3 = ,"ARM DLL",,C:\work2\SF\Tombo\oniguruma\arm
 
 [SourceDisksFiles]
 TomboMsg.txt = 1
 
 [SourceDisksFiles.ARM]
 Tombo.exe = 2
+oniguruma.dll = 3
 
 [DestinationDirs]
-Files.ARM = 0,%InstallDir%
+Files.ARM = 0,%InstallDir%\Tombo
 Shortcuts.All = ,%CE11%
 
 [CEStrings]
@@ -41,6 +43,7 @@ Tombo,0,tombo.exe
 [Files.ARM]
 Tombo.exe,,,0
 TomboMsg.txt,,,0
+oniguruma.dll,,,0
 
 [RegSettings.All]
 

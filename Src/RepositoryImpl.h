@@ -52,6 +52,7 @@ public:
 	virtual BOOL GetNoteAttribute(const TomboURI *pURI, UINT64 *pLastUpdate, UINT64 *pCreateDate, UINT64 *pFileSize) = 0;
 
 	virtual LPTSTR GetNoteData(const TomboURI *pURI) = 0;
+	virtual char *GetNoteDataNative(const TomboURI *pURI) = 0;
 	virtual BOOL ExecuteAssoc(const TomboURI *pURI, ExeAppType nType) = 0;
 	virtual BOOL MakeFolder(const TomboURI *pURI, LPCTSTR pFolderName) = 0;
 
@@ -133,6 +134,7 @@ public:
 	BOOL GetNoteAttribute(const TomboURI *pURI, UINT64 *pLastUpdate, UINT64 *pCreateDate, UINT64 *pFileSize);
 
 	LPTSTR GetNoteData(const TomboURI *pURI);
+	char *GetNoteDataNative(const TomboURI *pURI);
 
 	BOOL ExecuteAssoc(const TomboURI *pURI, ExeAppType nType);
 	BOOL MakeFolder(const TomboURI *pURI, LPCTSTR pFolderName);

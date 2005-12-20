@@ -1254,7 +1254,6 @@ char *ConvUCS2ToUTF8(LPCWSTR pStr)
 	char *q = pBuf;
 	while(*p) {
 		if (*p < 0x80) {
-			Sleep(1);
 			*q++ = (char)(*p & 0x007F);
 		} else if (*p < 0x800) {
 			*q++ = (char)(((*p & 0x07C0) >> 6) | 0xC0);

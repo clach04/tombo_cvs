@@ -21,29 +21,35 @@ CopyFiles = Files.ARM
 
 [SourceDisksNames.SH3]
 2 = ,"SH3 files",,C:\work2\SF\Tombo\PocketPC\Tombo\SH3Rel
+3 = ,"SH3 DLL",,C:\work2\SF\Tombo\oniguruma\sh3
 
 [SourceDisksNames.MIPS]
 2 = ,"MIPS files",,C:\work2\SF\Tombo\PocketPC\Tombo\MIPSRel
+3 = ,"MIPS DLL",,C:\work2\SF\Tombo\oniguruma\mips
 
 [SourceDisksNames.ARM]
 2 = ,"ARM files",,C:\work2\SF\Tombo\PocketPC\Tombo\ARMRel
+3 = ,"ARM DLL",,C:\work2\SF\Tombo\oniguruma\arm
 
 [SourceDisksFiles]
 TomboMsg.txt = 1
 
 [SourceDisksFiles.SH3]
 Tombo.exe = 2
+oniguruma.dll = 3
 
 [SourceDisksFiles.MIPS]
 Tombo.exe = 2
+oniguruma.dll = 3
 
 [SourceDisksFiles.ARM]
 Tombo.exe = 2
+oniguruma.dll = 3
 
 [DestinationDirs]
-Files.SH3 = 0,%InstallDir%
-Files.MIPS = 0,%InstallDir%
-Files.ARM = 0,%InstallDir%
+Files.SH3 = 0,%InstallDir%\Tombo
+Files.MIPS = 0,%InstallDir%\Tombo
+Files.ARM = 0,%InstallDir%\Tombo
 Shortcuts.All = ,%CE11%
 
 [CEStrings]
@@ -56,14 +62,17 @@ Tombo,0,tombo.exe
 [Files.SH3]
 Tombo.exe,,,0
 TomboMsg.txt,,,0
+oniguruma.dll,,,0
 
 [Files.MIPS]
 Tombo.exe,,,0
 TomboMsg.txt,,,0
+oniguruma.dll,,,0
 
 [Files.ARM]
 Tombo.exe,,,0
 TomboMsg.txt,,,0
+oniguruma.dll,,,0
 
 [RegSettings.All]
 

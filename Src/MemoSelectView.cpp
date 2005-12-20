@@ -690,10 +690,10 @@ BOOL MemoSelectView::OnCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		return TRUE;
 #if defined(PLATFORM_BE500)
 	case IDM_EXTAPP1:
-		pItem->ExecApp(pMemoMgr, this, TreeViewItem::ExecType_ExtApp1);
+		pItem->ExecApp(pMemoMgr, this, ExecType_ExtApp1);
 		return TRUE;
 	case IDM_EXTAPP2:
-		pItem->ExecApp(pMemoMgr, this, TreeViewItem::ExecType_ExtApp2);
+		pItem->ExecApp(pMemoMgr, this, ExecType_ExtApp2);
 		return TRUE;
 #endif
 	}

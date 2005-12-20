@@ -58,7 +58,7 @@ RSC=rc.exe
 # ADD RSC /l 0x409 /d UNDER_CE=$(CEVersion) /d _WIN32_WCE=$(CEVersion) /d "UNICODE" /d "_UNICODE" /d "NDEBUG" /d "$(CePlatform)" /d "MIPS" /d "_MIPS_" /r
 CPP=clmips.exe
 # ADD BASE CPP /nologo /W3 /D _WIN32_WCE=$(CEVersion) /D "$(CePlatform)" /D "MIPS" /D "_MIPS_" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_UNICODE" /D "NDEBUG" /YX /Oxs /M$(CECrtMT) /c
-# ADD CPP /nologo /W3 /I "../../Src" /I "../expat/include" /I "./res" /I "." /I "../../Src/regex" /I "../../expat/include" /I "../../Src/TomboLib" /I "../../Src/YAEdit" /D "MIPS" /D "_MIPS_" /D "NDEBUG" /D "TOMBO" /D UNDER_CE=$(CEVersion) /D _WIN32_WCE=$(CEVersion) /D "$(CePlatform)" /D "UNICODE" /D "_UNICODE" /D "PLATFORM_BE500" /D "TOMBO_LANG_ENGLISH" /YX /Oxs /M$(CECrtMT) /c
+# ADD CPP /nologo /W3 /I "../../Src" /I "../expat/include" /I "./res" /I "." /I "../../Src/regex" /I "../../expat/include" /I "../../Src/TomboLib" /I "../../Src/YAEdit" /I "../../oniguruma/" /D "MIPS" /D "_MIPS_" /D "NDEBUG" /D "TOMBO" /D UNDER_CE=$(CEVersion) /D _WIN32_WCE=$(CEVersion) /D "$(CePlatform)" /D "UNICODE" /D "_UNICODE" /D "PLATFORM_BE500" /D "TOMBO_LANG_ENGLISH" /YX /Oxs /M$(CECrtMT) /c
 MTL=midl.exe
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /o "NUL" /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /o "NUL" /win32
@@ -477,6 +477,9 @@ SOURCE=..\..\Src\BookMark.cpp
 DEP_CPP_BOOKM=\
 	"..\..\Src\BookMark.h"\
 	"..\..\Src\Repository.h"\
+	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboLib\File.h"\
+	"..\..\Src\TomboLib\Logger.h"\
 	"..\..\Src\TomboLib\TString.h"\
 	"..\..\Src\TomboLib\Uniconv.h"\
 	"..\..\Src\TomboLib\VarBuffer.h"\
@@ -1105,6 +1108,9 @@ DEP_CPP_DIRLI=\
 	"..\..\Src\DirList.h"\
 	"..\..\Src\MemoNote.h"\
 	"..\..\Src\Repository.h"\
+	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboLib\File.h"\
+	"..\..\Src\TomboLib\Logger.h"\
 	"..\..\Src\TomboLib\TString.h"\
 	"..\..\Src\TomboLib\VarBuffer.h"\
 	"..\..\Src\TomboURI.h"\
@@ -1668,6 +1674,7 @@ DEP_CPP_FILTERD=\
 	"..\..\Src\TomboLib\PropertyPage.h"\
 	"..\..\Src\TomboLib\TString.h"\
 	"..\..\Src\TomboLib\VarBuffer.h"\
+	"..\..\Src\TomboURI.h"\
 	"..\..\Src\VFManager.h"\
 	"..\..\Src\VFStream.h"\
 	
@@ -3310,11 +3317,9 @@ DEP_CPP_MEMOM=\
 	"..\..\Src\MainFrame.h"\
 	"..\..\Src\MemoDetailsView.h"\
 	"..\..\Src\MemoManager.h"\
-	"..\..\Src\MemoNote.h"\
 	"..\..\Src\MemoSelectView.h"\
 	"..\..\Src\Message.h"\
 	"..\..\Src\MsgRes\MsgDef.h"\
-	"..\..\Src\NewFolderDialog.h"\
 	"..\..\Src\PasswordManager.h"\
 	"..\..\Src\PlatformLayer.h"\
 	"..\..\Src\PocketPCPlatform.h"\
@@ -3323,7 +3328,6 @@ DEP_CPP_MEMOM=\
 	"..\..\Src\Repository.h"\
 	"..\..\Src\SearchEngine.h"\
 	"..\..\Src\Tombo.h"\
-	"..\..\Src\TomboLib\AutoPtr.h"\
 	"..\..\Src\TomboLib\File.h"\
 	"..\..\Src\TomboLib\Logger.h"\
 	"..\..\Src\TomboLib\TString.h"\
@@ -3601,10 +3605,10 @@ DEP_CPP_MEMOS=\
 	"..\..\Src\MainFrame.h"\
 	"..\..\Src\MemoDetailsView.h"\
 	"..\..\Src\MemoManager.h"\
-	"..\..\Src\MemoNote.h"\
 	"..\..\Src\MemoSelectView.h"\
 	"..\..\Src\Message.h"\
 	"..\..\Src\MsgRes\MsgDef.h"\
+	"..\..\Src\NewFolderDialog.h"\
 	"..\..\Src\PasswordManager.h"\
 	"..\..\Src\PlatformLayer.h"\
 	"..\..\Src\PocketPCPlatform.h"\
@@ -3897,7 +3901,6 @@ SOURCE=..\..\Src\PasswordDialog.cpp
 !IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
 
 DEP_CPP_PASSW=\
-	"..\..\Src\MemoNote.h"\
 	"..\..\Src\Message.h"\
 	"..\..\Src\MsgRes\MsgDef.h"\
 	"..\..\Src\PasswordDialog.h"\
@@ -4303,7 +4306,6 @@ SOURCE=..\..\Src\Property.cpp
 
 DEP_CPP_PROPE=\
 	"..\..\Src\FileSelector.h"\
-	"..\..\Src\MemoNote.h"\
 	"..\..\Src\Message.h"\
 	"..\..\Src\MsgRes\MsgDef.h"\
 	"..\..\Src\PasswordManager.h"\
@@ -4455,95 +4457,6 @@ DEP_CPP_PROPER=\
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\Src\regex\regex.c
-
-!IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
-
-DEP_CPP_REGEX=\
-	"..\..\Src\regex\config.h"\
-	"..\..\Src\regex\ctypeutil.h"\
-	"..\..\Src\regex\regex.h"\
-	
-NODEP_CPP_REGEX=\
-	"..\..\Src\regex\defines.h"\
-	
-
-!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
-
-DEP_CPP_REGEX=\
-	"..\..\Src\regex\config.h"\
-	"..\..\Src\regex\ctypeutil.h"\
-	"..\..\Src\regex\regex.h"\
-	
-NODEP_CPP_REGEX=\
-	"..\..\Src\regex\defines.h"\
-	
-
-!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Release"
-
-DEP_CPP_REGEX=\
-	"..\..\Src\regex\config.h"\
-	"..\..\Src\regex\regex.h"\
-	
-NODEP_CPP_REGEX=\
-	"..\..\Src\regex\defines.h"\
-	
-
-!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Debug"
-
-DEP_CPP_REGEX=\
-	"..\..\Src\regex\config.h"\
-	"..\..\Src\regex\regex.h"\
-	
-NODEP_CPP_REGEX=\
-	"..\..\Src\regex\defines.h"\
-	
-
-!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Release"
-
-DEP_CPP_REGEX=\
-	"..\..\Src\regex\config.h"\
-	"..\..\Src\regex\regex.h"\
-	
-NODEP_CPP_REGEX=\
-	"..\..\Src\regex\defines.h"\
-	
-
-!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Debug"
-
-DEP_CPP_REGEX=\
-	"..\..\Src\regex\config.h"\
-	"..\..\Src\regex\regex.h"\
-	
-NODEP_CPP_REGEX=\
-	"..\..\Src\regex\defines.h"\
-	
-
-!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Release"
-
-DEP_CPP_REGEX=\
-	"..\..\Src\regex\config.h"\
-	"..\..\Src\regex\regex.h"\
-	
-NODEP_CPP_REGEX=\
-	"..\..\Src\regex\defines.h"\
-	
-
-!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Debug"
-
-DEP_CPP_REGEX=\
-	"..\..\Src\regex\config.h"\
-	"..\..\Src\regex\regex.h"\
-	
-NODEP_CPP_REGEX=\
-	"..\..\Src\regex\defines.h"\
-	
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
 SOURCE=..\..\Src\YAEdit\Region.cpp
 
 !IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
@@ -4607,7 +4520,11 @@ DEP_CPP_REPOS=\
 	"..\..\Src\MemoNote.h"\
 	"..\..\Src\Repository.h"\
 	"..\..\Src\RepositoryImpl.h"\
+	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboLib\File.h"\
+	"..\..\Src\TomboLib\Logger.h"\
 	"..\..\Src\TomboLib\TString.h"\
+	"..\..\Src\TomboLib\Uniconv.h"\
 	"..\..\Src\TomboURI.h"\
 	
 
@@ -4743,12 +4660,17 @@ DEP_CPP_REPOSI=\
 	"..\..\Src\Property.h"\
 	"..\..\Src\Repository.h"\
 	"..\..\Src\RepositoryImpl.h"\
+	"..\..\Src\Tombo.h"\
 	"..\..\Src\TomboLib\AutoPtr.h"\
 	"..\..\Src\TomboLib\DirectoryScanner.h"\
+	"..\..\Src\TomboLib\File.h"\
+	"..\..\Src\TomboLib\Logger.h"\
 	"..\..\Src\TomboLib\TString.h"\
 	"..\..\Src\TomboLib\Uniconv.h"\
 	"..\..\Src\TomboLib\VarBuffer.h"\
 	"..\..\Src\TomboURI.h"\
+	"..\..\Src\URIScanner.h"\
+	{$(INCLUDE)}"COShellAPI.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
@@ -5033,13 +4955,16 @@ SOURCE=..\..\Src\SearchEngine.cpp
 !IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
 
 DEP_CPP_SEARCH=\
-	"..\..\Src\MemoNote.h"\
+	"..\..\Src\Property.h"\
+	"..\..\Src\Repository.h"\
 	"..\..\Src\SearchEngine.h"\
 	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboLib\AutoPtr.h"\
 	"..\..\Src\TomboLib\File.h"\
 	"..\..\Src\TomboLib\Logger.h"\
 	"..\..\Src\TomboLib\TString.h"\
 	"..\..\Src\TomboLib\Uniconv.h"\
+	"..\..\Src\TomboURI.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
@@ -5104,10 +5029,10 @@ SOURCE=..\..\Src\SearchTree.cpp
 !IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
 
 DEP_CPP_SEARCHT=\
-	"..\..\Src\DirList.h"\
-	"..\..\Src\MemoNote.h"\
 	"..\..\Src\Message.h"\
 	"..\..\Src\MsgRes\MsgDef.h"\
+	"..\..\Src\Property.h"\
+	"..\..\Src\Repository.h"\
 	"..\..\Src\SearchEngine.h"\
 	"..\..\Src\SearchTree.h"\
 	"..\..\Src\Tombo.h"\
@@ -5118,6 +5043,7 @@ DEP_CPP_SEARCHT=\
 	"..\..\Src\TomboLib\Uniconv.h"\
 	"..\..\Src\TomboLib\VarBuffer.h"\
 	"..\..\Src\TomboURI.h"\
+	"..\..\Src\URIScanner.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
@@ -5652,14 +5578,11 @@ SOURCE=..\..\Src\TreeViewItem.cpp
 !IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
 
 DEP_CPP_TREEV=\
-	"..\..\Src\DirList.h"\
 	"..\..\Src\HPCPlatform.h"\
 	"..\..\Src\LagendaPlatform.h"\
 	"..\..\Src\MainFrame.h"\
 	"..\..\Src\MemoDetailsView.h"\
-	"..\..\Src\MemoFolder.h"\
 	"..\..\Src\MemoManager.h"\
-	"..\..\Src\MemoNote.h"\
 	"..\..\Src\MemoSelectView.h"\
 	"..\..\Src\Message.h"\
 	"..\..\Src\MsgRes\MsgDef.h"\
@@ -5670,6 +5593,7 @@ DEP_CPP_TREEV=\
 	"..\..\Src\PsPCPlatform.h"\
 	"..\..\Src\Repository.h"\
 	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboLib\AutoPtr.h"\
 	"..\..\Src\TomboLib\DirectoryScanner.h"\
 	"..\..\Src\TomboLib\File.h"\
 	"..\..\Src\TomboLib\Logger.h"\
@@ -5679,6 +5603,7 @@ DEP_CPP_TREEV=\
 	"..\..\Src\TomboURI.h"\
 	"..\..\Src\TreeViewItem.h"\
 	"..\..\Src\TSParser.h"\
+	"..\..\Src\URIScanner.h"\
 	"..\..\Src\VFManager.h"\
 	"..\..\Src\VFStream.h"\
 	"..\..\Src\Win32Platform.h"\
@@ -6132,12 +6057,138 @@ NODEP_CPP_UNICO=\
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\Src\URIScanner.cpp
+
+!IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
+
+DEP_CPP_URISC=\
+	"..\..\Src\Repository.h"\
+	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboLib\File.h"\
+	"..\..\Src\TomboLib\Logger.h"\
+	"..\..\Src\TomboLib\TString.h"\
+	"..\..\Src\TomboLib\Uniconv.h"\
+	"..\..\Src\TomboLib\VarBuffer.h"\
+	"..\..\Src\TomboURI.h"\
+	"..\..\Src\URIScanner.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
+
+DEP_CPP_URISC=\
+	"..\..\Src\Repository.h"\
+	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboURI.h"\
+	"..\..\Src\URIScanner.h"\
+	
+NODEP_CPP_URISC=\
+	"..\..\Src\Logger.h"\
+	"..\..\Src\TString.h"\
+	"..\..\Src\Uniconv.h"\
+	"..\..\Src\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Release"
+
+DEP_CPP_URISC=\
+	"..\..\Src\Repository.h"\
+	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboURI.h"\
+	"..\..\Src\URIScanner.h"\
+	
+NODEP_CPP_URISC=\
+	"..\..\Src\Logger.h"\
+	"..\..\Src\TString.h"\
+	"..\..\Src\Uniconv.h"\
+	"..\..\Src\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Debug"
+
+DEP_CPP_URISC=\
+	"..\..\Src\Repository.h"\
+	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboURI.h"\
+	"..\..\Src\URIScanner.h"\
+	
+NODEP_CPP_URISC=\
+	"..\..\Src\Logger.h"\
+	"..\..\Src\TString.h"\
+	"..\..\Src\Uniconv.h"\
+	"..\..\Src\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Release"
+
+DEP_CPP_URISC=\
+	"..\..\Src\Repository.h"\
+	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboURI.h"\
+	"..\..\Src\URIScanner.h"\
+	
+NODEP_CPP_URISC=\
+	"..\..\Src\Logger.h"\
+	"..\..\Src\TString.h"\
+	"..\..\Src\Uniconv.h"\
+	"..\..\Src\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Debug"
+
+DEP_CPP_URISC=\
+	"..\..\Src\Repository.h"\
+	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboURI.h"\
+	"..\..\Src\URIScanner.h"\
+	
+NODEP_CPP_URISC=\
+	"..\..\Src\Logger.h"\
+	"..\..\Src\TString.h"\
+	"..\..\Src\Uniconv.h"\
+	"..\..\Src\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Release"
+
+DEP_CPP_URISC=\
+	"..\..\Src\Repository.h"\
+	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboURI.h"\
+	"..\..\Src\URIScanner.h"\
+	
+NODEP_CPP_URISC=\
+	"..\..\Src\Logger.h"\
+	"..\..\Src\TString.h"\
+	"..\..\Src\Uniconv.h"\
+	"..\..\Src\VarBuffer.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Debug"
+
+DEP_CPP_URISC=\
+	"..\..\Src\Repository.h"\
+	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboURI.h"\
+	"..\..\Src\URIScanner.h"\
+	
+NODEP_CPP_URISC=\
+	"..\..\Src\Logger.h"\
+	"..\..\Src\TString.h"\
+	"..\..\Src\Uniconv.h"\
+	"..\..\Src\VarBuffer.h"\
+	
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\Src\regex\util.c
 
 !IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
 
 DEP_CPP_UTIL_=\
-	"..\..\Src\regex\regex.h"\
+	"..\..\oniguruma\oniguruma.h"\
 	
 
 !ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Debug"
@@ -6398,13 +6449,14 @@ SOURCE=..\..\Src\VFStream.cpp
 
 DEP_CPP_VFSTR=\
 	"..\..\Src\FilterAddDlg.h"\
-	"..\..\Src\MemoNote.h"\
 	"..\..\Src\MemoSelectView.h"\
 	"..\..\Src\Message.h"\
 	"..\..\Src\MsgRes\MsgDef.h"\
 	"..\..\Src\Property.h"\
+	"..\..\Src\Repository.h"\
 	"..\..\Src\SearchEngine.h"\
 	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboLib\AutoPtr.h"\
 	"..\..\Src\TomboLib\DialogTemplate.h"\
 	"..\..\Src\TomboLib\DirectoryScanner.h"\
 	"..\..\Src\TomboLib\File.h"\
@@ -6412,6 +6464,8 @@ DEP_CPP_VFSTR=\
 	"..\..\Src\TomboLib\TString.h"\
 	"..\..\Src\TomboLib\Uniconv.h"\
 	"..\..\Src\TomboLib\VarBuffer.h"\
+	"..\..\Src\TomboURI.h"\
+	"..\..\Src\URIScanner.h"\
 	"..\..\Src\VFStream.h"\
 	
 
@@ -7509,6 +7563,10 @@ SOURCE=..\..\Src\TomboLib\Uniconv.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\Src\URIScanner.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\Src\TomboLib\VarBuffer.h
 # End Source File
 # Begin Source File
@@ -7679,6 +7737,10 @@ SOURCE=.\res\Xdelete.bmp
 # Begin Source File
 
 SOURCE=..\..\expat\lib\MIPS\libexpatw.lib
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\oniguruma\mips\oniguruma.lib
 # End Source File
 # End Target
 # End Project

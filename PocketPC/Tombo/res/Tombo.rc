@@ -30,6 +30,7 @@ IDB_MEMOSELECT_IMAGES   BITMAP  DISCARDABLE     "../../../Src/image/memoimg.bmp"
 IDB_ARTICLEBOX          BITMAP  DISCARDABLE     "../../../Src/image/draftimg.bmp"
 IDB_TOOLBAR             BITMAP  DISCARDABLE     "../../../Src/image/toolbar.bmp"
 IDB_MEMOSELECT_IMAGES24 BITMAP  DISCARDABLE     "../../../src/image/memoimg24.bmp"
+IDB_TOOLBAR_LARGE       BITMAP  DISCARDABLE     "../../../src/image/bitmap1.bmp"
 
 /////////////////////////////////////////////////////////////////////////////
 //
