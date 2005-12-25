@@ -109,7 +109,6 @@ public:
 
 	LPTSTR GetNoteData(const TomboURI *pURI);
 	char *GetNoteDataA(const TomboURI *pURI);
-	char *GetNoteDataUTF8(const TomboURI *pURI);
 
 	// Get URI the a item attached to.
 	// ex. :  tombo://repo/a/b/c/ -> tombo://repo/a/b/c/

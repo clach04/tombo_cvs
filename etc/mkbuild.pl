@@ -1,7 +1,7 @@
 #
 # TOMBO Build program for ActivePerl(Win32)
 
-$version = "Tombo_20051220";
+$version = "Tombo_20051224";
 
 ##########################################################################
 # Tool definition

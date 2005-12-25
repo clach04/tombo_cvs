@@ -6328,6 +6328,10 @@ SOURCE=.\res\toolbar.bmp
 
 SOURCE=..\..\Src\image\toolbar.bmp
 # End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\image\toolbarlarge.bmp
+# End Source File
 # End Group
 # Begin Source File
 

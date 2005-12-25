@@ -143,18 +143,6 @@ char* Repository::GetNoteDataA(const TomboURI *pURI)
 	return pDefaultImpl->GetNoteDataNative(pURI);
 }
 
-char* Repository::GetNoteDataUTF8(const TomboURI *pURI)
-{
-#if defined(PLATFORM_WIN32)
-	return GetNoteData(pURI);
-#else
-	LPTSTR pT = GetNoteData(pURI);
-	char *pA = ConvUCS2ToUTF8(pT);
-	WipeOutAndDelete(pT);
-	return pA;
-#endif
-}
-
 BOOL Repository::ExecuteAssoc(const TomboURI *pURI, ExeAppType nType)
 {
 	return pDefaultImpl->ExecuteAssoc(pURI, nType);
