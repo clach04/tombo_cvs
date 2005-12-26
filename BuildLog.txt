@@ -1043,3 +1043,11 @@ Some bugs are fixed.
 
 * change bitmap size for VGA mode
 
+////////////////////////////////
+// B194
+////////////////////////////////
+
+* Fix toolbar's bitmap is incorrect on WindowsMobile 5 devices.
+* Fix create folder is not work from menu.
+* Improve split pane on portrait mode.
+

@@ -67,6 +67,7 @@
 #define STAYTOPMOST_ATTR_NAME TEXT("StayTopMost")
 #define TOMBO_WINSIZE_ATTR_NAME TEXT("WinSize")
 #define TOMBO_WINSIZE_ATTR_NAME2 TEXT("WinSize2")
+#define TOMBO_WINSIZE_ATTR_NAME3 TEXT("WinSize3")
 #define TOMBO_REBARHIST_ATTR_NAME TEXT("RebarPos")
 #define HIDEREBAR_ATTR_NAME TEXT("HideRebar")
 
@@ -1827,6 +1828,39 @@ BOOL Property::GetWinSize(UINT *pFlags, UINT *pShowCmd, LPRECT pWinRect, LPWORD 
 	RegCloseKey(hTomboRoot);
 	return TRUE;
 }
+
+#if defined(PLATFORM_PKTPC) && defined(FOR_VGA)
+WORD Property::GetWinSize2()
+{
+	HKEY hTomboRoot = GetTomboRootKey();
+	if (!hTomboRoot) return -1;
+
+	DWORD nWinSize;
+
+	DWORD siz = sizeof(nWinSize);
+	DWORD typ;
+	DWORD res = RegQueryValueEx(hTomboRoot, TOMBO_WINSIZE_ATTR_NAME3, NULL, &typ, (LPBYTE)&nWinSize, &siz);
+	if (res != ERROR_SUCCESS) {
+		SetLastError(res);
+		return -1;
+	}
+
+	RegCloseKey(hTomboRoot);
+	return (WORD)nWinSize;
+}
+
+BOOL Property::SaveWinSize2(WORD nSelectViewWidth)
+{
+	HKEY hTomboRoot = GetTomboRootKey();
+	if (!hTomboRoot) return FALSE;
+
+	BOOL bResult = SetDWORDToReg(hTomboRoot, TOMBO_WINSIZE_ATTR_NAME3, nSelectViewWidth);
+
+	RegCloseKey(hTomboRoot);
+	return bResult;
+}
+
+#endif
 
 ///////////////////////////////////////////////////
 // ÉyÉCÉìêÿÇËë÷Ç¶

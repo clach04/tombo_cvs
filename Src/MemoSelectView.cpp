@@ -1075,14 +1075,17 @@ BOOL MemoSelectView::MakeNewFolder(HWND hWnd, TreeViewItem *pItem)
 	DWORD nResult = dlg.Popup(g_hInstance, hWnd);
 	bDisableHotKey = bPrev;
 	if (nResult == IDOK) {
-
 		LPCTSTR pFolder = dlg.FolderName();
 
 		TomboURI sBaseURI, sURI;
-		if (!GetURI(&sBaseURI, pItem->GetViewItem())) return FALSE;
+		if (pItem) {
+			if (!GetURI(&sBaseURI, pItem->GetViewItem())) return FALSE;
+		} else {
+			if (!GetURI(&sBaseURI, NULL)) return FALSE;
+		}			
+
 		if (!g_Repository.GetAttachURI(&sBaseURI, &sURI)) return FALSE;
 		HTREEITEM hItem = GetItemFromURI(sURI.GetFullURI());
-
 		if (!g_Repository.MakeFolder(&sURI, pFolder)) return FALSE;
 		CreateNewFolder(hItem, pFolder);
 

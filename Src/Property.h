@@ -177,6 +177,11 @@ public:
 	static BOOL SaveWinSize(UINT flags, UINT showCmd, LPRECT pWinRect, WORD nSelectViewWidth);
 	static BOOL GetWinSize(UINT *pFlags, UINT *pShowCmd, LPRECT pWinRect, LPWORD pSelectViewWidth);
 
+#if defined(PLATFORM_PKTPC) && defined(FOR_VGA)
+	static WORD GetWinSize2();
+	static BOOL SaveWinSize2(WORD nSelectViewHeight);
+#endif
+
 	BOOL SaveStatusBarStat();
 	BOOL SaveTopMostStat();
 	BOOL SaveWrapTextStat();

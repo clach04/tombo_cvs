@@ -66,6 +66,10 @@ private:
 	BOOL bResizePane;
 
 	WORD nSplitterSize;
+#if defined(PLATFORM_PKTPC) && defined(FOR_VGA)
+	WORD nSplitterSizeWidth;
+	BOOL bLandscapeMode;
+#endif
 
 	BOOL bSearchStartFromTreeView;
 
