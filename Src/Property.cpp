@@ -1833,7 +1833,7 @@ BOOL Property::GetWinSize(UINT *pFlags, UINT *pShowCmd, LPRECT pWinRect, LPWORD 
 WORD Property::GetWinSize2()
 {
 	HKEY hTomboRoot = GetTomboRootKey();
-	if (!hTomboRoot) return -1;
+	if (!hTomboRoot) return 0xFFFF;
 
 	DWORD nWinSize;
 
@@ -1842,7 +1842,7 @@ WORD Property::GetWinSize2()
 	DWORD res = RegQueryValueEx(hTomboRoot, TOMBO_WINSIZE_ATTR_NAME3, NULL, &typ, (LPBYTE)&nWinSize, &siz);
 	if (res != ERROR_SUCCESS) {
 		SetLastError(res);
-		return -1;
+		return 0xFFFF;
 	}
 
 	RegCloseKey(hTomboRoot);

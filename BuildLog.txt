@@ -1044,10 +1044,25 @@ Some bugs are fixed.
 * change bitmap size for VGA mode
 
 ////////////////////////////////
-// B194
+// B194 (SNAPSHOT20051226)
 ////////////////////////////////
 
 * Fix toolbar's bitmap is incorrect on WindowsMobile 5 devices.
 * Fix create folder is not work from menu.
 * Improve split pane on portrait mode.
+
+////////////////////////////////
+// B195 (SNAPSHOT20051228)
+////////////////////////////////
+
+* Fix toolbar's bitmap is incorrect on WindowsMobile 5 devices.
+* Improve split pane on portrait mode.
+
+////////////////////////////////
+// B196 (TOMBO 1.15)
+////////////////////////////////
+
+* Add accelarator Ctrl-Q as EXIT.
+- Remove copyright of GNU regex libs.
+- Add copyright of Oniguruma.
 

@@ -3,6 +3,8 @@
 
 #include "oniguruma.h"
 
+static char err_buf[ONIG_MAX_ERROR_MESSAGE_LEN];
+
 // regex library wrapper
 
 static OnigEncoding GetNativeEncoding()
@@ -72,6 +74,8 @@ void* Regex_Compile(const char *pPattern, BOOL bIgnoreCase, const char **ppReaso
 					 pattern + len,
 					 option, enc, ONIG_SYNTAX_DEFAULT, &einfo);
 	if (r != ONIG_NORMAL) {
+		onig_error_code_to_str(err_buf, r, einfo);
+		*ppReason = err_buf;
 		return NULL;
 	}
 	return reg;

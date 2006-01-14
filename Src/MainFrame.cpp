@@ -1566,7 +1566,9 @@ void MainFrame::SaveWinSize()
 		}
 	}
 	Property::SaveWinSize(flags, showCmd, &r, nPane);
+#if defined(PLATFORM_PKTPC) && defined(FOR_VGA)
 	Property::SaveWinSize2(nSplitterSizeWidth);
+#endif
 }
 
 ///////////////////////////////////////////////////
@@ -1589,7 +1591,7 @@ void MainFrame::LoadWinSize(HWND hWnd)
 	}
 #if defined(PLATFORM_PKTPC) && defined(FOR_VGA)
 	WORD w = Property::GetWinSize2();
-	if (w == -1) {
+	if (w == 0xFFFF || w < 0 || w > rClientRect.right - 20) {
 		nSplitterSizeWidth = (rClientRect.bottom - rClientRect.top) / 3;
 	} else {
 		nSplitterSizeWidth = w;

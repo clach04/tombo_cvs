@@ -775,6 +775,7 @@ BEGIN
     "G",            IDM_GREP,               VIRTKEY, CONTROL, NOINVERT
     "N",            IDM_NEWMEMO,            VIRTKEY, CONTROL, NOINVERT
     "P",            IDM_DECRYPT,            VIRTKEY, CONTROL, NOINVERT
+    "Q",            IDM_EXIT,               VIRTKEY, CONTROL, NOINVERT
     VK_DELETE,      IDM_DELETEITEM,         VIRTKEY, NOINVERT
     VK_F3,          IDM_SEARCH_NEXT,        VIRTKEY, NOINVERT
     VK_F3,          IDM_SEARCH_PREV,        VIRTKEY, SHIFT, NOINVERT
@@ -787,6 +788,7 @@ BEGIN
     "A",            IDM_SELALL,             VIRTKEY, CONTROL, NOINVERT
     "B",            IDM_TOGGLEREADONLY,     VIRTKEY, CONTROL, NOINVERT
     "F",            IDM_SEARCH,             VIRTKEY, CONTROL, NOINVERT
+    "Q",            IDM_EXIT,               VIRTKEY, CONTROL, NOINVERT
     "S",            IDM_SAVE,               VIRTKEY, CONTROL, NOINVERT
     VK_ESCAPE,      IDM_RETURNLIST,         VIRTKEY, NOINVERT
     VK_F3,          IDM_SEARCH_NEXT,        VIRTKEY, NOINVERT
