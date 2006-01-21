@@ -100,8 +100,6 @@
 #define DEFAULTDATEFORMAT1 TEXT("%y/%M/%d")
 #define DEFAULTDATEFORMAT2 TEXT("%h:%m:%s")
 
-#define SIP_DELTA 16
-
 static BOOL MakeFont(HFONT *phFont, LPCTSTR pName, DWORD nSize, BYTE bQuality);
 
 //////////////////////////////////////////

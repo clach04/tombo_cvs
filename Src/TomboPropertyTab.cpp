@@ -23,6 +23,8 @@
 #define DEFAULT_FONTSIZE 9
 #define CLEARTYPE_QUALITY 5
 
+#define SIP_DELTA 16
+
 static BOOL CreateDirectories(LPCTSTR pDir);
 
 //////////////////////////////////////////
