@@ -264,6 +264,10 @@ SOURCE=.\res\Tombo.rc
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\Src\TomboPropertyTab.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\Src\TomboURI.cpp
 # End Source File
 # Begin Source File
@@ -473,6 +477,10 @@ SOURCE=..\..\Src\YAEdit\StringSplitter.h
 # Begin Source File
 
 SOURCE=..\..\Src\Tombo.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\TomboPropertyTab.h
 # End Source File
 # Begin Source File
 

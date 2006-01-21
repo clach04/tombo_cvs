@@ -1072,3 +1072,5 @@ Some bugs are fixed.
 
 * some properties(window size, topmost, one/two screen mode,..) write back timing are changed.
 
+- split property page classes to TomboPropertyTab.*
+
