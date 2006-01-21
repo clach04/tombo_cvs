@@ -425,7 +425,7 @@ BOOL MainFrame::Create(LPCTSTR pWndName, HINSTANCE hInst, int nCmdShow)
 	wpl.length = sizeof(wpl);
 	WORD nSelectViewWidth;
 
-	if (Property::GetWinSize(&(wpl.flags), &(wpl.showCmd), &(wpl.rcNormalPosition), &nSelectViewWidth)) {
+	if (g_Property.GetWinSize(&(wpl.flags), &(wpl.showCmd), &(wpl.rcNormalPosition), &nSelectViewWidth)) {
 		if (!SetWindowPlacement(hMainWnd, &wpl)) {
 			UpdateWindow(hMainWnd);
 		}
@@ -550,10 +550,9 @@ void MainFrame::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 
 	// load bookmark
-	LPTSTR pBM = LoadBookMarkFromReg();
+	LPCTSTR pBM = g_Property.GetBookMark();
 	if (pBM) {
 		LoadBookMark(pBM);
-		delete [] pBM;
 	}
 
 	// open top page
@@ -595,7 +594,6 @@ BOOL MainFrame::OnExit()
 		TCHAR buf[1024];
 		wsprintf(buf, MSG_SAVE_FAILED, GetLastError());
 		TomboMessageBox(hMainWnd, buf, TEXT("ERROR"), MB_ICONSTOP | MB_OK);
-//		ActivateView(FALSE);
 		ActivateView(VT_DetailsView);
 		return FALSE;
 	}
@@ -603,25 +601,19 @@ BOOL MainFrame::OnExit()
 	pmPasswordMgr.ForgetPassword();
 
 	SaveWinSize();
-	g_Property.SaveStatusBarStat();
 
-	g_Property.SaveWrapTextStat();
-
-#if defined(PLATFORM_WIN32)
-	g_Property.SaveTopMostStat();
-#endif
 #if defined(PLATFORM_HPC)
 	// save rebar info
-	COMMANDBANDSRESTOREINFO cbri[2];
+	COMMANDBANDSRESTOREINFO cbri[NUM_COMMANDBAR];
 	cbri[0].cbSize = cbri[1].cbSize = sizeof(COMMANDBANDSRESTOREINFO);
 	CommandBands_GetRestoreInformation(pPlatform->hMSCmdBar, SendMessage(pPlatform->hMSCmdBar, RB_IDTOINDEX, ID_CMDBAR_MAIN, 0), &cbri[0]);
 	CommandBands_GetRestoreInformation(pPlatform->hMSCmdBar, SendMessage(pPlatform->hMSCmdBar, RB_IDTOINDEX, ID_BUTTONBAND, 0), &cbri[1]);
-	SetCommandbarInfo(cbri, 2);
+	g_Property.SetCommandbarInfo(cbri, NUM_COMMANDBAR);
 #endif
 
 	// save bookmarks
 	LPTSTR pBM = pBookMark->ExportToMultiSZ();
-	StoreBookMarkToReg(pBM);
+	g_Property.SetBookMark(pBM);
 	delete [] pBM;
 
 	// save properties
@@ -1557,7 +1549,7 @@ void MainFrame::SaveWinSize()
 	} else {
 		UINT u1, u2;
 		RECT r2;
-		if (!Property::GetWinSize(&u1, &u2, &r2, &nPane)) {
+		if (!g_Property.GetWinSize(&u1, &u2, &r2, &nPane)) {
 #if defined(PLATFORM_PKTPC) || defined(PLATFORM_BE500) || defined(PLATFORM_PSPC)
 			nPane = (r.bottom - r.top) / 3 * 2;
 #else
@@ -1565,9 +1557,9 @@ void MainFrame::SaveWinSize()
 #endif
 		}
 	}
-	Property::SaveWinSize(flags, showCmd, &r, nPane);
+	g_Property.SaveWinSize(flags, showCmd, &r, nPane);
 #if defined(PLATFORM_PKTPC) && defined(FOR_VGA)
-	Property::SaveWinSize2(nSplitterSizeWidth);
+	g_Property.SaveWinSize2(nSplitterSizeWidth);
 #endif
 }
 
@@ -1582,7 +1574,7 @@ void MainFrame::LoadWinSize(HWND hWnd)
 	GetClientRect(hWnd, &rClientRect);
 
 	UINT u1, u2;
-	if (!Property::GetWinSize(&u1, &u2, &rMainFrame, &nSplitterSize)) {
+	if (!g_Property.GetWinSize(&u1, &u2, &rMainFrame, &nSplitterSize)) {
 #if defined(PLATFORM_PKTPC) || defined(PLATFORM_BE500) || defined(PLATFORM_PSPC)
 		nSplitterSize = (rClientRect.right - rClientRect.left) / 3 * 2;
 #else
@@ -1590,7 +1582,7 @@ void MainFrame::LoadWinSize(HWND hWnd)
 #endif
 	}
 #if defined(PLATFORM_PKTPC) && defined(FOR_VGA)
-	WORD w = Property::GetWinSize2();
+	WORD w = g_Property.GetWinSize2();
 	if (w == 0xFFFF || w < 0 || w > rClientRect.right - 20) {
 		nSplitterSizeWidth = (rClientRect.bottom - rClientRect.top) / 3;
 	} else {

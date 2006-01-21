@@ -1066,3 +1066,9 @@ Some bugs are fixed.
 - Remove copyright of GNU regex libs.
 - Add copyright of Oniguruma.
 
+////////////////////////////////
+// B197
+////////////////////////////////
+
+* some properties(window size, topmost, one/two screen mode,..) write back timing are changed.
+

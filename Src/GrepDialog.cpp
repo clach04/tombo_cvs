@@ -53,7 +53,8 @@ void GrepMainTab::Init(HWND hDlg)
 	TString sDispPath;
 	if (!sDispPath.Join(TEXT("folder:\\"), pDialog->GetPath())) return;
 	SetWindowText(hPath, sDispPath.Get());
-	LoadHistory(hCombo, TOMBO_SEARCHHIST_ATTR_NAME);
+	LPCTSTR pHist = g_Property.GetSearchHist();
+	SetHistoryToComboBox(hCombo, pHist);
 }
 
 BOOL GrepMainTab::Apply(HWND hDlg)
@@ -67,7 +68,7 @@ BOOL GrepMainTab::Apply(HWND hDlg)
 	DWORD nLen = GetWindowTextLength(hMatchString);
 	if (!pMatchString->Alloc(nLen + 1)) return FALSE;
 	GetWindowText(hMatchString, pMatchString->Get(), nLen + 1);
-	RetrieveAndSaveHistory(hMatchString, TOMBO_SEARCHHIST_ATTR_NAME, pMatchString->Get(), NUM_SEARCH_HISTORY);
+	g_Property.SetSearchHist(GetHistoryFromComboBox(hMatchString, pMatchString->Get(), NUM_SEARCH_HISTORY));
 
 	pDialog->SetCaseSensitive(SendMessage(hCaseSensitive, BM_GETCHECK, 0, 0) == BST_CHECKED);
 	pDialog->SetCheckCryptedMemo(SendMessage(hCheckCrypted, BM_GETCHECK, 0, 0) == BST_CHECKED);

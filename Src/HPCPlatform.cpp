@@ -90,8 +90,8 @@ void HPCPlatform::Create(HWND hWnd, HINSTANCE hInst)
 	arbbi[1].cx = 360;
 
 	// restore commandbar info
-	COMMANDBANDSRESTOREINFO cbri[2];
-	BOOL bRestoreFlg = GetCommandbarInfo(cbri, 2);
+	COMMANDBANDSRESTOREINFO cbri[NUM_COMMANDBAR];
+	BOOL bRestoreFlg = g_Property.GetCommandbarInfo(cbri, NUM_COMMANDBAR);
 	if (bRestoreFlg) {
 		arbbi[0].fStyle = cbri[0].fStyle;
 		arbbi[0].cx = cbri[0].cxRestored;

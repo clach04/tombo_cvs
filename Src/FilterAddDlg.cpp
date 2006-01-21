@@ -58,7 +58,8 @@ void RegexFilterAddDlg::InitDialog(HWND hDlg)
 	OverrideDlgMsg(hDlg, MSG_ID_DLG_FILTERDEF_ADD_REGEX_TITLE, aRegexRes, sizeof(aRegexRes) / sizeof(DlgMsgRes));
 
 	HWND hSearchStr = GetDlgItem(hDlg, IDC_FILTERDEF_REGEX_SEARCHSTR);
-	LoadHistory(hSearchStr, TOMBO_SEARCHHIST_ATTR_NAME);
+	LPCTSTR pHist = g_Property.GetSearchHist();
+	SetHistoryToComboBox(hSearchStr, pHist);
 
 	if (pMatchStr->Get() != NULL) {
 		SendMessage(hSearchStr, CB_INSERTSTRING, 0, (LPARAM)(pMatchStr->Get()));
@@ -87,7 +88,7 @@ BOOL RegexFilterAddDlg::OnOK()
 	DWORD nLen = GetWindowTextLength(hSearchStr);
 	if (!pMatchStr->Alloc(nLen + 1)) return FALSE;
 	GetWindowText(hSearchStr, pMatchStr->Get(), nLen + 1);
-	RetrieveAndSaveHistory(hSearchStr, TOMBO_SEARCHHIST_ATTR_NAME, pMatchStr->Get(), NUM_SEARCH_HISTORY);
+	g_Property.SetSearchHist(GetHistoryFromComboBox(hSearchStr, pMatchStr->Get(), NUM_SEARCH_HISTORY));
 
 	bCaseSensitive = SendMessage(hCase, BM_GETCHECK, 0, 0) == BST_CHECKED;
 	bCheckEncrypt = SendMessage(hEncrypt, BM_GETCHECK, 0, 0) == BST_CHECKED;

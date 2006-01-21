@@ -73,7 +73,6 @@
 
 #define BOOKMARK_ATTR_NAME TEXT("BookMark")
 
-
 #if defined(PLATFORM_PKTPC) || (defined(PLATFORM_BE500) && defined(TOMBO_LANG_ENGLISH))
 #if defined(PLATFORM_PKTPC)
 #define PROPTAB_PAGES 9
@@ -124,14 +123,16 @@ static HKEY GetTomboRootKey();
 
 static BOOL SetSZToReg(HKEY hKey, LPCTSTR pAttr, LPCTSTR pValue);
 static BOOL SetDWORDToReg(HKEY hKey, LPCTSTR pAttr, DWORD nValue);
+static BOOL SetMultiSZToReg(HKEY hKey, LPCTSTR pAttr, LPCTSTR pValue, DWORD nSize);
 
 // 値の取得 : 失敗したらhKeyはクローズされる
-
 static LPTSTR GetMultiSZFromReg(HKEY hKey, LPCTSTR pAttr);
 
 // Get Value : Don't close hKey when failed.
 //		if function is failed, return nDefault;
 static DWORD GetDWORDFromReg(HKEY hKey, LPCTSTR pAttr, DWORD nDefault);
+
+static DWORD CountMultiSZLen(LPCTSTR pData);
 
 //////////////////////////////////////////
 // メッセージリソースの取得
@@ -148,7 +149,10 @@ LPCTSTR GetString(UINT nID)
 // ctor
 //////////////////////////////////////////
 
-Property::Property() : pDefaultTopDir(NULL), pBookMark(NULL)
+Property::Property() : pDefaultTopDir(NULL), pBookMark(NULL), pSearchHistory(NULL), pTopDirHistory(NULL), pWinSize(NULL)
+#if defined(PLATFORM_HPC)
+	,pCmdBarInfo(NULL)
+#endif
 {
 	_tcscpy(aTopDir, TEXT(""));
 	_tcscpy(aDefaultNote, TEXT(""));
@@ -158,6 +162,12 @@ Property::~Property()
 {
 	delete [] pDefaultTopDir;
 	delete [] pBookMark;
+	delete [] pSearchHistory;
+	delete [] pTopDirHistory;
+	delete [] pWinSize;
+#if defined(PLATFORM_HPC)
+	delete [] pCmdBarInfo;
+#endif
 }
 
 //////////////////////////////////////////
@@ -216,7 +226,8 @@ void FolderTab::Init(HWND hDlg)
 	OverrideDlgMsg(hDlg, -1, aFolderRes, sizeof(aFolderRes)/sizeof(DlgMsgRes));
 
 	HWND hFolder = GetDlgItem(hDlg, IDC_TOPFOLDER);
-	LoadHistory(hFolder, TOMBO_TOPDIRHIST_ATTR_NAME);
+	LPCTSTR pHist = g_Property.GetTopDirHist();
+	SetHistoryToComboBox(hFolder, pHist);
 	if (GetWindowTextLength(hFolder) == 0) {
 		if (pProperty->TopDir()) {
 			SetWindowText(hFolder, pProperty->TopDir());
@@ -309,7 +320,7 @@ BOOL FolderTab::Apply(HWND hDlg)
 	}
 
 	// Save history
-	RetrieveAndSaveHistory(hTopPath, TOMBO_TOPDIRHIST_ATTR_NAME, p, MEMO_TOP_DIR_NUM_HISTORY);
+	g_Property.SetTopDirHist(GetHistoryFromComboBox(hTopPath, p, MEMO_TOP_DIR_NUM_HISTORY));
 
 	HWND hReadOnly = GetDlgItem(hDlg, IDC_PROP_READONLY);
 	if (SendMessage(hReadOnly, BM_GETCHECK, 0, 0) == BST_CHECKED) {
@@ -1212,20 +1223,12 @@ DWORD Property::Popup(HINSTANCE hInst, HWND hWnd, LPCTSTR pSelPath)
 
 BOOL Property::Load(BOOL *pStrict)
 {
-	DWORD res, sam, typ, siz;
+	DWORD res, typ, siz;
 	HKEY hTomboRoot;
 
-#ifdef _WIN32_WCE
-	res = RegCreateKeyEx(HKEY_CURRENT_USER, TOMBO_MAIN_KEY, 0, NULL, 0,
-				0, NULL, &hTomboRoot, &sam);
-#else
-	res = RegCreateKeyEx(HKEY_CURRENT_USER, TOMBO_MAIN_KEY, 0, NULL, REG_OPTION_NON_VOLATILE,
-				KEY_ALL_ACCESS, NULL, &hTomboRoot, &sam);
-#endif
-	if (res != ERROR_SUCCESS) {
-		SetLastError(res);
-		return FALSE;
-	}
+	hTomboRoot = GetTomboRootKey();
+	if (hTomboRoot == NULL) return FALSE;
+
 	*pStrict = TRUE;
 
 	// メモトップフォルダパス
@@ -1414,6 +1417,14 @@ BOOL Property::Load(BOOL *pStrict)
 	}
 #endif
 
+	TCHAR buf[1024];
+	siz = 1024;
+	res = RegQueryValueEx(hTomboRoot, TOMBO_WINSIZE_ATTR_NAME2, NULL, &typ, (LPBYTE)buf, &siz);
+	if (res != ERROR_SUCCESS) {
+		pWinSize = NULL;
+	}
+	pWinSize = StringDup(buf);
+
 #if defined(PLATFORM_WIN32)
 	nTopMost = GetDWORDFromReg(hTomboRoot, STAYTOPMOST_ATTR_NAME, 0);
 	nHideRebar = GetDWORDFromReg(hTomboRoot, HIDEREBAR_ATTR_NAME, 0);
@@ -1448,6 +1459,32 @@ BOOL Property::Load(BOOL *pStrict)
 
 	nUseYAEdit = GetDWORDFromReg(hTomboRoot, USEYAE_ATTR_NAME, FALSE);
 
+	// load bookmark
+	delete[] pBookMark;
+	pBookMark = GetMultiSZFromReg(hTomboRoot, BOOKMARK_ATTR_NAME);
+
+	delete [] pSearchHistory;
+	pSearchHistory = GetMultiSZFromReg(hTomboRoot, TOMBO_SEARCHHIST_ATTR_NAME); 
+
+	delete [] pTopDirHistory;
+	pTopDirHistory = GetMultiSZFromReg(hTomboRoot, TOMBO_TOPDIRHIST_ATTR_NAME);
+
+#if defined(PLATFORM_PKTPC) && defined(FOR_VGA)
+	nWinSize2 = GetDWORDFromReg(hTomboRoot, TOMBO_WINSIZE_ATTR_NAME3, 0xFFFF);
+#endif
+
+#if defined(PLATFORM_HPC)
+	LPCOMMANDBANDSRESTOREINFO pcbi = new COMMANDBANDSRESTOREINFO[NUM_COMMANDBAR];
+	siz = sizeof(COMMANDBANDSRESTOREINFO) * NUM_COMMANDBAR;
+	res = RegQueryValueEx(hTomboRoot, TOMBO_REBARHIST_ATTR_NAME, 0, 
+						&typ, (LPBYTE)pcbi, &siz);
+
+	if (siz == NUM_COMMANDBAR * sizeof(COMMANDBANDSRESTOREINFO)) {
+		delete []pCmdBarInfo;
+		pCmdBarInfo = pcbi;
+	}
+#endif
+
 	RegCloseKey(hTomboRoot);
 	return TRUE;
 }
@@ -1458,20 +1495,11 @@ BOOL Property::Load(BOOL *pStrict)
 
 BOOL Property::Save()
 {
-	DWORD sam, res;
 	HKEY hTomboRoot;
+	DWORD res;
 
-#ifdef _WIN32_WCE
-	res = RegCreateKeyEx(HKEY_CURRENT_USER, TOMBO_MAIN_KEY, 0, NULL, 0,
-				0, NULL, &hTomboRoot, &sam);
-#else
-	res = RegCreateKeyEx(HKEY_CURRENT_USER, TOMBO_MAIN_KEY, 0, NULL, REG_OPTION_NON_VOLATILE,
-				KEY_ALL_ACCESS, NULL, &hTomboRoot, &sam);
-#endif
-	if (res != ERROR_SUCCESS) {
-		SetLastError(res);
-		return FALSE;
-	}
+	hTomboRoot = GetTomboRootKey();
+	if (hTomboRoot == NULL) return FALSE;
 
 	// メモトップフォルダパス
 	if (!SetSZToReg(hTomboRoot, TOPDIR_ATTR_NAME, aTopDir)) return FALSE;
@@ -1557,6 +1585,30 @@ BOOL Property::Save()
 	if (!SetSZToReg(hTomboRoot, EXTAPP2_ATTR_NAME, aExtApp2)) return FALSE;
 	
 	if (!SetDWORDToReg(hTomboRoot, SAFEFILENAME_ATTR_NAME, nSafeFileName)) return FALSE;
+
+	if (!SetDWORDToReg(hTomboRoot, WRAPTEXT_ATTR_NAME, nWrapText)) return FALSE;
+
+#if defined(PLATFORM_WIN32)
+	if (!SetDWORDToReg(hTomboRoot, STAYTOPMOST_ATTR_NAME, nTopMost)) return FALSE;
+#endif
+#if defined(PLATFORM_HPC) || defined(PLATFORM_WIN32)
+	if (!SetDWORDToReg(hTomboRoot, HIDESTATUSBAR_ATTR_NAME, nHideStatusBar)) return FALSE;
+#endif
+
+	if (!SetMultiSZToReg(hTomboRoot, BOOKMARK_ATTR_NAME, pBookMark, CountMultiSZLen(pBookMark) * sizeof(TCHAR))) return FALSE;
+	if (!SetMultiSZToReg(hTomboRoot, TOMBO_SEARCHHIST_ATTR_NAME, pSearchHistory, CountMultiSZLen(pSearchHistory) * sizeof(TCHAR))) return FALSE;
+	if (!SetMultiSZToReg(hTomboRoot, TOMBO_TOPDIRHIST_ATTR_NAME, pTopDirHistory, CountMultiSZLen(pTopDirHistory) * sizeof(TCHAR))) return FALSE;
+
+	if (!SetSZToReg(hTomboRoot, TOMBO_WINSIZE_ATTR_NAME2, pWinSize)) return FALSE;
+
+#if defined(PLATFORM_PKTPC) && defined(FOR_VGA)
+	if (!SetDWORDToReg(hTomboRoot, TOMBO_WINSIZE_ATTR_NAME3, nWinSize2)) return FALSE;
+#endif
+
+#if defined(PLATFORM_HPC)
+	if (RegSetValueEx(hTomboRoot, TOMBO_REBARHIST_ATTR_NAME, 0, 
+					REG_BINARY, (LPBYTE)pCmdBarInfo, sizeof(COMMANDBANDSRESTOREINFO) * NUM_COMMANDBAR) != ERROR_SUCCESS) return FALSE;
+#endif
 
 #if defined(PLATFORM_BE500)
 	CGDFlushRegistry();
@@ -1689,7 +1741,7 @@ static DWORD GetDWORDFromReg(HKEY hKey, LPCTSTR pAttr, DWORD nDefault)
 	return nValue;
 }
 
-static LPTSTR GetMultiSZFromReg(HKEY hKey, LPCTSTR pAttr, LPDWORD pSize)
+static LPTSTR GetMultiSZFromReg(HKEY hKey, LPCTSTR pAttr)
 {
 	DWORD res, siz, typ;
 	res = RegQueryValueEx(hKey, pAttr, NULL, &typ, NULL, &siz);
@@ -1698,7 +1750,6 @@ static LPTSTR GetMultiSZFromReg(HKEY hKey, LPCTSTR pAttr, LPDWORD pSize)
 		SetLastError(res);
 		return NULL;
 	}
-	*pSize = siz;
 
 	LPTSTR pBuf;
 	DWORD n = siz / sizeof(TCHAR) + 1;
@@ -1721,6 +1772,8 @@ static LPTSTR GetMultiSZFromReg(HKEY hKey, LPCTSTR pAttr, LPDWORD pSize)
 
 static BOOL SetMultiSZToReg(HKEY hKey, LPCTSTR pAttr, LPCTSTR pValue, DWORD nSize)
 {
+	if (pValue == NULL) return TRUE;
+
 	DWORD res;
 	DWORD typ;
 #if defined(PLATFORM_WIN32)
@@ -1774,21 +1827,14 @@ BOOL Property::SaveWinSize(UINT flags, UINT showCmd, LPRECT pWinRect, WORD nSele
 {
 	TCHAR buf[1024];
 
-	HKEY hTomboRoot = GetTomboRootKey();
-	if (!hTomboRoot) return FALSE;
-
 	wsprintf(buf, TEXT("%d,%d,%d,%d,%d,%d,%d"), 
 		flags, showCmd,
 		pWinRect->left, pWinRect->top,
 		pWinRect->right, pWinRect->bottom,
 		nSelectViewWidth);
 
-	if (!SetSZToReg(hTomboRoot, TOMBO_WINSIZE_ATTR_NAME2, buf)) {
-		RegCloseKey(hTomboRoot);
-		return FALSE;
-	}
-
-	RegCloseKey(hTomboRoot);
+	delete [] pWinSize;
+	pWinSize = StringDup(buf);
 	return TRUE;
 }
 
@@ -1798,83 +1844,66 @@ BOOL Property::SaveWinSize(UINT flags, UINT showCmd, LPRECT pWinRect, WORD nSele
 
 BOOL Property::GetWinSize(UINT *pFlags, UINT *pShowCmd, LPRECT pWinRect, LPWORD pSelectViewWidth)
 {
-	HKEY hTomboRoot = GetTomboRootKey();
-	if (!hTomboRoot) return FALSE;
-
-	DWORD res, typ, siz;
-	TCHAR buf[1024];
-
-	siz = 1024;
-	res = RegQueryValueEx(hTomboRoot, TOMBO_WINSIZE_ATTR_NAME2, NULL, &typ, (LPBYTE)buf, &siz);
-	if (res != ERROR_SUCCESS || typ != REG_SZ) {
-		SetLastError(res);
-		RegCloseKey(hTomboRoot);
+	if (pWinSize == NULL) {
+		SetLastError(ERROR_INVALID_DATA);
 		return FALSE;
 	}
-	if (_stscanf(buf, TEXT("%d,%d,%d,%d,%d,%d,%d"),
+
+	if (_stscanf(pWinSize, TEXT("%d,%d,%d,%d,%d,%d,%d"),
 		pFlags, pShowCmd,
 		&(pWinRect->left), &(pWinRect->top),
 		&(pWinRect->right), &(pWinRect->bottom),
 		pSelectViewWidth) != 7) {
 
 		SetLastError(ERROR_INVALID_DATA);
-		RegCloseKey(hTomboRoot);
 		return FALSE;
 	}
 	// check and modify window position
 	if (pWinRect->left < 0) pWinRect->left = 0;
 	if (pWinRect->top < 0) pWinRect->top = 0;
 
-	RegCloseKey(hTomboRoot);
 	return TRUE;
 }
 
 #if defined(PLATFORM_PKTPC) && defined(FOR_VGA)
 WORD Property::GetWinSize2()
 {
-	HKEY hTomboRoot = GetTomboRootKey();
-	if (!hTomboRoot) return 0xFFFF;
-
-	DWORD nWinSize;
-
-	DWORD siz = sizeof(nWinSize);
-	DWORD typ;
-	DWORD res = RegQueryValueEx(hTomboRoot, TOMBO_WINSIZE_ATTR_NAME3, NULL, &typ, (LPBYTE)&nWinSize, &siz);
-	if (res != ERROR_SUCCESS) {
-		SetLastError(res);
-		return 0xFFFF;
-	}
-
-	RegCloseKey(hTomboRoot);
-	return (WORD)nWinSize;
+	return (WORD)nWinSize2;
 }
 
 BOOL Property::SaveWinSize2(WORD nSelectViewWidth)
 {
-	HKEY hTomboRoot = GetTomboRootKey();
-	if (!hTomboRoot) return FALSE;
-
-	BOOL bResult = SetDWORDToReg(hTomboRoot, TOMBO_WINSIZE_ATTR_NAME3, nSelectViewWidth);
-
-	RegCloseKey(hTomboRoot);
-	return bResult;
+	nWinSize2 = nSelectViewWidth;
+	return TRUE;
 }
 
 #endif
 
-///////////////////////////////////////////////////
-// ペイン切り替え
-///////////////////////////////////////////////////
-
 void Property::SetUseTwoPane(BOOL bPane) 
 {
 	nUseTwoPane = bPane;
-	
-	HKEY hTomboRoot = GetTomboRootKey();
-	if (!hTomboRoot) return;
+}
 
-	if (!SetDWORDToReg(hTomboRoot, USE_TWO_PANE_ATTR_NAME, nUseTwoPane)) return;
-	RegCloseKey(hTomboRoot);
+LPCTSTR Property::GetSearchHist() 
+{
+	return pSearchHistory;
+}
+
+LPCTSTR Property::GetTopDirHist()
+{
+	return pTopDirHistory;
+}
+
+void Property::SetSearchHist(LPTSTR pHist)
+{
+	delete [] pSearchHistory;
+	pSearchHistory = pHist;
+}
+
+void Property::SetTopDirHist(LPTSTR pHist)
+{
+	delete [] pTopDirHistory;
+	pTopDirHistory = pHist;
 }
 
 ///////////////////////////////////////////////////
@@ -1900,57 +1929,23 @@ static HKEY GetTomboRootKey()
 	return hTomboRoot;
 }
 
-///////////////////////////////////////////////////
-// 検索履歴
-///////////////////////////////////////////////////
-
-LPTSTR LoadStringHistory(LPCTSTR pAttrName)
-{
-	HKEY hTomboRoot = GetTomboRootKey();
-	if (!hTomboRoot) return NULL;
-	DWORD nSize;
-	LPTSTR p = GetMultiSZFromReg(hTomboRoot, pAttrName, &nSize);
-	if (p) RegCloseKey(hTomboRoot);
-	return p;
-}
-
-BOOL StoreStringHistory(LPCTSTR pAttrName, LPCTSTR pHistString, DWORD nSize)
-{
-	HKEY hTomboRoot = GetTomboRootKey();
-	if (!hTomboRoot) return FALSE;
-	if (SetMultiSZToReg(hTomboRoot, pAttrName, pHistString, nSize)) {
-		RegCloseKey(hTomboRoot);
-		return TRUE;
-	} else {
-		return FALSE;
-	}
-}
-
 ////////////////////////////////////////////////////////////////
-// 履歴の呼び出し
+// Get/Set History from/to ComboBox
 ////////////////////////////////////////////////////////////////
 
-BOOL LoadHistory(HWND hCombo, LPCTSTR pAttrName)
+BOOL SetHistoryToComboBox(HWND hCombo, LPCTSTR pHistoryStr)
 {
-	LPTSTR p = LoadStringHistory(pAttrName);
-	if (p) {
-		LPTSTR q = p;
-		while(*q) {
-			SendMessage(hCombo, CB_ADDSTRING, 0, (LPARAM)q);
-			q += _tcslen(q) + 1;
-		}
-		delete [] p;
+	LPCTSTR p = pHistoryStr;
+	LPCTSTR q = p;
+	while(*q) {
+		SendMessage(hCombo, CB_ADDSTRING, 0, (LPARAM)q);
+		q += _tcslen(q) + 1;
 	}
 	SendMessage(hCombo, CB_SETCURSEL, 0, 0);
 	return TRUE;
 }
 
-
-////////////////////////////////////////////////////////////////
-// 履歴の保存
-////////////////////////////////////////////////////////////////
-
-BOOL RetrieveAndSaveHistory(HWND hCombo, LPCTSTR pAttrName, LPCTSTR pSelValue, DWORD nSave)
+LPTSTR GetHistoryFromComboBox(HWND hCombo, LPCTSTR pSelValue, DWORD nSave)
 {
 	DWORD nItems = SendMessage(hCombo, CB_GETCOUNT, 0, 0);
 	if (nItems > nSave) nItems = nSave;
@@ -1958,7 +1953,6 @@ BOOL RetrieveAndSaveHistory(HWND hCombo, LPCTSTR pAttrName, LPCTSTR pSelValue, D
 	DWORD i;
 	DWORD nMatch = SendMessage(hCombo, CB_FINDSTRINGEXACT, (WPARAM)-1, (LPARAM)pSelValue);
 
-	// 必要領域のカウント
 	DWORD nBufLen = _tcslen(pSelValue) + 1;
 	DWORD nLen;
 	for (i = 0; i < nItems; i++) {
@@ -1970,14 +1964,12 @@ BOOL RetrieveAndSaveHistory(HWND hCombo, LPCTSTR pAttrName, LPCTSTR pSelValue, D
 	}
 	nBufLen++;
 
-	// 領域の確保
 	LPTSTR p = new TCHAR[nBufLen];
 	if (!p) {
 		SetLastError(ERROR_NOT_ENOUGH_MEMORY);
 		return FALSE;
 	}
 
-	// 保存用バッファ生成
 	LPTSTR q = p;
 	_tcscpy(q, pSelValue);
 	q += _tcslen(pSelValue) + 1;
@@ -1987,56 +1979,7 @@ BOOL RetrieveAndSaveHistory(HWND hCombo, LPCTSTR pAttrName, LPCTSTR pSelValue, D
 		q += _tcslen(q) + 1;
 	}
 	*q = TEXT('\0');
-
-	BOOL bResult = StoreStringHistory(pAttrName, p, nBufLen * sizeof(TCHAR));
-	delete [] p; 
-
-	return bResult;
-}
-
-///////////////////////////////////////////////////
-// Save statusbar info
-///////////////////////////////////////////////////
-
-BOOL Property::SaveStatusBarStat()
-{
-#if defined(PLATFORM_HPC) || defined(PLATFORM_WIN32)
-	HKEY hTomboRoot = GetTomboRootKey();
-	if (!hTomboRoot) return FALSE;
-
-	if (!SetDWORDToReg(hTomboRoot, HIDESTATUSBAR_ATTR_NAME, nHideStatusBar)) return FALSE;
-
-	RegCloseKey(hTomboRoot);
-#endif
-	return TRUE;
-}
-
-///////////////////////////////////////////////////
-// Save topmost stat
-///////////////////////////////////////////////////
-
-BOOL Property::SaveTopMostStat()
-{
-#if defined(PLATFORM_WIN32)
-	HKEY hTomboRoot = GetTomboRootKey();
-	if (!hTomboRoot) return FALSE;
-
-	if (!SetDWORDToReg(hTomboRoot, STAYTOPMOST_ATTR_NAME, nTopMost)) return FALSE;
-
-	RegCloseKey(hTomboRoot);
-#endif
-	return TRUE;
-}
-
-BOOL Property::SaveWrapTextStat()
-{
-	HKEY hTomboRoot = GetTomboRootKey();
-	if (!hTomboRoot) return FALSE;
-
-	if (!SetDWORDToReg(hTomboRoot, WRAPTEXT_ATTR_NAME, nWrapText)) return FALSE;
-
-	RegCloseKey(hTomboRoot);
-	return TRUE;
+	return p;
 }
 
 ///////////////////////////////////////////////////
@@ -2044,43 +1987,19 @@ BOOL Property::SaveWrapTextStat()
 ///////////////////////////////////////////////////
 #if defined(PLATFORM_HPC)
 
-BOOL SetCommandbarInfo(LPCOMMANDBANDSRESTOREINFO p, DWORD n)
+BOOL Property::SetCommandbarInfo(LPCOMMANDBANDSRESTOREINFO p, DWORD n)
 {
-	HKEY hTomboRoot = GetTomboRootKey();
-	if (!hTomboRoot) return FALSE;
-
-	DWORD res = RegSetValueEx(hTomboRoot, TOMBO_REBARHIST_ATTR_NAME, 0, 
-					REG_BINARY, (LPBYTE)p, sizeof(COMMANDBANDSRESTOREINFO)*n);
-	RegCloseKey(hTomboRoot);
-	if (res != ERROR_SUCCESS) {
-		SetLastError(res);
-		return FALSE;
-	} else {
-		return TRUE;
-	}
+	delete[] pCmdBarInfo;
+	pCmdBarInfo = new COMMANDBANDSRESTOREINFO[NUM_COMMANDBAR];
+	memcpy(pCmdBarInfo, p, sizeof(COMMANDBANDSRESTOREINFO) * NUM_COMMANDBAR);
+	return TRUE;
 }
 
-BOOL GetCommandbarInfo(LPCOMMANDBANDSRESTOREINFO p, DWORD n)
+BOOL Property::GetCommandbarInfo(LPCOMMANDBANDSRESTOREINFO p, DWORD n)
 {
-	HKEY hTomboRoot = GetTomboRootKey();
-	if (!hTomboRoot) return FALSE;
-
-	DWORD typ;
-	DWORD siz = n * sizeof(COMMANDBANDSRESTOREINFO);
-
-	DWORD res = RegQueryValueEx(hTomboRoot, TOMBO_REBARHIST_ATTR_NAME, 0, 
-						&typ, (LPBYTE)p, &siz);
-
-	if (siz != n * sizeof(COMMANDBANDSRESTOREINFO)) {
-		res = ERROR_INVALID_DATA;
-	}
-	RegCloseKey(hTomboRoot);
-	if (res != ERROR_SUCCESS) {
-		SetLastError(res);
-		return FALSE;
-	} else {
-		return TRUE;
-	}
+	if (pCmdBarInfo == NULL) return FALSE;
+	memcpy(p, pCmdBarInfo, sizeof(COMMANDBANDSRESTOREINFO) * NUM_COMMANDBAR);
+	return TRUE;
 }
 
 #endif
@@ -2095,38 +2014,40 @@ BOOL Property::SetDefaultTomboRoot(LPCTSTR p, DWORD nLen)
 	return TRUE;
 }
 
+static DWORD CountMultiSZLen(LPCTSTR pData)
+{
+	LPCTSTR p = pData;
+	DWORD n = 0;
+	while(*p) {
+		DWORD i = _tcslen(p) + 1;
+		p += i;
+		n += i;
+	}
+	n++;
+	return n;
+}
 
 ///////////////////////////////////////////////////
 // BookMark
 ///////////////////////////////////////////////////
 
 
-LPTSTR LoadBookMarkFromReg()
+LPCTSTR Property::GetBookMark()
 {
-	HKEY hTomboRoot = GetTomboRootKey();
-	if (!hTomboRoot) return NULL;
-	DWORD nSize;
-	LPTSTR p = GetMultiSZFromReg(hTomboRoot, BOOKMARK_ATTR_NAME, &nSize);
-	if (p) RegCloseKey(hTomboRoot);
-	return p;
+	return pBookMark;
 }
 
-BOOL StoreBookMarkToReg(LPCTSTR pBookMark)
+BOOL Property::SetBookMark(LPCTSTR pBM)
 {
-	LPCTSTR p = pBookMark;
-	DWORD nSize = 0;
-	while (*p) {
-		nSize += (_tcslen(p) + 1) * sizeof(TCHAR);
-		p += _tcslen(p) + 1;
-	}
-	nSize++;
+	DWORD nSize = CountMultiSZLen(pBM);
 
-	HKEY hTomboRoot = GetTomboRootKey();
-	if (!hTomboRoot) return FALSE;
-	if (SetMultiSZToReg(hTomboRoot, BOOKMARK_ATTR_NAME, pBookMark, nSize)) {
-		RegCloseKey(hTomboRoot);
-		return TRUE;
-	} else {
-		return FALSE;
+	LPTSTR pBuf = new TCHAR[nSize];
+	if (pBuf == NULL) return FALSE;
+	for (DWORD i = 0; i < nSize; i++) {
+		pBuf[i] = pBM[i];
 	}
+	delete[] pBookMark;
+
+	pBookMark = pBuf;
+	return TRUE;
 }

@@ -80,7 +80,8 @@ void SearchDialog::InitDialog(HWND hDlg)
 	hDialog = hDlg;
 
 	HWND hCombo = GetDlgItem(hDlg, IDC_SEARCH_STRING);
-	LoadHistory(hCombo, TOMBO_SEARCHHIST_ATTR_NAME);
+	LPCTSTR pHist = g_Property.GetSearchHist();
+	SetHistoryToComboBox(hCombo, pHist);
 
 	HWND hCheckEncrypt = GetDlgItem(hDlg, IDC_SEARCH_ENCRYPTMEMO);
 	EnableWindow(hCheckEncrypt, bCheckEncrypt);
@@ -151,7 +152,7 @@ BOOL SearchDialog::OnOK()
 	if (pSearchTextW == NULL) return FALSE;
 	GetWindowText(hSearchWord, pSearchTextW, n + 1);
 	
-	RetrieveAndSaveHistory(hSearchWord, TOMBO_SEARCHHIST_ATTR_NAME, pSearchTextW, NUM_SEARCH_HISTORY);
+	g_Property.SetSearchHist(GetHistoryFromComboBox(hSearchWord, pSearchTextW, NUM_SEARCH_HISTORY));
 	pSearchStr = pSearchTextW;
 	return TRUE;
 }

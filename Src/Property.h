@@ -74,6 +74,15 @@ class Property {
 
 	DWORD nUseYAEdit;
 
+	LPTSTR pWinSize;
+#if defined(PLATFORM_PKTPC) && defined(FOR_VGA)
+	DWORD nWinSize2;
+#endif
+
+#if defined(PLATFORM_HPC)
+	LPCOMMANDBANDSRESTOREINFO pCmdBarInfo;
+#endif
+
 public:
 	Property();
 	~Property();
@@ -174,17 +183,13 @@ public:
 	BOOL OpenReadOnly() { return bOpenReadOnly; }
 
 	// save restore main window size
-	static BOOL SaveWinSize(UINT flags, UINT showCmd, LPRECT pWinRect, WORD nSelectViewWidth);
-	static BOOL GetWinSize(UINT *pFlags, UINT *pShowCmd, LPRECT pWinRect, LPWORD pSelectViewWidth);
+	BOOL SaveWinSize(UINT flags, UINT showCmd, LPRECT pWinRect, WORD nSelectViewWidth);
+	BOOL GetWinSize(UINT *pFlags, UINT *pShowCmd, LPRECT pWinRect, LPWORD pSelectViewWidth);
 
 #if defined(PLATFORM_PKTPC) && defined(FOR_VGA)
-	static WORD GetWinSize2();
-	static BOOL SaveWinSize2(WORD nSelectViewHeight);
+	WORD GetWinSize2();
+	BOOL SaveWinSize2(WORD nSelectViewHeight);
 #endif
-
-	BOOL SaveStatusBarStat();
-	BOOL SaveTopMostStat();
-	BOOL SaveWrapTextStat();
 
 	LPCTSTR GetDefaultNote() { return aDefaultNote; }
 	DWORD DisableSaveDlg() { return nDisableSaveDlg; }
@@ -211,32 +216,35 @@ public:
 	friend class SipTab;
 	friend class DefaultNoteTab;
 	friend class ExtAppTab;
+
+	LPCTSTR GetBookMark();
+	BOOL SetBookMark(LPCTSTR pBookMark);
+
+	LPTSTR pSearchHistory;
+	LPTSTR pTopDirHistory;
+
+	LPCTSTR GetSearchHist();
+	LPCTSTR GetTopDirHist();
+	void SetSearchHist(LPTSTR pHist);
+	void SetTopDirHist(LPTSTR pHist);
+
+#if defined(PLATFORM_HPC)
+	////////////////////////////////////
+	// save commandbar position
+	BOOL SetCommandbarInfo(LPCOMMANDBANDSRESTOREINFO p, DWORD n);
+	BOOL GetCommandbarInfo(LPCOMMANDBANDSRESTOREINFO p, DWORD n);
+#endif
+
 };
 
 ////////////////////////////////////
 // Search history
 ////////////////////////////////////
 
-LPTSTR LoadStringHistory(LPCTSTR pAttrName);
-BOOL StoreStringHistory(LPCTSTR pAttrName, LPCTSTR pHistString, DWORD nSize);
-BOOL RetrieveAndSaveHistory(HWND hCombo, LPCTSTR pAttrName, LPCTSTR pSelValue, DWORD nSave);
-BOOL LoadHistory(HWND hCombo, LPCTSTR pAttrName);
+BOOL SetHistoryToComboBox(HWND hCombo, LPCTSTR pHistoryStr);
+LPTSTR GetHistoryFromComboBox(HWND hCombo, LPCTSTR pSelValue, DWORD nSave);
 
-////////////////////////////////////
-// Bookmark
-////////////////////////////////////
 
-LPTSTR LoadBookMarkFromReg();
-BOOL StoreBookMarkToReg(LPCTSTR pBookMark);
-
-////////////////////////////////////
-// save commandbar position
-////////////////////////////////////
-
-#if defined(PLATFORM_HPC)
-BOOL SetCommandbarInfo(LPCOMMANDBANDSRESTOREINFO p, DWORD n);
-BOOL GetCommandbarInfo(LPCOMMANDBANDSRESTOREINFO p, DWORD n);
-#endif
 
 ////////////////////////////////////
 // global var declaration
@@ -246,8 +254,9 @@ extern Property g_Property;
 /////////////////////////////////////////////
 // attribute name definitions
 /////////////////////////////////////////////
-
 #define TOMBO_SEARCHHIST_ATTR_NAME TEXT("SearchHistory")
 #define TOMBO_TOPDIRHIST_ATTR_NAME TEXT("TopDirHistory")
+
+#define NUM_COMMANDBAR 2
 
 #endif
