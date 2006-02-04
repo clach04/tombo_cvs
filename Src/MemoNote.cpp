@@ -134,16 +134,6 @@ LPBYTE CryptedMemoNote::GetMemoBodySub(LPCTSTR pTopDir, PasswordManager *pMgr, L
 		if (bCancel) SetLastError(ERROR_CANCELLED);
 		return NULL;
 	}
-	if (g_Property.FingerPrint()) {
-		if (!CheckFingerPrint(g_Property.FingerPrint(), pPassword)) {
-			if (TomboMessageBox(NULL, MSG_PASS_NOT_MATCH2, MSG_PASS_MISMATCH_TTL, MB_ICONQUESTION | MB_YESNO) == IDNO) {
-				pMgr->ForgetPassword();
-				return NULL;
-			}
-			bRegistedPassword = FALSE;
-		}
-	}
-
 	if (!cMgr.Init(pPassword)) return NULL;
 
 	LPBYTE pPlain = cMgr.LoadAndDecrypt(pSize, sFileName.Get());
@@ -203,13 +193,6 @@ BOOL CryptedMemoNote::SaveData(PasswordManager *pMgr, const char *pText, LPCTSTR
 	const char *pPassword = pMgr->Password(&bCancel, TRUE);
 	if (pPassword == NULL) return FALSE;
 
-	if (g_Property.FingerPrint()) {
-		if (!CheckFingerPrint(g_Property.FingerPrint(), pPassword)) {
-			TomboMessageBox(NULL, MSG_PASS_NOT_MATCH3, MSG_PASS_MISMATCH_TTL, MB_ICONWARNING | MB_OK);
-			pMgr->ForgetPassword();
-			return NULL;
-		}
-	}
 	if (!cMgr.Init(pPassword)) {
 		MessageBox(NULL, TEXT("In CryptedMemoNote::SaveData,CryptManager::Init failed"), TEXT("DEBUG"), MB_OK);
 		return FALSE;
@@ -240,7 +223,7 @@ MemoNote *CryptedMemoNote::Decrypt(LPCTSTR pTopDir, PasswordManager *pMgr, TStri
 	TString sFullPath;
 	LPTSTR pNotePath;
 	TString sHeadLine;
-	if (g_Property.KeepTitle()) {
+	if (g_Property.GetKeepTitle()) {
 		if (!GetHeadLineFromFilePath(pPath, &sHeadLine)) return FALSE;
 	} else {
 		if (!GetHeadLineFromMemoText(pText, &sHeadLine)) return FALSE;

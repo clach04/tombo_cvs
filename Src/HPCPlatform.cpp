@@ -65,7 +65,7 @@ void HPCPlatform::Create(HWND hWnd, HINSTANCE hInst)
 	REBARBANDINFO arbbi[2];
 
 	pStatusBar = new StatusBar();
-	pStatusBar->Create(hWnd, g_Property.IsUseTwoPane());
+	pStatusBar->Create(hWnd, g_Property.GetUseTwoPane());
 
 	// CommandBandê∂ê¨
 	HIMAGELIST himl = ImageList_Create(16,16,ILC_COLOR, 0, 1);
@@ -240,7 +240,7 @@ void HPCPlatform::AdjustUserRect(RECT *r)
 	DWORD nHOffset = CommandBands_Height(hMSCmdBar);
 
 	WORD nStatusHeight;
-	if (g_Property.HideStatusBar()) {
+	if (g_Property.GetHideStatusBar()) {
 		nStatusHeight = 0;
 	} else {
 		nStatusHeight = GetStatusBarHeight();

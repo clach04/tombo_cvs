@@ -86,7 +86,7 @@ BOOL MemoDetailsView::DiscardMemo()
 
 BOOL MemoDetailsView::StoreCursorPos()
 {
-	if (g_Property.KeepCaret()) {
+	if (g_Property.GetKeepCaret()) {
 
 		DWORD nPos = GetCursorPos();
 		DWORD nInitPos = GetInitialPos();
@@ -343,7 +343,7 @@ BOOL SimpleEditor::SetMemo(LPCTSTR pMemo, DWORD nPos, BOOL bReadOnly)
 	nInitialPos = nPos;
 
 	SetWindowText(hViewWnd, pMemo);
-	if (g_Property.KeepCaret()) {
+	if (g_Property.GetKeepCaret()) {
 		SendMessage(hViewWnd, EM_SETSEL, nPos, nPos);
 		PostMessage(hViewWnd, EM_SCROLLCARET, 0, 0);
 	}
@@ -701,7 +701,7 @@ BOOL SimpleEditor::SetFolding(BOOL bFold)
 /////////////////////////////////////////
 
 void SimpleEditor::SetTabstop() {
-	DWORD n = g_Property.Tabstop() * 4;
+	DWORD n = g_Property.GetTabstop() * 4;
 	SendMessage(hViewWnd_fd, EM_SETTABSTOPS, 1, (LPARAM)&n);
 	SendMessage(hViewWnd_nf, EM_SETTABSTOPS, 1, (LPARAM)&n);
 }
@@ -784,7 +784,7 @@ void SimpleEditor::InsertDate1()
 	TString sPathStr;
 	pManager->GetCurrentSelectedPath(&sPathStr);
 
-	if (!GetDateText(&sDate, g_Property.DateFormat1(), &sPathStr)) {
+	if (!GetDateText(&sDate, g_Property.GetDateFormat1(), &sPathStr)) {
 		TomboMessageBox(NULL, MSG_GET_DATE_FAILED, TEXT("ERROR"), MB_ICONERROR | MB_OK);
 		return;
 	}
@@ -798,7 +798,7 @@ void SimpleEditor::InsertDate2()
 	TString sPathStr;
 	pManager->GetCurrentSelectedPath(&sPathStr);
 
-	if (!GetDateText(&sDate, g_Property.DateFormat2(), &sPathStr)) {
+	if (!GetDateText(&sDate, g_Property.GetDateFormat2(), &sPathStr)) {
 		TomboMessageBox(NULL, MSG_GET_DATE_FAILED, TEXT("ERROR"), MB_ICONERROR | MB_OK);
 		return;
 	}

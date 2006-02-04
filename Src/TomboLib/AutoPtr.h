@@ -12,6 +12,17 @@ public:
 	void releaseAndSet(T* p) { delete pPtr; pPtr = p; }
 };
 
+template <class T>
+class ArrayAutoPointer {
+	T* pPtr;
+public:
+	ArrayAutoPointer(T* p = NULL) : pPtr(p) {}
+	~ArrayAutoPointer() { delete [] pPtr; }
+
+	void set(T* p) { pPtr = p; }
+	void releaseAndSet(T* p) { delete [] pPtr; pPtr = p; }
+};
+
 class SecureBufferAutoPointerT {
 	LPTSTR pPtr;
 public:

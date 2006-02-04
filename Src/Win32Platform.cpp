@@ -76,7 +76,7 @@ static HWND CreateToolBar(HWND hParent, HINSTANCE hInst)
 void Win32Platform::Create(HWND hWnd, HINSTANCE hInst)
 {
 	pStatusBar = new StatusBar();
-	pStatusBar->Create(hWnd, g_Property.IsUseTwoPane());
+	pStatusBar->Create(hWnd, g_Property.GetUseTwoPane());
 
 	 hRebar = CreateWindowEx(WS_EX_TOOLWINDOW, REBARCLASSNAME, NULL,
 								WS_BORDER | RBS_BANDBORDERS | RBS_AUTOSIZE | 
@@ -197,7 +197,7 @@ void Win32Platform::AdjustUserRect(RECT *pRect)
 	// get rebar height
 	WORD nRebarH;
 
-	if (g_Property.HideRebar()) {
+	if (g_Property.GetHideRebar()) {
 		nRebarH = 0;
 	} else {
 		RECT r;
@@ -207,7 +207,7 @@ void Win32Platform::AdjustUserRect(RECT *pRect)
 
 	// get statusbar height
 	WORD nStatusHeight;
-	if (g_Property.HideStatusBar()) {
+	if (g_Property.GetHideStatusBar()) {
 		nStatusHeight = 0;
 	} else {
 		nStatusHeight = GetStatusBarHeight();

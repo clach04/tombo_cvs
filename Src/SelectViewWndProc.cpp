@@ -117,7 +117,7 @@ LRESULT CALLBACK NewSelectViewProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lP
 		break;
 	case WM_SETFOCUS:
 		{
-			if (g_Property.IsUseTwoPane() && pView) {
+			if (g_Property.GetUseTwoPane() && pView) {
 				pView->OnGetFocus();
 			}
 			break;

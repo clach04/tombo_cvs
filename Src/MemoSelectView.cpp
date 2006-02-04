@@ -458,7 +458,7 @@ LRESULT MemoSelectView::OnNotify(HWND hWnd, WPARAM wParam, LPARAM lParam)
 				g_Logger.WriteLog("\r\n");
 			}
 #endif
-			if (!g_Property.IsUseTwoPane() || !pMemoMgr) return FALSE;
+			if (!g_Property.GetUseTwoPane() || !pMemoMgr) return FALSE;
 
 			DWORD nYNC;
 			if (!pMemoMgr->SaveIfModify(&nYNC, FALSE)) {
@@ -522,7 +522,7 @@ LRESULT MemoSelectView::OnNotify(HWND hWnd, WPARAM wParam, LPARAM lParam)
 			// Control menu item
 			ControlMenu();
 
-			if (g_Property.IsUseTwoPane() && (p->action == TVC_BYMOUSE || p->action == TVC_BYKEYBOARD)) {
+			if (g_Property.GetUseTwoPane() && (p->action == TVC_BYMOUSE || p->action == TVC_BYKEYBOARD)) {
 				// change notes if operated by user. Otherwise no switching occured.
 				pMemoMgr->SetMSSearchFlg(TRUE);
 				tvi->LoadMemo(this, FALSE);
@@ -580,7 +580,7 @@ void MemoSelectView::OnNotify_RClick(POINT pt)
 	if (pItem->HasMultiItem()) {
 		nFlg = CTXMENU_DIR;
 	} else {
-		nFlg = CTXMENU_FILE | (g_Property.UseAssociation() ? CTXMENU_USEASSOC : 0);
+		nFlg = CTXMENU_FILE | (g_Property.GetUseAssociation() ? CTXMENU_USEASSOC : 0);
 		if (!((TreeViewFileItem*)pItem)->IsEncrypted()) {
 			nFlg |= CTXMENU_ENABLEEXTAPP;
 		}

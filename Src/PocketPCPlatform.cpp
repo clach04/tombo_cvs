@@ -291,7 +291,7 @@ void PocketPCPlatform::AdjustUserRect(RECT *r)
 
 	if (bStat) {
 		RECT rSip = sc.GetRect();
-		DWORD nDelta = g_Property.SipSizeDelta();
+		DWORD nDelta = g_Property.GetSipSizeDelta();
 	
 		r->bottom -= (rSip.bottom - rSip.top + nDelta);
 	}

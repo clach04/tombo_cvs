@@ -136,7 +136,7 @@ BOOL YAEditor::SetMemo(LPCTSTR pMemoW, DWORD nPos, BOOL bReadOnly)
 	YAEditDoc *pOldDoc = pEdit->SetDoc(pDoc);
 	delete pOldDoc;
 
-	if (g_Property.KeepCaret()) {
+	if (g_Property.GetKeepCaret()) {
 		pEdit->SetCaretPos(nPos);
 	}
 

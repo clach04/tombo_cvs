@@ -913,7 +913,7 @@ BOOL LocalFileRepository::GetAttribute(const TomboURI *pURI, NoteAttribute *pAtt
 	pAttribute->nCursorPos = nPos;
 
 	BOOL bReadOnly;
-	if (!g_Property.OpenReadOnly()) {
+	if (!g_Property.GetOpenReadOnly()) {
 //		if (!pNote->IsReadOnly(&bReadOnly)) {
 //			return FALSE;
 //		}

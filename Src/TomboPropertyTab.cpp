@@ -47,20 +47,20 @@ void FolderTab::Init(HWND hDlg)
 	LPCTSTR pHist = g_Property.GetTopDirHist();
 	SetHistoryToComboBox(hFolder, pHist);
 	if (GetWindowTextLength(hFolder) == 0) {
-		if (pProperty->TopDir()) {
-			SetWindowText(hFolder, pProperty->TopDir());
+		if (pProperty->GetTopDir()) {
+			SetWindowText(hFolder, pProperty->GetTopDir());
 		}
 	}
 
 	HWND hKeepTitle = GetDlgItem(hDlg, IDC_KEEPTITLE);
-	if (pProperty->KeepTitle()) {
+	if (pProperty->GetKeepTitle()) {
 		SendMessage(hKeepTitle, BM_SETCHECK, BST_UNCHECKED, 0);
 	} else {
 		SendMessage(hKeepTitle, BM_SETCHECK, BST_CHECKED, 0);
 	}
 
 	HWND hOpenReadOnly = GetDlgItem(hDlg, IDC_PROP_READONLY);
-	if (pProperty->OpenReadOnly()) {
+	if (pProperty->GetOpenReadOnly()) {
 		SendMessage(hOpenReadOnly, BM_SETCHECK, BST_CHECKED, 0);
 	} else {
 		SendMessage(hOpenReadOnly, BM_SETCHECK, BST_UNCHECKED, 0);
@@ -71,9 +71,9 @@ BOOL FolderTab::Apply(HWND hDlg)
 {
 	HWND hKeepTitle = GetDlgItem(hDlg, IDC_KEEPTITLE);
 	if (SendMessage(hKeepTitle, BM_GETCHECK, 0, 0) == BST_CHECKED) {
-		pProperty->nKeepTitle = FALSE;
+		pProperty->SetKeepTitle(FALSE);
 	} else {
-		pProperty->nKeepTitle = TRUE;
+		pProperty->SetKeepTitle(TRUE);
 	}
 
 	TCHAR aTopPath[MAX_PATH];
@@ -91,13 +91,11 @@ BOOL FolderTab::Apply(HWND hDlg)
 
 #if defined(PLATFORM_WIN32)
 	if (_tcslen(p) == 3 && _istalpha(p[0]) && p[1] == TEXT(':') && p[2] == TEXT('\\')) {
-		_tcscpy(pProperty->aTopDir, p);
-		return TRUE;
+		return pProperty->SetTopDir(p);
 	} else if (_tcslen(p) == 2 && _istalpha(p[0]) && p[1] == TEXT(':')) {
 		p[2] = TEXT('\\');
 		p[3] = TEXT('\0');
-		_tcscpy(pProperty->aTopDir, p);
-		return TRUE;
+		return pProperty->SetTopDir(p);
 	} else {
 		ChopFileSeparator(p);
 	}
@@ -142,13 +140,12 @@ BOOL FolderTab::Apply(HWND hDlg)
 
 	HWND hReadOnly = GetDlgItem(hDlg, IDC_PROP_READONLY);
 	if (SendMessage(hReadOnly, BM_GETCHECK, 0, 0) == BST_CHECKED) {
-		pProperty->bOpenReadOnly = TRUE;
+		pProperty->SetOpenReadOnly(TRUE);
 	} else {
-		pProperty->bOpenReadOnly = FALSE;
+		pProperty->SetOpenReadOnly(FALSE);
 	}
 
-	_tcscpy(pProperty->aTopDir, p);
-	return TRUE;
+	return pProperty->SetTopDir(p);
 }
 
 BOOL FolderTab::OnCommand(HWND hDlg, WPARAM wParam, LPARAM lParam)
@@ -183,11 +180,11 @@ void PassTimeoutTab::Init(HWND hDlg)
 	OverrideDlgMsg(hDlg, -1, aPassTimeout, sizeof(aPassTimeout)/sizeof(DlgMsgRes));
 	HWND hTimeout = GetDlgItem(hDlg, IDC_PASS_TIMEOUT);
 	TCHAR buf[64];
-	wsprintf(buf, TEXT("%d"), pProperty->nPassTimeOut);
+	wsprintf(buf, TEXT("%d"), pProperty->GetPassTimeout());
 	SetWindowText(hTimeout, buf);
 
 	HWND hSafeFileName = GetDlgItem(hDlg, IDC_PASS_TIMEOUT_USE_SAFEFILE);
-	if (pProperty->UseSafeFileName()) {
+	if (pProperty->GetUseSafeFileName()) {
 		SendMessage(hSafeFileName, BM_SETCHECK, BST_CHECKED, 0);
 	} else {
 		SendMessage(hSafeFileName, BM_SETCHECK, BST_UNCHECKED, 0);
@@ -207,13 +204,13 @@ BOOL PassTimeoutTab::Apply(HWND hDlg)
 		SetFocus(hTimeout);
 		return FALSE;
 	}
-	pProperty->nPassTimeOut = n;
+	pProperty->SetPassTimeout(n);
 
 	HWND hSafeFileName = GetDlgItem(hDlg, IDC_PASS_TIMEOUT_USE_SAFEFILE);
 	if (SendMessage(hSafeFileName, BM_GETCHECK, 0, 0) == BST_CHECKED) {
-		pProperty->nSafeFileName = TRUE;
+		pProperty->SetUseSafeFileName(TRUE);
 	} else {
-		pProperty->nSafeFileName = FALSE;
+		pProperty->SetUseSafeFileName(FALSE);
 	}
 	return TRUE;
 }
@@ -315,8 +312,8 @@ void FontTab::Init(HWND hDlg)
 
 	HDC hDC = GetDC(hDlg);
 
-	InitFontControls(hDC, hSelectName, hSelectSize, hSelectUseDefault, hSelectCT, pProperty->aSelectViewFontName, pProperty->nSelectViewFontSize, pProperty->bSelectViewFontQuality);
-	InitFontControls(hDC, hDetailsName, hDetailsSize, hDetailsUseDefault, hDetailsCT, pProperty->aDetailsViewFontName, pProperty->nDetailsViewFontSize, pProperty->bDetailsViewFontQuality);
+	InitFontControls(hDC, hSelectName, hSelectSize, hSelectUseDefault, hSelectCT, pProperty->GetSelectViewFontName(), pProperty->GetSelectViewFontSize(), (BYTE)pProperty->GetSelectViewFontQuality());
+	InitFontControls(hDC, hDetailsName, hDetailsSize, hDetailsUseDefault, hDetailsCT, pProperty->GetDetailsViewFontName(), pProperty->GetDetailsViewFontSize(), (BYTE)pProperty->GetDetailsViewFontQuality());
 
 	ReleaseDC(hDlg, hDC);
 }
@@ -374,13 +371,23 @@ BOOL FontTab::Apply(HWND hDlg)
 	HWND hDetailsSize = GetDlgItem(hDlg, IDC_FONT_DETAILS_SIZE);
 	HWND hDetailsCT   = GetDlgItem(hDlg, IDC_FONT_DETAILS_CLEARTYPE);
 
-	if(!GetFontStat(hSelectName, hSelectSize, hSelectUseDefault, hSelectCT, pProperty->aSelectViewFontName, &(pProperty->nSelectViewFontSize), &(pProperty->bSelectViewFontQuality))) {
-		return FALSE;
-	}
-	if (!GetFontStat(hDetailsName, hDetailsSize, hDetailsUseDefault, hDetailsCT, pProperty->aDetailsViewFontName, &(pProperty->nDetailsViewFontSize), &(pProperty->bDetailsViewFontQuality))) {
-		return FALSE;
-	}
+	TCHAR fontName[LF_FACESIZE];
 
+	DWORD nFS;
+	BYTE nFQ;
+	if(!GetFontStat(hSelectName, hSelectSize, hSelectUseDefault, hSelectCT, fontName, &nFS, &nFQ)) {
+		return FALSE;
+	}
+	if (!pProperty->SetSelectViewFontName(fontName)) return FALSE;
+	pProperty->SetSelectViewFontSize(nFS);
+	pProperty->SetSelectViewFontQuality(nFQ);
+
+	if (!GetFontStat(hDetailsName, hDetailsSize, hDetailsUseDefault, hDetailsCT, fontName, &nFS, &nFQ)) {
+		return FALSE;
+	}
+	if (!pProperty->SetDetailsViewFontName(fontName)) return FALSE;
+	pProperty->SetDetailsViewFontSize(nFS);
+	pProperty->SetDetailsViewFontQuality(nFQ);
 	return TRUE;
 }
 
@@ -438,8 +445,8 @@ void DateFormatTab::Init(HWND hDlg)
 	HWND hFormat1 = GetDlgItem(hDlg, IDC_PROP_DATEFORMAT1);
 	HWND hFormat2 = GetDlgItem(hDlg, IDC_PROP_DATEFORMAT2);
 	HWND hDesc = GetDlgItem(hDlg, IDC_DATEFORMAT_DESC);
-	SetWindowText(hFormat1, pProperty->aDateFormat1);
-	SetWindowText(hFormat2, pProperty->aDateFormat2);
+	SetWindowText(hFormat1, pProperty->GetDateFormat1());
+	SetWindowText(hFormat2, pProperty->GetDateFormat2());
 	DWORD nTS = 4*4;
 	SendMessage(hDesc, EM_SETTABSTOPS, 1, (LPARAM)&nTS);
 //	SetWindowText(hDesc, MSG_DATEFORMAT_DESC);
@@ -450,8 +457,11 @@ BOOL DateFormatTab::Apply(HWND hDlg)
 	HWND hFormat1 = GetDlgItem(hDlg, IDC_PROP_DATEFORMAT1);
 	HWND hFormat2 = GetDlgItem(hDlg, IDC_PROP_DATEFORMAT2);
 
-	GetWindowText(hFormat1, pProperty->aDateFormat1, MAX_DATEFORMAT_LEN - 1);
-	GetWindowText(hFormat2, pProperty->aDateFormat2, MAX_DATEFORMAT_LEN - 1);
+	TCHAR buf[MAX_DATEFORMAT_LEN];
+	GetWindowText(hFormat1, buf, MAX_DATEFORMAT_LEN - 1);
+	if (!pProperty->SetDateFormat1(buf)) return FALSE;
+	GetWindowText(hFormat2, buf, MAX_DATEFORMAT_LEN - 1);
+	if (!pProperty->SetDateFormat2(buf)) return FALSE;
 	return TRUE;
 }
 
@@ -478,7 +488,7 @@ void KeepCaretTab::Init(HWND hDlg)
 	OverrideDlgMsg(hDlg, -1, aKeepCaretRes, sizeof(aKeepCaretRes)/sizeof(DlgMsgRes));
 
 	HWND hWnd = GetDlgItem(hDlg, IDC_PROP_KEEPCARET);
-	if (pProperty->KeepCaret()) {
+	if (pProperty->GetKeepCaret()) {
 		SendMessage(hWnd, BM_SETCHECK, BST_CHECKED, 0);
 	} else {
 		SendMessage(hWnd, BM_SETCHECK, BST_UNCHECKED, 0);
@@ -487,12 +497,12 @@ void KeepCaretTab::Init(HWND hDlg)
 	// tab stop
 	HWND hTabWnd = GetDlgItem(hDlg, IDC_PROP_TABSTOP);
 	TCHAR buf[30];
-	wsprintf(buf, TEXT("%d"), pProperty->Tabstop());
+	wsprintf(buf, TEXT("%d"), pProperty->GetTabstop());
 	SetWindowText(hTabWnd, buf);
 
 #if defined(PLATFORM_WIN32) || defined(PLATFORM_PKTPC)
 	HWND hSwitchTitleWnd = GetDlgItem(hDlg, IDC_PROP_SWITCHTITLE);
-	if (pProperty->SwitchWindowTitle()) {
+	if (pProperty->GetSwitchWindowTitle()) {
 		SendMessage(hSwitchTitleWnd, BM_SETCHECK, BST_CHECKED, 0);
 	} else {
 		SendMessage(hSwitchTitleWnd, BM_SETCHECK, BST_UNCHECKED, 0);
@@ -500,7 +510,7 @@ void KeepCaretTab::Init(HWND hDlg)
 #endif
 
 	HWND hDisableSaveDlg = GetDlgItem(hDlg, IDC_PROPTAB_DISABLESAVEDLG);
-	if (pProperty->nDisableSaveDlg) {
+	if (pProperty->GetDisableSaveDlg()) {
 		SendMessage(hDisableSaveDlg, BM_SETCHECK, BST_CHECKED, 0);
 	} else {
 		SendMessage(hDisableSaveDlg, BM_SETCHECK, BST_UNCHECKED, 0);
@@ -512,9 +522,9 @@ BOOL KeepCaretTab::Apply(HWND hDlg)
 {
 	HWND hWnd = GetDlgItem(hDlg, IDC_PROP_KEEPCARET);
 	if (SendMessage(hWnd, BM_GETCHECK, 0, 0) == BST_CHECKED) {
-		pProperty->nKeepCaret = TRUE;
+		pProperty->SetKeepCaret(TRUE);
 	} else {
-		pProperty->nKeepCaret = FALSE;
+		pProperty->SetKeepCaret(FALSE);
 	}
 
 	// tab stop
@@ -528,22 +538,22 @@ BOOL KeepCaretTab::Apply(HWND hDlg)
 		SetFocus(hTabWnd);
 		return FALSE;
 	}
-	pProperty->nTabstop = n;
+	pProperty->SetTabstop(n);
 
 #if defined(PLATFORM_WIN32) || defined(PLATFORM_PKTPC)
 	HWND hSwitchWnd = GetDlgItem(hDlg, IDC_PROP_SWITCHTITLE);
 	if (SendMessage(hSwitchWnd, BM_GETCHECK, 0, 0) == BST_CHECKED) {
-		pProperty->nSwitchWindowTitle = TRUE;
+		pProperty->SetSwitchWindowTitle(TRUE);
 	} else {
-		pProperty->nSwitchWindowTitle = FALSE;
+		pProperty->SetSwitchWindowTitle(FALSE);
 	}
 #endif
 
 	HWND hDisableSaveDlg = GetDlgItem(hDlg, IDC_PROPTAB_DISABLESAVEDLG);
 	if (SendMessage(hDisableSaveDlg, BM_GETCHECK, 0, 0) == BST_CHECKED) {
-		pProperty->nDisableSaveDlg = TRUE;
+		pProperty->SetDisableSaveDlg(TRUE);
 	} else {
-		pProperty->nDisableSaveDlg = FALSE;
+		pProperty->SetDisableSaveDlg(FALSE);
 	}
 
 	return TRUE;
@@ -576,33 +586,33 @@ void AppButtonTab::Init(HWND hDlg)
 
 	HWND hDisableAppButton = GetDlgItem(hDlg, IDC_PROPTAB_DISABLEACTION);
 
-	if (pProperty->AppButton1()) {
+	if (pProperty->GetAppButton1()) {
 		SendMessage(hAppButton1, BM_SETCHECK, BST_CHECKED, 0);
 	} else {
 		SendMessage(hAppButton1, BM_SETCHECK, BST_UNCHECKED, 0);
 	}
-	if (pProperty->AppButton2()) {
+	if (pProperty->GetAppButton2()) {
 		SendMessage(hAppButton2, BM_SETCHECK, BST_CHECKED, 0);
 	} else {
 		SendMessage(hAppButton2, BM_SETCHECK, BST_UNCHECKED, 0);
 	}
-	if (pProperty->AppButton3()) {
+	if (pProperty->GetAppButton3()) {
 		SendMessage(hAppButton3, BM_SETCHECK, BST_CHECKED, 0);
 	} else {
 		SendMessage(hAppButton3, BM_SETCHECK, BST_UNCHECKED, 0);
 	}
-	if (pProperty->AppButton4()) {
+	if (pProperty->GetAppButton4()) {
 		SendMessage(hAppButton4, BM_SETCHECK, BST_CHECKED, 0);
 	} else {
 		SendMessage(hAppButton4, BM_SETCHECK, BST_UNCHECKED, 0);
 	}
-	if (pProperty->AppButton5()) {
+	if (pProperty->GetAppButton5()) {
 		SendMessage(hAppButton5, BM_SETCHECK, BST_CHECKED, 0);
 	} else {
 		SendMessage(hAppButton5, BM_SETCHECK, BST_UNCHECKED, 0);
 	}
 
-	if (pProperty->DisableExtraActionButton()) {
+	if (pProperty->GetDisableExtraActionButton()) {
 		SendMessage(hDisableAppButton, BM_SETCHECK, BST_CHECKED, 0);
 	} else {
 		SendMessage(hDisableAppButton, BM_SETCHECK, BST_UNCHECKED, 0);
@@ -619,35 +629,35 @@ BOOL AppButtonTab::Apply(HWND hDlg)
 	HWND hDisableAppButton = GetDlgItem(hDlg, IDC_PROPTAB_DISABLEACTION);
 
 	if (SendMessage(hAppButton1, BM_GETCHECK, 0, 0) == BST_CHECKED) {
-		pProperty->nAppButton1 = APPBUTTON_ACTION_ENABLE;
+		pProperty->SetAppButton1(APPBUTTON_ACTION_ENABLE);
 	} else {
-		pProperty->nAppButton1 = APPBUTTON_ACTION_DISABLE;
+		pProperty->SetAppButton1(APPBUTTON_ACTION_DISABLE);
 	}
 	if (SendMessage(hAppButton2, BM_GETCHECK, 0, 0) == BST_CHECKED) {
-		pProperty->nAppButton2 = APPBUTTON_ACTION_ENABLE;
+		pProperty->SetAppButton2(APPBUTTON_ACTION_ENABLE);
 	} else {
-		pProperty->nAppButton2 = APPBUTTON_ACTION_DISABLE;
+		pProperty->SetAppButton2(APPBUTTON_ACTION_DISABLE);
 	}
 	if (SendMessage(hAppButton3, BM_GETCHECK, 0, 0) == BST_CHECKED) {
-		pProperty->nAppButton3 = APPBUTTON_ACTION_ENABLE;
+		pProperty->SetAppButton3(APPBUTTON_ACTION_ENABLE);
 	} else {
-		pProperty->nAppButton3 = APPBUTTON_ACTION_DISABLE;
+		pProperty->SetAppButton3(APPBUTTON_ACTION_DISABLE);
 	}
 	if (SendMessage(hAppButton4, BM_GETCHECK, 0, 0) == BST_CHECKED) {
-		pProperty->nAppButton4 = APPBUTTON_ACTION_ENABLE;
+		pProperty->SetAppButton4(APPBUTTON_ACTION_ENABLE);
 	} else {
-		pProperty->nAppButton4 = APPBUTTON_ACTION_DISABLE;
+		pProperty->SetAppButton4(APPBUTTON_ACTION_DISABLE);
 	}
 	if (SendMessage(hAppButton5, BM_GETCHECK, 0, 0) == BST_CHECKED) {
-		pProperty->nAppButton5 = APPBUTTON_ACTION_ENABLE;
+		pProperty->SetAppButton5(APPBUTTON_ACTION_ENABLE);
 	} else {
-		pProperty->nAppButton5 = APPBUTTON_ACTION_DISABLE;
+		pProperty->SetAppButton5(APPBUTTON_ACTION_DISABLE);
 	}
 
 	if (SendMessage(hDisableAppButton, BM_GETCHECK, 0, 0) == BST_CHECKED) {
-		pProperty->nDisableExtraActionButton = TRUE;
+		pProperty->SetDisableExtraActionButton(TRUE);
 	} else {
-		pProperty->nDisableExtraActionButton = FALSE;
+		pProperty->SetDisableExtraActionButton(FALSE);
 	}
 
 	return TRUE;
@@ -669,7 +679,7 @@ void SipTab::Init(HWND hDlg)
 	OverrideDlgMsg(hDlg, -1, aSIPRes, sizeof(aSIPRes)/sizeof(DlgMsgRes));
 
 	HWND hKeepDelta = GetDlgItem(hDlg, IDC_PROP_SIPDELTA);
-	if (pProperty->SipSizeDelta() != 0) {
+	if (pProperty->GetSipSizeDelta() != 0) {
 		SendMessage(hKeepDelta, BM_SETCHECK, BST_CHECKED, 0);
 	} else {
 		SendMessage(hKeepDelta, BM_SETCHECK, BST_UNCHECKED, 0);
@@ -680,9 +690,9 @@ BOOL SipTab::Apply(HWND hDlg)
 {
 	HWND hKeepDelta = GetDlgItem(hDlg, IDC_PROP_SIPDELTA);
 	if (SendMessage(hKeepDelta, BM_GETCHECK, 0, 0) == BST_CHECKED) {
-		pProperty->nSIPSizeDelta = SIP_DELTA;
+		pProperty->SetSipSizeDelta(SIP_DELTA);
 	} else {
-		pProperty->nSIPSizeDelta = 0;
+		pProperty->SetSipSizeDelta(0);
 	}
 	return TRUE;
 }
@@ -700,7 +710,7 @@ void CodepageTab::Init(HWND hDlg)
 	HWND hWnd = GetDlgItem(hDlg, IDC_CODEPAGE);
 	SendMessage(hWnd, CB_ADDSTRING, 0, (LPARAM)MSG_CODEPAGE_DEFAULT);
 	SendMessage(hWnd, CB_ADDSTRING, 0, (LPARAM)MSG_CODEPAGE_GREEK);
-	if (pProperty->nCodePage == 1253) {
+	if (pProperty->GetCodePage() == 1253) {
 		SendMessage(hWnd, CB_SETCURSEL, 1, 0);
 	} else {
 		SendMessage(hWnd, CB_SETCURSEL, 0, 0);
@@ -711,9 +721,9 @@ BOOL CodepageTab::Apply(HWND hDlg)
 {
 	HWND hWnd = GetDlgItem(hDlg, IDC_CODEPAGE);
 	if (SendMessage(hWnd, CB_GETCURSEL, 0, 0) == 1) {
-		pProperty->nCodePage = 1253; // Greek
+		pProperty->SetCodePage(1253); // Greek
 	} else {
-		pProperty->nCodePage = 0; // default
+		pProperty->SetCodePage(0); // default
 	}
 	return TRUE;
 }
@@ -739,8 +749,9 @@ void DefaultNoteTab::Init(HWND hDlg)
 BOOL DefaultNoteTab::Apply(HWND hDlg)
 {
 	HWND hPath = GetDlgItem(hDlg, IDC_PROPTAB_DEFNOTE_PATH);
-	GetWindowText(hPath, g_Property.aDefaultNote, MAX_PATH);
-	return TRUE;
+	TCHAR buf[MAX_PATH];
+	GetWindowText(hPath, buf, MAX_PATH);
+	return g_Property.SetDefaultNote(buf);
 }
 
 BOOL DefaultNoteTab::OnCommand(HWND hDlg, WPARAM wParam, LPARAM lParam)
@@ -789,23 +800,23 @@ void ExtAppTab::Init(HWND hDlg)
 	OverrideDlgMsg(hDlg, -1, aExtApp, sizeof(aExtApp)/sizeof(DlgMsgRes));
 
 	HWND hUseAssoc = GetDlgItem(hDlg, IDC_PROP_EXTAPP_USEASSOC);
-	if (pProperty->UseAssociation()) {
+	if (pProperty->GetUseAssociation()) {
 		SendMessage(hUseAssoc, BM_SETCHECK, BST_CHECKED, 0);
 	} else {
 		SendMessage(hUseAssoc, BM_SETCHECK, BST_UNCHECKED, 0);
 	}
 
-	SetWindowText(GetDlgItem(hDlg, IDC_PROP_EXTAPP_PATH_EXTAPP1), pProperty->aExtApp1);
-	SetWindowText(GetDlgItem(hDlg, IDC_PROP_EXTAPP_PATH_EXTAPP2), pProperty->aExtApp2);
+	SetWindowText(GetDlgItem(hDlg, IDC_PROP_EXTAPP_PATH_EXTAPP1), pProperty->GetExtApp1());
+	SetWindowText(GetDlgItem(hDlg, IDC_PROP_EXTAPP_PATH_EXTAPP2), pProperty->GetExtApp2());
 }
 
 BOOL ExtAppTab::Apply(HWND hDlg)
 {
 	HWND hWnd = GetDlgItem(hDlg, IDC_PROP_EXTAPP_USEASSOC);
 	if (SendMessage(hWnd, BM_GETCHECK, 0, 0) == BST_CHECKED) {
-		pProperty->nUseAssoc = TRUE;
+		pProperty->SetUseAssociation(TRUE);
 	} else {
-		pProperty->nUseAssoc = FALSE;
+		pProperty->SetUseAssociation(FALSE);
 	}
 	HWND hAp1 = GetDlgItem(hDlg, IDC_PROP_EXTAPP_PATH_EXTAPP1);
 	HWND hAp2 = GetDlgItem(hDlg, IDC_PROP_EXTAPP_PATH_EXTAPP2);
@@ -815,9 +826,9 @@ BOOL ExtAppTab::Apply(HWND hDlg)
 	TString s;
 	if (!s.Alloc(n)) return FALSE;
 	GetWindowText(hAp1, s.Get(), n);
-	_tcsncpy(pProperty->aExtApp1, s.Get(), MAX_PATH);
+	if (!pProperty->SetExtApp1(s.Get())) return FALSE;
 	GetWindowText(hAp2, s.Get(), n);
-	_tcsncpy(pProperty->aExtApp2, s.Get(), MAX_PATH);
+	if (!pProperty->SetExtApp2(s.Get())) return FALSE;
 	return TRUE;
 }
 

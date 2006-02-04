@@ -1074,3 +1074,10 @@ Some bugs are fixed.
 
 - split property page classes to TomboPropertyTab.*
 
+////////////////////////////////
+// B198
+////////////////////////////////
+
+* Save/load properties to/from file.
+  some features are still used registory yet.
+

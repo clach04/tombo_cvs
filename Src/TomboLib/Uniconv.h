@@ -27,6 +27,7 @@ DWORD CountWCBytes(LPCTSTR pStr, DWORD nChar);
 
 
 LPWSTR ConvTCharToWChar(LPCTSTR p);
+LPTSTR ConvWCharToTChar(LPCWSTR p);
 
 //////////////////////////////////
 // UTF-8 <--> UCS2
@@ -37,6 +38,8 @@ char *ConvUCS2ToUTF8(LPCWSTR pStr);
 
 DWORD ConvUTF8PosToUCSPos(const char *pUTF, DWORD nUTFPos);
 DWORD ConvUCSPosToUTF8Pos(const char *pUTF, DWORD nUCSPos);
+
+char *EscapeXMLStr(LPCTSTR pStr);
 
 //////////////////////////////////
 // JIS -> SJIS

@@ -6,6 +6,7 @@
 #endif
 #include "Uniconv.h"
 #include "TString.h"
+#include "AutoPtr.h"
 
 #ifndef ESC
 #define ESC 0x1B
@@ -357,7 +358,7 @@ LPTSTR ConvSJIS2Unicode(const char *p)
 
 #ifdef _WIN32_WCE
 #if defined(PLATFORM_BE500) && defined(TOMBO_LANG_ENGLISH)
-	if (g_Property.CodePage() == 1253) { // Greek codepage
+	if (g_Property.GetCodePage() == 1253) { // Greek codepage
 		MultiByteToWideChar_CP1253((LPCSTR)p, pUni, -1);
 	} else {
 		MultiByteToWideChar(CP_ACP, 0, (LPCSTR)p, -1, pUni, l);
@@ -383,7 +384,7 @@ LPTSTR ConvSJIS2UnicodeWithByte(const char *p, DWORD n)
 
 #ifdef _WIN32_WCE
 #if defined(PLATFORM_BE500) && defined(TOMBO_LANG_ENGLISH)
-	if (g_Property.CodePage() == 1253) {
+	if (g_Property.GetCodePage() == 1253) {
 		MultiByteToWideChar_CP1253((LPCSTR)p, pUni, n);
 	} else {
 		MultiByteToWideChar(CP_ACP, 0, (LPCSTR)p, n, pUni, n);
@@ -404,7 +405,7 @@ LPTSTR ConvSJIS2UnicodeWithByte(const char *p, DWORD n)
 DWORD CountMBStrings(const char *pStr, DWORD nBytes)
 {
 #if defined(PLATFORM_BE500) && defined(TOMBO_LANG_ENGLISH)
-	if (g_Property.CodePage() == 1253) {
+	if (g_Property.GetCodePage() == 1253) {
 		DWORD n = strlen(pStr);
 		return (n < nBytes) ? n : nBytes;
 	} else {
@@ -420,7 +421,7 @@ DWORD CountMBStrings(const char *pStr, DWORD nBytes)
 DWORD CountWCBytes(LPCTSTR pStr, DWORD nChar)
 {
 #if defined(PLATFORM_BE500) && defined(TOMBO_LANG_ENGLISH)
-	if (g_Property.CodePage() == 1253) {
+	if (g_Property.GetCodePage() == 1253) {
 		DWORD n = _tcslen(pStr);
 		return (n < nChar) ? n : nChar;
 	} else{
@@ -481,7 +482,7 @@ char *ConvUnicode2SJIS(LPCTSTR p)
 #ifdef _WIN32_WCE
 //	unicode2sjis(p, (LPBYTE)pS, l);
 #if defined(PLATFORM_BE500) && defined(TOMBO_LANG_ENGLISH)
-	if (g_Property.CodePage() == 1253) {
+	if (g_Property.GetCodePage() == 1253) {
 		WideCharToMultiByte_CP1253(p, pS, -1);
 	} else {
 		WideCharToMultiByte(CP_ACP, 0, p, -1, pS, l, NULL, NULL);
@@ -508,6 +509,20 @@ LPWSTR ConvTCharToWChar(LPCTSTR p)
 	if (pW == NULL) return NULL;
 	MultiByteToWideChar(CP_ACP, 0, p, -1, pW, nLen + 1);
 	return pW;
+#else
+	return StringDup(p);
+#endif
+}
+
+LPTSTR ConvWCharToTChar(LPCWSTR p)
+{
+#if defined(PLATFORM_WIN32)
+	DWORD nLen = WideCharToMultiByte(CP_ACP, 0, p, -1, NULL, 0, NULL, NULL);
+	LPTSTR pT = new TCHAR[nLen + 1];
+	if (pT == NULL) return NULL;
+	WideCharToMultiByte(CP_ACP, 0, p, -1, pT, nLen + 1, NULL, NULL);
+	pT[nLen] = TEXT('\0');
+	return pT;
 #else
 	return StringDup(p);
 #endif
@@ -1268,6 +1283,74 @@ char *ConvUCS2ToUTF8(LPCWSTR pStr)
 
 	*q = '\0';
 	return pBuf;
+}
+
+////////////////////////////////////////////////////
+// Escape XML special string
+////////////////////////////////////////////////////
+
+char *EscapeXMLStr(LPCTSTR pStr)
+{
+	LPWSTR pWStr;
+#if defined(PLATFORM_WIN32)
+	pWStr =  ConvTCharToWChar(pStr);
+	ArrayAutoPointer<WCHAR> ap1(pWStr);
+	if (pWStr == NULL) return NULL;
+#else
+	pWStr = (LPWSTR)pStr;
+#endif
+
+	// check escape string is exist
+	DWORD nExt = 0;
+	LPCWSTR p = pWStr;
+	while(*p) {
+		if (*p == TEXT('<') || *p == TEXT('>') ||
+			*p == TEXT('&') || 
+			*p == TEXT('\'') || *p == TEXT('"')) {
+			nExt += 6;
+		}
+		p++;
+	}
+
+	LPWSTR pUCS;
+	ArrayAutoPointer<WCHAR> ap2;
+
+	if (nExt == 0) {
+		pUCS = pWStr;
+	} else {
+		// Need escape
+		LPWSTR pEscaped = new WCHAR[wcslen(pWStr) + nExt + 1];
+		ap2.set(pEscaped);
+		
+		LPWSTR q = pEscaped;
+		p = pWStr;
+		while(*p) {
+			switch (*p) {
+			case L'<':
+				wcscpy(q, L"&lt;"); q+= 4;
+				break;
+			case L'>':
+				wcscpy(q, L"&gt;"); q+= 4;
+				break;
+			case L'&':
+				wcscpy(q, L"&amp;"); q+= 5;
+				break;
+			case L'\'':
+				wcscpy(q, L"&apos;"); q+= 6;
+				break;
+			case L'"':
+				wcscpy(q, L"&quot;"); q+= 6;
+				break;
+			default:
+				*q++ = *p;
+			}
+			p++;
+		}
+		*q = L'\0';
+		pUCS = pEscaped;
+	}
+	
+	return ConvUCS2ToUTF8(pUCS);
 }
 
 ////////////////////////////////////////////////////

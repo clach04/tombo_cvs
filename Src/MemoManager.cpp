@@ -94,7 +94,7 @@ BOOL MemoManager::SaveIfModify(LPDWORD pYNC, BOOL bDupMode)
 	}
 
 	if (pYNC) {
-		if (!g_Property.DisableSaveDlg()) {
+		if (!g_Property.GetDisableSaveDlg()) {
 			*pYNC = pMainFrame->MessageBox(MSG_MEMO_EDITED, MSG_CONFIRM_SAVE, MB_ICONQUESTION | MB_YESNOCANCEL | MB_APPLMODAL);
 			if (*pYNC == IDNO || *pYNC == IDCANCEL) return TRUE;
 		} else {

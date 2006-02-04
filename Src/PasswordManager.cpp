@@ -203,7 +203,7 @@ void PasswordManager::ForgetPasswordIfNotAccessed()
 	}
 	nDiffHigh = ftNow.dwHighDateTime - ftLastAccess.dwHighDateTime;
 
-	if (nDiffLow > g_Property.PassTimeout() * 60 * 10000000) {
+	if (nDiffLow > g_Property.GetPassTimeout() * 60 * 10000000) {
 		SendMessage(hParent, WM_TIMER, 0, 0);
 	}
 }

@@ -186,21 +186,21 @@ static LRESULT CALLBACK MainFrameWndProc(HWND hWnd, UINT nMessage, WPARAM wParam
 		if (frm->OnHotKey(wParam, lParam)) return 0;
 		break;
 	case WM_LBUTTONDOWN:
-		if (g_Property.IsUseTwoPane()) {
+		if (g_Property.GetUseTwoPane()) {
 			// ペイン配分の変更開始
 			frm->OnLButtonDown(wParam, lParam);
 			return 0;
 		}
 		break;
 	case WM_MOUSEMOVE:
-		if (g_Property.IsUseTwoPane()) {
+		if (g_Property.GetUseTwoPane()) {
 			// ペイン配分の変更中
 			frm->OnMouseMove(wParam, lParam);
 			return 0;
 		}
 		break;
 	case WM_LBUTTONUP:
-		if (g_Property.IsUseTwoPane()) {
+		if (g_Property.GetUseTwoPane()) {
 			// ペイン配分の変更終了
 			frm->OnLButtonUp(wParam, lParam);
 			return 0;
@@ -262,7 +262,7 @@ int MainFrame::MainLoop() {
 
 #if defined(PLATFORM_PKTPC)
 		// On PocketPC devices, you can select enable/disable about this feature.
-		if (!g_Property.DisableExtraActionButton()) {
+		if (!g_Property.GetDisableExtraActionButton()) {
 		//disable logic begin
 #endif
 
@@ -322,7 +322,7 @@ int MainFrame::MainLoop() {
 
 void MainFrame::NotifyDetailsViewFocused()
 {
-	if (!g_Property.IsUseTwoPane()) return;
+	if (!g_Property.GetUseTwoPane()) return;
 
 	SetFocus(MainFrame::VT_DetailsView);
 
@@ -476,14 +476,13 @@ void MainFrame::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		}
 	}
 
-
 	// Initialize RepositoryFactory
 	RepositoryOption roOpt;
-	roOpt.bKeepCaret = g_Property.KeepCaret();
-	roOpt.bKeepTitle = g_Property.KeepTitle();
+	roOpt.bKeepCaret = g_Property.GetKeepCaret();
+	roOpt.bKeepTitle = g_Property.GetKeepTitle();
 
-	roOpt.bSafeFileName = g_Property.UseSafeFileName();
-	roOpt.pTopDir = g_Property.TopDir();
+	roOpt.bSafeFileName = g_Property.GetUseSafeFileName();
+	roOpt.pTopDir = g_Property.GetTopDir();
 
 	g_Repository.Init(&roOpt);
 
@@ -491,20 +490,20 @@ void MainFrame::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	pPlatform->Create(hWnd, pcs->hInstance);
 
 #if defined(PLATFORM_WIN32)
-	pPlatform->ShowRebar(!g_Property.HideRebar());
+	pPlatform->ShowRebar(!g_Property.GetHideRebar());
 #endif
 
 	// adjust client area to remove toolbar area
 	pPlatform->AdjustUserRect(&r);
 
 	// Status Bar
-	SetNewMemoStatus(g_Property.IsUseTwoPane());
+	SetNewMemoStatus(g_Property.GetUseTwoPane());
 	SetModifyStatus(FALSE);
 
 #if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
 	// control show/hide status bar
 	HMENU hMenu = pPlatform->GetMainMenu();
-	if (g_Property.HideStatusBar()) {
+	if (g_Property.GetHideStatusBar()) {
 		CheckMenuItem(hMenu, IDM_SHOWSTATUSBAR, MF_BYCOMMAND | MF_UNCHECKED);
 	} else {
 		CheckMenuItem(hMenu, IDM_SHOWSTATUSBAR, MF_BYCOMMAND | MF_CHECKED);
@@ -512,13 +511,13 @@ void MainFrame::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	}	
 #endif
 
-	pPlatform->CheckMenu(IDM_TOGGLEPANE, g_Property.IsUseTwoPane());
+	pPlatform->CheckMenu(IDM_TOGGLEPANE, g_Property.GetUseTwoPane());
 
 	// Create edit view
 	pDetailsView->Create(TEXT("MemoDetails"), r, hWnd,  hInstance, g_Property.DetailsViewFont());
 
-	if (!g_Property.WrapText()) {
-		SetWrapText(g_Property.WrapText());
+	if (!g_Property.GetWrapText()) {
+		SetWrapText(g_Property.GetWrapText());
 	}
 
 	// Create tree view
@@ -526,9 +525,9 @@ void MainFrame::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	msView.InitTree(pVFManager);
 
 	// set auto switch mode
-	if (g_Property.IsUseTwoPane()) {
-		msView.SetAutoLoadMode(g_Property.AutoSelectMemo());
-		msView.SetSingleClickMode(g_Property.SingleClickOpenMemo());
+	if (g_Property.GetUseTwoPane()) {
+		msView.SetAutoLoadMode(g_Property.GetAutoSelectMemo());
+		msView.SetSingleClickMode(g_Property.GetSingleClick());
 	}
 
 	LoadWinSize(hWnd);
@@ -608,7 +607,7 @@ BOOL MainFrame::OnExit()
 	cbri[0].cbSize = cbri[1].cbSize = sizeof(COMMANDBANDSRESTOREINFO);
 	CommandBands_GetRestoreInformation(pPlatform->hMSCmdBar, SendMessage(pPlatform->hMSCmdBar, RB_IDTOINDEX, ID_CMDBAR_MAIN, 0), &cbri[0]);
 	CommandBands_GetRestoreInformation(pPlatform->hMSCmdBar, SendMessage(pPlatform->hMSCmdBar, RB_IDTOINDEX, ID_BUTTONBAND, 0), &cbri[1]);
-	g_Property.SetCommandbarInfo(cbri, NUM_COMMANDBAR);
+	g_Property.SetCommandbarInfo(cbri);
 #endif
 
 	// save bookmarks
@@ -679,8 +678,8 @@ void MainFrame::OnCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		}
 		break;
 	case IDM_DETAILS_HSCROLL:
-		g_Property.SetWrapText(!g_Property.WrapText());
-		SetWrapText(g_Property.WrapText());
+		g_Property.SetWrapText(!g_Property.GetWrapText());
+		SetWrapText(g_Property.GetWrapText());
 		break;
 	case IDM_TOGGLEPANE:
 		TogglePane();
@@ -934,7 +933,7 @@ void MainFrame::OnLButtonUp(WPARAM wParam, LPARAM lParam)
 
 void MainFrame::MovePane(WORD nSplit)
 {
-	if (!g_Property.IsUseTwoPane()) return;
+	if (!g_Property.GetUseTwoPane()) return;
 #if defined(PLATFORM_PKTPC) && defined(FOR_VGA)
 	if (bLandscapeMode) {
 		nSplitterSizeWidth = nSplit;
@@ -981,7 +980,7 @@ void MainFrame::NewMemo()
 	}
 
 	// if modifying notes, confirm save.
-	if (g_Property.IsUseTwoPane()) {
+	if (g_Property.GetUseTwoPane()) {
 		LeaveDetailsView(TRUE);
 	}
 	SetNewMemoStatus(TRUE);
@@ -1022,7 +1021,7 @@ void MainFrame::About()
 void MainFrame::SetWindowTitle(const TomboURI *pURI)
 {
 #if defined(PLATFORM_WIN32) || defined(PLATFORM_PKTPC)
-	if (g_Property.SwitchWindowTitle()) {
+	if (g_Property.GetSwitchWindowTitle()) {
 		if (pURI == NULL) {
 			SetWindowText(hMainWnd, TOMBO_APP_NAME);
 			return;
@@ -1098,7 +1097,7 @@ void MainFrame::OpenDetailsView(const TomboURI *pURI, DWORD nSwitchView)
 
 	SetWindowTitle(pURI);
 
-	if (g_Property.IsUseTwoPane()) {
+	if (g_Property.GetUseTwoPane()) {
 		if (nSwitchView & OPEN_REQUEST_MSVIEW_ACTIVE) {
 			ActivateView(VT_DetailsView);
 		}
@@ -1163,7 +1162,7 @@ void MainFrame::LeaveDetailsView(BOOL bAskSave)
 	if (nYNC == IDCANCEL) return;
 	ActivateView(VT_SelectView);
 
-	if (g_Property.IsUseTwoPane()) {
+	if (g_Property.GetUseTwoPane()) {
 		// clear encrypted notes if two pane mode
 		if (nYNC == IDNO) {
 			// discard current note and load old one.
@@ -1216,7 +1215,7 @@ void MainFrame::ActivateView(ViewType vt)
 
 void MainFrame::SetLayout()
 {
-	if (g_Property.IsUseTwoPane()) {
+	if (g_Property.GetUseTwoPane()) {
 #if defined(PLATFORM_HPC) || defined(PLATFORM_WIN32)
 		ChangeLayout(LT_TwoPane);
 #endif
@@ -1247,13 +1246,13 @@ void MainFrame::SetLayout()
 ///////////////////////////////////////////////////
 void MainFrame::TogglePane()
 {
-	pPlatform->CheckMenu(IDM_TOGGLEPANE, !g_Property.IsUseTwoPane());
+	pPlatform->CheckMenu(IDM_TOGGLEPANE, !g_Property.GetUseTwoPane());
 
-	if (g_Property.IsUseTwoPane()) {
+	if (g_Property.GetUseTwoPane()) {
 		SaveWinSize();
 	}
 
-	DWORD nPane = g_Property.IsUseTwoPane() ? MF_UNCHECKED : MF_CHECKED;
+	DWORD nPane = g_Property.GetUseTwoPane() ? MF_UNCHECKED : MF_CHECKED;
 	g_Property.SetUseTwoPane(nPane);
 
 	SetLayout();
@@ -1265,9 +1264,9 @@ void MainFrame::TogglePane()
 
 void MainFrame::ChangeLayout(LayoutType layout)
 {
-	pPlatform->ShowStatusBar(!g_Property.HideStatusBar());
+	pPlatform->ShowStatusBar(!g_Property.GetHideStatusBar());
 #if defined(PLATFORM_WIN32)
-	pPlatform->ShowRebar(!g_Property.HideRebar());
+	pPlatform->ShowRebar(!g_Property.GetHideRebar());
 #endif
 
 	// get tree/edit view area
@@ -1415,10 +1414,10 @@ void MainFrame::OnProperty()
 
 	// Repository setting
 	RepositoryOption roOpt;
-	roOpt.bKeepCaret = g_Property.KeepCaret();
-	roOpt.bKeepTitle = g_Property.KeepTitle();
-	roOpt.bSafeFileName = g_Property.UseSafeFileName();
-	roOpt.pTopDir = g_Property.TopDir();
+	roOpt.bKeepCaret = g_Property.GetKeepCaret();
+	roOpt.bKeepTitle = g_Property.GetKeepTitle();
+	roOpt.bSafeFileName = g_Property.GetUseSafeFileName();
+	roOpt.pTopDir = g_Property.GetTopDir();
 
 	g_Repository.SetRepositoryOption(&roOpt);
 
@@ -1433,7 +1432,7 @@ void MainFrame::OnProperty()
 	msView.DeleteAllItem();
 	msView.InitTree(pVFManager);
 #if defined(PLATFORM_WIN32) || defined(PLATFORM_PKTPC)
-	if (!g_Property.SwitchWindowTitle()) {
+	if (!g_Property.GetSwitchWindowTitle()) {
 		SetWindowText(hMainWnd, TOMBO_APP_NAME);
 	}
 #endif
@@ -1494,23 +1493,23 @@ BOOL MainFrame::EnableApplicationButton(HWND hWnd)
 		FreeLibrary(hCoreDll);
 		return FALSE;
 	}
-	if (g_Property.AppButton1()) {
+	if (g_Property.GetAppButton1()) {
 		procUnregisterFunc(MOD_WIN, APP_BUTTON1);
 		RegisterHotKey(hWnd, APP_BUTTON1, MOD_WIN, APP_BUTTON1);
 	}
-	if (g_Property.AppButton2()) {
+	if (g_Property.GetAppButton2()) {
 		procUnregisterFunc(MOD_WIN, APP_BUTTON2);
 		RegisterHotKey(hWnd, APP_BUTTON2, MOD_WIN, APP_BUTTON2);
 	}
-	if (g_Property.AppButton3()) {
+	if (g_Property.GetAppButton3()) {
 		procUnregisterFunc(MOD_WIN, APP_BUTTON3);
 		RegisterHotKey(hWnd, APP_BUTTON3, MOD_WIN, APP_BUTTON3);
 	}
-	if (g_Property.AppButton4()) {
+	if (g_Property.GetAppButton4()) {
 		procUnregisterFunc(MOD_WIN, APP_BUTTON4);
 		RegisterHotKey(hWnd, APP_BUTTON4, MOD_WIN, APP_BUTTON4);
 	}
-	if (g_Property.AppButton5()) {
+	if (g_Property.GetAppButton5()) {
 		procUnregisterFunc(MOD_WIN, APP_BUTTON5);
 		RegisterHotKey(hWnd, APP_BUTTON5, MOD_WIN, APP_BUTTON5);
 	}
@@ -1544,7 +1543,7 @@ void MainFrame::SaveWinSize()
 #endif
 
 	WORD nPane;
-	if (g_Property.IsUseTwoPane()) {
+	if (g_Property.GetUseTwoPane()) {
 		nPane = nSplitterSize;
 	} else {
 		UINT u1, u2;
@@ -1559,7 +1558,7 @@ void MainFrame::SaveWinSize()
 	}
 	g_Property.SaveWinSize(flags, showCmd, &r, nPane);
 #if defined(PLATFORM_PKTPC) && defined(FOR_VGA)
-	g_Property.SaveWinSize2(nSplitterSizeWidth);
+	g_Property.SetWinSize2(nSplitterSizeWidth);
 #endif
 }
 
@@ -1582,7 +1581,7 @@ void MainFrame::LoadWinSize(HWND hWnd)
 #endif
 	}
 #if defined(PLATFORM_PKTPC) && defined(FOR_VGA)
-	WORD w = g_Property.GetWinSize2();
+	WORD w = (WORD)g_Property.GetWinSize2();
 	if (w == 0xFFFF || w < 0 || w > rClientRect.right - 20) {
 		nSplitterSizeWidth = (rClientRect.bottom - rClientRect.top) / 3;
 	} else {
@@ -1734,7 +1733,7 @@ void MainFrame::ToggleShowStatusBar()
 
 	HMENU hMenu = pPlatform->GetMainMenu();
 
-	if (g_Property.HideStatusBar()) {
+	if (g_Property.GetHideStatusBar()) {
 		CheckMenuItem(hMenu, IDM_SHOWSTATUSBAR, MF_BYCOMMAND | MF_UNCHECKED);
 	} else {
 		CheckMenuItem(hMenu, IDM_SHOWSTATUSBAR, MF_BYCOMMAND | MF_CHECKED);
@@ -1759,8 +1758,8 @@ void MainFrame::ToggleShowRebar()
 	RECT r;
 	GetClientRect(hMainWnd, &r);
 
-	pPlatform->ShowRebar(!g_Property.HideRebar());
-	if (g_Property.HideRebar()) {
+	pPlatform->ShowRebar(!g_Property.GetHideRebar());
+	if (g_Property.GetHideRebar()) {
 		CheckMenuItem(hMenu, IDM_SHOWREBAR, MF_BYCOMMAND | MF_UNCHECKED);
 	} else {
 		InvalidateRect(hMainWnd, &r, TRUE);
@@ -1814,7 +1813,7 @@ void MainFrame::SetTopMost()
 #if defined(PLATFORM_WIN32)
 	HMENU hMenu = GetMenu(hMainWnd);
 
-	if (g_Property.StayTopMost()) {
+	if (g_Property.GetStayTopMost()) {
 		CheckMenuItem(hMenu, IDM_TOPMOST, MF_BYCOMMAND | MF_CHECKED);
 		SendMessage(pPlatform->hToolBar, TB_SETSTATE, IDM_TOPMOST, MAKELONG(TBSTATE_ENABLED |TBSTATE_PRESSED, 0)); 
 
