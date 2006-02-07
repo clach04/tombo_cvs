@@ -108,9 +108,9 @@ BOOL Repository::ChangeHeadLine(const TomboURI *pURI, LPCTSTR pReqNewHeadLine, U
 }
 
 
-URIList *Repository::GetChild(const TomboURI *pFolder, BOOL bSkipEncrypt)
+URIList *Repository::GetChild(const TomboURI *pFolder, BOOL bSkipEncrypt, BOOL bLooseDecrypt, BOOL *pLoose)
 {
-	return pDefaultImpl->GetChild(pFolder, bSkipEncrypt);
+	return pDefaultImpl->GetChild(pFolder, bSkipEncrypt, bLooseDecrypt, pLoose);
 }
 
 BOOL Repository::RequestAllocateURI(const TomboURI *pBaseURI, LPCTSTR pText, TString *pHeadLine, TomboURI *pURI, const TomboURI *pTemplateURI)

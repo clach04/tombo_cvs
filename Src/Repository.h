@@ -39,6 +39,10 @@ class NoteAttribute;
 #define ERROR_TOMBO_I_OPERATION_NOT_PERFORMED (ERROR_TOMBO_REP_CODE_BASE_INFO + 1)
 #define ERROR_TOMBO_I_GET_PASSWORD_CANCELED   (ERROR_TOMBO_REP_CODE_BASE_INFO + 2)
 
+#define TOMBO_REPO_GETLIST_FAIL 0
+#define TOMBO_REPO_GETLIST_SUCCESS 1
+#define TOMBO_REPO_GETLIST_PARTIAL 2
+
 /////////////////////////////////////////
 // Repository options
 /////////////////////////////////////////
@@ -58,7 +62,7 @@ public:
 
 class IEnumRepository {
 public:
-	virtual URIList *GetChild(const TomboURI *pFolderURI, BOOL bSkipEncrypt) = 0;
+	virtual URIList *GetChild(const TomboURI *pFolderURI, BOOL bSkipEncrypt, BOOL bLooseDecrypt, BOOL *pLoose) = 0;
 	virtual BOOL GetOption(const TomboURI *pURI, URIOption *pOption) = 0;
 	virtual BOOL GetHeadLine(const TomboURI *pURI, TString *pHeadLine) = 0;
 };
@@ -119,7 +123,7 @@ public:
 	BOOL GetFileName(const TomboURI *pURI, TString *pName);
 
 	// Get notes under the url.
-	URIList *GetChild(const TomboURI *pFolderURI, BOOL bSkipEncrypt);
+	URIList *GetChild(const TomboURI *pFolderURI, BOOL bSkipEncrypt, BOOL bLooseDecrypt, BOOL *pLoose);
 
 	// Decide URI
 	BOOL RequestAllocateURI(const TomboURI *pBaseURI, LPCTSTR pText, TString *pHeadLine, TomboURI *pURI, const TomboURI *pTemplateURI);

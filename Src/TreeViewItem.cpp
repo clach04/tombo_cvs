@@ -591,9 +591,14 @@ BOOL TreeViewFolderItem::Expand(MemoSelectView *pView)
 	TomboURI sURI;
 	if (!pView->GetURI(&sURI, hParent)) return FALSE;
 
-	URIList *pURIList = g_Repository.GetChild(&sURI, FALSE);
+	BOOL bLoose;
+	URIList *pURIList = g_Repository.GetChild(&sURI, FALSE, TRUE, &bLoose);
 	if (pURIList == NULL) return FALSE;
 	AutoPointer<URIList> ap(pURIList);
+
+	if (bLoose) {
+		MessageBox(NULL, MSG_DECRYPT_IS_PARTIAL, TEXT("Warning"), MB_ICONWARNING | MB_OK);
+	}
 
 	DWORD n = pURIList->GetSize();
 	for (DWORD i = 0; i < n; i++) {

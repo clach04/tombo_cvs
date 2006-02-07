@@ -118,11 +118,43 @@ LPTSTR PlainMemoNote::GetMemoBody(LPCTSTR pTopDir, PasswordManager *p) const
 }
 
 /////////////////////////////////////////////
-// ÉÅÉÇì‡óeÇÃéÊìæ(CryptedMemoNote)
+// Get memo body and decrypt 
 /////////////////////////////////////////////
+
 LPBYTE CryptedMemoNote::GetMemoBodySub(LPCTSTR pTopDir, PasswordManager *pMgr, LPDWORD pSize) const
 {
-	CryptManager cMgr;
+	BOOL bRegistedPassword = TRUE;
+
+	TString sFileName;
+	if (!sFileName.Join(pTopDir, TEXT("\\"), pPath)) return NULL;
+
+	LPBYTE pPlain;
+	for (DWORD i = 0; i < NUM_RETRY_INVALID_PASSWORD; i++) {
+		BOOL bCancel;
+		const char *pPassword = pMgr->Password(&bCancel, FALSE);
+		if (pPassword == NULL) {
+			if (bCancel) SetLastError(ERROR_CANCELLED);
+			pMgr->ForgetPassword();
+			return NULL;
+		}
+		CryptManager cMgr;
+		if (!cMgr.Init(pPassword)) return NULL;
+
+		pPlain = cMgr.LoadAndDecrypt(pSize, sFileName.Get());
+		if (pPlain != NULL) {
+			bRegistedPassword = TRUE;
+			break;
+		} else {
+			bRegistedPassword = FALSE;
+			pMgr->ForgetPassword();
+		}
+	}
+	return pPlain;
+}
+
+#ifdef COMMENT
+LPBYTE CryptedMemoNote::GetMemoBodySub(LPCTSTR pTopDir, PasswordManager *pMgr, LPDWORD pSize) const
+{
 	BOOL bRegistedPassword = TRUE;
 
 	TString sFileName;
@@ -134,6 +166,7 @@ LPBYTE CryptedMemoNote::GetMemoBodySub(LPCTSTR pTopDir, PasswordManager *pMgr, L
 		if (bCancel) SetLastError(ERROR_CANCELLED);
 		return NULL;
 	}
+	CryptManager cMgr;
 	if (!cMgr.Init(pPassword)) return NULL;
 
 	LPBYTE pPlain = cMgr.LoadAndDecrypt(pSize, sFileName.Get());
@@ -145,6 +178,7 @@ LPBYTE CryptedMemoNote::GetMemoBodySub(LPCTSTR pTopDir, PasswordManager *pMgr, L
 
 	return pPlain;
 }
+#endif
 
 char *CryptedMemoNote::GetMemoBodyA(LPCTSTR pTopDir, PasswordManager *pMgr) const
 {

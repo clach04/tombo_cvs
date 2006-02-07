@@ -287,4 +287,11 @@ static LPCTSTR defaultMsg[] = {
 	TEXT("Save options failed. Change may not be reflected."),
 	TEXT("Use random filename"),
 	TEXT("When encrypting, generate file name by random number."),
+	TEXT("Get headline failed for some notes due to wrong password. Display ???????? the notes."),
+	TEXT("TOMBO registry erase tool"),
+	TEXT("The registry entry that TOMBO 1.14 or orlder uses are erased. Are you sure?"),
+	TEXT("Canceled."),
+	TEXT("Deleted."),
+	TEXT("There are no registry entry."),
+	TEXT("Delete failed(%d)."),
 };

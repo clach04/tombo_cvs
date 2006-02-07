@@ -177,6 +177,9 @@ Property::Property() : pDefaultTopDir(NULL), pBookMark(NULL), pSearchHistory(NUL
 	,pCmdBarInfo(NULL)
 #endif
 {
+	bLoad = FALSE;
+	bNeedAsk = TRUE;
+
 	for (DWORD i = 0; i < NUM_PROPS_STR; i++) {
 		pPropsStr[i] = NULL;
 	}
@@ -463,10 +466,40 @@ static void EndElement(void *userData, const XML_Char *name)
 	}
 }
 
-BOOL Property::Load(BOOL *pStrict)
+BOOL Property::LoadDefaultProperties()
 {
-	*pStrict = TRUE;
+	PropListNum *pNum = propListNum;
+	while (pNum->nPropId != 0xFFFFFFFF) {
+		nPropsNum[pNum->nPropId] = pNum->nDefault;
+		pNum++;
+	}
 
+	PropListStr *pPLS = propListStr;
+	while (pPLS->nPropId != 0xFFFFFFFF) {
+		if (pPLS->pDefault != NULL) {
+			pPropsStr[pPLS->nPropId] = StringDup(pPLS->pDefault);
+			if (pPropsStr[pPLS->nPropId] == NULL) return FALSE;
+		} else {
+			pPropsStr[pPLS->nPropId] = NULL;
+		}
+		pPLS++;
+	}
+	return TRUE;
+}
+
+BOOL Property::Load()
+{
+	BOOL bResult = LoadProperties();
+	if (!bResult) {
+		// set default value
+		bNeedAsk = TRUE;
+		return LoadDefaultProperties();
+	}
+	return TRUE;
+}
+
+BOOL Property::LoadProperties()
+{
 	TCHAR pathbuf[MAX_PATH + 1];
 	TCHAR pathbuf2[MAX_PATH + 1];
 	GetModuleFileName(NULL, pathbuf, MAX_PATH);
@@ -477,7 +510,18 @@ BOOL Property::Load(BOOL *pStrict)
 	File fFile;
 
 	if (!fFile.Open(sPropFile.Get(), GENERIC_READ, FILE_SHARE_READ, OPEN_EXISTING)) {
-		return LoadFromReg(pStrict);
+		BOOL bStrict;
+		BOOL bResult = LoadFromReg(&bStrict);
+		if (bResult) {
+			if (bStrict) {
+				bNeedAsk = FALSE;
+			} else {
+				bNeedAsk = TRUE;
+			}
+			return TRUE;
+		} else {
+			return FALSE;
+		}
 	}
 	DWORD nFileSize = fFile.FileSize();
 	XML_Parser pParser = XML_ParserCreate(NULL);
@@ -500,12 +544,12 @@ BOOL Property::Load(BOOL *pStrict)
 	}
 
 	if (!XML_ParseBuffer(pParser, nFileSize, TRUE)) {
+		return FALSE;
 	}
 	XML_ParserFree(pParser);
 
-	if (GetTopDir() == NULL || _tcslen(GetTopDir()) == 0) {
-		*pStrict = FALSE;
-	}
+	bNeedAsk = FALSE;
+	bLoad = TRUE;
 
 	return TRUE;
 }
@@ -604,14 +648,6 @@ BOOL Property::LoadFromReg(BOOL *pStrict)
 //////////////////////////////////////////
 // save properties
 //////////////////////////////////////////
-
-#if defined(PLATFORM_HPC)
-BOOL SetCommandBarInfoToReg(HKEY hKey, LPCTSTR pAttr, LPCOMMANDBANDSRESTOREINFO pValue) {
-	if (RegSetValueEx(hKey, pAttr, 0, 
-					REG_BINARY, (LPBYTE)pValue, sizeof(COMMANDBANDSRESTOREINFO) * NUM_COMMANDBAR) != ERROR_SUCCESS) return FALSE;
-	return TRUE;
-}
-#endif
 
 BOOL SaveMultiSZToFile(File *pFile, LPCTSTR pAttr, LPCTSTR pMValue)
 {
@@ -773,93 +809,12 @@ BOOL Property::Save()
 		DeleteFile(sPropFile.Get());
 		MoveFile(sPropFileTmp.Get(), sPropFile.Get());
 	}
-
-/*
-	HKEY hTomboRoot;
-	hTomboRoot = GetTomboRootKey();
-	if (hTomboRoot == NULL) return FALSE;
-
-	// save number props.
-	PropListNum *pNum = propListNum;
-	while (pNum->nPropId != 0xFFFFFFFF) {
-		DWORD nValue = nPropsNum[pNum->nPropId];
-		if (!SetDWORDToReg(hTomboRoot, pNum->pAttrName, nValue)) return FALSE;
-		pNum++;
-	}
-
-	// save string props.
-	PropListStr *pStr = propListStr;
-	while (pStr->nPropId != 0xFFFFFFFF) {
-		if (pPropsStr[pStr->nPropId] != NULL) {
-			if (!SetSZToReg(hTomboRoot, pStr->pAttrName, pPropsStr[pStr->nPropId])) return FALSE;
-		}
-		pStr++;
-	}
-
-	// save multip props
-	if (!SetMultiSZToReg(hTomboRoot, BOOKMARK_ATTR_NAME, pBookMark, CountMultiSZLen(pBookMark) * sizeof(TCHAR))) return FALSE;
-	if (!SetMultiSZToReg(hTomboRoot, SEARCHHIST_ATTR_NAME, pSearchHistory, CountMultiSZLen(pSearchHistory) * sizeof(TCHAR))) return FALSE;
-	if (!SetMultiSZToReg(hTomboRoot, TOPDIRHIST_ATTR_NAME, pTopDirHistory, CountMultiSZLen(pTopDirHistory) * sizeof(TCHAR))) return FALSE;
-
-#if defined(PLATFORM_HPC)
-	// save commandbar info
-	if (!SetCommandBarInfoToReg(hTomboRoot, REBARHIST_ATTR_NAME, pCmdBarInfo)) return FALSE;
-#endif
-
-#if defined(PLATFORM_BE500)
-	CGDFlushRegistry();
-#endif
-*/
 	return TRUE;
 }
 
 //////////////////////////////////////////
 // Registry operations
 //////////////////////////////////////////
-
-static BOOL SetSZToReg(HKEY hKey, LPCTSTR pAttr, LPCTSTR pValue)
-{
-	DWORD res;
-	res = RegSetValueEx(hKey, pAttr, 0, REG_SZ, (LPBYTE)pValue, (_tcslen(pValue) + 1)*sizeof(TCHAR));
-	if (res != ERROR_SUCCESS) {
-		RegCloseKey(hKey);
-		SetLastError(res);
-		return FALSE;
-	}
-	return TRUE;
-}
-
-static BOOL SetDWORDToReg(HKEY hKey, LPCTSTR pAttr, DWORD nValue)
-{
-	DWORD res;
-	res = RegSetValueEx(hKey, pAttr, 0, REG_DWORD, (LPBYTE)&nValue, sizeof(DWORD));
-	if (res != ERROR_SUCCESS) {
-		RegCloseKey(hKey);
-		SetLastError(res);
-		return FALSE;
-	}
-	return TRUE;
-}
-
-static BOOL SetMultiSZToReg(HKEY hKey, LPCTSTR pAttr, LPCTSTR pValue, DWORD nSize)
-{
-	if (pValue == NULL) return TRUE;
-
-	DWORD res;
-	DWORD typ;
-#if defined(PLATFORM_WIN32)
-	typ = REG_MULTI_SZ;
-#else
-	typ = REG_BINARY;
-#endif
-	res = RegSetValueEx(hKey, pAttr, 0, typ, (LPBYTE)pValue, nSize);
-	if (res != ERROR_SUCCESS) {
-		RegCloseKey(hKey);
-		SetLastError(res);
-		return FALSE;
-	}
-	return TRUE;
-}
 
 static DWORD GetDWORDFromReg(HKEY hKey, LPCTSTR pAttr, DWORD nDefault)
 {
@@ -1015,16 +970,10 @@ BOOL Property::GetWinSize(UINT *pFlags, UINT *pShowCmd, LPRECT pWinRect, LPWORD 
 
 static HKEY GetTomboRootKey()
 {
-	DWORD res, sam;
+	DWORD res;
 	HKEY hTomboRoot;
 
-#ifdef _WIN32_WCE
-	res = RegCreateKeyEx(HKEY_CURRENT_USER, TOMBO_MAIN_KEY, 0, NULL, 0,
-				0, NULL, &hTomboRoot, &sam);
-#else
-	res = RegCreateKeyEx(HKEY_CURRENT_USER, TOMBO_MAIN_KEY, 0, NULL, REG_OPTION_NON_VOLATILE,
-				KEY_ALL_ACCESS, NULL, &hTomboRoot, &sam);
-#endif
+	res = RegOpenKeyEx(HKEY_CURRENT_USER, TOMBO_MAIN_KEY, 0, KEY_READ, &hTomboRoot);
 	if (res != ERROR_SUCCESS) {
 		SetLastError(res);
 		return NULL;

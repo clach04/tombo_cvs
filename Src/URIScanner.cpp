@@ -126,7 +126,8 @@ BOOL URIScanner::PushFrame(const TomboURI *pURI)
 	StackFrame *pSF = new StackFrame();
 	if (pSF == NULL) { SetLastError(ERROR_NOT_ENOUGH_MEMORY); return FALSE; }
 
-	pSF->pList = pRepository->GetChild(pCurrentURI, bSkipEncrypt);
+	BOOL bLoose;
+	pSF->pList = pRepository->GetChild(pCurrentURI, bSkipEncrypt, FALSE, &bLoose);
 	if (pSF->pList == NULL) {
 		DWORD n = GetLastError();
 		if (GetLastError() == ERROR_CANCELLED) {

@@ -812,31 +812,45 @@ BOOL LocalFileRepository::ChangeHeadLine(const TomboURI *pURI, LPCTSTR pReqNewHe
 // GetList
 /////////////////////////////////////////
 
-BOOL LocalFileRepository::GetList(const TomboURI *pFolder, DirList *pList, BOOL bSkipEncrypt)
+DWORD LocalFileRepository::GetList(const TomboURI *pFolder, DirList *pList, BOOL bSkipEncrypt, BOOL bLooseDecrypt)
 {
 	TString sPartPath;
-	if (!pFolder->GetFilePath(&sPartPath)) return FALSE;
+	if (!pFolder->GetFilePath(&sPartPath)) return TOMBO_REPO_GETLIST_FAIL;
 
 	TString sFullPath;
 	if (_tcslen(sPartPath.Get()) > 0) {
-		if (!sFullPath.Join(pTopDir, TEXT("\\"), sPartPath.Get(), TEXT("*.*"))) return FALSE;
+		if (!sFullPath.Join(pTopDir, TEXT("\\"), sPartPath.Get(), TEXT("*.*"))) return TOMBO_REPO_GETLIST_FAIL;
 	} else {
-		if (!sFullPath.Join(pTopDir, TEXT("\\*.*"))) return FALSE;
+		if (!sFullPath.Join(pTopDir, TEXT("\\*.*"))) return TOMBO_REPO_GETLIST_FAIL;
 	}
 
-	if (!pList->Init(pFolder->GetFullURI())) return FALSE;
-	if (!pList->GetList(sFullPath.Get(), bSkipEncrypt)) return FALSE;
-
-	return TRUE;
+	if (!pList->Init(pFolder->GetFullURI())) return TOMBO_REPO_GETLIST_FAIL;
+	switch (pList->GetList(sFullPath.Get(), bSkipEncrypt, bLooseDecrypt)) {
+	case DIRLIST_GETLIST_RESULT_SUCCESS:
+		return TOMBO_REPO_GETLIST_SUCCESS;
+	case DIRLIST_GETLIST_RESULT_PARTIAL:
+		return TOMBO_REPO_GETLIST_PARTIAL;
+	default:
+		return TOMBO_REPO_GETLIST_FAIL;
+	}
 }
 
-URIList *LocalFileRepository::GetChild(const TomboURI *pFolder, BOOL bSkipEncrypt)
+URIList *LocalFileRepository::GetChild(const TomboURI *pFolder, BOOL bSkipEncrypt, BOOL bLooseDecrypt, BOOL *pLoose)
 {
 	URIList *pList = new URIList();
 	if (pList == NULL || !pList->Init()) { return FALSE; }
 
 	DirList dlist;
-	if (!GetList(pFolder, &dlist, bSkipEncrypt)) return NULL;
+	switch (GetList(pFolder, &dlist, bSkipEncrypt, bLooseDecrypt)) {
+	case DIRLIST_GETLIST_RESULT_FAIL:
+		return NULL;
+	case DIRLIST_GETLIST_RESULT_SUCCESS:
+		*pLoose = FALSE;
+		break;
+	case DIRLIST_GETLIST_RESULT_PARTIAL:
+		*pLoose = TRUE;
+		break;
+	}
 
 	for (DWORD i = 0; i < dlist.NumItems(); i++) {
 		DirListItem *pItem = dlist.GetItem(i);

@@ -285,3 +285,10 @@ Toolbar
 Save options failed. Change may not be reflected.
 Use random filename
 When encrypting, generate file name by random number.
+Get headline failed for some notes due to wrong password. Display ???????? the notes.
+TOMBO registry erase tool
+The registry entry that TOMBO 1.14 or orlder uses are erased. Are you sure?
+Canceled.
+Deleted.
+There are no registry entry.
+Delete failed(%d).

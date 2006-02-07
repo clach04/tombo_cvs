@@ -101,4 +101,6 @@ typedef WNDPROC SUPER_WND_PROC;
 typedef FARPROC SUPER_WND_PROC;
 #endif 
 
+#define NUM_RETRY_INVALID_PASSWORD 3
+
 #endif

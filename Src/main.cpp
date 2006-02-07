@@ -102,6 +102,20 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPTSTR pCmdLine, int nCmdSh
 	MainFrame::RegisterClass(hInst);
 
 	g_hInstance = hInst;
+
+	// load properties
+	BOOL bResult;
+	bResult = g_Property.Load();
+	if (!bResult || g_Property.IsNeedAskUser()) {
+		BOOL bPrev = bDisableHotKey;
+		bDisableHotKey = TRUE;
+		DWORD nResult = g_Property.Popup(hInst, NULL, TEXT(""));
+		bDisableHotKey = bPrev;
+		if (nResult == IDCANCEL) {
+			return 1;
+		}
+	}
+
 	frmMain.Create(TOMBO_APP_NAME, hInst, nCmdShow);
 
 	// go message loop

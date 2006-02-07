@@ -38,8 +38,10 @@ DirList::~DirList()
 {
 }
 
-BOOL DirList::GetList(LPCTSTR pMatchPath, BOOL bSkipEncrypt)
+DWORD DirList::GetList(LPCTSTR pMatchPath, BOOL bSkipEncrypt, BOOL bLooseDecrypt)
 {
+	BOOL bPartial = FALSE;
+
 	// make folder/file list
 	WIN32_FIND_DATA wfd;
 	HANDLE hHandle = FindFirstFile(pMatchPath, &wfd);
@@ -61,28 +63,35 @@ BOOL DirList::GetList(LPCTSTR pMatchPath, BOOL bSkipEncrypt)
 				di.bFolder = FALSE;
 			}
 
-			if (!sbDirList.Add(pURIBase, _tcslen(pURIBase), &(di.nURIPos))) return FALSE;
+			if (!sbDirList.Add(pURIBase, _tcslen(pURIBase), &(di.nURIPos))) return DIRLIST_GETLIST_RESULT_FAIL;
 			DWORD d;
-			if (!sbDirList.Add(wfd.cFileName, l, &d)) return FALSE;
+			if (!sbDirList.Add(wfd.cFileName, l, &d)) return DIRLIST_GETLIST_RESULT_FAIL;
 			if (wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
-				if (!sbDirList.Add(TEXT("/"), 1, &d)) return FALSE;
+				if (!sbDirList.Add(TEXT("/"), 1, &d)) return DIRLIST_GETLIST_RESULT_FAIL;
 			}
-			if (!sbDirList.Add(TEXT(""), 1, &d)) return FALSE;
+			if (!sbDirList.Add(TEXT(""), 1, &d)) return DIRLIST_GETLIST_RESULT_FAIL;
 
 			TomboURI sURI;
 			TString sHeadLine;
-			if (!sURI.Init(GetFileName(di.nURIPos))) return FALSE;
+			if (!sURI.Init(GetFileName(di.nURIPos))) return DIRLIST_GETLIST_RESULT_FAIL;
 
 			URIOption opt(NOTE_OPTIONMASK_ENCRYPTED);
 			g_Repository.GetOption(&sURI, &opt);
 
 			if (!opt.bEncrypt || !bSkipEncrypt) {
-				if (!g_Repository.GetHeadLine(&sURI, &sHeadLine)) return FALSE;
-				if (!sbDirList.Add(sHeadLine.Get(), _tcslen(sHeadLine.Get()) + 1, &(di.nHeadLinePos))) return FALSE;
+				if (!g_Repository.GetHeadLine(&sURI, &sHeadLine)) {
+					if (GetLastError() == ERROR_INVALID_PASSWORD && bLooseDecrypt) {
+						bPartial = TRUE;
+						sHeadLine.Set(TEXT("????????"));
+					} else {
+						return DIRLIST_GETLIST_RESULT_FAIL;
+					}
+				}
+				if (!sbDirList.Add(sHeadLine.Get(), _tcslen(sHeadLine.Get()) + 1, &(di.nHeadLinePos))) return DIRLIST_GETLIST_RESULT_FAIL;
 	
 				// Add file name to buffer
-				if (!sbDirList.Add(wfd.cFileName, l + 1, &(di.nFileNamePos))) return FALSE;
-				if (!vDirList.Add(&di)) return FALSE;
+				if (!sbDirList.Add(wfd.cFileName, l + 1, &(di.nFileNamePos))) return DIRLIST_GETLIST_RESULT_FAIL;
+				if (!vDirList.Add(&di)) return DIRLIST_GETLIST_RESULT_FAIL;
 			}
 		} while(FindNextFile(hHandle, &wfd));
 		FindClose(hHandle);
@@ -94,5 +103,9 @@ BOOL DirList::GetList(LPCTSTR pMatchPath, BOOL bSkipEncrypt)
 	pSortSB = &sbDirList;
 	qsort((LPBYTE)vDirList.GetBuf(), n, sizeof(struct DirListItem), SortItems);
 
-	return TRUE;
+	if (bPartial) {
+		return DIRLIST_GETLIST_RESULT_PARTIAL;
+	} else {
+		return DIRLIST_GETLIST_RESULT_SUCCESS;
+	}
 }

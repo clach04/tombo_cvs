@@ -462,20 +462,6 @@ void MainFrame::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	RECT r;
 	GetClientRect(hWnd, &r);
 
-	// load properties
-	BOOL bResult, bStrict;
-	bResult = g_Property.Load(&bStrict);
-	if (!(bResult && bStrict)) {
-		BOOL bPrev = bDisableHotKey;
-		bDisableHotKey = TRUE;
-		DWORD nResult = g_Property.Popup(pcs->hInstance, hWnd, TEXT(""));
-		bDisableHotKey = bPrev;
-		if (nResult == IDCANCEL) {
-			PostQuitMessage(1);
-			return;
-		}
-	}
-
 	// Initialize RepositoryFactory
 	RepositoryOption roOpt;
 	roOpt.bKeepCaret = g_Property.GetKeepCaret();

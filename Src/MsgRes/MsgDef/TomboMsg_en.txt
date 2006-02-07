@@ -285,3 +285,10 @@ MSG_MENUITEM_W32_T_REBAR	Toolbar
 MSG_DLG_SAVEPROP_FAILED	Save options failed. Change may not be reflected.
 MSG_DLG_PROPTAB_TIMEOUT_USE_SAFENAME	Use random filename
 MSG_DLG_PROPTAB_TIMEOUT_USE_SAFENAME_HELP	When encrypting, generate file name by random number.
+MSG_DECRYPT_IS_PARTIAL	Get headline failed for some notes due to wrong password. Display ???????? the notes.
+MSG_REGERASE_TITLE	TOMBO registry erase tool
+MSG_REGERASE_CONFIRM	The registry entry that TOMBO 1.14 or orlder uses are erased. Are you sure?
+MSG_REGERASE_CANCELED	Canceled.
+MSG_REGERASE_DELETED	Deleted.
+MSG_REGERASE_NOT_EXIST	There are no registry entry.
+MSG_REGERASE_ERROR	Delete failed(%d).

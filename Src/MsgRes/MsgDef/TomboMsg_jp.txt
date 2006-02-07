@@ -285,3 +285,10 @@ MSG_MENUITEM_W32_T_REBAR	ツールバー
 MSG_DLG_SAVEPROP_FAILED	プロパティの保存に失敗しました。変更した設定が反映されない可能性があります。
 MSG_DLG_PROPTAB_TIMEOUT_USE_SAFENAME	暗号化時にファイル名をランダムにする
 MSG_DLG_PROPTAB_TIMEOUT_USE_SAFENAME_HELP	暗号化時にファイル名をランダムに決定します。\r\nより安全になる反面、ファイルの整理がしにくくなります。
+MSG_DECRYPT_IS_PARTIAL	一部ファイルはパスワード不一致のためタイトルが取得できませんでした。????????で表示します。
+MSG_REGERASE_TITLE	TOMBOレジストリ削除ツール
+MSG_REGERASE_CONFIRM	以前のバージョンのTOMBOが使用していたレジストリを削除します。よろしいですか？
+MSG_REGERASE_CANCELED	削除はキャンセルされました。
+MSG_REGERASE_DELETED	削除されました。
+MSG_REGERASE_NOT_EXIST	エントリは既に削除されていました。
+MSG_REGERASE_ERROR	削除に失敗しました(%d)。

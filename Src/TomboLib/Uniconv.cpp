@@ -7,6 +7,7 @@
 #include "Uniconv.h"
 #include "TString.h"
 #include "AutoPtr.h"
+#include "File.h"
 
 #ifndef ESC
 #define ESC 0x1B

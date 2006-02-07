@@ -1081,3 +1081,16 @@ Some bugs are fixed.
 * Save/load properties to/from file.
   some features are still used registory yet.
 
+////////////////////////////////
+// B199
+////////////////////////////////
+
+* When some *.chs crypted with another password, popup warnings and show title '???????' if crypt failed.(#7227)
+* Add RegErase tool.
+
+- Change property load timing.
+- Set default value at the time of first use.
+
+////////////////////////////////
+//
+////////////////////////////////

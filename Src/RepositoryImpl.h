@@ -42,8 +42,7 @@ public:
 
 	virtual BOOL GetPhysicalPath(const TomboURI *pURI, TString *pFullPath) = 0;
 
-	virtual BOOL GetList(const TomboURI *pFolder, DirList *pList, BOOL bSkipEncrypt) = 0;
-	virtual URIList *GetChild(const TomboURI *pFolder, BOOL bSkipEncrypt) = 0;
+	virtual URIList *GetChild(const TomboURI *pFolder, BOOL bSkipEncrypt, BOOL bLooseDecrypt, BOOL *pLoose) = 0;
 
 	virtual BOOL RequestAllocateURI(const TomboURI *pBaseURI, LPCTSTR pText, TString *pHeadLine, TomboURI *pURI, const TomboURI *pTemplateURI) = 0;
 
@@ -124,8 +123,8 @@ public:
 	// change note status
 	BOOL SetOption(const TomboURI *pCurrentURI, URIOption *pOption);
 
-	BOOL GetList(const TomboURI *pFolder, DirList *pList, BOOL bSkipEncrypt);
-	URIList *GetChild(const TomboURI *pFolder, BOOL bSkipEncrypt);
+	DWORD GetList(const TomboURI *pFolder, DirList *pList, BOOL bSkipEncrypt, BOOL bLooseDecrypt);
+	URIList *GetChild(const TomboURI *pFolder, BOOL bSkipEncrypt, BOOL bLooseDecrypt, BOOL *pLoose);
 
 	BOOL RequestAllocateURI(const TomboURI *pBaseURI, LPCTSTR pText, TString *pHeadLine, TomboURI *pURI, const TomboURI *pTemplateURI);
 

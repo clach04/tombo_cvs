@@ -56,6 +56,10 @@ class File;
 
 class Property {
 
+	// 
+	BOOL bLoad;
+	BOOL bNeedAsk;
+
 	// persistent props
 	DWORD nPropsNum[NUM_PROPS_NUM];
 	LPTSTR pPropsStr[NUM_PROPS_STR];
@@ -77,6 +81,8 @@ class Property {
 
 	BOOL SaveToFile(File *pFile);
 	BOOL LoadFromReg(BOOL *pStrict);
+	BOOL LoadProperties();
+	BOOL LoadDefaultProperties();
 
 public:
 	Property();
@@ -263,11 +269,14 @@ public:
 	DWORD Popup(HINSTANCE hInst, HWND hWnd, LPCTSTR pSelPath);
 
 	// load properties
-	BOOL Load(BOOL *pStrict);
+	BOOL Load();
 
 	// save properties
 	BOOL Save();
 
+	// check object status
+	BOOL IsLoaded() { return bLoad; }
+	BOOL IsNeedAskUser() { return bNeedAsk; }
 };
 
 ////////////////////////////////////
