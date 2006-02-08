@@ -27,6 +27,24 @@
 
 static BOOL CreateDirectories(LPCTSTR pDir);
 
+static void SetCheckBox(HWND hWnd, BOOL bChecked)
+{
+	if (bChecked) {
+		SendMessage(hWnd, BM_SETCHECK, BST_CHECKED, 0);
+	} else {
+		SendMessage(hWnd, BM_SETCHECK, BST_UNCHECKED, 0);
+	}
+}
+
+static BOOL GetCheckBox(HWND hWnd)
+{
+	if (SendMessage(hWnd, BM_GETCHECK, 0, 0) == BST_CHECKED) {
+		return TRUE;
+	} else {
+		return FALSE;
+	}
+}
+
 //////////////////////////////////////////
 // TomboRoot setting tab
 //////////////////////////////////////////
@@ -737,13 +755,24 @@ static DlgMsgRes aDefNote[] = {
 	{ IDC_PROPTAB_DEFNOTE_LABEL,      MSG_ID_DLG_PROPTAB_DEFNOTE_LABEL },
 	{ IDC_PROPTAB_DEFNOTE_SETCURRENT, MSG_ID_DLG_PROPTAB_DEFNOTE_CURRENT },
 	{ IDC_PROPTAB_DEFNOTE_SETBLANK,   MSG_ID_DLG_PROPTAB_BLANK },
+	{ IDC_PROPTAB_DEFNOTE_USELAST,	  MSG_ID_DLG_PROPTAB_DEFNOTE_LAST_USE },
 };
 
 void DefaultNoteTab::Init(HWND hDlg)
 {
 	OverrideDlgMsg(hDlg, -1, aDefNote, sizeof(aDefNote)/sizeof(DlgMsgRes));
+	HWND hLastOpen = GetDlgItem(hDlg, IDC_PROPTAB_DEFNOTE_USELAST);
+	SetCheckBox(hLastOpen, g_Property.GetKeepLastOpen());
+
 	HWND hPath = GetDlgItem(hDlg, IDC_PROPTAB_DEFNOTE_PATH);
 	SetWindowText(hPath, g_Property.GetDefaultNote());
+
+	HWND hButton1 = GetDlgItem(hDlg, IDC_PROPTAB_DEFNOTE_SETCURRENT);
+	HWND hButton2 = GetDlgItem(hDlg, IDC_PROPTAB_DEFNOTE_SETBLANK);
+	BOOL bEnable = !g_Property.GetKeepLastOpen();
+	EnableWindow(hPath, bEnable);
+	EnableWindow(hButton1, bEnable);
+	EnableWindow(hButton2, bEnable);
 }
 
 BOOL DefaultNoteTab::Apply(HWND hDlg)
@@ -751,6 +780,7 @@ BOOL DefaultNoteTab::Apply(HWND hDlg)
 	HWND hPath = GetDlgItem(hDlg, IDC_PROPTAB_DEFNOTE_PATH);
 	TCHAR buf[MAX_PATH];
 	GetWindowText(hPath, buf, MAX_PATH);
+	g_Property.SetKeepLastOpen(GetCheckBox(GetDlgItem(hDlg, IDC_PROPTAB_DEFNOTE_USELAST)));
 	return g_Property.SetDefaultNote(buf);
 }
 
@@ -762,6 +792,17 @@ BOOL DefaultNoteTab::OnCommand(HWND hDlg, WPARAM wParam, LPARAM lParam)
 		break;
 	case IDC_PROPTAB_DEFNOTE_SETBLANK:
 		SetBlank(hDlg);
+		break;
+	case IDC_PROPTAB_DEFNOTE_USELAST:
+		{
+			HWND hPath = GetDlgItem(hDlg, IDC_PROPTAB_DEFNOTE_PATH);
+			HWND hButton1 = GetDlgItem(hDlg, IDC_PROPTAB_DEFNOTE_SETCURRENT);
+			HWND hButton2 = GetDlgItem(hDlg, IDC_PROPTAB_DEFNOTE_SETBLANK);
+			DWORD bEnable = !GetCheckBox(GetDlgItem(hDlg, IDC_PROPTAB_DEFNOTE_USELAST));
+			EnableWindow(hPath, bEnable);
+			EnableWindow(hButton1, bEnable);
+			EnableWindow(hButton2, bEnable);
+		}
 		break;
 	}
 	return TRUE;

@@ -488,32 +488,6 @@ LRESULT MemoSelectView::OnNotify(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 	case TVN_SELCHANGED:
 		{
-#ifdef COMMENT
-			{
-				NMTREEVIEW *p = (LPNMTREEVIEW)lParam;
-				HTREEITEM hOld = p->itemOld.hItem;
-				HTREEITEM hNew = p->itemNew.hItem;
-				TString info;
-
-				if (hOld != NULL) {
-					TString sOldURI;
-					GetURI(&sOldURI, hOld);
-					info.Join(sOldURI.Get(), "->");
-				} else {
-					info.Set("-- ->");
-				}
-				if (hNew != NULL) {
-					TString sNewURI;
-					GetURI(&sNewURI, hNew);
-					info.StrCat(sNewURI.Get());
-				} else {
-					info.StrCat("--");
-				}
-				g_Logger.WriteLog("TVN_SELCHANGED ");
-				g_Logger.WriteLog(info.Get());
-				g_Logger.WriteLog("\r\n");
-			}
-#endif
 			NMTREEVIEW *p = (LPNMTREEVIEW)lParam;
 			TreeViewItem *tvi = (TreeViewItem*)((p->itemNew).lParam);
 			if (tvi == NULL) {

@@ -541,7 +541,12 @@ void MainFrame::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	}
 
 	// open top page
-	if (_tcslen(g_Property.GetDefaultNote()) != 0) {
+	if (g_Property.GetKeepLastOpen()) {
+		if (g_Property.GetLastOpenURI() == NULL) return;
+		TomboURI sURI;
+		if (!sURI.Init(g_Property.GetLastOpenURI())) return;
+		msView.ShowItemByURI(&sURI);
+	} else if (_tcslen(g_Property.GetDefaultNote()) != 0) {
 		TomboURI sURI;
 		if (!sURI.Init(g_Property.GetDefaultNote())) return;
 		msView.ShowItemByURI(&sURI);
@@ -574,6 +579,10 @@ void MainFrame::SetNewMemoStatus(BOOL bNew)
 
 BOOL MainFrame::OnExit()
 {
+	TomboURI uri;
+	msView.GetURI(&uri);
+	g_Property.SetLastOpenURI(uri.GetFullURI());
+
 	DWORD nYNC;
 	if (!mmMemoManager.SaveIfModify(&nYNC, FALSE)) {
 		TCHAR buf[1024];
@@ -1110,7 +1119,6 @@ void MainFrame::LoadMemo(const TomboURI *pURI, BOOL bAskPass)
 	}
 	pDetailsView->LoadNote(pURI);
 	SetNewMemoStatus(FALSE);
-
 	SetWindowTitle(pURI);
 }
 

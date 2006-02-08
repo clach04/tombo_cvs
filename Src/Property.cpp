@@ -137,6 +137,7 @@ struct PropListNum {
 #if defined(PLATFORM_PKTPC) && defined(FOR_VGA)
 	{ PROP_N_TOMBO_WINSIZE3,			TEXT("WinSize3"),					0xFFFF },
 #endif
+	{ PROP_N_KEEP_LAST_OPEN,			TEXT("UseLastOpenNote"),			FALSE },
 	{ 0xFFFFFFFF,						NULL,								NULL},
 };
 
@@ -146,14 +147,16 @@ struct PropListStr {
 	LPCTSTR pDefault;
 } propListStr[] = {
 	{ PROP_S_TOPDIR,					TOPDIR_ATTR_NAME,					NULL },	
-	{ PROP_S_SELECTVIEW_FONTNAME,		TEXT("SelectViewFontName"),		TEXT("") },
+	{ PROP_S_SELECTVIEW_FONTNAME,		TEXT("SelectViewFontName"),			TEXT("") },
 	{ PROP_S_DETAILSVIEW_FONTNAME,		TEXT("DetailsViewFontName"),		TEXT("") },
-	{ PROP_S_DETAILSVIEW_DATEFORMAT1,	TEXT("DateFormat1"),	DEFAULTDATEFORMAT1 },
-	{ PROP_S_DETAILSVIEW_DATEFORMAT2,	TEXT("DateFormat2"),	DEFAULTDATEFORMAT2 },
+	{ PROP_S_DETAILSVIEW_DATEFORMAT1,	TEXT("DateFormat1"),				DEFAULTDATEFORMAT1 },
+	{ PROP_S_DETAILSVIEW_DATEFORMAT2,	TEXT("DateFormat2"),				DEFAULTDATEFORMAT2 },
 	{ PROP_S_DEFAULTNOTE,				TEXT("DefaultNote"),				TEXT("") },
 	{ PROP_S_EXTAPP1,					TEXT("ExtApp1"),					TEXT("") },
 	{ PROP_S_EXTAPP2,					TEXT("ExtApp2"),					TEXT("") },
-	{ PROP_S_WINSIZE,					TEXT("WinSize2"),			NULL }, 
+	{ PROP_S_WINSIZE,					TEXT("WinSize2"),					NULL }, 
+	{ PROP_S_LAST_OPEN_URI,				TEXT("LastOpenURI"),				TEXT("") },
+	{ PROP_S_NOTE_ENCODING,				TEXT("NoteEncoding"),				TEXT("") },
 	{ 0xFFFFFFFF,						NULL,								NULL },
 };
 
@@ -292,7 +295,6 @@ DWORD Property::Popup(HINSTANCE hInst, HWND hWnd, LPCTSTR pSelPath)
 	}
 	return IDCANCEL;
 }
-
 
 //////////////////////////////////////////
 // load properties

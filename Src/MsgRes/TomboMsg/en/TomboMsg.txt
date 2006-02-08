@@ -228,7 +228,7 @@ Save
 Name:
 New folder
 Password
-Top page
+Default note
 Use selected
 Use blank
 Root folder:
@@ -292,3 +292,4 @@ Canceled.
 Deleted.
 There are no registry entry.
 Delete failed(%d).
+When starting select the tree item last selected

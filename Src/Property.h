@@ -5,7 +5,10 @@
 
 #define MAX_DATEFORMAT_LEN 256
 
-// property index(number)
+////////////////////////////////////
+// property index
+////////////////////////////////////
+
 #define PROP_N_PASSTIMEOUT				 0
 #define PROP_N_DETAILSVIEW_KEEPCARET	 1
 #define PROP_NDETAILSVIEW_TABSTOP		 2
@@ -35,8 +38,9 @@
 #define PROP_N_USEASSOC					26
 #define PROP_N_SAFEFILENAME				27
 #define PROP_N_TOMBO_WINSIZE3			28	// PKTPCVGA
+#define PROP_N_KEEP_LAST_OPEN			29
 
-#define NUM_PROPS_NUM 29
+#define NUM_PROPS_NUM 30
 
 #define PROP_S_TOPDIR					 0
 #define PROP_S_SELECTVIEW_FONTNAME		 1
@@ -47,7 +51,22 @@
 #define PROP_S_EXTAPP1					 6
 #define PROP_S_EXTAPP2					 7
 #define PROP_S_WINSIZE					 8
-#define NUM_PROPS_STR 9
+#define PROP_S_LAST_OPEN_URI			 9
+#define PROP_S_NOTE_ENCODING			10
+
+#define NUM_PROPS_STR 10
+
+////////////////////////////////////
+// accessor generation macros
+////////////////////////////////////
+
+#define STR_ACCESSOR(NAME, ATTR) \
+	LPCTSTR Get##NAME##() { return pPropsStr[ATTR]; }\
+	BOOL Set##NAME##(LPCTSTR pDir) { return SetStringProperty(ATTR, pDir); }
+
+#define NUM_ACCESSOR(NAME, ATTR) \
+	DWORD Get##NAME##() { return nPropsNum[ATTR]; }\
+	void Set##NAME##(DWORD n) { nPropsNum[ATTR] = n; }
 
 class File;
 ////////////////////////////////////
@@ -56,7 +75,7 @@ class File;
 
 class Property {
 
-	// 
+	// internal status
 	BOOL bLoad;
 	BOOL bNeedAsk;
 
@@ -97,151 +116,95 @@ public:
 	/////////////////////////////////
 	// accessor
 
-	// tombo root directory
-	LPCTSTR GetTopDir() { return pPropsStr[PROP_S_TOPDIR]; }
-	BOOL SetTopDir(LPCTSTR pDir) { return SetStringProperty(PROP_S_TOPDIR, pDir); }
+	// startup related
+	STR_ACCESSOR(LastOpenURI, PROP_S_LAST_OPEN_URI) // notes store folder
+	NUM_ACCESSOR(KeepLastOpen, PROP_N_KEEP_LAST_OPEN)	// when starting, the note last open is opened.
+	STR_ACCESSOR(DefaultNote, PROP_S_DEFAULTNOTE)	// use this uri when starting tombo
 
-	// password timeout
-	DWORD GetPassTimeout() { return nPropsNum[PROP_N_PASSTIMEOUT]; }
-	void SetPassTimeout(DWORD n) { nPropsNum[PROP_N_PASSTIMEOUT] = n; }
+	STR_ACCESSOR(TopDir, PROP_S_TOPDIR)		// TOMBO root directory
 
-	// font
-	LPCTSTR GetSelectViewFontName() { return pPropsStr[PROP_S_SELECTVIEW_FONTNAME]; }
-	BOOL SetSelectViewFontName(LPCTSTR pFontName) { return SetStringProperty(PROP_S_SELECTVIEW_FONTNAME, pFontName); }
-
-	LPCTSTR GetDetailsViewFontName() { return pPropsStr[PROP_S_DETAILSVIEW_FONTNAME]; }
-	BOOL SetDetailsViewFontName(LPCTSTR pFontName) { return SetStringProperty(PROP_S_DETAILSVIEW_FONTNAME, pFontName); }
-
+	// font related
+	STR_ACCESSOR(SelectViewFontName, PROP_S_SELECTVIEW_FONTNAME)
+	NUM_ACCESSOR(SelectViewFontSize, PROP_N_SELECTVIEW_FONTSIZE)	// selectview font size
+	NUM_ACCESSOR(SelectViewFontQuality, PROP_N_SELECTVIEW_FONTQUALITY) // do use selectview ClearType font?
+	STR_ACCESSOR(DetailsViewFontName, PROP_S_DETAILSVIEW_FONTNAME)
+	NUM_ACCESSOR(DetailsViewFontSize, PROP_N_DETAILSVIEW_FONTSIZE)	// editview font size
+	NUM_ACCESSOR(DetailsViewFontQuality, PROP_N_DETAILSVIEW_FONTQUALITY) // do use editview ClearType font? 
 	HFONT SelectViewFont();
 	HFONT DetailsViewFont();
 
-	// date format
-	LPCTSTR GetDateFormat1() { return pPropsStr[PROP_S_DETAILSVIEW_DATEFORMAT1]; }
-	BOOL SetDateFormat1(LPCTSTR pFormat) { return SetStringProperty(PROP_S_DETAILSVIEW_DATEFORMAT1, pFormat); }
+	// editview related
+	STR_ACCESSOR(DateFormat1, PROP_S_DETAILSVIEW_DATEFORMAT1)
+	STR_ACCESSOR(DateFormat2, PROP_S_DETAILSVIEW_DATEFORMAT2)
+	STR_ACCESSOR(NoteEncoding, PROP_S_NOTE_ENCODING)
+	NUM_ACCESSOR(Tabstop, PROP_NDETAILSVIEW_TABSTOP)	// tab stop
+	NUM_ACCESSOR(KeepCaret, PROP_N_DETAILSVIEW_KEEPCARET) // whether keep caret position or not
+	NUM_ACCESSOR(WrapText, PROP_N_WRAPTEXT)	// text wrapping on editview
+	NUM_ACCESSOR(OpenReadOnly, PROP_N_OPENREADONLY)	// always read only mode when open the nots.
+	NUM_ACCESSOR(DisableSaveDlg, PROP_N_DISABLESAVEDLG)	// disable asking save when closing notes
 
-	LPCTSTR GetDateFormat2() { return pPropsStr[PROP_S_DETAILSVIEW_DATEFORMAT2]; }
-	BOOL SetDateFormat2(LPCTSTR pFormat) { return SetStringProperty(PROP_S_DETAILSVIEW_DATEFORMAT2, pFormat); }
+	// crypt related
+	NUM_ACCESSOR(UseSafeFileName, PROP_N_SAFEFILENAME)	// change crypted file name random
+	NUM_ACCESSOR(PassTimeout, PROP_N_PASSTIMEOUT)	// password timeout	
 
-	LPCTSTR GetDefaultNote() { return pPropsStr[PROP_S_DEFAULTNOTE]; }
-	BOOL SetDefaultNote(LPCTSTR p) { return SetStringProperty(PROP_S_DEFAULTNOTE, p); }
+	// MainFrame related
+	NUM_ACCESSOR(AutoSelectMemo, PROP_N_AUTOSELECT_MODE)	// display note when treeview selection is moving
+	NUM_ACCESSOR(SingleClick, PROP_N_SINGLECLICK_MODE)	// display note when clicking the tree item 
+	NUM_ACCESSOR(SwitchWindowTitle, PROP_N_SWITCH_WINDOW_TITLE) // is sync window text to note's name?
+	NUM_ACCESSOR(KeepTitle, PROP_N_KEEP_TITLE) // keep file name even if headline has changed
+	NUM_ACCESSOR(UseTwoPane, PROP_N_USE_TWO_PANE) // is two pane mode?
 
-	LPCTSTR GetExtApp1() { return pPropsStr[PROP_S_EXTAPP1]; }
-	BOOL SetExtApp1(LPCTSTR p) { return SetStringProperty(PROP_S_EXTAPP1, p); }
+	// extapp related
+	NUM_ACCESSOR(UseAssociation, PROP_N_USEASSOC)	// use default file assosiation
+	STR_ACCESSOR(ExtApp1, PROP_S_EXTAPP1)
+	STR_ACCESSOR(ExtApp2, PROP_S_EXTAPP2)
 
-	LPCTSTR GetExtApp2() { return pPropsStr[PROP_S_EXTAPP2]; }
-	BOOL SetExtApp2(LPCTSTR p) { return SetStringProperty(PROP_S_EXTAPP2, p); }
+	// Use YAEDIT component. On 1.x, always FALSE.
+//	BOOL UseYAEdit() { return nUseYAEdit; }
+	BOOL UseYAEdit() { return FALSE; }
+//	BOOL UseYAEdit() { return TRUE; }
 
-	// tab stop
-	DWORD GetTabstop() { return nPropsNum[PROP_NDETAILSVIEW_TABSTOP]; }
-	void SetTabstop(DWORD n) { nPropsNum[PROP_NDETAILSVIEW_TABSTOP] = n; }
 
-	// whether keep caret position or not
-	DWORD GetKeepCaret() { return nPropsNum[PROP_N_DETAILSVIEW_KEEPCARET]; }
-	void SetKeepCaret(DWORD n) { nPropsNum[PROP_N_DETAILSVIEW_KEEPCARET] = n; }
-
-	DWORD GetSelectViewFontSize() { return nPropsNum[PROP_N_SELECTVIEW_FONTSIZE]; }
-	void SetSelectViewFontSize(DWORD n) { nPropsNum[PROP_N_SELECTVIEW_FONTSIZE] = n; }
-
-	DWORD GetSelectViewFontQuality() { return nPropsNum[PROP_N_SELECTVIEW_FONTQUALITY]; }
-	void SetSelectViewFontQuality(DWORD n) { nPropsNum[PROP_N_SELECTVIEW_FONTQUALITY] = n; }
-
-	DWORD GetDetailsViewFontSize() { return nPropsNum[PROP_N_DETAILSVIEW_FONTSIZE]; }
-	void SetDetailsViewFontSize(DWORD n) { nPropsNum[PROP_N_DETAILSVIEW_FONTSIZE] = n; }
-
-	DWORD GetDetailsViewFontQuality() { return nPropsNum[PROP_N_DETAILSVIEW_FONTQUALITY]; }
-	void SetDetailsViewFontQuality(DWORD n) { nPropsNum[PROP_N_DETAILSVIEW_FONTQUALITY] = n; }
-
-	DWORD GetAutoSelectMemo() { return nPropsNum[PROP_N_AUTOSELECT_MODE]; }
-	void SetAutoSelectMemo(DWORD n) { nPropsNum[PROP_N_AUTOSELECT_MODE] = n; }
-
-	DWORD GetSingleClick() { return nPropsNum[PROP_N_SINGLECLICK_MODE]; }
-	void SetSingleClick(DWORD n) { nPropsNum[PROP_N_SINGLECLICK_MODE] = n; }
-
-	// is sync window text to note's name?
-	DWORD GetSwitchWindowTitle() { return nPropsNum[PROP_N_SWITCH_WINDOW_TITLE]; }
-	void SetSwitchWindowTitle(DWORD n) { nPropsNum[PROP_N_SWITCH_WINDOW_TITLE] = n; }
-
-	// keep file name even if headline has changed
-	DWORD GetKeepTitle() { return nPropsNum[PROP_N_KEEP_TITLE]; }
-	void SetKeepTitle(DWORD n) { nPropsNum[PROP_N_KEEP_TITLE] = n; }
-
-	// is two pane mode?
-	DWORD GetUseTwoPane() { return nPropsNum[PROP_N_USE_TWO_PANE]; }
-	void SetUseTwoPane(DWORD n) { nPropsNum[PROP_N_USE_TWO_PANE] = n; }
-
-	// application buttons
-	DWORD GetAppButton1() { return nPropsNum[PROP_N_APP_BUTTON1]; }
-	DWORD GetAppButton2() { return nPropsNum[PROP_N_APP_BUTTON2]; }
-	DWORD GetAppButton3() { return nPropsNum[PROP_N_APP_BUTTON3]; }
-	DWORD GetAppButton4() { return nPropsNum[PROP_N_APP_BUTTON4]; }
-	DWORD GetAppButton5() { return nPropsNum[PROP_N_APP_BUTTON5]; }
-
-	void SetAppButton1(DWORD n) { nPropsNum[PROP_N_APP_BUTTON1] = n; }
-	void SetAppButton2(DWORD n) { nPropsNum[PROP_N_APP_BUTTON2] = n; }
-	void SetAppButton3(DWORD n) { nPropsNum[PROP_N_APP_BUTTON3] = n; }
-	void SetAppButton4(DWORD n) { nPropsNum[PROP_N_APP_BUTTON4] = n; }
-	void SetAppButton5(DWORD n) { nPropsNum[PROP_N_APP_BUTTON5] = n; }
+	NUM_ACCESSOR(AppButton1, PROP_N_APP_BUTTON1)	// application buttons
+	NUM_ACCESSOR(AppButton2, PROP_N_APP_BUTTON2)
+	NUM_ACCESSOR(AppButton3, PROP_N_APP_BUTTON3)
+	NUM_ACCESSOR(AppButton4, PROP_N_APP_BUTTON4)
+	NUM_ACCESSOR(AppButton5, PROP_N_APP_BUTTON5)
 
 #if defined(PLATFORM_PKTPC)
-	DWORD GetSipSizeDelta() { return nPropsNum[PROP_N_SIPSIZE_DELTA]; }
-	void SetSipSizeDelta(DWORD n) { nPropsNum[PROP_N_SIPSIZE_DELTA] = n; }
+	NUM_ACCESSOR(SipSizeDelta, PROP_N_SIPSIZE_DELTA)
+
 	// Disable open/close notes when action button pushed
-	DWORD GetDisableExtraActionButton() { return nPropsNum[PROP_N_DISABLEEXTRAACTIONBUTTON]; }
-	void SetDisableExtraActionButton(DWORD n) { nPropsNum[PROP_N_DISABLEEXTRAACTIONBUTTON] = n; }
+	NUM_ACCESSOR(DisableExtraActionButton, PROP_N_DISABLEEXTRAACTIONBUTTON)
+
 #endif
 
 #if defined(PLATFORM_BE500)
-	// Codepage selection
-	DWORD GetCodePage() { return nPropsNum[PROP_N_CODEPAGE]; }
-	void SetCodePage(DWORD n) { nPropsNum[PROP_N_CODEPAGE] = n; }
+	NUM_ACCESSOR(CodePage, PROP_N_CODEPAGE) 	// Codepage selection
 #endif
 
 #if defined(PLATFORM_HPC) || defined(PLATFORM_WIN32)
-	// Hide status bar
-	DWORD GetHideStatusBar() { return nPropsNum[PROP_N_HIDESTATUSBAR]; }
-	void SetHideStatusBar(DWORD n) { nPropsNum[PROP_N_HIDESTATUSBAR] = n; }
+	NUM_ACCESSOR(HideStatusBar, PROP_N_HIDESTATUSBAR)	// Hide status bar
 	void ToggleShowStatusBar() { nPropsNum[PROP_N_HIDESTATUSBAR] = !nPropsNum[PROP_N_HIDESTATUSBAR]; }
 #else
 	DWORD GetHideStatusBar() { return TRUE; }
 	void ToggleShowStatusBar() { /* nop */ }
 #endif
 #if defined(PLATFORM_WIN32)
-	DWORD GetStayTopMost() { return nPropsNum[PROP_N_STAYTOPMOST]; }
-	void SetStayTopMost(DWORD n) { nPropsNum[PROP_N_STAYTOPMOST] = n; }
+	NUM_ACCESSOR(StayTopMost, PROP_N_STAYTOPMOST)	// keep tombo topmost of the window
 	void ToggleStayTopMost() { nPropsNum[PROP_N_STAYTOPMOST] = !nPropsNum[PROP_N_STAYTOPMOST]; }
 
-	DWORD GetHideRebar() { return nPropsNum[PROP_N_HIDEREBAR]; }
-	void SetHideRebar(DWORD n) { nPropsNum[PROP_N_HIDEREBAR] = n; }
+	NUM_ACCESSOR(HideRebar, PROP_N_HIDEREBAR)	// hide rebar(toolbar)
 	void ToggleShowRebar() { nPropsNum[PROP_N_HIDEREBAR] = !nPropsNum[PROP_N_HIDEREBAR]; }
 #endif
-	DWORD GetWrapText() { return nPropsNum[PROP_N_WRAPTEXT]; }
-	void SetWrapText(DWORD n) { nPropsNum[PROP_N_WRAPTEXT] = n; }
-
-	DWORD GetOpenReadOnly() { return nPropsNum[PROP_N_OPENREADONLY]; }
-	void SetOpenReadOnly(DWORD n) { nPropsNum[PROP_N_OPENREADONLY] = n; }
 
 	// save restore main window size
 	BOOL SaveWinSize(UINT flags, UINT showCmd, LPRECT pWinRect, WORD nSelectViewWidth);
 	BOOL GetWinSize(UINT *pFlags, UINT *pShowCmd, LPRECT pWinRect, LPWORD pSelectViewWidth);
 
 #if defined(PLATFORM_PKTPC) && defined(FOR_VGA)
-	DWORD GetWinSize2() { return nPropsNum[PROP_N_TOMBO_WINSIZE3]; }
-	void SetWinSize2(DWORD n) { nPropsNum[PROP_N_TOMBO_WINSIZE3] = n; }
+	NUM_ACCESSOR(WinSize2, PROP_N_TOMBO_WINSIZE3)	// horizontal pane size
 #endif
-
-	DWORD GetDisableSaveDlg() { return nPropsNum[PROP_N_DISABLESAVEDLG]; }
-	void SetDisableSaveDlg(DWORD n) { nPropsNum[PROP_N_DISABLESAVEDLG] = n; }
-
-	DWORD GetUseAssociation() { return nPropsNum[PROP_N_USEASSOC]; }
-	void SetUseAssociation(DWORD n) { nPropsNum[PROP_N_USEASSOC] = n; }
-
-	DWORD GetUseSafeFileName() { return nPropsNum[PROP_N_SAFEFILENAME]; }
-	void SetUseSafeFileName(DWORD n) { nPropsNum[PROP_N_SAFEFILENAME] = n; }
-
-//	BOOL UseYAEdit() { return nUseYAEdit; }
-	BOOL UseYAEdit() { return FALSE; }
-//	BOOL UseYAEdit() { return TRUE; }
-
 
 	LPCTSTR GetBookMark() { return pBookMark; }
 	BOOL SetBookMark(LPCTSTR pBookMark);

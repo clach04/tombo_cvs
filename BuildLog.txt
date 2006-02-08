@@ -1092,5 +1092,14 @@ Some bugs are fixed.
 - Set default value at the time of first use.
 
 ////////////////////////////////
+// B200
+////////////////////////////////
+
+* Remember last tree item (#6057)
+
+- support uri attribute of src tag in vfolder.xml.
+	This change is prepare for future changes.
+
+////////////////////////////////
 //
 ////////////////////////////////

@@ -9,6 +9,9 @@
 #include "TSParser.h"
 #include "VFStream.h"
 #include "VFManager.h"
+#include "AutoPtr.h"
+#include "TString.h"
+#include "TomboURI.h"
 
 ///////////////////////////////////////
 // UCS2 -> MBCS conversion libs.
@@ -102,9 +105,10 @@ BOOL TSParseTagItem::EndElement(ParseInfo *p)
 
 class TSSrcTag : public TSParseTagItem {
 	WCHAR *pSrc;
+	WCHAR *pURI;
 	BOOL bCheckEncrypt;
 public:
-	TSSrcTag() : TSParseTagItem(TAGID_SRC), pSrc(NULL), bCheckEncrypt(FALSE) {}
+	TSSrcTag() : TSParseTagItem(TAGID_SRC), pSrc(NULL), bCheckEncrypt(FALSE), pURI(NULL) {}
 	~TSSrcTag();
 
 	BOOL StartElement(ParseInfo *p, const XML_Char **atts);
@@ -113,7 +117,8 @@ public:
 
 TSSrcTag::~TSSrcTag()
 {
-	if (pSrc) delete [] pSrc;
+	delete [] pSrc;
+	delete [] pURI;
 }
 
 BOOL TSSrcTag::StartElement(ParseInfo *p, const XML_Char **atts)
@@ -123,12 +128,13 @@ BOOL TSSrcTag::StartElement(ParseInfo *p, const XML_Char **atts)
 	DWORD i = 0;
 	while(atts[i] != NULL) {
 		if (wcsicmp(atts[i], L"folder") == 0) {
-			pSrc = new WCHAR[wcslen(atts[i + 1]) + 1];
-			if (pSrc == NULL) {
-				SetLastError(ERROR_NOT_ENOUGH_MEMORY);
-				return FALSE;
-			}
-			wcscpy(pSrc, atts[i + 1]);
+			delete[] pSrc;
+			pSrc = StringDupW(atts[i + 1]);
+			if (pSrc == NULL) return FALSE;
+		} else if (wcsicmp(atts[i], L"uri") == 0) {
+			delete[] pURI;
+			pURI = StringDupW(atts[i + 1]);
+			if (pURI == NULL) return FALSE;
 		} else if (wcsicmp(atts[i], L"checkencrypt") == 0) {
 			bCheckEncrypt = TRUE;
 		}
@@ -136,7 +142,7 @@ BOOL TSSrcTag::StartElement(ParseInfo *p, const XML_Char **atts)
 		i += 2;
 	}
 
-	if (!pSrc) {
+	if (!pSrc && !pURI) {
 		// necessary attribute is not found.
 		return FALSE;
 	}
@@ -152,19 +158,19 @@ BOOL TSSrcTag::EndElement(ParseInfo *p)
 
 	VFDirectoryGenerator *pGen = new VFDirectoryGenerator();
 	if (pGen == NULL) return FALSE;
-#ifdef _WIN32_WCE
-	LPTSTR pConved = StringDup(pSrc);
-#else
-	ConvertWideToMultiByte conv;
-	if (!conv.Convert(pSrc)) return FALSE;
-	LPTSTR pConved = StringDup(conv.Get());
-#endif
-	if (!pGen->Init(pConved, bCheckEncrypt)) {
-		delete [] pConved;
-		return FALSE;
-	}
-	delete pConved;
 
+	LPTSTR pSrcPath = ConvWCharToTChar(pSrc);
+	ArrayAutoPointer<TCHAR> ap1(pSrcPath);
+
+	LPTSTR pSrcURI = ConvWCharToTChar(pURI);
+	ArrayAutoPointer<TCHAR> ap2(pSrcURI);
+
+	if (pSrcPath && !pGen->Init(pSrcPath, bCheckEncrypt)) return FALSE;
+	else if (pSrcURI) {
+		TomboURI uri;
+		if (!uri.Init(pSrcURI)) return FALSE;
+		if (!pGen->Init(&uri, bCheckEncrypt)) return FALSE;
+	}
 	// Pass create object to parent item
 	TSParseTagItem *pParent = pNext;
 	pParent->pHead = pParent->pTail = pGen;

@@ -503,6 +503,7 @@ char *ConvUnicode2SJIS(LPCTSTR p)
 
 LPWSTR ConvTCharToWChar(LPCTSTR p)
 {
+	if (p == NULL) return NULL;
 #if defined(PLATFORM_WIN32)
 	LPWSTR pW;
 	DWORD nLen = strlen(p);
@@ -517,6 +518,7 @@ LPWSTR ConvTCharToWChar(LPCTSTR p)
 
 LPTSTR ConvWCharToTChar(LPCWSTR p)
 {
+	if (p == NULL) return NULL;
 #if defined(PLATFORM_WIN32)
 	DWORD nLen = WideCharToMultiByte(CP_ACP, 0, p, -1, NULL, 0, NULL, NULL);
 	LPTSTR pT = new TCHAR[nLen + 1];

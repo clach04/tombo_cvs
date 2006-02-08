@@ -230,7 +230,7 @@ static LPCTSTR defaultMsg[] = {
 	TEXT("Name:"),
 	TEXT("New folder"),
 	TEXT("Password"),
-	TEXT("Top page"),
+	TEXT("Default note"),
 	TEXT("Use selected"),
 	TEXT("Use blank"),
 	TEXT("Root folder:"),
@@ -294,4 +294,5 @@ static LPCTSTR defaultMsg[] = {
 	TEXT("Deleted."),
 	TEXT("There are no registry entry."),
 	TEXT("Delete failed(%d)."),
+	TEXT("When starting select the tree item last selected"),
 };
