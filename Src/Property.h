@@ -26,7 +26,7 @@
 #define PROP_N_APP_BUTTON3				14
 #define PROP_N_APP_BUTTON4				15
 #define PROP_N_APP_BUTTON5				16
-#define PROP_N_CODEPAGE					17	// BE500
+#define PROP_N_CODEPAGE					17
 #define PROP_N_DISABLEEXTRAACTIONBUTTON	18	// PKTPC
 #define PROP_N_SIPSIZE_DELTA			19	// PKTPC
 #define PROP_N_HIDESTATUSBAR			20	// HPC, WIN32
@@ -52,9 +52,14 @@
 #define PROP_S_EXTAPP2					 7
 #define PROP_S_WINSIZE					 8
 #define PROP_S_LAST_OPEN_URI			 9
-#define PROP_S_NOTE_ENCODING			10
 
 #define NUM_PROPS_STR 10
+
+// file encoding related defs
+#define TOMBO_CP_DEFAULT	    0
+#define TOMBO_CP_UTF16LE	 1200	// UTF-16LE
+#define TOMBO_CP_UTF8		65001	// UTF-8
+#define TOMBO_CP_GREEK		 1253	// Greek
 
 ////////////////////////////////////
 // accessor generation macros
@@ -136,12 +141,12 @@ public:
 	// editview related
 	STR_ACCESSOR(DateFormat1, PROP_S_DETAILSVIEW_DATEFORMAT1)
 	STR_ACCESSOR(DateFormat2, PROP_S_DETAILSVIEW_DATEFORMAT2)
-	STR_ACCESSOR(NoteEncoding, PROP_S_NOTE_ENCODING)
 	NUM_ACCESSOR(Tabstop, PROP_NDETAILSVIEW_TABSTOP)	// tab stop
 	NUM_ACCESSOR(KeepCaret, PROP_N_DETAILSVIEW_KEEPCARET) // whether keep caret position or not
 	NUM_ACCESSOR(WrapText, PROP_N_WRAPTEXT)	// text wrapping on editview
 	NUM_ACCESSOR(OpenReadOnly, PROP_N_OPENREADONLY)	// always read only mode when open the nots.
 	NUM_ACCESSOR(DisableSaveDlg, PROP_N_DISABLESAVEDLG)	// disable asking save when closing notes
+	NUM_ACCESSOR(CodePage, PROP_N_CODEPAGE) 	// Codepage selection
 
 	// crypt related
 	NUM_ACCESSOR(UseSafeFileName, PROP_N_SAFEFILENAME)	// change crypted file name random
@@ -164,7 +169,6 @@ public:
 	BOOL UseYAEdit() { return FALSE; }
 //	BOOL UseYAEdit() { return TRUE; }
 
-
 	NUM_ACCESSOR(AppButton1, PROP_N_APP_BUTTON1)	// application buttons
 	NUM_ACCESSOR(AppButton2, PROP_N_APP_BUTTON2)
 	NUM_ACCESSOR(AppButton3, PROP_N_APP_BUTTON3)
@@ -177,10 +181,6 @@ public:
 	// Disable open/close notes when action button pushed
 	NUM_ACCESSOR(DisableExtraActionButton, PROP_N_DISABLEEXTRAACTIONBUTTON)
 
-#endif
-
-#if defined(PLATFORM_BE500)
-	NUM_ACCESSOR(CodePage, PROP_N_CODEPAGE) 	// Codepage selection
 #endif
 
 #if defined(PLATFORM_HPC) || defined(PLATFORM_WIN32)
@@ -260,5 +260,14 @@ extern Property g_Property;
 
 // some codes assumes this value is just '2'. check if this value is changed.
 #define NUM_COMMANDBAR 2
+
+/////////////////////////////////////////////
+// Code conversion related
+/////////////////////////////////////////////
+
+LPBYTE ConvTCharToFileEncoding(LPCTSTR p, LPDWORD pSize);
+
+// p is assumed terminated by '\0' if encoding is MBCS/UTF-8 and L'\0' if encoding is UTF-16
+LPTSTR ConvFileEncodingToTChar(LPBYTE p);
 
 #endif

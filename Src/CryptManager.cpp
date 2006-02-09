@@ -230,14 +230,15 @@ LPBYTE CryptManager::LoadAndDecrypt(LPDWORD pSize, LPCTSTR pFileName)
 	// 領域再確保
 	// 乱数データとMD5SUMをまとめて復号化するために1つのバッファで確保したが、
 	// deleteを正しく行えるように領域を再確保、コピーして返す
-	LPBYTE pData = new BYTE[nDataSize + 1];
+	LPBYTE pData = new BYTE[nDataSize + 2];
 	if (pData == NULL) {
-		WipeOutAndDelete((char*)pBuf, nFileSize + 1);
+		WipeOutAndDelete((char*)pBuf, nFileSize + 2);
 		SetLastError(ERROR_NOT_ENOUGH_MEMORY);
 		return NULL;
 	}
 	memcpy(pData, pBuf + 24, nDataSize);
 	pData[nDataSize] = '\0';
+	pData[nDataSize + 1] = '\0';	// sentinel for the file is UTF16
 	WipeOutAndDelete((char*)pBuf, nFileSize + 1);
 	return pData;
 }

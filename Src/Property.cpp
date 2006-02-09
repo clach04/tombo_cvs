@@ -49,7 +49,7 @@
 #define PROPTAB_PAGES 8
 #endif
 #else
-#define PROPTAB_PAGES 7
+#define PROPTAB_PAGES 8
 #endif
 
 //////////////////////////////////////////
@@ -116,9 +116,7 @@ struct PropListNum {
 	{ PROP_N_APP_BUTTON5,				TEXT("AppButton5"),					APPBUTTON_ACTION_DISABLE },
 	{ PROP_N_SIPSIZE_DELTA,				TEXT("SipSizeDelta"),				0},
 #endif
-#if defined(PLATFORM_BE500)
 	{ PROP_N_CODEPAGE,					TEXT("CodePage"),					0 },
-#endif
 #if defined(PLATFORM_PKTPC)
 	{ PROP_N_DISABLEEXTRAACTIONBUTTON,	TEXT("DisableExtraActionButton"),	0},
 #endif
@@ -156,7 +154,6 @@ struct PropListStr {
 	{ PROP_S_EXTAPP2,					TEXT("ExtApp2"),					TEXT("") },
 	{ PROP_S_WINSIZE,					TEXT("WinSize2"),					NULL }, 
 	{ PROP_S_LAST_OPEN_URI,				TEXT("LastOpenURI"),				TEXT("") },
-	{ PROP_S_NOTE_ENCODING,				TEXT("NoteEncoding"),				TEXT("") },
 	{ 0xFFFFFFFF,						NULL,								NULL },
 };
 
@@ -251,18 +248,12 @@ DWORD Property::Popup(HINSTANCE hInst, HWND hWnd, LPCTSTR pSelPath)
 	PassTimeoutTab pgTimeout(this);
 	FontTab pgFont(this);
 	DateFormatTab pgDate(this);
-//	PasswordTab pgPass(this);
 	KeepCaretTab pgKeepCaret(this);
-#if defined(PLATFORM_WIN32)
-//	SelectMemoTab pgSelectMemo(this);
-#endif
 #if defined(PLATFORM_PKTPC)
 	AppButtonTab pgAppButton(this);
 	SipTab pgSip(this);
 #endif
-#if defined(PLATFORM_BE500) && defined(TOMBO_LANG_ENGLISH)
 	CodepageTab pgCodepage(this);
-#endif
 #if !defined(PLATFORM_PSPC)
 	ExtAppTab pgExtApp(this);
 #endif
@@ -282,9 +273,7 @@ DWORD Property::Popup(HINSTANCE hInst, HWND hWnd, LPCTSTR pSelPath)
 	pages[n++] = &pgAppButton;
 	pages[n++] = &pgSip;
 #endif
-#if defined(PLATFORM_BE500) && defined(TOMBO_LANG_ENGLISH)
 	pages[n++] = &pgCodepage;
-#endif
 
 	PropertyPage pp;
 	if (pp.Popup(hInst, hWnd, pages, n, MSG_PROPTAB_TITLE, MAKEINTRESOURCE(IDI_TOMBO)) == IDOK) {
@@ -1097,4 +1086,43 @@ BOOL Property::SetBookMark(LPCTSTR pBM)
 
 	pBookMark = pBuf;
 	return TRUE;
+}
+
+///////////////////////////////////////////////////
+// Code conversion related
+///////////////////////////////////////////////////
+
+LPBYTE ConvTCharToFileEncoding(LPCTSTR p, LPDWORD pSize)
+{
+	LPBYTE pData;
+
+	switch (g_Property.GetCodePage()) {
+	case TOMBO_CP_UTF16LE:
+		pData = (LPBYTE)ConvTCharToWChar(p);
+		if (pData == NULL) return FALSE;
+		*pSize = wcslen((LPCWSTR)pData) * sizeof(WCHAR);
+		break;
+	case TOMBO_CP_UTF8:
+		pData = (LPBYTE)ConvTCharToUTF8(p);
+		if (pData == NULL) return FALSE;
+		*pSize = strlen((const char*)pData);
+		break;
+	default:
+		pData = (LPBYTE)ConvUnicode2SJIS(p);
+		if (pData == NULL) return FALSE;
+		*pSize = strlen((const char*)pData);
+	}
+	return pData;
+}
+
+LPTSTR ConvFileEncodingToTChar(LPBYTE p)
+{
+	switch (g_Property.GetCodePage()) {
+	case TOMBO_CP_UTF16LE:
+		return ConvWCharToTChar((LPCWSTR)p);
+	case TOMBO_CP_UTF8:
+		return ConvUTF8ToTChar((const char*)p);
+	default:
+		return ConvSJIS2Unicode((const char*)p);	
+	}
 }

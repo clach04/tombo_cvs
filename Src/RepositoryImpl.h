@@ -51,7 +51,8 @@ public:
 	virtual BOOL GetNoteAttribute(const TomboURI *pURI, UINT64 *pLastUpdate, UINT64 *pCreateDate, UINT64 *pFileSize) = 0;
 
 	virtual LPTSTR GetNoteData(const TomboURI *pURI) = 0;
-	virtual char *GetNoteDataNative(const TomboURI *pURI) = 0;
+	virtual LPBYTE GetNoteDataNative(const TomboURI *pURI, LPDWORD pSize) = 0;
+
 	virtual BOOL ExecuteAssoc(const TomboURI *pURI, ExeAppType nType) = 0;
 	virtual BOOL MakeFolder(const TomboURI *pURI, LPCTSTR pFolderName) = 0;
 
@@ -75,8 +76,8 @@ protected:
 
 	BOOL Save(const TomboURI *pCurrentURI, LPCTSTR pMemo, TomboURI *pNewURI, TString *pHeadLine);
 
-	BOOL SaveIfHeadLineIsNotChanged(MemoNote *pNote, const char *pText, LPCTSTR pOrigFile);
-	BOOL SaveIfHeadLineIsChanged(MemoNote *pNote, const char *pText,
+	BOOL SaveIfHeadLineIsNotChanged(MemoNote *pNote, LPCTSTR pMemo, LPCTSTR pOrigFile);
+	BOOL SaveIfHeadLineIsChanged(MemoNote *pNote, LPCTSTR pMemo,
 								 LPCTSTR pOrigFile, LPCTSTR pHeadLine, 
 								 TString *pNewHeadLine);
 
@@ -89,7 +90,7 @@ protected:
 	TomboURI *DoEncryptFile(const TomboURI *pOldURI, MemoNote *pNote, TString *pHeadLine);
 	BOOL NegotiateNewName(LPCTSTR pMemoPath, LPCTSTR pText, 
 							 LPCTSTR pMemoDir,
-							 TString *pFullPath, LPTSTR *ppNotePath, TString *pHeadLine);
+							 TString *pFullPath, LPCTSTR *ppNotePath, TString *pHeadLine);
 
 	////////////////////////////////////////
 	// others
@@ -133,7 +134,7 @@ public:
 	BOOL GetNoteAttribute(const TomboURI *pURI, UINT64 *pLastUpdate, UINT64 *pCreateDate, UINT64 *pFileSize);
 
 	LPTSTR GetNoteData(const TomboURI *pURI);
-	char *GetNoteDataNative(const TomboURI *pURI);
+	LPBYTE GetNoteDataNative(const TomboURI *pURI, LPDWORD pSize);
 
 	BOOL ExecuteAssoc(const TomboURI *pURI, ExeAppType nType);
 	BOOL MakeFolder(const TomboURI *pURI, LPCTSTR pFolderName);

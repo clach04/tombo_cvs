@@ -49,6 +49,7 @@
 #define IDR_CONTEXTMENU                 133
 #define IDD_BOOKMARK_EDIT               134
 #define IDD_PROPTAB_EXTAPP              135
+#define IDD_PROPTAB_CODEPAGE            136
 #define IDD_FILTERDEF_SRC               138
 #define IDD_FILTERDEF_FILTER            139
 #define IDD_FILTERDEF_ADD_REGEX         140
@@ -91,6 +92,7 @@
 #define IDC_COPYRIGHT                   1025
 #define IDC_DATEFORMAT_DESC             1025
 #define IDC_PROP_EXTAPP_PATH_EXTAPP1    1025
+#define IDC_PROPTAB_CODEPAGE_NOTICE     1025
 #define IDC_FILENAMEONLY                1026
 #define IDC_PROP_EXTAPP_PATH_EXTAPP2    1026
 #define IDC_VERSIONINFO                 1028
@@ -168,6 +170,9 @@
 #define IDC_PROPTAB_DISABLESAVEDLG      1070
 #define IDC_PASS_TIMEOUT_USE_SAFEFILE   1071
 #define IDC_PROPTAB_PASS_TIMEOUT_SAFEFILE_HELP 1072
+#define IDC_PROPTAB_CODEPAGE_CODEPAGE   1073
+#define IDC_PROPTAB_DEFNOTE_USELAST     1074
+#define IDC_PROPTAB_CODEPAGE_LABEL      1075
 #define IDM_ACTIONBUTTON                30001
 #define IDM_FILE_EXIT                   40002
 #define IDM_HELP_ABOUT                  40003
@@ -235,9 +240,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        136
+#define _APS_NEXT_RESOURCE_VALUE        137
 #define _APS_NEXT_COMMAND_VALUE         40063
-#define _APS_NEXT_CONTROL_VALUE         1073
+#define _APS_NEXT_CONTROL_VALUE         1076
 #define _APS_NEXT_SYMED_VALUE           118
 #endif
 #endif

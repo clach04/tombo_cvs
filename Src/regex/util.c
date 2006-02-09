@@ -2,16 +2,26 @@
 #include <string.h>
 
 #include "oniguruma.h"
+#include "RegexUtil.h"
 
 static char err_buf[ONIG_MAX_ERROR_MESSAGE_LEN];
 
 // regex library wrapper
 
-static OnigEncoding GetNativeEncoding()
+static OnigEncoding GetNativeEncoding(DWORD nCodePage)
 {
 	OnigEncoding enc;
-
 	UINT acp = GetACP();
+
+	switch (nCodePage) {
+	case 1200:	// UTF-16LE
+		return ONIG_ENCODING_UTF16_LE;
+	case 65001:	// UTF-8
+		return ONIG_ENCODING_UTF8;
+	}
+
+	// if not match, use system default
+
 	switch(acp) {
 	case 932:	// Japan
 		enc = ONIG_ENCODING_SJIS;
@@ -33,8 +43,8 @@ static OnigEncoding GetNativeEncoding()
 	case 1253:	// Greek
 		enc = ONIG_ENCODING_ISO_8859_7;
 		break;
-	default:	// 
-		enc = ONIG_ENCODING_UTF16_LE;
+	default:	// default = ASCII
+		enc = ONIG_ENCODING_ASCII;
 	}
 	return enc;
 }
@@ -50,7 +60,7 @@ static OnigEncoding GetNativeEncoding()
 // result 		: if success, returns pointer to pattern which is compiled.
 //				  if fail, return NULL
 
-void* Regex_Compile(const char *pPattern, BOOL bIgnoreCase, const char **ppReason)
+void* Regex_Compile(const LPBYTE pPattern, BOOL bIgnoreCase, const char **ppReason, DWORD nCodePage)
 {
 	regex_t *reg;
 	OnigErrorInfo einfo;
@@ -67,8 +77,9 @@ void* Regex_Compile(const char *pPattern, BOOL bIgnoreCase, const char **ppReaso
 		option = ONIG_OPTION_NONE;
 	}
 
-	enc = GetNativeEncoding();
-	len = strlen(pattern);
+	enc = GetNativeEncoding(nCodePage);
+
+	len = onigenc_str_bytelen_null(enc, pattern);
 
 	r = onig_new(&reg, pattern, 
 					 pattern + len,
@@ -112,7 +123,7 @@ void Regex_Free(void *p)
 //  -1  : not matched.
 //  -2  : error
 
-int Regex_Search(void *p, int iStart, const char *pTarget, BOOL bForward, int *pStart, int *pEnd)
+int Regex_Search(void *p, int iStart, const LPBYTE pTarget, BOOL bForward, int *pStart, int *pEnd, DWORD nCodePage)
 {
 	regex_t *reg = (regex_t*)p;
 	unsigned char *str;
@@ -120,11 +131,13 @@ int Regex_Search(void *p, int iStart, const char *pTarget, BOOL bForward, int *p
 	unsigned char *start, *range;
 	int r;
 	int result;
+	OnigEncoding enc;
 
 	OnigRegion *region;
 
+	enc = GetNativeEncoding(nCodePage);
 	str = (unsigned char*)pTarget;
-	end = str + onigenc_str_bytelen_null(GetNativeEncoding(), str);
+	end = str + onigenc_str_bytelen_null(enc, str);
 
 	if (bForward) {
 		start = str + iStart;
@@ -154,43 +167,57 @@ int Regex_Search(void *p, int iStart, const char *pTarget, BOOL bForward, int *p
 }
 
 //////////////////////////////////////////////////////////
-// convert Unicode position to multibyte code position
+// convert an encoding position to another position
 //////////////////////////////////////////////////////////
-// pStr   : ptr to multibyte code string
-// n      : unicode position (= number of letters)
-//
-// result : multibyte position
 
-DWORD UnicodePosToMBCSPos(const char *pStr, DWORD n)
+DWORD ConvertPos(const LPBYTE pSrcStr, DWORD nSrcPos, DWORD nSrcEnc, const LPBYTE pDstStr, DWORD nDstEnc)
 {
-	UChar *pStrU = (UChar*)pStr;
+	OnigEncoding srcEnc = GetNativeEncoding(nSrcEnc);
+	OnigEncoding dstEnc = GetNativeEncoding(nDstEnc);
 
-	UChar *p = pStrU;
 	DWORD i = 0;
-	while(*p) {
-		if (i >= n) break;
-		p++;
-		if (*p) {
-			p = onigenc_get_right_adjust_char_head(GetNativeEncoding(), pStrU, p);
-		}
-		i++;
+	const UChar* p = pSrcStr;
+	const UChar* q = pDstStr;
+
+	DWORD nSrc, nDst;
+
+	Sleep(1);
+
+	nSrc = nDst = 0;
+	while (*p) {
+		nSrc = p - pSrcStr;
+		nDst = q - pDstStr; 
+
+		if (nSrc >= nSrcPos) break;
+
+		p = onigenc_get_right_adjust_char_head(srcEnc, (LPBYTE)pSrcStr, p + 1);
+		q = onigenc_get_right_adjust_char_head(dstEnc, (LPBYTE)pDstStr, q + 1);
 	}
-	return (p - pStrU);
+
+	return nDst;
 }
 
-DWORD MBCSPosToUnicodePos(const char *pStr, DWORD n)
-{
-	UChar *pStrU = (UChar*)pStr;
+//////////////////////////////////////////////////////////
+// 
+//////////////////////////////////////////////////////////
 
-	UChar *p = pStrU;
-	DWORD i = 0;
-	while(*p) {
-		if ((DWORD)(p - pStrU) >= n) break;
-		p++;
-		if (*p) {
-			p = onigenc_get_right_adjust_char_head(GetNativeEncoding(), pStrU, p);
-		}
-		i++;
+const LPBYTE ShiftLeft(const LPBYTE pString, const LPBYTE pPos, DWORD nCodePage)
+{
+	OnigEncoding enc = GetNativeEncoding(nCodePage);
+
+	LPBYTE p = pPos - 1;
+	LPBYTE q;
+	while (p >= pString) {
+		q = onigenc_get_right_adjust_char_head(enc, pString, p);
+		if (q < pPos) break;
+		p--;
 	}
-	return i;
+	return q;
 }
+
+const LPBYTE ShiftRight(const LPBYTE pString, const LPBYTE pPos, DWORD nCodePage)
+{
+	OnigEncoding enc = GetNativeEncoding(nCodePage);
+	return (LPBYTE)onigenc_get_right_adjust_char_head(enc, pString, pPos + 1);
+}
+

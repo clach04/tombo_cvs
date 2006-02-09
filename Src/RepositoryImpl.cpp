@@ -132,13 +132,6 @@ BOOL LocalFileRepository::Save(const TomboURI *pCurrentURI, LPCTSTR pMemo,
 	TString sOrigFile;
 	if (!GetPhysicalPath(pCurrentURI, &sOrigFile)) return FALSE;
 
-	// prepare text to write
-	char *pText = ConvUnicode2SJIS(pMemo);
-	if (pText == NULL) return FALSE;
-	SecureBufferA sText(pText);
-
-	BOOL bResult;
-
 	// get current headline from path
 	if (!GetHeadLine(pCurrentURI, pNewHeadLine)) return FALSE;
 
@@ -146,7 +139,7 @@ BOOL LocalFileRepository::Save(const TomboURI *pCurrentURI, LPCTSTR pMemo,
 	if (!GetOption(pCurrentURI, &opt)) return FALSE;
 
 	if (pOpt->bKeepTitle || opt.bSafeFileName) {
-		if (!SaveIfHeadLineIsNotChanged(pNote, pText, sOrigFile.Get())) return FALSE;
+		if (!SaveIfHeadLineIsNotChanged(pNote, pMemo, sOrigFile.Get())) return FALSE;
 
 		// URI is not changed.
 		return pNewURI->Init(*pCurrentURI);
@@ -159,11 +152,12 @@ BOOL LocalFileRepository::Save(const TomboURI *pCurrentURI, LPCTSTR pMemo,
 		DWORD nH = ChopFileNumberLen(pNewHeadLine->Get());
 		DWORD nH2 = ChopFileNumberLen(sHeadLine.Get());
 
+		BOOL bResult;
 		// check headline has changed.
 		if (nH == nH2 && _tcsncmp(pNewHeadLine->Get(), sHeadLine.Get(), nH) == 0) {
-			bResult = SaveIfHeadLineIsNotChanged(pNote, pText, sOrigFile.Get());
+			bResult = SaveIfHeadLineIsNotChanged(pNote, pMemo, sOrigFile.Get());
 		} else {
-			bResult = SaveIfHeadLineIsChanged(pNote, pText, sOrigFile.Get(), 
+			bResult = SaveIfHeadLineIsChanged(pNote, pMemo, sOrigFile.Get(), 
 										 sHeadLine.Get(), pNewHeadLine);
 		}
 		if (bResult) {
@@ -174,20 +168,21 @@ BOOL LocalFileRepository::Save(const TomboURI *pCurrentURI, LPCTSTR pMemo,
 }
 
 BOOL LocalFileRepository::SaveIfHeadLineIsChanged(
-	MemoNote *pNote, const char *pText, LPCTSTR pOrigFile, LPCTSTR pHeadLine, 
+	MemoNote *pNote, LPCTSTR pMemo, LPCTSTR pOrigFile, LPCTSTR pHeadLine, 
 	TString *pNewHeadLine)
 {
-		LPTSTR pNotePath = pNote->pPath;
+		LPCTSTR pNotePath = pNote->MemoPath();
 
 		// changed.
 		TString sMemoDir;
 		TString sNewFile;
 
-		if (!sMemoDir.GetDirectoryPath(pNote->pPath)) return FALSE;
+		if (!sMemoDir.GetDirectoryPath(pNotePath)) return FALSE;
 		if (!MemoNote::GetHeadLinePath(pTopDir, sMemoDir.Get(), pHeadLine, pNote->GetExtension(),
 							 &sNewFile, &pNotePath, pNewHeadLine)) return FALSE;
 
-		BOOL bResult = pNote->SaveData(g_pPassManager, pText, sNewFile.Get());
+		// write data		
+		BOOL bResult = pNote->SaveDataT(g_pPassManager, pMemo, sNewFile.Get());
 		if (bResult) {
 			// delete original file
 			DeleteFile(pOrigFile);
@@ -199,10 +194,7 @@ BOOL LocalFileRepository::SaveIfHeadLineIsChanged(
 			}
 
 			// Update note's file path information. 
-			LPTSTR pNewPath = StringDup(pNotePath);
-			if (pNewPath == NULL) return FALSE;
-			delete [] pNote->pPath;
-			pNote->pPath = pNewPath;
+			if (!pNote->SetMemoPath(pNotePath)) return FALSE;
 
 			return TRUE;
 
@@ -213,7 +205,7 @@ BOOL LocalFileRepository::SaveIfHeadLineIsChanged(
 		}
 }
 
-BOOL LocalFileRepository::SaveIfHeadLineIsNotChanged(MemoNote *pNote, const char *pText, LPCTSTR pOrigFile)
+BOOL LocalFileRepository::SaveIfHeadLineIsNotChanged(MemoNote *pNote, LPCTSTR pMemo, LPCTSTR pOrigFile)
 {
 	// Generate backup file name
 	TString sBackupFile;
@@ -225,8 +217,9 @@ BOOL LocalFileRepository::SaveIfHeadLineIsNotChanged(MemoNote *pNote, const char
 		// if new file, copy are failed but it is OK.
 		if (GetLastError() != ERROR_FILE_NOT_FOUND) return FALSE;
 	}
+
 	// Save to file
-	if (!pNote->SaveData(g_pPassManager, pText, pOrigFile)) {
+	if (!pNote->SaveDataT(g_pPassManager, pMemo, pOrigFile)) {
 		// When save failed, try to rollback original file.
 		DeleteFile(pOrigFile);
 		MoveFile(sBackupFile.Get(), pOrigFile);
@@ -298,7 +291,7 @@ BOOL LocalFileRepository::GetHeadLine(const TomboURI *pURI, TString *pHeadLine)
 			cn.Init(sPath.Get());
 			LPTSTR p = cn.GetMemoBody(pTopDir, g_pPassManager);
 			if (p == NULL) return FALSE;
-			SecureBufferT sbt(p);
+			SecureBufferAutoPointerT ap(p);
 			if (!MemoNote::GetHeadLineFromMemoText(p, pHeadLine)) return FALSE;
 			return TRUE;
 		}
@@ -444,7 +437,7 @@ BOOL LocalFileRepository::GetSafeFileName(const TString *pBasePath, TString *pNe
 /////////////////////////////////////////
 
 BOOL LocalFileRepository::NegotiateNewName(LPCTSTR pMemoPath, LPCTSTR pText, LPCTSTR pMemoDir,
-							 TString *pFullPath, LPTSTR *ppNotePath, TString *pNewHeadLine)
+							 TString *pFullPath, LPCTSTR *ppNotePath, TString *pNewHeadLine)
 {
 	TString sHeadLine;
 
@@ -486,10 +479,10 @@ TomboURI *LocalFileRepository::DoEncryptFile(const TomboURI *pOldURI, MemoNote *
 	// Get plain memo data from file
 	LPTSTR pText = pNote->GetMemoBody(pTopDir, g_pPassManager);
 	if (pText == NULL) return NULL;
-	SecureBufferT sbt(pText);
+	SecureBufferAutoPointerT ap1(pText);
 
 	TString sFullPath;
-	LPTSTR pNotePath;
+	LPCTSTR pNotePath;
 
 	// Decide new name
 	if (!NegotiateNewName(pNote->MemoPath(), pText, sMemoDir.Get(), 
@@ -499,15 +492,10 @@ TomboURI *LocalFileRepository::DoEncryptFile(const TomboURI *pOldURI, MemoNote *
 	CryptedMemoNote *p = new CryptedMemoNote();
 
 	if (!p->Init(pNotePath)) return NULL;
-	AutoPointer<CryptedMemoNote> ap(p);
-
-	// convert date as write
-	char *pTextA = ConvUnicode2SJIS(pText);
-	if (pTextA == NULL) return NULL;
-	SecureBufferA sba(pTextA);
+	AutoPointer<CryptedMemoNote> ap2(p);
 
 	// Save memo
-	if (!p->SaveData(g_pPassManager, pTextA, sFullPath.Get())) return NULL;
+	if (!p->SaveDataT(g_pPassManager, pText, sFullPath.Get())) return NULL;
 
 	// rename TDT
 	TString sOrigTDT;
@@ -902,10 +890,11 @@ BOOL LocalFileRepository::RequestAllocateURI(const TomboURI *pBaseURI, LPCTSTR p
 	
 	TString sFullPath;
 	TString sHeadLine;
-	LPTSTR pNotePath;
+	LPCTSTR pNotePath;
 
 	if (!MemoNote::GetHeadLineFromMemoText(pText, &sHeadLine)) return FALSE;
-	if (!MemoNote::GetHeadLinePath(pTopDir, pMemoPath, sHeadLine.Get(), pNote->GetExtension(), &sFullPath, &pNotePath, pHeadLine)) return FALSE;
+	if (!MemoNote::GetHeadLinePath(pTopDir, pMemoPath, sHeadLine.Get(), 
+									pNote->GetExtension(), &sFullPath, &pNotePath, pHeadLine)) return FALSE;
 	if (!pNote->Init(pNotePath)) return FALSE;
 
 	if (!pNote->GetURI(pURI)) return FALSE;
@@ -1010,18 +999,18 @@ LPTSTR LocalFileRepository::GetNoteData(const TomboURI *pURI)
 	return p;
 }
 
-char *LocalFileRepository::GetNoteDataNative(const TomboURI *pURI)
+LPBYTE LocalFileRepository::GetNoteDataNative(const TomboURI *pURI, LPDWORD pSize)
 {
 	MemoNote *pNote = MemoNote::MemoNoteFactory(pURI);
 	if (pNote == NULL) return FALSE;
 	AutoPointer<MemoNote> ap(pNote);
 
 	BOOL bLoop = FALSE;
-	char *p;
-
+	LPBYTE p;
+	DWORD nSize;
 	do {
 		bLoop = FALSE;
-		p = pNote->GetMemoBodyA(pTopDir, g_pPassManager);
+		p = pNote->GetMemoBodyNative(pTopDir, g_pPassManager, &nSize);
 		if (p == NULL) {
 			DWORD nError = GetLastError();
 			if (nError == ERROR_INVALID_PASSWORD) {
@@ -1031,6 +1020,11 @@ char *LocalFileRepository::GetNoteDataNative(const TomboURI *pURI)
 			}
 		}
 	} while (bLoop);
+
+	if (p) {
+		*pSize = nSize;
+	}
+
 	return p;
 }
 

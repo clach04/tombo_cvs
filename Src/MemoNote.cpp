@@ -13,6 +13,7 @@
 #include "MemoInfo.h"
 #include "Message.h"
 #include "TomboURI.h"
+#include "AutoPtr.h"
 
 #include "Repository.h"
 
@@ -40,41 +41,6 @@ BOOL MemoNote::Init(LPCTSTR p)
 }
 
 /////////////////////////////////////////////
-// Copy Instance
-/////////////////////////////////////////////
-// if subclass of MemoNote has class-oriented member variables,
-// create this method for each classes.
-
-MemoNote *MemoNote::Clone() const
-{
-	MemoNote *p = GetNewInstance();
-	if (p == NULL || !p->Init(pPath)) return NULL;
-	return p;
-}
-
-BOOL MemoNote::Equal(MemoNote *pTarget)
-{
-	if (pTarget == NULL) return FALSE;
-	return (_tcsicmp(pPath, pTarget->MemoPath()) == 0);
-}
-
-/////////////////////////////////////////////
-// メモ内容の取得(MemoNote)
-/////////////////////////////////////////////
-
-LPTSTR MemoNote::GetMemoBody(LPCTSTR pTopDir, PasswordManager *pMgr) const
-{
-	SetLastError(ERROR_INVALID_FUNCTION);
-	return NULL;
-}
-
-char *MemoNote::GetMemoBodyA(LPCTSTR pTopDir, PasswordManager *pMgr) const
-{
-	SetLastError(ERROR_INVALID_FUNCTION);
-	return NULL;
-}
-
-/////////////////////////////////////////////
 // get note's URI
 /////////////////////////////////////////////
 
@@ -84,10 +50,19 @@ BOOL MemoNote::GetURI(TomboURI *pURI) const
 }
 
 /////////////////////////////////////////////
-// メモ内容の取得(PlainMemoNote)
+// Get memo data from file and decrypt if nesessary
 /////////////////////////////////////////////
 
-char *PlainMemoNote::GetMemoBodyA(LPCTSTR pTopDir, PasswordManager*) const
+LPTSTR MemoNote::GetMemoBody(LPCTSTR pTopDir, PasswordManager *pMgr) const
+{
+	DWORD nSize;
+	LPBYTE pData = GetMemoBodyNative(pTopDir, pMgr, &nSize);
+	if (!pData) return NULL;
+	SecureBufferAutoPointerByte ap(pData, nSize);
+	return ConvFileEncodingToTChar(pData);
+}
+
+LPBYTE PlainMemoNote::GetMemoBodyNative(LPCTSTR pTopDir, PasswordManager *pMgr, LPDWORD pSize) const
 {
 	TString sFileName;
 	if (!sFileName.Join(pTopDir, TEXT("\\"), pPath)) return NULL;
@@ -95,31 +70,17 @@ char *PlainMemoNote::GetMemoBodyA(LPCTSTR pTopDir, PasswordManager*) const
 	File inf;
 	if (!inf.Open(sFileName.Get(), GENERIC_READ, FILE_SHARE_READ, OPEN_EXISTING)) return NULL;
 
-	char *pText = new char[inf.FileSize() + 1];
-	if (pText == NULL) return NULL;
+	LPBYTE pData = new BYTE[inf.FileSize() + 2];
+	if (pData == NULL) return NULL;
 
 	DWORD nSize = inf.FileSize();
-	if (!inf.Read((LPBYTE)pText, &nSize)) return NULL;
-	pText[nSize] = TEXT('\0');
+	if (!inf.Read(pData, &nSize)) return NULL;
+	pData[nSize] = TEXT('\0');
+	pData[nSize + 1] = TEXT('\0');	// sentinel for the UTF16 encoding file
 
-	return pText;
+	*pSize = nSize;
+	return pData;
 }
-
-LPTSTR PlainMemoNote::GetMemoBody(LPCTSTR pTopDir, PasswordManager *p) const
-{
-	char *pText = GetMemoBodyA(pTopDir, p);
-	if (!pText) return NULL;
-
-	LPTSTR pMemo = ConvSJIS2Unicode(pText);
-	delete [] pText;
-	if (!pMemo) return NULL;
-
-	return pMemo;
-}
-
-/////////////////////////////////////////////
-// Get memo body and decrypt 
-/////////////////////////////////////////////
 
 LPBYTE CryptedMemoNote::GetMemoBodySub(LPCTSTR pTopDir, PasswordManager *pMgr, LPDWORD pSize) const
 {
@@ -152,75 +113,37 @@ LPBYTE CryptedMemoNote::GetMemoBodySub(LPCTSTR pTopDir, PasswordManager *pMgr, L
 	return pPlain;
 }
 
-#ifdef COMMENT
-LPBYTE CryptedMemoNote::GetMemoBodySub(LPCTSTR pTopDir, PasswordManager *pMgr, LPDWORD pSize) const
+LPBYTE CryptedMemoNote::GetMemoBodyNative(LPCTSTR pTopDir, PasswordManager *pMgr, LPDWORD pSize) const
 {
-	BOOL bRegistedPassword = TRUE;
-
-	TString sFileName;
-	if (!sFileName.Join(pTopDir, TEXT("\\"), pPath)) return NULL;
-
-	BOOL bCancel;
-	const char *pPassword = pMgr->Password(&bCancel, FALSE);
-	if (pPassword == NULL) {
-		if (bCancel) SetLastError(ERROR_CANCELLED);
-		return NULL;
-	}
-	CryptManager cMgr;
-	if (!cMgr.Init(pPassword)) return NULL;
-
-	LPBYTE pPlain = cMgr.LoadAndDecrypt(pSize, sFileName.Get());
-	if (pPlain == NULL) {
-		pMgr->ForgetPassword();
-		return NULL;
-	}
-	if (!bRegistedPassword) pMgr->ForgetPassword();
-
-	return pPlain;
-}
-#endif
-
-char *CryptedMemoNote::GetMemoBodyA(LPCTSTR pTopDir, PasswordManager *pMgr) const
-{
-	DWORD nSize;
-	return (char*)GetMemoBodySub(pTopDir, pMgr, &nSize);
-}
-
-LPTSTR CryptedMemoNote::GetMemoBody(LPCTSTR pTopDir, PasswordManager *pMgr) const
-{
-	DWORD nSize;
-	LPBYTE pPlain = GetMemoBodySub(pTopDir, pMgr, &nSize);
-	if (!pPlain) return NULL;
-
-	LPTSTR pMemo = ConvSJIS2Unicode((const char*)pPlain);
-
-	// plain textバッファのゼロクリア
-	for (DWORD i = 0; i < nSize; i++) {
-		pPlain[i] = 0;
-	}
-
-	return pMemo;
+	return GetMemoBodySub(pTopDir, pMgr, pSize);
 }
 
 /////////////////////////////////////////////
-// メモ内容の保存
+// Save note data
 /////////////////////////////////////////////
-BOOL MemoNote::SaveData(PasswordManager *pMgr, const char *pText, LPCTSTR pWriteWile)
+
+BOOL MemoNote::SaveDataT(PasswordManager *pMgr, LPCTSTR pMemo, LPCTSTR pWriteFile)
 {
-	return FALSE;
+	LPBYTE pData;
+	DWORD nLen;
+
+	pData = ConvTCharToFileEncoding(pMemo, &nLen);
+	if (pData == NULL) return FALSE;
+	SecureBufferAutoPointerByte ap(pData, nLen);
+	return SaveData(pMgr, pData, nLen, pWriteFile);
 }
 
-BOOL PlainMemoNote::SaveData(PasswordManager *pMgr, const char *pText, LPCTSTR pWriteFile)
+BOOL PlainMemoNote::SaveData(PasswordManager *pMgr, const LPBYTE pData, DWORD nLen, LPCTSTR pWriteFile)
 {
 	File outf;
 	if (!outf.Open(pWriteFile, GENERIC_WRITE, 0, OPEN_ALWAYS)) return FALSE;
-	if (!outf.Write((LPBYTE)pText, strlen(pText))) return FALSE;
+	if (!outf.Write((LPBYTE)pData, nLen)) return FALSE;
 	if (!outf.SetEOF()) return FALSE;
 	outf.Close();
 	return TRUE;
 }
 
-BOOL CryptedMemoNote::SaveData(PasswordManager *pMgr, const char *pText, LPCTSTR pWriteFile)
+BOOL CryptedMemoNote::SaveData(PasswordManager *pMgr, const LPBYTE pData, DWORD nLen, LPCTSTR pWriteFile)
 {
 	CryptManager cMgr;
 	BOOL bCancel;
@@ -231,7 +154,7 @@ BOOL CryptedMemoNote::SaveData(PasswordManager *pMgr, const char *pText, LPCTSTR
 		MessageBox(NULL, TEXT("In CryptedMemoNote::SaveData,CryptManager::Init failed"), TEXT("DEBUG"), MB_OK);
 		return FALSE;
 	}
-	return cMgr.EncryptAndStore((LPBYTE)pText, strlen(pText), pWriteFile);
+	return cMgr.EncryptAndStore(pData, nLen, pWriteFile);
 }
 
 /////////////////////////////////////////////
@@ -248,14 +171,14 @@ MemoNote *CryptedMemoNote::Decrypt(LPCTSTR pTopDir, PasswordManager *pMgr, TStri
 	// メモ本文取得
 	LPTSTR pText = GetMemoBody(pTopDir, pMgr);
 	if (pText == NULL) return FALSE;
-	SecureBufferT sTextT(pText);
+	SecureBufferAutoPointerT ap(pText);
 
 	// ヘッドライン取得
 	TString sMemoDir;
 	if (!sMemoDir.GetDirectoryPath(pPath)) return FALSE;
 
 	TString sFullPath;
-	LPTSTR pNotePath;
+	LPCTSTR pNotePath;
 	TString sHeadLine;
 	if (g_Property.GetKeepTitle()) {
 		if (!GetHeadLineFromFilePath(pPath, &sHeadLine)) return FALSE;
@@ -263,7 +186,8 @@ MemoNote *CryptedMemoNote::Decrypt(LPCTSTR pTopDir, PasswordManager *pMgr, TStri
 		if (!GetHeadLineFromMemoText(pText, &sHeadLine)) return FALSE;
 	}
 
-	if (!GetHeadLinePath(pTopDir, sMemoDir.Get(), sHeadLine.Get(), TEXT(".txt"), &sFullPath, &pNotePath, pHeadLine)) {
+	if (!GetHeadLinePath(pTopDir, sMemoDir.Get(), sHeadLine.Get(), TEXT(".txt"), 
+							&sFullPath, &pNotePath, pHeadLine)) {
 		return FALSE;
 	}
 
@@ -275,11 +199,7 @@ MemoNote *CryptedMemoNote::Decrypt(LPCTSTR pTopDir, PasswordManager *pMgr, TStri
 	}
 
 	// メモ保存
-	char *pTextA = ConvUnicode2SJIS(pText);
-	if (pTextA == NULL) return FALSE;
-	SecureBufferA sTextA(pTextA);
-
-	if (!p->SaveData(pMgr, pTextA, sFullPath.Get())) {
+	if (!p->SaveDataT(pMgr, pText, sFullPath.Get())) {
 		delete p;
 		return NULL;
 	}
@@ -404,7 +324,7 @@ static BOOL IsFileExist(LPCTSTR pFileName)
 //		pNewHeadLine: 一覧表示用新ヘッドライン(必要に応じて"(n)"が付与されている)
 
 BOOL MemoNote::GetHeadLinePath(LPCTSTR pTopDir, LPCTSTR pMemoPath, LPCTSTR pHeadLine, LPCTSTR pExt, 
-							TString *pFullPath, LPTSTR *ppNotePath, TString *pNewHeadLine)
+							TString *pFullPath, LPCTSTR *ppNotePath, TString *pNewHeadLine)
 {
 	DWORD n = _tcslen(pHeadLine);
 	if (n < _tcslen(DEFAULT_HEADLINE)) n = _tcslen(DEFAULT_HEADLINE);
@@ -487,7 +407,7 @@ MemoNote *MemoNote::CopyMemo(LPCTSTR pTopDir, const MemoNote *pOrig, LPCTSTR pMe
 	}
 
 	TString sNewFullPath;
-	LPTSTR pNotePath;
+	LPCTSTR pNotePath;
 	TString sHeadLine;
 
 	if (!GetHeadLineFromFilePath(pOrig->MemoPath(), &sHeadLine)) {
@@ -593,6 +513,18 @@ DWORD MemoNote::IsNote(LPCTSTR pFile)
 	return nType;
 }
 
+/////////////////////////////////////////////
+// set the note path
+/////////////////////////////////////////////
+
+BOOL MemoNote::SetMemoPath(LPCTSTR p)
+{
+	LPTSTR pNewPath = StringDup(p);
+	if (pNewPath == NULL) return FALSE;
+	delete [] pPath;
+	pPath = pNewPath;
+	return TRUE;
+}
 
 /////////////////////////////////////////////
 // MemoNote object factory

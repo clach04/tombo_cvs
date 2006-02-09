@@ -721,31 +721,54 @@ BOOL SipTab::Apply(HWND hDlg)
 // Codepage tab
 //////////////////////////////////////////
 
-#if defined(PLATFORM_BE500) && defined(TOMBO_LANG_ENGLISH)
+static DlgMsgRes aCPRes[] = {
+	{ IDC_PROPTAB_CODEPAGE_LABEL, MSG_ID_DLG_PROPTAB_CODEPAGE_LABEL },
+	{ IDC_PROPTAB_CODEPAGE_NOTICE, MSG_ID_DLG_PROPTAB_CODEPAGE_NOTICE },
+};
 
 void CodepageTab::Init(HWND hDlg)
 {
-	HWND hWnd = GetDlgItem(hDlg, IDC_CODEPAGE);
+	OverrideDlgMsg(hDlg, -1, aCPRes, sizeof(aCPRes)/sizeof(DlgMsgRes));
+
+	HWND hWnd = GetDlgItem(hDlg, IDC_PROPTAB_CODEPAGE_CODEPAGE);
 	SendMessage(hWnd, CB_ADDSTRING, 0, (LPARAM)MSG_CODEPAGE_DEFAULT);
+	SendMessage(hWnd, CB_ADDSTRING, 0, (LPARAM)MSG_CODEPAGE_UTF16);
+	SendMessage(hWnd, CB_ADDSTRING, 0, (LPARAM)MSG_CODEPAGE_UTF8);
 	SendMessage(hWnd, CB_ADDSTRING, 0, (LPARAM)MSG_CODEPAGE_GREEK);
-	if (pProperty->GetCodePage() == 1253) {
+	switch (pProperty->GetCodePage()) {
+	case TOMBO_CP_UTF16LE:
 		SendMessage(hWnd, CB_SETCURSEL, 1, 0);
-	} else {
+		break;
+	case TOMBO_CP_UTF8:
+		SendMessage(hWnd, CB_SETCURSEL, 2, 0);
+		break;
+	case TOMBO_CP_GREEK:
+		SendMessage(hWnd, CB_SETCURSEL, 3, 0);
+		break;
+	default:
 		SendMessage(hWnd, CB_SETCURSEL, 0, 0);
 	}
 }
 
 BOOL CodepageTab::Apply(HWND hDlg)
 {
-	HWND hWnd = GetDlgItem(hDlg, IDC_CODEPAGE);
-	if (SendMessage(hWnd, CB_GETCURSEL, 0, 0) == 1) {
-		pProperty->SetCodePage(1253); // Greek
-	} else {
-		pProperty->SetCodePage(0); // default
+	HWND hWnd = GetDlgItem(hDlg, IDC_PROPTAB_CODEPAGE_CODEPAGE);
+	switch (SendMessage(hWnd, CB_GETCURSEL, 0, 0)) {
+	case 0:		// default
+		pProperty->SetCodePage(TOMBO_CP_DEFAULT);
+		break;
+	case 1:		// UTF16
+		pProperty->SetCodePage(TOMBO_CP_UTF16LE);
+		break;
+	case 2:		// UTF8
+		pProperty->SetCodePage(TOMBO_CP_UTF8);
+		break;
+	case 3:		// Greek
+		pProperty->SetCodePage(TOMBO_CP_GREEK);
+		break;
 	}
 	return TRUE;
 }
-#endif
 
 //////////////////////////////////////////
 // DefaultNote tab

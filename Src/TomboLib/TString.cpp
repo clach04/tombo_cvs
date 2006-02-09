@@ -223,29 +223,6 @@ BOOL WString::Set(TString *pSrc)
 }
 
 /////////////////////////////////////////////
-// secure buffer
-/////////////////////////////////////////////
-// clear buffer by zero when deleting
-
-SecureBufferT::~SecureBufferT()
-{
-	if (pBuf) {
-		LPTSTR p = pBuf;
-		for (DWORD i = 0; i < nBufLen; i++) *p++ = TEXT('\0');
-		delete [] pBuf;
-	}
-}
-
-SecureBufferA::~SecureBufferA()
-{
-	if (pBuf) {
-		char *p = pBuf;
-		for (DWORD i = 0; i < nBufLen; i++) *p++ = '\0';
-		delete [] pBuf;
-	}
-}
-
-/////////////////////////////////////////////
 // SharedString implimentation
 /////////////////////////////////////////////
 

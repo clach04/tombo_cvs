@@ -374,34 +374,6 @@ LPTSTR ConvSJIS2Unicode(const char *p)
 	return pUni;
 }
 
-LPTSTR ConvSJIS2UnicodeWithByte(const char *p, DWORD n)
-{
-	// alloc memory
-	LPTSTR pUni = new TCHAR[n + 1];
-	if (pUni == NULL) {
-		SetLastError(ERROR_NOT_ENOUGH_MEMORY);
-		return NULL;
-	}
-
-#ifdef _WIN32_WCE
-#if defined(PLATFORM_BE500) && defined(TOMBO_LANG_ENGLISH)
-	if (g_Property.GetCodePage() == 1253) {
-		MultiByteToWideChar_CP1253((LPCSTR)p, pUni, n);
-	} else {
-		MultiByteToWideChar(CP_ACP, 0, (LPCSTR)p, n, pUni, n);
-		*(pUni + n) = TEXT('\0');
-	}
-#else
-	MultiByteToWideChar(CP_ACP, 0, (LPCSTR)p, n, pUni, n);
-	*(pUni + n) = TEXT('\0');
-#endif
-#else
-	_tcsncpy(pUni, p, n);
-	*(pUni + n) = '\0';
-#endif
-	return pUni;
-}
-
 #ifdef _WIN32_WCE
 DWORD CountMBStrings(const char *pStr, DWORD nBytes)
 {
@@ -481,7 +453,6 @@ char *ConvUnicode2SJIS(LPCTSTR p)
 		return NULL;
 	}
 #ifdef _WIN32_WCE
-//	unicode2sjis(p, (LPBYTE)pS, l);
 #if defined(PLATFORM_BE500) && defined(TOMBO_LANG_ENGLISH)
 	if (g_Property.GetCodePage() == 1253) {
 		WideCharToMultiByte_CP1253(p, pS, -1);
@@ -510,6 +481,7 @@ LPWSTR ConvTCharToWChar(LPCTSTR p)
 	pW = new WCHAR[nLen +1];
 	if (pW == NULL) return NULL;
 	MultiByteToWideChar(CP_ACP, 0, p, -1, pW, nLen + 1);
+	pW[nLen] = L'\0';
 	return pW;
 #else
 	return StringDup(p);
@@ -528,6 +500,36 @@ LPTSTR ConvWCharToTChar(LPCWSTR p)
 	return pT;
 #else
 	return StringDup(p);
+#endif
+}
+
+//////////////////////////////////
+// TCHAR <-> UTF-8
+//////////////////////////////////
+
+char *ConvTCharToUTF8(LPCTSTR p)
+{
+	if (p == NULL) return NULL;
+#if defined(PLATFORM_WIN32)
+	LPWSTR pW = ConvTCharToWChar(p);
+	SecureBufferAutoPointerW ap(pW);
+	if (pW == NULL) return NULL;
+	
+	return ConvUCS2ToUTF8(pW);
+#else
+	return ConvUCS2ToUTF8(p);
+#endif
+}
+
+LPTSTR ConvUTF8ToTChar(const char *p)
+{
+	LPWSTR pW = ConvUTF8ToUCS2(p);
+	if (pW == NULL) return NULL;
+#if defined(PLATFORM_WIN32)
+	SecureBufferAutoPointerW ap(pW);
+	return ConvWCharToTChar(pW);
+#else
+	return pW;
 #endif
 }
 
@@ -1487,36 +1489,6 @@ void DropInvalidFileChar(LPTSTR pDst, LPCTSTR pSrc)
 		*q++ = *p++;
 	}
 	*q = TEXT('\0');
-}
-
-////////////////////////////////////////////////////////////////////
-// パスファイル名からベース名(パスと拡張子を除いたもの)を取得
-////////////////////////////////////////////////////////////////////
-// ...\..\AA.txt -> AA
-BOOL GetBaseName(TString *pBase, LPCTSTR pFull)
-{
-	LPCTSTR p = pFull;
-	LPCTSTR pLastDot = NULL;
-	LPCTSTR pLastYen = NULL;
-	while (*p) {
-#ifndef _WIN32_WCE
-		if (IsDBCSLeadByte(*p)) {
-			p += 2;
-			continue;
-		}
-#endif
-		if (*p == TEXT('.')) pLastDot = p;
-		if (*p == TEXT('\\')) pLastYen = p;
-		p++;
-	}
-	if (pLastDot == NULL) pLastDot = p;
-	if (pLastYen == NULL) pLastYen = pFull - 1;
-
-	DWORD n = pLastDot - pLastYen - 1;
-	if (!pBase->Alloc(n + 1)) return FALSE;
-	_tcsncpy(pBase->Get(), pLastYen + 1, n);
-	*(pBase->Get() + n) = TEXT('\0');
-	return TRUE;
 }
 
 ////////////////////////////////////////////////////////////////////

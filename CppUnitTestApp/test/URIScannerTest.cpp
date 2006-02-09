@@ -138,10 +138,10 @@ BOOL DummyRepoBase::GetHeadLine(const TomboURI *pURI, TString *pHeadLine)
 // dummy repo sample
 
 class RepoX : public DummyRepoBase {
-	URIList *GetChild(const TomboURI *pFolderURI, BOOL bSkipEncrypt);
+	URIList *GetChild(const TomboURI *pFolderURI, BOOL bSkipEncrypt, BOOL bLooseDecrypt, BOOL *pLoose);
 };
 
-URIList *RepoX::GetChild(const TomboURI *pFolderURI, BOOL bSkipEncrypt)
+URIList *RepoX::GetChild(const TomboURI *pFolderURI, BOOL bSkipEncrypt, BOOL bLooseDecrypt, BOOL *pLoose)
 {
 	if (strcmp(pFolderURI->GetFullURI(), "tombo://default/aaa/") == 0) {
 		URIList *pList = new URIList();
@@ -300,10 +300,10 @@ BOOL TestScanner1::Check(LPCTSTR pMsg, LPCTSTR pCorrect)
 
 // test data
 class Repo1 : public DummyRepoBase {
-	URIList *GetChild(const TomboURI *pFolderURI, BOOL bSkipEncrypt);
+	URIList *GetChild(const TomboURI *pFolderURI, BOOL bSkipEncrypt, BOOL bLooseDecrypt, BOOL *pLoose);
 };
 
-URIList *Repo1::GetChild(const TomboURI *pFolderURI, BOOL bSkipEncrypt)
+URIList *Repo1::GetChild(const TomboURI *pFolderURI, BOOL bSkipEncrypt, BOOL bLooseDecrypt, BOOL *pLoose)
 {
 	URIList *pList = new URIList();
 	pList->Init();
@@ -331,10 +331,10 @@ void TEST_CLASS_NAME::URIScanTest1()
 
 // test data
 class Repo2 : public DummyRepoBase {
-	URIList *GetChild(const TomboURI *pFolderURI, BOOL bSkipEncrypt);
+	URIList *GetChild(const TomboURI *pFolderURI, BOOL bSkipEncrypt, BOOL bLooseDecrypt, BOOL *pLoose);
 };
 
-URIList *Repo2::GetChild(const TomboURI *pFolderURI, BOOL bSkipEncrypt)
+URIList *Repo2::GetChild(const TomboURI *pFolderURI, BOOL bSkipEncrypt, BOOL bLooseDecrypt, BOOL *pLoose)
 {
 	URIList *pList = new URIList();
 	pList->Init();
@@ -367,10 +367,10 @@ void TEST_CLASS_NAME::URIScanTest2()
 
 // test data
 class Repo3 : public DummyRepoBase {
-	URIList *GetChild(const TomboURI *pFolderURI, BOOL bSkipEncrypt);
+	URIList *GetChild(const TomboURI *pFolderURI, BOOL bSkipEncrypt, BOOL bLooseDecrypt, BOOL *pLoose);
 };
 
-URIList *Repo3::GetChild(const TomboURI *pFolderURI, BOOL bSkipEncrypt)
+URIList *Repo3::GetChild(const TomboURI *pFolderURI, BOOL bSkipEncrypt, BOOL bLooseDecrypt, BOOL *pLoose)
 {
 	URIList *pList = new URIList();
 	pList->Init();
@@ -412,7 +412,7 @@ void TEST_CLASS_NAME::URIScanTest3()
 class Repo4 : public DummyRepoBase {
 	const TomboURI *pStopURI;
 protected:
-	URIList *GetChild(const TomboURI *pFolderURI, BOOL bSkipEncrypt);
+	URIList *GetChild(const TomboURI *pFolderURI, BOOL bSkipEncrypt, BOOL bLooseDecrypt, BOOL *pLoose);
 public:
 	Repo4() : DummyRepoBase(), pStopURI(NULL) {}
 	Repo4(const TomboURI *pURI);
@@ -423,7 +423,7 @@ Repo4::Repo4(const TomboURI *pURI)
 	pStopURI = new TomboURI(*pURI);
 }
 
-URIList *Repo4::GetChild(const TomboURI *pFolderURI, BOOL bSkipEncrypt)
+URIList *Repo4::GetChild(const TomboURI *pFolderURI, BOOL bSkipEncrypt, BOOL bLooseDecrypt, BOOL *pLoose)
 {
 	URIList *pList = new URIList();
 	pList->Init();
@@ -531,16 +531,16 @@ void TEST_CLASS_NAME::URIScanTest5()
 // assume when user cancelled password dialog
 
 class Repo6 : public Repo4 {
-	URIList *GetChild(const TomboURI *pFolderURI, BOOL bSkipEncrypt);
+	URIList *GetChild(const TomboURI *pFolderURI, BOOL bSkipEncrypt, BOOL bLooseDecrypt, BOOL *pLoose);
 };
 
-URIList *Repo6::GetChild(const TomboURI *pFolderURI, BOOL bSkipEncrypt)
+URIList *Repo6::GetChild(const TomboURI *pFolderURI, BOOL bSkipEncrypt, BOOL bLooseDecrypt, BOOL *pLoose)
 {
 	if (strcmp(pFolderURI->GetFullURI(), "tombo://default/aaa/bbb/ccc/") == 0) {
 		SetLastError(ERROR_CANCELLED);
 		return NULL;
 	} else {
-		return Repo4::GetChild(pFolderURI, bSkipEncrypt);
+		return Repo4::GetChild(pFolderURI, bSkipEncrypt, FALSE, FALSE);
 	}
 }
 
@@ -566,10 +566,10 @@ void TEST_CLASS_NAME::URIScanTest6()
 // assume when user cancelled password dialog
 
 class Repo7 : public Repo4 {
-	URIList *GetChild(const TomboURI *pFolderURI, BOOL bSkipEncrypt);
+	URIList *GetChild(const TomboURI *pFolderURI, BOOL bSkipEncrypt, BOOL bLooseDecrypt, BOOL *pLoose);
 };
 
-URIList *Repo7::GetChild(const TomboURI *pFolderURI, BOOL bSkipEncrypt)
+URIList *Repo7::GetChild(const TomboURI *pFolderURI, BOOL bSkipEncrypt, BOOL bLooseDecrypt, BOOL *pLoose)
 {
 	SetLastError(ERROR_CANCELLED);
 	return NULL;

@@ -1,22 +1,27 @@
 #ifndef UNICONV_H
 #define UNICONV_H
 
-// SJIS<->Unicode変換
+// most of the methods are allocate buffer by new[], so use delete[] for free memoy. 
 
-// 領域はnewで動的に確保する。できなかったらNULLでSetLastError()する。
-// 領域の開放は呼んだ側が行う。
+//////////////////////////////////
+// Native <-> Unicode Conversion
+//////////////////////////////////
 
 LPTSTR ConvSJIS2Unicode(const char *p);
 char *ConvUnicode2SJIS(LPCTSTR p);
 
-LPTSTR ConvSJIS2UnicodeWithByte(const char *p, DWORD nByte);
+//////////////////////////////////
+// TCHAR/WCHAR version of strdup
+//////////////////////////////////
+// not use malloc but use new[].
 
-// TCHAR version of strdup
-// allocation is used by new[], so use delete[] for free memoy. 
 LPTSTR StringDup(LPCTSTR pStr);
 LPWSTR StringDupW(LPCWSTR pStr);
 char *StringDupA(const char *pStr);
 
+//////////////////////////////////
+// Length count 
+//////////////////////////////////
 #ifdef _WIN32_WCE
 // count number of MBCS strings. return value are number of letters insted of bytes.
 DWORD CountMBStrings(const char *pStr, DWORD nBytes);
@@ -25,9 +30,21 @@ DWORD CountMBStrings(const char *pStr, DWORD nBytes);
 DWORD CountWCBytes(LPCTSTR pStr, DWORD nChar);
 #endif
 
+//////////////////////////////////
+// LPTSTR <-> LPWSTR conversion
+//////////////////////////////////
+// On CE platform, same as StringDup.
+// On Windows platform, MBCS <-> WBCS conversion.
 
 LPWSTR ConvTCharToWChar(LPCTSTR p);
 LPTSTR ConvWCharToTChar(LPCWSTR p);
+
+//////////////////////////////////
+// TCHAR <-> UTF-8
+//////////////////////////////////
+
+char *ConvTCharToUTF8(LPCTSTR p);
+LPTSTR ConvUTF8ToTChar(const char *p);
 
 //////////////////////////////////
 // UTF-8 <--> UCS2
@@ -155,7 +172,6 @@ public:
 //////////////////////////////////
 // helper functions
 //////////////////////////////////
-class TString;
 
 // remove '\' 
 // ex. aa\xx\ -> aa\xx
@@ -166,9 +182,6 @@ void TrimRight(LPTSTR pBuf);
 // Eliminate letters "\\/:,;*?<>\"\t" from pSrc.
 // pDst has at least same size of pSrc
 void DropInvalidFileChar(LPTSTR pDst, LPCTSTR pSrc);
-
-// Get base file name (except path and extensions)
-BOOL GetBaseName(TString *pBase, LPCTSTR pFull);
 
 LPCTSTR GetNextDirSeparator(LPCTSTR pStart);
 

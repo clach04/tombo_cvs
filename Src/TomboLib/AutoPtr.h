@@ -27,23 +27,32 @@ class SecureBufferAutoPointerT {
 	LPTSTR pPtr;
 public:
 	SecureBufferAutoPointerT(LPTSTR p) : pPtr(p) {}
-	~SecureBufferAutoPointerT() {
-		if (pPtr == NULL) return;
-		LPTSTR q = pPtr;
-		while(*q) *q++ = TEXT('\0');
-		delete [] pPtr;
-	}
+	~SecureBufferAutoPointerT();
 };
 
 class SecureBufferAutoPointerA {
 	char *pPtr;
 public:
 	SecureBufferAutoPointerA(char *p) : pPtr(p) {}
-	~SecureBufferAutoPointerA() {
-		if (pPtr == NULL) return;
-		char *q = pPtr;
-		while(*q) *q++ = TEXT('\0');
-		delete [] pPtr;
-	}
+	~SecureBufferAutoPointerA();
 };
+
+class SecureBufferAutoPointerW {
+	LPWSTR pPtr;
+public:
+	SecureBufferAutoPointerW(LPWSTR p) : pPtr(p) {}
+	~SecureBufferAutoPointerW();
+};
+
+class SecureBufferAutoPointerByte {
+	LPBYTE pPtr;
+	DWORD nLen;
+public:
+	SecureBufferAutoPointerByte(LPBYTE p = NULL, DWORD n = 0) : pPtr(p), nLen(n) {}
+	~SecureBufferAutoPointerByte();
+
+	void Set(LPBYTE p, DWORD n) { Clear(); pPtr = p; nLen = n; }
+	void Clear();
+};
+
 #endif

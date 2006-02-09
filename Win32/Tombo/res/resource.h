@@ -73,6 +73,7 @@
 #define IDD_BOOKMARK_EDIT               147
 #define IDD_PROPTAB_EXTAPP              148
 #define IDD_LANG_DLG                    149
+#define IDD_PROPTAB_CODEPAGE            150
 #define IDC_PASS                        1000
 #define IDC_PROP_PASSWORD_DESC          1001
 #define IDC_PASS_TIMEOUT                1002
@@ -182,6 +183,9 @@
 #define IDC_PASS_TIMEOUT_USE_SAFEFILE   1101
 #define IDC_PROPTAB_PASS_TIMEOUT_SAFEFILE_HELP 1102
 #define IDC_PROPTAB_DEFNOTE_USELAST     1103
+#define IDC_PROPTAB_CODEPAGE_LABEL      1104
+#define IDC_PROPTAB_CODEPAGE_CODEPAGE   1105
+#define IDC_PROPTAB_CODEPAGE_NOTICE     1106
 #define IDM_EXIT                        40001
 #define IDM_NEWMEMO                     40002
 #define IDM_RETURNLIST                  40003
@@ -223,9 +227,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        150
+#define _APS_NEXT_RESOURCE_VALUE        151
 #define _APS_NEXT_COMMAND_VALUE         40039
-#define _APS_NEXT_CONTROL_VALUE         1104
+#define _APS_NEXT_CONTROL_VALUE         1107
 #define _APS_NEXT_SYMED_VALUE           116
 #endif
 #endif

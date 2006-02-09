@@ -261,6 +261,43 @@ DEP_CPP_ABOUT=\
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\Src\TomboLib\AutoPtr.cpp
+
+!IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
+
+DEP_CPP_AUTOP=\
+	"..\..\Src\TomboLib\AutoPtr.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH4) Release"
+
+DEP_CPP_AUTOP=\
+	"..\..\Src\TomboLib\AutoPtr.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE SH3) Release"
+
+DEP_CPP_AUTOP=\
+	"..\..\Src\TomboLib\AutoPtr.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Release"
+
+DEP_CPP_AUTOP=\
+	"..\..\Src\TomboLib\AutoPtr.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Tombo - Win32 (WCE ARM) Sig3"
+
+DEP_CPP_AUTOP=\
+	"..\..\Src\TomboLib\AutoPtr.h"\
+	
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\Src\gnupg\blowfish.c
 
 !IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
@@ -2506,6 +2543,7 @@ DEP_CPP_MEMOM=\
 	"..\..\Src\Repository.h"\
 	"..\..\Src\SearchEngine.h"\
 	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboLib\AutoPtr.h"\
 	"..\..\Src\TomboLib\File.h"\
 	"..\..\Src\TomboLib\Logger.h"\
 	"..\..\Src\TomboLib\TString.h"\
@@ -2653,6 +2691,7 @@ DEP_CPP_MEMON=\
 	"..\..\Src\Property.h"\
 	"..\..\Src\Repository.h"\
 	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboLib\AutoPtr.h"\
 	"..\..\Src\TomboLib\File.h"\
 	"..\..\Src\TomboLib\Logger.h"\
 	"..\..\Src\TomboLib\TString.h"\
@@ -3333,12 +3372,14 @@ SOURCE=..\..\Src\Property.cpp
 !IF  "$(CFG)" == "Tombo - Win32 (WCE MIPS) Release"
 
 DEP_CPP_PROPE=\
+	"..\..\expat\include\expat.h"\
 	"..\..\Src\FileSelector.h"\
 	"..\..\Src\Message.h"\
 	"..\..\Src\MsgRes\MsgDef.h"\
 	"..\..\Src\PasswordManager.h"\
 	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboLib\AutoPtr.h"\
 	"..\..\Src\TomboLib\DialogTemplate.h"\
 	"..\..\Src\TomboLib\File.h"\
 	"..\..\Src\TomboLib\Logger.h"\
@@ -4513,10 +4554,13 @@ SOURCE=..\..\Src\TSParser.cpp
 DEP_CPP_TSPAR=\
 	"..\..\expat\include\expat.h"\
 	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboLib\AutoPtr.h"\
 	"..\..\Src\TomboLib\File.h"\
 	"..\..\Src\TomboLib\Logger.h"\
+	"..\..\Src\TomboLib\TString.h"\
 	"..\..\Src\TomboLib\Uniconv.h"\
 	"..\..\Src\TomboLib\VarBuffer.h"\
+	"..\..\Src\TomboURI.h"\
 	"..\..\Src\TSParser.h"\
 	"..\..\Src\VFManager.h"\
 	"..\..\Src\VFStream.h"\
@@ -4632,6 +4676,7 @@ SOURCE=..\..\Src\TomboLib\Uniconv.cpp
 DEP_CPP_UNICO=\
 	"..\..\Src\Property.h"\
 	"..\..\Src\Tombo.h"\
+	"..\..\Src\TomboLib\AutoPtr.h"\
 	"..\..\Src\TomboLib\File.h"\
 	"..\..\Src\TomboLib\Logger.h"\
 	"..\..\Src\TomboLib\TString.h"\

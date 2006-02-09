@@ -11,12 +11,15 @@ class TomboURI;
 
 class SearchEngineA {
 protected:
+	DWORD nCodePage;
+
 	DWORD nMatchStart;
 	DWORD nMatchEnd;
 
 	BOOL bCaseSensitive;
 	BOOL bFileNameOnly;
-	char *pPattern;
+	LPBYTE pPattern; // assume null terminated string(MBCS/UCS2)
+	DWORD nPatLen;
 
 	BOOL bSearchEncrypt;
 
@@ -24,7 +27,7 @@ protected:
 
 	PasswordManager *pPassMgr;
 
-	BOOL SearchTextA(const char *pText, DWORD nStartPos, BOOL bForward, BOOL bShift);
+	BOOL SearchTextA(const LPBYTE pText, DWORD nStartPos, BOOL bForward, BOOL bShift);
 
 public:
 
@@ -32,7 +35,7 @@ public:
 	// ctor & dtor
 	SearchEngineA();
 	~SearchEngineA();
-	BOOL Init(BOOL bSearchEncrypt, BOOL bFileNameOnly, PasswordManager *pPassMgr);
+	BOOL Init(DWORD nCodePage, BOOL bSearchEncrypt, BOOL bFileNameOnly, PasswordManager *pPassMgr);
 
 	//////////////////////////////
 	// prepare pattern

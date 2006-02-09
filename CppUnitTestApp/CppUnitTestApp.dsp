@@ -288,6 +288,10 @@ SOURCE=..\oniguruma\win32\oniguruma.lib
 # End Group
 # Begin Source File
 
+SOURCE=..\Src\TomboLib\AutoPtr.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\Src\TomboLib\HttpUtil.cpp
 # End Source File
 # Begin Source File

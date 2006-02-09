@@ -130,7 +130,7 @@ MSG_GREPTAB_MAIN	Main
 MSG_GREPTAB_PERSIST	Save
 MSG_PROPTAB_APPBUTTON	AppButton
 MSG_PROPTAB_SIP	SIP
-MSG_PROPTAB_CODEPAGE	CodePage
+MSG_PROPTAB_CODEPAGE	Encoding
 MSG_MENU_NOTE	Memo
 MSG_MENU_TOOL	Tool
 MSG_MENU_EDIT	Edit
@@ -263,7 +263,7 @@ MSG_DLG_PROPTAB_APPBTN_BUTTON5	Button5
 MSG_DLG_PROPTAB_APPBTN_HELP	Assign application button to action button. It is enabled after restarting TOMBO
 MSG_DLG_PROPTAB_APPBTN_DISABLE	Disable close notes on edit view
 MSG_DLG_PROPTAB_SIP_SHIFT	Keep space over the SIP
-MSG_CODEPAGE_DEFAULT	Default(English)
+MSG_CODEPAGE_DEFAULT	Default(System native)
 MSG_CODEPAGE_GREEK	Greek
 MSG_MENUITEM_FIND	&Search
 MSG_MENUITEM_EXTAPP1	Ext tool1
@@ -293,3 +293,7 @@ MSG_REGERASE_DELETED	Deleted.
 MSG_REGERASE_NOT_EXIST	There are no registry entry.
 MSG_REGERASE_ERROR	Delete failed(%d).
 MSG_DLG_PROPTAB_DEFNOTE_LAST_USE	When starting select the tree item last selected
+MSG_DLG_PROPTAB_CODEPAGE_LABEL	File encoding
+MSG_CODEPAGE_UTF16	Unicode(UTF16LE)
+MSG_CODEPAGE_UTF8	UTF-8
+MSG_DLG_PROPTAB_CODEPAGE_NOTICE	Set file encoding. Auto detection/conversion is not supported, so do not change if you hanve already some notes.

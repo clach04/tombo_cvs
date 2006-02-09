@@ -130,7 +130,7 @@ Main
 Save
 AppButton
 SIP
-CodePage
+Encoding
 Memo
 Tool
 Edit
@@ -263,7 +263,7 @@ Button5
 Assign application button to action button. It is enabled after restarting TOMBO
 Disable close notes on edit view
 Keep space over the SIP
-Default(English)
+Default(System native)
 Greek
 &Search
 Ext tool1
@@ -293,3 +293,7 @@ Deleted.
 There are no registry entry.
 Delete failed(%d).
 When starting select the tree item last selected
+File encoding
+Unicode(UTF16LE)
+UTF-8
+Set file encoding. Auto detection/conversion is not supported, so do not change if you hanve already some notes.

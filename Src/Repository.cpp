@@ -138,9 +138,9 @@ LPTSTR Repository::GetNoteData(const TomboURI *pURI)
 	return pDefaultImpl->GetNoteData(pURI);
 }
 
-char* Repository::GetNoteDataA(const TomboURI *pURI)
+LPBYTE Repository::GetNoteDataNative(const TomboURI *pURI, LPDWORD pSize)
 {
-	return pDefaultImpl->GetNoteDataNative(pURI);
+	return pDefaultImpl->GetNoteDataNative(pURI, pSize);
 }
 
 BOOL Repository::ExecuteAssoc(const TomboURI *pURI, ExeAppType nType)

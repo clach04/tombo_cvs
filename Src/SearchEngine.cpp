@@ -13,34 +13,7 @@
 
 #include "AutoPtr.h"
 
-extern "C" {
-void* Regex_Compile(const char *pPattern, BOOL bIgnoreCase, const char **ppReason);
-void Regex_Free(void *p);
-int Regex_Search(void *p, int iStart, const char *pTarget, BOOL bForward, int *pStart, int *pEnd);
-
-DWORD UnicodePosToMBCSPos(const char *pStr, DWORD n);
-DWORD MBCSPosToUnicodePos(const char *pStr, DWORD n);
-};
-
-
-#if defined(PLATFORM_HPC) || defined(PLATFORM_PSPC)
-int _strnicmp(const char *p1, const char *p2, int n)
-{
-	const char *p, *q;
-	p = p1;
-	q = p2;
-	char c1 = '\0', c2 = '\0';
-	for (int i = 0; i < n; i++) {
-		if (!*p || !*q) break;
-		c1 = ('A' <= *p && *p <= 'Z') ? 'a' + (*p - 'A') : *p;
-		c2 = ('A' <= *q && *q <= 'Z') ? 'a' + (*q - 'A') : *q;
-		if (c1 != c2) break;
-		*p++;
-		*q++;
-	}
-	return c2 - c1;
-}
-#endif
+#include "RegexUtil.h"
 
 ////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////
@@ -64,8 +37,9 @@ SearchEngineA::~SearchEngineA()
 	}
 }
 
-BOOL SearchEngineA::Init(BOOL bSE, BOOL bFo, PasswordManager *pPMgr)
+BOOL SearchEngineA::Init(DWORD nCP, BOOL bSE, BOOL bFo, PasswordManager *pPMgr)
 {
+	nCodePage = nCP;
 	bSearchEncrypt = bSE;
 	bFileNameOnly = bFo;
 	pPassMgr = pPMgr;
@@ -79,7 +53,7 @@ BOOL SearchEngineA::Init(BOOL bSE, BOOL bFo, PasswordManager *pPMgr)
 BOOL SearchEngineA::Prepare(LPCTSTR pPat, BOOL bCS, const char **ppReason)
 {
 	delete[] pPattern;	// release previous Prepare data
-	pPattern = ConvUnicode2SJIS(pPat);
+	pPattern = ConvTCharToFileEncoding(pPat, &nPatLen);
 
 	if (pPattern == NULL) {
 		SetLastError(ERROR_NOT_ENOUGH_MEMORY);
@@ -91,7 +65,7 @@ BOOL SearchEngineA::Prepare(LPCTSTR pPat, BOOL bCS, const char **ppReason)
 		Regex_Free(pCompiledPattern);
 	}
 
-	pCompiledPattern = Regex_Compile(pPattern, !bCS, ppReason);
+	pCompiledPattern = Regex_Compile(pPattern, !bCS, ppReason, nCodePage);
 	if (!pCompiledPattern) {
 		return FALSE;
 	}
@@ -104,38 +78,24 @@ BOOL SearchEngineA::Prepare(LPCTSTR pPat, BOOL bCS, const char **ppReason)
 // search from text
 ////////////////////////////////////////////////////////
 
-BOOL SearchEngineA::SearchTextA(const char *pText, DWORD nStartPos, BOOL bForward, BOOL bShift)
+BOOL SearchEngineA::SearchTextA(const LPBYTE pText, DWORD nStartPos, BOOL bForward, BOOL bShift)
 {
-	const char *p = pText + nStartPos;
+	LPBYTE p = pText + nStartPos;
 
 	if (!pCompiledPattern) return TRUE;
 
 	// if bShift is TRUE, shift start position 1 letter
 	if (bShift) {
 		if (bForward) {
-#if defined(PLATFORM_WIN32)
-			if (IsDBCSLeadByte((BYTE)*p)) {
-				p++;
-			}
-			if (*p) p++;
-#else
-			p += 2;
-#endif
+			p = ShiftRight(pText, p, nCodePage);
 		} else {
-#if defined(PLATFORM_WIN32)
-			p--;
-			if ((p-1) > pText && IsDBCSLeadByte((BYTE)*(p-1))) {
-				p--;
-			}
-#else
-			p -= 2;
-#endif
+			p = ShiftLeft(pText, p, nCodePage);
 		}
 	}
 
 	// execute searching
 	int s, e;
-	int res = Regex_Search(pCompiledPattern, (p - pText), pText, bForward, &s, &e);
+	int res = Regex_Search(pCompiledPattern, (p - pText), pText, bForward, &s, &e, nCodePage);
 	if (res >= 0) {
 		nMatchStart = s;
 		nMatchEnd = e;
@@ -147,28 +107,31 @@ BOOL SearchEngineA::SearchTextA(const char *pText, DWORD nStartPos, BOOL bForwar
 
 BOOL SearchEngineA::SearchTextT(LPCTSTR pText, DWORD nStartPos, BOOL bForward, BOOL bShift)
 {
+	DWORD nTextLen;
+	LPBYTE pData = ConvTCharToFileEncoding(pText, &nTextLen);
+	SecureBufferAutoPointerByte ap(pData, nTextLen);
+
 #if defined(PLATFORM_WIN32)
-	return SearchTextA(pText, nStartPos, bForward, bShift);
+	DWORD nSystemCodePage = 0;
 #else
-	char *pTextA = ConvUnicode2SJIS(pText);
-	SecureBufferAutoPointerA sa(pTextA);
+	DWORD nSystemCodePage = TOMBO_CP_UTF16LE;
+#endif
 
 	// convert unicode pos to MBCS pos
-	DWORD nStartPosA = UnicodePosToMBCSPos(pTextA, nStartPos);
+	DWORD nStartPosA = ConvertPos((LPBYTE)pText, nStartPos * sizeof(TCHAR), nSystemCodePage, pData, nCodePage) * sizeof(TCHAR);
 
 	// exec searching
-	BOOL bResult = SearchTextA(pTextA, nStartPosA, bForward, bShift);
+	BOOL bResult = SearchTextA(pData, nStartPosA, bForward, bShift);
 
 	// if matched, convert MBCS pos to unicode pos
 	if (bResult) {
 		DWORD nMatchStartA = nMatchStart;
 		DWORD nMatchEndA = nMatchEnd;
 
-		nMatchStart = MBCSPosToUnicodePos(pTextA, nMatchStartA);
-		nMatchEnd = MBCSPosToUnicodePos(pTextA, nMatchEndA);
+		nMatchStart = ConvertPos(pData, nMatchStartA, nCodePage, (LPBYTE)pText, nSystemCodePage) / sizeof(TCHAR);
+		nMatchEnd = ConvertPos(pData, nMatchEndA, nCodePage, (LPBYTE)pText, nSystemCodePage) / sizeof(TCHAR);
 	}
 	return bResult;
-#endif
 }
 
 ////////////////////////////////////////////////////////
@@ -183,9 +146,11 @@ SearchResult SearchEngineA::SearchFromURI(const TomboURI *pURI)
 
 		BOOL bMatch;
 
-		char *pText = ConvUnicode2SJIS(sPartName.Get());
-		SecureBufferAutoPointerA sb(pText);
-		bMatch = (Regex_Search(pCompiledPattern, 0, pText, TRUE, NULL, NULL) >= 0);
+		DWORD nSize;
+		LPBYTE pText = ConvTCharToFileEncoding(sPartName.Get(), &nSize);
+		SecureBufferAutoPointerByte ap(pText, nSize);
+
+		bMatch = (Regex_Search(pCompiledPattern, 0, pText, TRUE, NULL, NULL, nCodePage) >= 0);
 
 		return bMatch ? SR_FOUND : SR_NOTFOUND;
 	} else {
@@ -195,11 +160,12 @@ SearchResult SearchEngineA::SearchFromURI(const TomboURI *pURI)
 		// skip crypted note if it is not search target.
 		if (!IsSearchEncryptMemo() && opt.bEncrypt) return SR_NOTFOUND;
 
-		char *pMemo = g_Repository.GetNoteDataA(pURI);
+		DWORD nSize;
+		LPBYTE pMemo = g_Repository.GetNoteDataNative(pURI, &nSize);
 		if (pMemo == NULL) return SR_FAILED;
+		SecureBufferAutoPointerByte ap(pMemo, nSize);
 
-		BOOL bMatch = (Regex_Search(pCompiledPattern, 0, pMemo, TRUE, NULL, NULL) >= 0);
-		WipeOutAndDelete(pMemo);
+		BOOL bMatch = (Regex_Search(pCompiledPattern, 0, pMemo, TRUE, NULL, NULL, nCodePage) >= 0);
 		return bMatch ? SR_FOUND : SR_NOTFOUND;
 	}
 }
@@ -212,15 +178,16 @@ SearchEngineA *SearchEngineA::Clone()
 {
 	const char *pReason;
 	SearchEngineA *p = new SearchEngineA();
-	LPTSTR pPat = ConvSJIS2Unicode(pPattern);
 	if (!p) return NULL;
-	if (!p->Init(bSearchEncrypt, bFileNameOnly, pPassMgr) ||
+
+	LPTSTR pPat = ConvFileEncodingToTChar(pPattern);
+	ArrayAutoPointer<TCHAR> ap(pPat);
+
+	if (!p->Init(nCodePage, bSearchEncrypt, bFileNameOnly, pPassMgr) ||
 		!p->Prepare(pPat, bCaseSensitive, &pReason)) {
 		delete p;
-		delete [] pPat;
 		return NULL;
 	}
-	delete [] pPat;
 	return p;
 }
 

@@ -394,7 +394,7 @@ BOOL VFRegexFilter::Reset(LPCTSTR pPat, BOOL bCase, BOOL bEnc, BOOL bFileName, B
 
 	pRegex = new SearchEngineA();
 	const char *pReason;
-	if (!pRegex || !pRegex->Init(bEnc, bFileName, pPassMgr)) return FALSE;
+	if (!pRegex || !pRegex->Init(g_Property.GetCodePage(), bEnc, bFileName, pPassMgr)) return FALSE;
 	if (!pRegex->Prepare(pPat, bCase, &pReason)) return FALSE;
 	return TRUE;
 }

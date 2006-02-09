@@ -1619,7 +1619,7 @@ void MainFrame::OnSearch()
 	if (sd.Popup(g_hInstance, hMainWnd, SelectViewActive()) != IDOK) return;
 
 	SearchEngineA *pSE = new SearchEngineA();
-	if(!pSE->Init(sd.IsSearchEncryptMemo(), sd.IsFileNameOnly(), &pmPasswordMgr)) {
+	if(!pSE->Init(g_Property.GetCodePage(), sd.IsSearchEncryptMemo(), sd.IsFileNameOnly(), &pmPasswordMgr)) {
 		delete pSE;
 		return;
 	}

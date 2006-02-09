@@ -14,6 +14,7 @@
 #include "SearchEngine.h"
 #include "Message.h"
 #include "TomboURI.h"
+#include "AutoPtr.h"
 
 #include "Repository.h"
 
@@ -106,7 +107,7 @@ BOOL MemoManager::SaveIfModify(LPDWORD pYNC, BOOL bDupMode)
 
 	// get memo data
 	LPTSTR pText = pMemoDetailsView->GetMemo();
-	SecureBufferT sbData(pText);
+	SecureBufferAutoPointerT ap(pText);
 	if (pText == NULL) return FALSE;
 
 	////////////////////////////////////////////

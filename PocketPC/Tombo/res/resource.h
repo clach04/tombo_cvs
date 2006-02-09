@@ -49,6 +49,7 @@
 #define IDB_TOOLBAR_LARGE               133
 #define IDD_BOOKMARK_EDIT               134
 #define IDD_PROPTAB_EXTAPP              135
+#define IDD_PROPTAB_CODEPAGE            136
 #define IDD_FILTERDEF_SRC               138
 #define IDD_FILTERDEF_FILTER            139
 #define IDD_FILTERDEF_ADD_REGEX         140
@@ -177,6 +178,10 @@
 #define IDC_PROPTAB_DISABLESAVEDLG      1076
 #define IDC_PASS_TIMEOUT_USE_SAFEFILE   1077
 #define IDC_PROPTAB_PASS_TIMEOUT_SAFEFILE_HELP 1078
+#define IDC_PROPTAB_CODEPAGE_CODEPAGE   1079
+#define IDC_PROPTAB_DEFNOTE_USELAST     1080
+#define IDC_PROPTAB_CODEPAGE_NOTICE     1081
+#define IDC_PROPTAB_CODEPAGE_LABEL      1082
 #define IDC_LANG_LIST                   1099
 #define IDM_ACTIONBUTTON                30001
 #define IDM_FILE_EXIT                   40002
@@ -259,9 +264,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        134
+#define _APS_NEXT_RESOURCE_VALUE        137
 #define _APS_NEXT_COMMAND_VALUE         40085
-#define _APS_NEXT_CONTROL_VALUE         1079
+#define _APS_NEXT_CONTROL_VALUE         1083
 #define _APS_NEXT_SYMED_VALUE           113
 #endif
 #endif

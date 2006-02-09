@@ -1095,11 +1095,17 @@ Some bugs are fixed.
 // B200
 ////////////////////////////////
 
-* Remember last tree item (#6057)
+* Add Remember last tree item option (#6057)
 
 - support uri attribute of src tag in vfolder.xml.
 	This change is prepare for future changes.
 
 ////////////////////////////////
-//
+// B201
 ////////////////////////////////
+
+* Fixed memory some leaks about SecureBuffer[TA]. SecureBuffer has replaced to SecureBufferAutoPointer[TA]
+* Fix: search position is wrong when search twice or more.(WinCE)
+
+* Save/Load UTF-8/Unicode support(#5814)
+	This feature is not fully tested on CE devices yet.

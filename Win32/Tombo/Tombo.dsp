@@ -436,6 +436,10 @@ SOURCE=..\..\Src\TomboLib\PropertyPage.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\Src\RegexUtil.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\Src\YAEdit\Region.h
 # End Source File
 # Begin Source File
@@ -658,6 +662,10 @@ SOURCE=..\..\Src\YAEdit\YAEditView.h
 # Begin Group "utils"
 
 # PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\..\Src\TomboLib\AutoPtr.cpp
+# End Source File
 # Begin Source File
 
 SOURCE=..\..\Src\TomboLib\AutoPtr.h

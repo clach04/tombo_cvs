@@ -115,8 +115,6 @@ public:
 // Codepage tab
 //////////////////////////////////////////
 
-#if defined(PLATFORM_BE500) && defined(TOMBO_LANG_ENGLISH)
-
 class CodepageTab : public TomboPropertyTab {
 public:
 	CodepageTab(Property *p) :
@@ -125,7 +123,6 @@ public:
 	void Init(HWND hDlg);
 	BOOL Apply(HWND hDlg);
 };
-#endif
 
 //////////////////////////////////////////
 // DefaultNote tab

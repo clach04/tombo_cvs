@@ -82,31 +82,4 @@ public:
 	BOOL Set(TString *pSrc);
 };
 
-////////////////////////////////////
-//  Secure buffer
-////////////////////////////////////
-// secure auto ptr string buffer
-
-// SecureBuffer decides erase range by INITIAL string length. So be careful if you want to update buffer.
-
-class SecureBufferT {
-	LPTSTR pBuf;
-	DWORD nBufLen;
-public:
-	SecureBufferT(LPTSTR p) { pBuf = p; nBufLen = _tcslen(p); }
-	~SecureBufferT();
-
-	LPTSTR Get() { return pBuf; }
-};
-
-class SecureBufferA {
-	char *pBuf;
-	DWORD nBufLen;
-public:
-	SecureBufferA(char *p) { pBuf = p; nBufLen = strlen(p); }
-	~SecureBufferA();
-
-	char *Get() { return pBuf; }
-};
-
 #endif

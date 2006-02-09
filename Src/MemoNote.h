@@ -20,10 +20,12 @@ class Repository;
 ////////////////////////////////////////
 
 class MemoNote {
+private:
+	virtual BOOL SaveData(PasswordManager *pMgr, const LPBYTE pData, DWORD nLen, LPCTSTR pWriteFile) = 0;
+	static BOOL MemoNoteFactory(LPCTSTR pFile, MemoNote **ppNote);
 protected:
 	LPTSTR pPath;
 public:
-
 	///////////////////////////////////////////
 	// initialize
 
@@ -37,18 +39,15 @@ public:
 	virtual MemoNote *GetNewInstance() const = 0;
 	virtual LPCTSTR GetExtension() = 0;
 
-	MemoNote *Clone() const;
-	BOOL Equal(MemoNote *pTarget);
-
 	//////////////////////////////////
 	// memo data operation members
 
 	// get memo data
-	virtual LPTSTR GetMemoBody(LPCTSTR pTopDir, PasswordManager *pMgr) const;
-	virtual char *GetMemoBodyA(LPCTSTR pTopDir, PasswordManager *pMgr) const;
+	virtual LPBYTE GetMemoBodyNative(LPCTSTR pTopDir, PasswordManager *pMgr, LPDWORD pSize) const = 0;
+	LPTSTR GetMemoBody(LPCTSTR pTopDir, PasswordManager *pMgr) const;
 
 	// save memo
-	virtual BOOL SaveData(PasswordManager *pMgr, const char *pMemo, LPCTSTR pWriteFile);
+	BOOL SaveDataT(PasswordManager *pMgr, LPCTSTR pMemo, LPCTSTR pWriteFile);
 
 	//////////////////////////////////
 	// Encryption/Decryption : 
@@ -70,6 +69,7 @@ public:
 	// path related functions
 
 	LPCTSTR MemoPath() const { return pPath; }
+	BOOL SetMemoPath(LPCTSTR p);
 	BOOL GetURI(TomboURI *pURI) const;
 
 	//////////////////////////////////
@@ -83,18 +83,16 @@ public:
 	//
 	// if creation failed, return FALSE.
 	// if pFile is not memo, return TRUE and *ppNote sets to NULL.
-	static BOOL MemoNoteFactory(LPCTSTR pFile, MemoNote **ppNote);
 	static MemoNote *MemoNoteFactory(const TomboURI *pURI);
 
 	//////////////////////////////////
 	// Headline related funcs
 
 	static BOOL GetHeadLinePath(LPCTSTR pTopDir, LPCTSTR pMemoPath, LPCTSTR pHeadLine, LPCTSTR pExt, 
-								TString *pFullPath, LPTSTR *ppNotePath, TString *pNewHeadLine);
+								TString *pFullPath, LPCTSTR *ppNotePath, TString *pNewHeadLine);
 	static BOOL GetHeadLineFromMemoText(LPCTSTR pMemo, TString *pHeadLine);
 	static BOOL GetHeadLineFromFilePath(LPCTSTR pFilePath, TString *pHeadLine);
 
-	friend class LocalFileRepository;
 };
 
 ////////////////////////////////////////
@@ -102,14 +100,14 @@ public:
 ////////////////////////////////////////
 
 class PlainMemoNote : public MemoNote {
+	BOOL SaveData(PasswordManager *pMgr, const LPBYTE pData, DWORD nLen, LPCTSTR pWriteFile);
+
 public:
 	MemoNote *GetNewInstance() const ;
 	LPCTSTR GetExtension();
 
-	LPTSTR GetMemoBody(LPCTSTR pTopDir, PasswordManager *pMgr) const;
-	char *GetMemoBodyA(LPCTSTR pTopDir, PasswordManager *pMgr) const;
+	LPBYTE GetMemoBodyNative(LPCTSTR pTopDir, PasswordManager *pMgr, LPDWORD pSize) const;
 
-	BOOL SaveData(PasswordManager *pMgr, const char *pMemo, LPCTSTR pWriteFile);
 };
 
 ////////////////////////////////////////
@@ -117,16 +115,15 @@ public:
 ////////////////////////////////////////
 
 class CryptedMemoNote : public MemoNote {
+	BOOL SaveData(PasswordManager *pMgr, const LPBYTE pData, DWORD nLen, LPCTSTR pWriteFile);
+
 protected:
 	LPBYTE GetMemoBodySub(LPCTSTR pTopDir, PasswordManager *pMgr, LPDWORD pSize) const;
 public:
 	MemoNote *GetNewInstance() const ;
 	LPCTSTR GetExtension();
 
-	LPTSTR GetMemoBody(LPCTSTR pTopDir, PasswordManager *pMgr) const;
-	char *GetMemoBodyA(LPCTSTR pTopDIr, PasswordManager *pMgr) const;
-
-	BOOL SaveData(PasswordManager *pMgr, const char *pMemo, LPCTSTR pWriteFile);
+	LPBYTE GetMemoBodyNative(LPCTSTR pTopDir, PasswordManager *pMgr, LPDWORD pSize) const;
 
 	MemoNote *Decrypt(LPCTSTR pTopDir, PasswordManager *pMgr, TString *pHeadLine, BOOL *pIsModified) const;
 };
