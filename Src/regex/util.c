@@ -181,8 +181,6 @@ DWORD ConvertPos(const LPBYTE pSrcStr, DWORD nSrcPos, DWORD nSrcEnc, const LPBYT
 
 	DWORD nSrc, nDst;
 
-	Sleep(1);
-
 	nSrc = nDst = 0;
 	while (*p) {
 		nSrc = p - pSrcStr;
@@ -193,7 +191,9 @@ DWORD ConvertPos(const LPBYTE pSrcStr, DWORD nSrcPos, DWORD nSrcEnc, const LPBYT
 		p = onigenc_get_right_adjust_char_head(srcEnc, (LPBYTE)pSrcStr, p + 1);
 		q = onigenc_get_right_adjust_char_head(dstEnc, (LPBYTE)pDstStr, q + 1);
 	}
-
+	if (*p == 0) {
+		nDst = q - pDstStr;
+	}
 	return nDst;
 }
 

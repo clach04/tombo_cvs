@@ -63,6 +63,7 @@ class TEST_CLASS_NAME : public CppUnit::TestFixture {
 	CPPUNIT_TEST(ConvertPosTest3);
 	CPPUNIT_TEST(ConvertPosTest4);
 	CPPUNIT_TEST(ConvertPosTest5);
+	CPPUNIT_TEST(ConvertPosTest6);
 
 	CPPUNIT_TEST_SUITE_END();
 
@@ -111,6 +112,7 @@ public:
 	void ConvertPosTest3();
 	void ConvertPosTest4();
 	void ConvertPosTest5();
+	void ConvertPosTest6();
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION(TEST_CLASS_NAME);
@@ -438,7 +440,6 @@ void TEST_CLASS_NAME::ConvertPosTest4() {
 	CPPUNIT_ASSERT(n == 7);
 }
 
-
 // Native -> UCS2
 void TEST_CLASS_NAME::ConvertPosTest5() {
 	LPBYTE pSrc = (LPBYTE)"Š¿abƒÓŽš";
@@ -448,3 +449,12 @@ void TEST_CLASS_NAME::ConvertPosTest5() {
 	CPPUNIT_ASSERT(n == 8);
 }
 
+// UTF-8 -> Native
+void TEST_CLASS_NAME::ConvertPosTest6() {
+	LPBYTE pSrc = (LPBYTE)ConvUCS2ToUTF8(_L("Š¿abƒÓŽš"));
+	LPBYTE pDst = (LPBYTE)"Š¿abƒÓŽš";
+
+	DWORD n = ConvertPos(pSrc, 10, 65001, pDst, 0);
+	CPPUNIT_ASSERT(n == 8);
+
+}

@@ -538,69 +538,6 @@ DEP_CPP_REGER=\
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\Src\TomboLib\TString.cpp
-
-!IF  "$(CFG)" == "RegErase - Win32 (WCE MIPS) Release"
-
-DEP_CPP_TSTRI=\
-	"..\..\Src\TomboLib\TString.h"\
-	"..\..\Src\TomboLib\Uniconv.h"\
-	
-
-!ELSEIF  "$(CFG)" == "RegErase - Win32 (WCE MIPS) Debug"
-
-DEP_CPP_TSTRI=\
-	"..\..\Src\TomboLib\TString.h"\
-	"..\..\Src\TomboLib\Uniconv.h"\
-	
-
-!ELSEIF  "$(CFG)" == "RegErase - Win32 (WCE SH4) Release"
-
-DEP_CPP_TSTRI=\
-	"..\..\Src\TomboLib\TString.h"\
-	"..\..\Src\TomboLib\Uniconv.h"\
-	
-
-!ELSEIF  "$(CFG)" == "RegErase - Win32 (WCE SH4) Debug"
-
-DEP_CPP_TSTRI=\
-	"..\..\Src\TomboLib\TString.h"\
-	"..\..\Src\TomboLib\Uniconv.h"\
-	
-
-!ELSEIF  "$(CFG)" == "RegErase - Win32 (WCE SH3) Release"
-
-DEP_CPP_TSTRI=\
-	"..\..\Src\TomboLib\TString.h"\
-	"..\..\Src\TomboLib\Uniconv.h"\
-	
-
-!ELSEIF  "$(CFG)" == "RegErase - Win32 (WCE SH3) Debug"
-
-DEP_CPP_TSTRI=\
-	"..\..\Src\TomboLib\TString.h"\
-	"..\..\Src\TomboLib\Uniconv.h"\
-	
-
-!ELSEIF  "$(CFG)" == "RegErase - Win32 (WCE ARM) Release"
-
-DEP_CPP_TSTRI=\
-	"..\..\Src\TomboLib\TString.h"\
-	"..\..\Src\TomboLib\Uniconv.h"\
-	
-
-!ELSEIF  "$(CFG)" == "RegErase - Win32 (WCE ARM) Debug"
-
-DEP_CPP_TSTRI=\
-	"..\..\Src\TomboLib\TString.h"\
-	"..\..\Src\TomboLib\Uniconv.h"\
-	
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
 SOURCE=..\..\Src\TomboLib\Uniconv.cpp
 
 !IF  "$(CFG)" == "RegErase - Win32 (WCE MIPS) Release"
@@ -713,10 +650,6 @@ SOURCE=..\..\Src\TomboLib\File.h
 # Begin Source File
 
 SOURCE=..\..\Src\Message.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Src\TomboLib\TString.h
 # End Source File
 # Begin Source File
 

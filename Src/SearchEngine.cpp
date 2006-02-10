@@ -118,7 +118,7 @@ BOOL SearchEngineA::SearchTextT(LPCTSTR pText, DWORD nStartPos, BOOL bForward, B
 #endif
 
 	// convert unicode pos to MBCS pos
-	DWORD nStartPosA = ConvertPos((LPBYTE)pText, nStartPos * sizeof(TCHAR), nSystemCodePage, pData, nCodePage) * sizeof(TCHAR);
+	DWORD nStartPosA = ConvertPos((LPBYTE)pText, nStartPos * sizeof(TCHAR), nSystemCodePage, pData, nCodePage);
 
 	// exec searching
 	BOOL bResult = SearchTextA(pData, nStartPosA, bForward, bShift);

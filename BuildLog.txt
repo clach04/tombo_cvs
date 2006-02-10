@@ -1109,3 +1109,10 @@ Some bugs are fixed.
 
 * Save/Load UTF-8/Unicode support(#5814)
 	This feature is not fully tested on CE devices yet.
+
+////////////////////////////////
+// B202
+////////////////////////////////
+
+- Test and fix UTF-8/Unicode support on CE devices.
+
