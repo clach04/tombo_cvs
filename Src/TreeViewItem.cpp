@@ -398,7 +398,12 @@ BOOL TreeViewFolderItem::Copy(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR 
 BOOL TreeViewFolderItem::Delete(MemoManager *pMgr, MemoSelectView *pView)
 {
 	TomboURI sURI;
-	if (!pView->GetURI(&sURI)) return FALSE;
+	if (!pView->GetURI(&sURI, GetViewItem())) return FALSE;
+	{
+		TCHAR buf[1024];
+		wsprintf(buf, TEXT("URI = %s"), sURI.GetFullURI());
+		MessageBox(NULL, buf, TEXT("DEBUG"), MB_OK);
+	}
 	if (sURI.IsRoot()) return TRUE;
 	if (TomboMessageBox(NULL, MSG_CONFIRM_DEL_FOLDER, MSG_DEL_FOLDER_TTL, MB_ICONQUESTION | MB_OKCANCEL) != IDOK) return FALSE;
 
@@ -432,7 +437,7 @@ BOOL TreeViewFolderItem::Delete(MemoManager *pMgr, MemoSelectView *pView)
 BOOL TreeViewFolderItem::Encrypt(MemoManager *pMgr, MemoSelectView *pView)
 {
 	TomboURI sURI;
-	if (!pView->GetURI(&sURI)) return FALSE;
+	if (!pView->GetURI(&sURI, GetViewItem())) return FALSE;
 
 	if (sURI.IsRoot()) return TRUE;
 	if (TomboMessageBox(NULL, MSG_CONFIRM_ENCRYPT_FOLDER, MSG_CONFIRM_ENCRYPT_FOLDER_TTL, MB_ICONQUESTION | MB_OKCANCEL) != IDOK) return TRUE;
@@ -459,7 +464,7 @@ BOOL TreeViewFolderItem::Encrypt(MemoManager *pMgr, MemoSelectView *pView)
 BOOL TreeViewFolderItem::Decrypt(MemoManager *pMgr, MemoSelectView *pView)
 {
 	TomboURI sURI;
-	if (!pView->GetURI(&sURI)) return FALSE;
+	if (!pView->GetURI(&sURI, GetViewItem())) return FALSE;
 
 	if (sURI.IsRoot()) return TRUE;
 	if (TomboMessageBox(NULL, MSG_CONFIRM_DECRYPT_FOLDER, MSG_CONFIRM_DECRYPT_FOLDER_TTL, MB_ICONQUESTION | MB_OKCANCEL) != IDOK) return TRUE;
@@ -549,7 +554,7 @@ BOOL TreeViewFolderItem::GetURIItem(MemoSelectView *pView, TString *pItem)
 BOOL TreeViewFolderItem::Rename(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR pNewName)
 {
 	TomboURI sCurrentURI;
-	if (!pView->GetURI(&sCurrentURI)) return FALSE;
+	if (!pView->GetURI(&sCurrentURI, GetViewItem())) return FALSE;
 	
 	if (sCurrentURI.IsRoot()) return FALSE;
 
@@ -618,7 +623,7 @@ BOOL TreeViewFolderItem::Expand(MemoSelectView *pView)
 BOOL TreeViewFolderItem::ExecApp(MemoManager *pMgr, MemoSelectView *pView, ExeAppType nType)
 {
 	TomboURI sURI;
-	if (!pView->GetURI(&sURI)) return FALSE;
+	if (!pView->GetURI(&sURI, GetViewItem())) return FALSE;
 	g_Repository.ExecuteAssoc(&sURI, nType);
 	return TRUE;
 }

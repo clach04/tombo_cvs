@@ -432,32 +432,6 @@ LRESULT MemoSelectView::OnNotify(HWND hWnd, WPARAM wParam, LPARAM lParam)
 			// 2-Pane Viewの場合には メモの切り替えが発生し、かつ
 			// 保存確認でキャンセルを押した場合、アイテムの切り替えを
 			// 認めてはならない
-#ifdef COMMENT
-			{
-				NMTREEVIEW *p = (LPNMTREEVIEW)lParam;
-				HTREEITEM hOld = p->itemOld.hItem;
-				HTREEITEM hNew = p->itemNew.hItem;
-				TString info;
-
-				if (hOld != NULL) {
-					TString sOldURI;
-					GetURI(&sOldURI, hOld);
-					info.Join(sOldURI.Get(), "->");
-				} else {
-					info.Set("-- ->");
-				}
-				if (hNew != NULL) {
-					TString sNewURI;
-					GetURI(&sNewURI, hNew);
-					info.StrCat(sNewURI.Get());
-				} else {
-					info.StrCat("--");
-				}
-				g_Logger.WriteLog("TVN_SELCHANGING ");
-				g_Logger.WriteLog(info.Get());
-				g_Logger.WriteLog("\r\n");
-			}
-#endif
 			if (!g_Property.GetUseTwoPane() || !pMemoMgr) return FALSE;
 
 			DWORD nYNC;
@@ -545,7 +519,6 @@ void MemoSelectView::OnNotify_RClick(POINT pt)
 #endif
 	hti.pt = cpt;
 	HTREEITEM hX = TreeView_HitTest(hViewWnd, &hti);
-
 
 	if (hti.hItem == NULL) return;
 	TreeViewItem *pItem = GetTVItem(hti.hItem);
