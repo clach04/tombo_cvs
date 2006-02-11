@@ -1123,8 +1123,12 @@ Some bugs are fixed.
 * FIX: Deleting folder deletes wrong one(#7725)
 
 ////////////////////////////////
-// B204 (TOMBO 1.16)
+// B204
 ////////////////////////////////
 
 * FIX again: Deleting folder deletes wrong one(#7725)
+
+////////////////////////////////
+// B205  (TOMBO 1.16)
+////////////////////////////////
 
