@@ -61,15 +61,16 @@ public:
 	virtual BOOL IsOperationEnabled(MemoSelectView *pView, OpType op);
 
 	//  node operators
-	virtual BOOL Move(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR *ppErr) = 0;
-	virtual BOOL Copy(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR *ppErr) = 0;
 	virtual BOOL Rename(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR pNewName) = 0;
 	virtual BOOL Delete(MemoManager *pMgr, MemoSelectView *pView) = 0;
 		// "this" object is not deleted, so delete manually if return value is TRUE.
 	virtual BOOL Encrypt(MemoManager *pMgr, MemoSelectView *pView) = 0;
 	virtual BOOL Decrypt(MemoManager *pMgr, MemoSelectView *pView) = 0;
-
 	virtual BOOL ExecApp(MemoManager *pMgr, MemoSelectView *pView, ExeAppType nType) = 0;
+
+	// Move/Copy this item to current selected item
+	virtual BOOL Move(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR *ppErr) = 0;
+	virtual BOOL Copy(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR *ppErr) = 0;
 
 	// Compare item order
 	virtual DWORD ItemOrder() = 0;
@@ -118,13 +119,14 @@ public:
 	// inherited methods
 	BOOL IsOperationEnabled(MemoSelectView *pView, OpType op);
 
-	BOOL Move(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR *ppErr);
-	BOOL Copy(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR *ppErr);
 	BOOL Delete(MemoManager *pMgr, MemoSelectView *pView);
 	BOOL Encrypt(MemoManager *pMgr, MemoSelectView *pView);
 	BOOL Decrypt(MemoManager *pMgr, MemoSelectView *pView);
 	BOOL Rename(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR pNewName);
 	BOOL ExecApp(MemoManager *pMgr, MemoSelectView *pView, ExeAppType nType);
+
+	BOOL Move(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR *ppErr);
+	BOOL Copy(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR *ppErr);
 
 	DWORD GetIcon(MemoSelectView *pView, DWORD nStatus);
 	DWORD ItemOrder();
@@ -159,13 +161,14 @@ public:
 
 	BOOL IsOperationEnabled(MemoSelectView *pView, OpType op);
 
-	BOOL Move(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR *ppErr);
-	BOOL Copy(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR *ppErr);
 	BOOL Rename(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR pNewName);
 	BOOL Delete(MemoManager *pMgr, MemoSelectView *pView);
 	BOOL Encrypt(MemoManager *pMgr, MemoSelectView *pView);
 	BOOL Decrypt(MemoManager *pMgr, MemoSelectView *pView);
 	BOOL ExecApp(MemoManager *pMgr, MemoSelectView *pView, ExeAppType nType);
+
+	BOOL Move(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR *ppErr);
+	BOOL Copy(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR *ppErr);
 
 	DWORD GetIcon(MemoSelectView *pView, DWORD nStatus);
 	DWORD ItemOrder();

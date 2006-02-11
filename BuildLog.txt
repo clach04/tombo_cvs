@@ -1117,7 +1117,14 @@ Some bugs are fixed.
 - Test and fix UTF-8/Unicode support on CE devices.
 
 ////////////////////////////////
-// B203 (TOMBO 1.16)
+// B203
 ////////////////////////////////
 
 * FIX: Deleting folder deletes wrong one(#7725)
+
+////////////////////////////////
+// B204 (TOMBO 1.16)
+////////////////////////////////
+
+* FIX again: Deleting folder deletes wrong one(#7725)
+

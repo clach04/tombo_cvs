@@ -1,7 +1,7 @@
 #
 # TOMBO Build program for ActivePerl(Win32)
 
-$version = "Tombo_1_15";
+$version = "Tombo_1_16";
 
 ##########################################################################
 # Tool definition
@@ -45,22 +45,27 @@ $be300root = "E:\\work2\\BE300SDK_1012\\Installer\\English PC Tools";
 	["Bin\\HPCPro\\ARM", "$buildroot\\HpcPro\\Tombo\\ARMRel\\Tombo.exe"],
 	["Bin\\HPCPro\\ARM", "$buildroot\\Src\\MsgRes\\TomboMsg\\jp\\TomboMsg.txt"],
 	["Bin\\HPCPro\\ARM", "$buildroot\\oniguruma\\arm\\oniguruma.dll"],
+	["Bin\\HPCPro\\ARM", "$buildroot\\HpcPro\\RegErase\\ARMRel\\RegErase.exe"],
 
 	["Bin\\HPCPro\\MIPS", "$buildroot\\HpcPro\\Tombo\\MIPSRel\\Tombo.exe"],
 	["Bin\\HPCPro\\MIPS", "$buildroot\\Src\\MsgRes\\TomboMsg\\jp\\TomboMsg.txt"],
 	["Bin\\HPCPro\\MIPS", "$buildroot\\oniguruma\\mips\\oniguruma.dll"],
+	["Bin\\HPCPro\\MIPS", "$buildroot\\HpcPro\\RegErase\\MIPSRel\\RegErase.exe"],
 
 	["Bin\\HPCPro\\SH3", "$buildroot\\HpcPro\\Tombo\\SH3Rel\\Tombo.exe"],
 	["Bin\\HPCPro\\SH3", "$buildroot\\Src\\MsgRes\\TomboMsg\\jp\\TomboMsg.txt"],
 	["Bin\\HPCPro\\SH3", "$buildroot\\oniguruma\\sh3\\oniguruma.dll"],
+	["Bin\\HPCPro\\SH3", "$buildroot\\HpcPro\\RegErase\\SH3Rel\\RegErase.exe"],
 
 	["Bin\\HPCPro\\SH4", "$buildroot\\HpcPro\\Tombo\\SH4Rel\\Tombo.exe"],
 	["Bin\\HPCPro\\SH4", "$buildroot\\Src\\MsgRes\\TomboMsg\\jp\\TomboMsg.txt"],
 	["Bin\\HPCPro\\SH4", "$buildroot\\oniguruma\\sh4\\oniguruma.dll"],
+	["Bin\\HPCPro\\SH4", "$buildroot\\HpcPro\\RegErase\\SH4Rel\\RegErase.exe"],
 
 	["Bin\\HPCPro\\Sig3", "$buildroot\\HpcPro\\Tombo\\ARMSig3\\Tombo.exe"],
 	["Bin\\HPCPro\\Sig3", "$buildroot\\Src\\MsgRes\\TomboMsg\\jp\\TomboMsg.txt"],
 	["Bin\\HPCPro\\Sig3", "$buildroot\\oniguruma\\arm\\oniguruma.dll"],
+	["Bin\\HPCPro\\Sig3", "$buildroot\\HpcPro\\RegErase\\ARMRel\\RegErase.exe"],
 
 	["Bin\\PocketPC\\MIPS", "$buildroot\\PocketPC\\CabWiz\\Tombo.mips.CAB"],
 
@@ -73,6 +78,7 @@ $be300root = "E:\\work2\\BE300SDK_1012\\Installer\\English PC Tools";
 	["Bin\\BE500", "$buildroot\\BE300\\Tombo\\MIPSRel\\Tombo.exe"],
 	["Bin\\BE500", "$buildroot\\Src\\MsgRes\\TomboMsg\\jp\\TomboMsg.txt"],
 	["Bin\\BE500", "$buildroot\\oniguruma\\mips\\oniguruma.dll"],
+	["Bin\\BE500", "$buildroot\\HpcPro\\RegErase\\MIPSRel\\RegErase.exe"],
 
 	@docsJP
 
@@ -90,6 +96,7 @@ $be300root = "E:\\work2\\BE300SDK_1012\\Installer\\English PC Tools";
 	["", "$buildroot\\HpcPro\\Tombo\\ARMSig3\\Tombo.exe"],
 	["", "$buildroot\\Src\\MsgRes\\TomboMsg\\jp\\TomboMsg.txt"],
 	["", "$buildroot\\oniguruma\\arm\\oniguruma.dll"],
+	["", "$buildroot\\HpcPro\\RegErase\\ARMRel\\RegErase.exe"],
 
 	@docsJP
 );
@@ -98,6 +105,7 @@ $be300root = "E:\\work2\\BE300SDK_1012\\Installer\\English PC Tools";
 	["", "$buildroot\\Win32\\Tombo\\Release\\Tombo.exe"],
 	["", "$buildroot\\Src\\MsgRes\\TomboMsg\\jp\\TomboMsg.txt"],
 	["", "$buildroot\\oniguruma\\win32\\oniguruma.dll"],
+	["", "$buildroot\\Win32\\RegErase\\Release\\RegErase.exe"],
 
 	@docsJP
 );
@@ -106,18 +114,22 @@ $be300root = "E:\\work2\\BE300SDK_1012\\Installer\\English PC Tools";
 	["Bin\\HPCPro\\ARM", "$buildroot\\HpcPro\\Tombo\\ARMRel\\Tombo.exe"],
 	["Bin\\HPCPro\\ARM", "$buildroot\\Src\\MsgRes\\TomboMsg\\en\\TomboMsg.txt"],
 	["Bin\\HPCPro\\ARM", "$buildroot\\oniguruma\\arm\\oniguruma.dll"],
+	["Bin\\HPCPro\\ARM", "$buildroot\\HpcPro\\RegErase\\ARMRel\\RegErase.exe"],
 
 	["Bin\\HPCPro\\MIPS", "$buildroot\\HpcPro\\Tombo\\MIPSRel\\Tombo.exe"],
 	["Bin\\HPCPro\\MIPS", "$buildroot\\Src\\MsgRes\\TomboMsg\\en\\TomboMsg.txt"],
 	["Bin\\HPCPro\\MIPS", "$buildroot\\oniguruma\\mips\\oniguruma.dll"],
+	["Bin\\HPCPro\\MIPS", "$buildroot\\HpcPro\\RegErase\\MIPSRel\\RegErase.exe"],
 
 	["Bin\\HPCPro\\SH3", "$buildroot\\HpcPro\\Tombo\\SH3Rel\\Tombo.exe"],
 	["Bin\\HPCPro\\SH3", "$buildroot\\Src\\MsgRes\\TomboMsg\\en\\TomboMsg.txt"],
 	["Bin\\HPCPro\\SH3", "$buildroot\\oniguruma\\sh3\\oniguruma.dll"],
+	["Bin\\HPCPro\\SH3", "$buildroot\\HpcPro\\RegErase\\SH3Rel\\RegErase.exe"],
 
 	["Bin\\HPCPro\\SH4", "$buildroot\\HpcPro\\Tombo\\SH4Rel\\Tombo.exe"],
 	["Bin\\HPCPro\\SH4", "$buildroot\\Src\\MsgRes\\TomboMsg\\en\\TomboMsg.txt"],
 	["Bin\\HPCPro\\SH4", "$buildroot\\oniguruma\\sh4\\oniguruma.dll"],
+	["Bin\\HPCPro\\SH4", "$buildroot\\HpcPro\\RegErase\\SH4Rel\\RegErase.exe"],
 
 	["Bin\\PocketPC\\MIPS", "$buildroot\\PocketPC\\CabWiz\\TomboE.mips.CAB"],
 
@@ -129,6 +141,7 @@ $be300root = "E:\\work2\\BE300SDK_1012\\Installer\\English PC Tools";
 	["Bin\\BE300", "$buildroot\\BE300\\Tombo\\MIPSRel\\Tombo.exe"],
 	["Bin\\BE300", "$buildroot\\Src\\MsgRes\\TomboMsg\\en\\TomboMsg.txt"],
 	["Bin\\BE300", "$buildroot\\oniguruma\\mips\\oniguruma.dll"],
+	["Bin\\BE300", "$buildroot\\HpcPro\\RegErase\\MIPSRel\\RegErase.exe"],
 
 	@docsEN
 );
@@ -144,6 +157,7 @@ $be300root = "E:\\work2\\BE300SDK_1012\\Installer\\English PC Tools";
 	["", "$buildroot\\Win32\\Tombo\\Release\\Tombo.exe"],
 	["", "$buildroot\\Src\\MsgRes\\TomboMsg\\en\\TomboMsg.txt"],
 	["", "$buildroot\\oniguruma\\win32\\oniguruma.dll"],
+	["", "$buildroot\\Win32\\RegErase\\Release\\RegErase.exe"],
 
 	@docsEN
 );

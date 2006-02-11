@@ -42,7 +42,8 @@ RSC=rc.exe
 # PROP Intermediate_Dir "Release"
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /Yu"stdafx.h" /FD /c
-# ADD CPP /nologo /W3 /GX /O2 /I "../../Src/TomboLib" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "PLATFORM_WIN32" /Yu"stdafx.h" /FD /c
+# ADD CPP /nologo /W3 /GX /O2 /I "../../Src/TomboLib" /I "../../Src/" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "PLATFORM_WIN32" /FD /c
+# SUBTRACT CPP /YX /Yc /Yu
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x411 /d "NDEBUG"
@@ -90,6 +91,10 @@ LINK32=link.exe
 # Begin Group "Source Files"
 
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
+# Begin Source File
+
+SOURCE=..\..\Src\TomboLib\AutoPtr.cpp
+# End Source File
 # Begin Source File
 
 SOURCE=..\..\Src\TomboLib\File.cpp

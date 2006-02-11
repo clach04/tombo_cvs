@@ -399,11 +399,6 @@ BOOL TreeViewFolderItem::Delete(MemoManager *pMgr, MemoSelectView *pView)
 {
 	TomboURI sURI;
 	if (!pView->GetURI(&sURI, GetViewItem())) return FALSE;
-	{
-		TCHAR buf[1024];
-		wsprintf(buf, TEXT("URI = %s"), sURI.GetFullURI());
-		MessageBox(NULL, buf, TEXT("DEBUG"), MB_OK);
-	}
 	if (sURI.IsRoot()) return TRUE;
 	if (TomboMessageBox(NULL, MSG_CONFIRM_DEL_FOLDER, MSG_DEL_FOLDER_TTL, MB_ICONQUESTION | MB_OKCANCEL) != IDOK) return FALSE;
 
