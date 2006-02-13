@@ -166,7 +166,6 @@ BOOL YAEdit::Create(HINSTANCE hInst, HWND hParent, DWORD nId, RECT &r)
 	if (!pLineMgr->Init(this)) return FALSE;
 
 	pView = new YAEditView(this);
-	if (!pView->Init()) return FALSE;
 
 	FixedPixelLineWrapper *pWw = new FixedPixelLineWrapper();
 	if (pWw == NULL || !pWw->Init(this)) return FALSE;
@@ -175,6 +174,7 @@ BOOL YAEdit::Create(HINSTANCE hInst, HWND hParent, DWORD nId, RECT &r)
 	pDoc = new YAEditDoc(); 
 	if (!pDoc->Init("", this, pCallback)) return FALSE;
 
+//	if (!pView->ResetPosition()) return FALSE;
 	
 #if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
 	pView->hViewWnd = CreateWindowEx(WS_EX_CLIENTEDGE, YAEDIT_CLASS_NAME, TEXT(""),
@@ -222,6 +222,8 @@ BOOL YAEdit::Create(HINSTANCE hInst, HWND hParent, DWORD nId, RECT &r)
 void YAEdit::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
 	pView->OnCreate(hWnd, wParam, lParam);
+
+	pView->ResetPosition();
 	pWrapper->SetViewWidth(pView->rClientRect.right - pView->rClientRect.left - pView->nMaxCharWidth);
 
 	// associate with default(empty) document.
@@ -635,26 +637,23 @@ void YAEdit::OnTimer(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 YAEditDoc *YAEdit::SetDoc(YAEditDoc *pNewDoc)
 {
+	// replace document and LineManager
 	YAEditDoc *pOldDoc = pDoc;
 	pDoc = pNewDoc;
-
-	pView->Init();
-
-	bWrapText = TRUE;
-
-	if (bWrapText) {
-		pView->nMaxWidthPixel = pWrapper->GetViewWidth();
-	} else {
-		pView->GetMaxLineWidth();
-		pWrapper->SetViewWidth(pView->nMaxWidthPixel);
-	}
-
-	pLineMgr->Reset();
+	pLineMgr->ReleaseBuffer();
 	pLineMgr->RecalcWrap(pWrapper);
+
+	// reset LineWrapper
+	pWrapper->SetViewWidth(pView->rClientRect.right - pView->rClientRect.left - pView->nMaxCharWidth);
+
+	// reset view
+	pView->ResetPosition();
+	pView->UpdateMaxLineWidth();	// UpdateMaxLineWidth depends on LineManager so call after updating LineManager.
 
 	pView->SetCaretPosition(Coordinate(0, 0));
 	ClearSelectedRegion();	
 
+	// update view
 	pView->ResetScrollbar();
 	pView->RedrawAllScreen();
 	return pOldDoc;
@@ -672,21 +671,19 @@ DWORD YAEdit::GetLineWidth(DWORD nOffset, LPCTSTR pStr, DWORD nLen) { return pVi
 
 void YAEdit::ResizeWindow(int x, int y, int width, int height) 
 {
-	MoveWindow(pView->hViewWnd, x, y, width, height, FALSE);
-
-	pView->ResetParam();
-
-	pWrapper->SetViewWidth(pView->rClientRect.right - pView->rClientRect.left - pView->nMaxCharWidth);
+	Region rPhRgn;
 
 	// Preserve absolute cursor position before rewrapping.
 	Coordinate cPhCursorPos;
 	pLineMgr->LogicalPosToPhysicalPos(&(pView->GetCaretPosition()), &cPhCursorPos);
-
-	Region rPhRgn;
 	pLineMgr->LogicalPosToPhysicalPos(&(rSelRegion.posStart), &(rPhRgn.posStart));
 	pLineMgr->LogicalPosToPhysicalPos(&(rSelRegion.posEnd), &(rPhRgn.posEnd));
 
-	// Rewrapping. Logical line will be changed.
+
+	// resizing and re-configure logical lines
+	MoveWindow(pView->hViewWnd, x, y, width, height, FALSE);
+	pView->ResetParam();
+	pWrapper->SetViewWidth(pView->rClientRect.right - pView->rClientRect.left - pView->nMaxCharWidth);
 	pLineMgr->RecalcWrap(pWrapper);
 	pView->ResetScrollbar();
 
@@ -694,7 +691,6 @@ void YAEdit::ResizeWindow(int x, int y, int width, int height)
 	Coordinate cLgCursorPos;
 	pLineMgr->PhysicalPosToLogicalPos(&cPhCursorPos, &cLgCursorPos);
 	pView->SetCaretPosition(cLgCursorPos);
-
 	pLineMgr->PhysicalPosToLogicalPos(&(rPhRgn.posStart), &(rSelRegion.posStart));
 	pLineMgr->PhysicalPosToLogicalPos(&(rPhRgn.posEnd), &(rSelRegion.posEnd));
 

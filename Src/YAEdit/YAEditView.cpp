@@ -40,7 +40,7 @@ YAEditView::~YAEditView()
 	if (pFontCache) delete pFontCache;
 }
 
-BOOL YAEditView::Init()
+BOOL YAEditView::ResetPosition()
 {
 	nCursorColPos = nCursorCol = 0;
 	nBaseLineNo = nCursorRow = 0;
@@ -959,7 +959,7 @@ DWORD YAEditView::GetLineWidth(DWORD nOffset, LPCTSTR pStr, DWORD nLen)
 	return w;
 }
 
-void YAEditView::GetMaxLineWidth()
+void YAEditView::UpdateMaxLineWidth()
 {
 	DWORD i, w;
 	DWORD n = pCtrl->GetLineMgr()->MaxLine();

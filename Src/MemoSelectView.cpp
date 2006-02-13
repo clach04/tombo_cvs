@@ -523,7 +523,6 @@ void MemoSelectView::OnNotify_RClick(POINT pt)
 	if (hti.hItem == NULL) return;
 	TreeViewItem *pItem = GetTVItem(hti.hItem);
 
-	// XXXX
 	TreeView_SelectItem(hViewWnd, hti.hItem);
 
 	DWORD nFlg;

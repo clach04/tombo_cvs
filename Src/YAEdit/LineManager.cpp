@@ -31,7 +31,7 @@ BOOL LineManager::Init(YAEdit *pEd)
 	return TRUE;
 }
 
-BOOL LineManager::Reset()
+BOOL LineManager::ReleaseBuffer()
 {
 	if (MaxLine() != 0 && !aliLine.Clear(TRUE)) return FALSE;
 	return TRUE;

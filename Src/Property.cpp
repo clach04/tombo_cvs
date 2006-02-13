@@ -136,6 +136,7 @@ struct PropListNum {
 	{ PROP_N_TOMBO_WINSIZE3,			TEXT("WinSize3"),					0xFFFF },
 #endif
 	{ PROP_N_KEEP_LAST_OPEN,			TEXT("UseLastOpenNote"),			FALSE },
+	{ PROP_N_USE_YAE,					TEXT("UseYAE"),						FALSE },
 	{ 0xFFFFFFFF,						NULL,								NULL},
 };
 

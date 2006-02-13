@@ -63,7 +63,7 @@ public:
 	YAEditView(YAEdit *p) : pCtrl(p), pFontCache(NULL), hFont(NULL) {}
 	~YAEditView();
 
-	BOOL Init();
+	BOOL ResetPosition();
 
 	void ResetParam();
 	BOOL ResetScrollbar();
@@ -99,6 +99,7 @@ public:
 
 	///////////////////////////////////////
 	// Coordinate conversion
+	// logical line No <-> display line no / pixel position
 
 	DWORD LgLineNoToDpLineNo(DWORD nLgLineNo);
 	DWORD DpLineNoToDpLinePixel(DWORD nDpLineNo);
@@ -141,8 +142,16 @@ public:
 	void MoveEOL();
 	void MoveTOL();
 
+	///////////////////////////////////////
+	// line width related funcs.
+
 	DWORD GetLineWidth(DWORD nOffset, LPCTSTR pStr, DWORD nLen);
-	void GetMaxLineWidth();
+
+	// Check all LineManager data and get the value of max width.
+	void UpdateMaxLineWidth();
+
+	///////////////////////////////////////
+	// font related funcs
 
 	void ResetFontInfo();
 	void SetFont(HFONT hFont);

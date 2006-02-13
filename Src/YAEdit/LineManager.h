@@ -100,7 +100,7 @@ public:
 	LineManager();
 	~LineManager();
 	BOOL Init(YAEdit *pEdit);
-	BOOL Reset();
+	BOOL ReleaseBuffer();
 
 	////////////////////////////////////////////////////
 	// request rewrapping

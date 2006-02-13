@@ -350,7 +350,7 @@ BOOL MainFrame::Create(LPCTSTR pWndName, HINSTANCE hInst, int nCmdShow)
 
 	YAEditor *pYAE;
 	SimpleEditor *pSe;
-	if (g_Property.UseYAEdit()) {
+	if (g_Property.GetUseYAEdit()) {
 		YAEdit::RegisterClass(hInst);
 
 		pYAE = new YAEditor(&mmMemoManager);
@@ -365,7 +365,7 @@ BOOL MainFrame::Create(LPCTSTR pWndName, HINSTANCE hInst, int nCmdShow)
 	mmMemoManager.Init(this, pDetailsView, &msView);
 	msView.Init(&mmMemoManager);
 
-	if (g_Property.UseYAEdit()) {
+	if (g_Property.GetUseYAEdit()) {
 		pYAE->Init(IDC_TOMBOEDIT);
 	} else {
 		pSe->Init(IDC_MEMODETAILSVIEW, IDC_MEMODETAILSVIEW_NF);

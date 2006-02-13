@@ -345,8 +345,8 @@ BOOL LocalFileRepository::GetOption(const TomboURI *pURI, URIOption *pOption) co
 		LPCTSTR p = pURI->GetFullURI();
 		DWORD n = _tcslen(p);
 		if (n > 4) {
-			if (_tcscmp(p + n - 4, TEXT(".chi")) == 0 ||
-				_tcscmp(p + n - 4, TEXT(".chs")) == 0) {
+			if (_tcsicmp(p + n - 4, TEXT(".chi")) == 0 ||
+				_tcsicmp(p + n - 4, TEXT(".chs")) == 0) {
 				pOption->bEncrypt = TRUE;
 			} else {
 				pOption->bEncrypt = FALSE;

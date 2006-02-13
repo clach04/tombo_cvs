@@ -56,7 +56,6 @@ protected:
 	LineManager *pLineMgr;
 
 	FixedPixelLineWrapper *pWrapper;
-	BOOL bWrapText;		// TRUE if wrap text
 
 	BOOL bScrollTimerOn;
 	POINT ptMousePos;

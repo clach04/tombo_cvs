@@ -1132,3 +1132,15 @@ Some bugs are fixed.
 // B205  (TOMBO 1.16)
 ////////////////////////////////
 
+////////////////////////////////
+// B206
+////////////////////////////////
+
+* FIX: Crypted notes are displayed as plain text on TreeView(#7985)
+
+- Add AutoPtr.cpp. This file is part of TOMBO 1.16 but I forgot to add it ...
+- Add option to change editor modules by property.
+
+- Some fixes to YAE.
+	- Horiz scrollbar is displayed even though wrapping mode.
+	- Horiz scrollbar is displayed even though note is empty at startup.
