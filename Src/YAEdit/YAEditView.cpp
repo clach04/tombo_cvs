@@ -29,7 +29,7 @@
 #define CHAR_TYPE_SPACE_ZENKAKU 2
 #define CHAR_TYPE_TAB 3
 
-#define SCROLL_EXTRA_WIDTH 10
+//#define SCROLL_EXTRA_WIDTH 10
 
 /////////////////////////////////////////////////////////////////////////////
 // initialize
@@ -50,7 +50,7 @@ BOOL YAEditView::ResetPosition()
 	return TRUE;
 }
 
-void YAEditView::ResetParam()
+void YAEditView::ResizeNotify()
 {
 	GetClientRect(hViewWnd, &rClientRect);
 	nPageHeight = (rClientRect.bottom - rClientRect.top) / nLineH;
@@ -74,7 +74,7 @@ BOOL YAEditView::ResetScrollbar()
 
 	// horiz scroll bar
 	si.nMin = 0;
-	si.nMax = nMaxWidthPixel + SCROLL_EXTRA_WIDTH;
+	si.nMax = nMaxWidthPixel + (DWORD)GetSystemMetrics(SM_CXVSCROLL);
 	si.nPage = (rClientRect.right - rClientRect.left);
 	si.nPos = nColOffset;
 	::SetScrollInfo(hViewWnd, SB_HORZ, &si, TRUE);
@@ -348,7 +348,7 @@ void YAEditView::PaintRect(HDC hDC, const RECT &rPaintRect)
 	for (i = nStartRow; i < nEndRow; i++) {
 		// get line data
 		LineChunk lc;
-		if (!pCtrl->GetDoc()->GetLineChunk(i, &lc)) break;
+		if (!pCtrl->GetLgLineChunk(i, &lc)) break;
 
 		lc.GetSelRange(&nSelStart, &nSelEnd);
 
@@ -363,7 +363,7 @@ BOOL YAEditView::DirectPaintLine(DWORD nLineNo)
 	if (!IsLineDisplay(nLineNo)) return TRUE; // the line is not in window
 
 	LineChunk lc;
-	if (!pCtrl->GetDoc()->GetLineChunk(nLineNo, &lc)) return FALSE;
+	if (!pCtrl->GetLgLineChunk(nLineNo, &lc)) return FALSE;
 
 	DWORD nDpLineNo = LgLineNoToDpLineNo(nLineNo);
 
@@ -410,7 +410,7 @@ void YAEditView::RequestRedraw(DWORD nLineNo, WORD nLeftPos, BOOL bToBottom)
 void YAEditView::RequestRedrawWithLine(DWORD nLineNo, DWORD nNumLine)
 {
 	LineChunk lc;
-	pCtrl->GetDoc()->GetLineChunk(nLineNo + nNumLine, &lc);
+	pCtrl->GetLgLineChunk(nLineNo + nNumLine, &lc);
 
 	// redraw updated region
 	Region r;
@@ -426,7 +426,7 @@ void YAEditView::RequestRedrawRegion(const Region *pRegion)
 	// replace Region::COL_EOL
 	if (rgn.posEnd.col == Region::COL_EOL) {
 		LineChunk lc2;
-		pCtrl->GetDoc()->GetLineChunk(rgn.posEnd.row, &lc2);
+		pCtrl->GetLgLineChunk(rgn.posEnd.row, &lc2);
 		rgn.posEnd.col = lc2.LineLen();
 	}
 
@@ -443,7 +443,7 @@ void YAEditView::RequestRedrawRegion(const Region *pRegion)
 		// top of line
 		if (rgn.posStart.row >= nBaseLineNo && rgn.posStart.row <= nBaseLineNo + nPageHeight) {
 			LineChunk lc;
-			pCtrl->GetDoc()->GetLineChunk(rgn.posStart.row, &lc);
+			pCtrl->GetLgLineChunk(rgn.posStart.row, &lc);
 			CalcInvalidateArea(rgn.posStart.row, 0, lc.LineLen());
 		}
 
@@ -485,7 +485,7 @@ void YAEditView::CalcInvalidateArea(DWORD nLine, DWORD nStart, DWORD nEnd)
 	RECT r;
 
 	LineChunk lc;
-	if (!pCtrl->GetDoc()->GetLineChunk(nLine, &lc)) return;
+	if (!pCtrl->GetLgLineChunk(nLine, &lc)) return;
 
 	DWORD nStartPos = GetLineWidth(0, lc.GetLineData(), nStart);
 	DWORD nEndPos = GetLineWidth(nStartPos, lc.GetLineData() + nStart, 
@@ -593,7 +593,7 @@ void YAEditView::SetNearCursorPos(WORD xPos, DWORD nYLines)
 	nCursorRow = nYLines;
 
 	LineChunk lc;
-	if (!pCtrl->GetDoc()->GetLineChunk(nYLines, &lc)) {
+	if (!pCtrl->GetLgLineChunk(nYLines, &lc)) {
 		SetCaretPos();
 		return;
 	}
@@ -626,7 +626,7 @@ void YAEditView::SetCaretPosition(const Coordinate &pos)
 	nCursorCol = pos.col;
 
 	LineChunk lc;
-	if (!pCtrl->GetDoc()->GetLineChunk(nCursorRow, &lc)) return;
+	if (!pCtrl->GetLgLineChunk(nCursorRow, &lc)) return;
 
 	nCursorColPos = GetLineWidth(0, lc.GetLineData(), nCursorCol);
 
@@ -824,7 +824,7 @@ void YAEditView::MoveRight()
 	if (!pCtrl->GetDoc()) return;
 
 	LineChunk lc;
-	if (!pCtrl->GetDoc()->GetLineChunk(nCursorRow, &lc)) return;
+	if (!pCtrl->GetLgLineChunk(nCursorRow, &lc)) return;
 
 	if (nCursorCol >= lc.LineLen()) {
 		// at the right of the line.
@@ -866,9 +866,9 @@ void YAEditView::MoveLeft()
 	}
 
 	LineChunk lc;
-	if (!pCtrl->GetDoc()->GetLineChunk(nCursorRow, &lc)) return;
+	if (!pCtrl->GetLgLineChunk(nCursorRow, &lc)) return;
 	LPCTSTR pLine = lc.GetLineData();
-	DWORD nLen = pCtrl->GetDoc()->GetPrevOffset(nCursorRow, nCursorCol);
+	DWORD nLen = pCtrl->GetPrevOffset(nCursorRow, nCursorCol);
 	LPCTSTR pNewChar = pLine + nCursorCol - nLen;
 	nCursorColPos = GetLineWidth(0, pLine, nCursorCol - nLen);
 	nCursorCol -= nLen;
@@ -892,7 +892,7 @@ void YAEditView::MoveUp()
 void YAEditView::MoveEOL()
 {
 	LineChunk lc;
-	if (!pCtrl->GetDoc()->GetLineChunk(nCursorRow, &lc)) return;
+	if (!pCtrl->GetLgLineChunk(nCursorRow, &lc)) return;
 
 	LPCTSTR p = lc.GetLineData();
 	nCursorCol = lc.LineLen();
@@ -967,7 +967,7 @@ void YAEditView::UpdateMaxLineWidth()
 	nMaxWidthPixel = 0;
 	LineChunk lc;
 	for (i = 0; i < n; i++) {
-		if (!pCtrl->GetDoc()->GetLineChunk(i, &lc)) return;
+		if (!pCtrl->GetLgLineChunk(i, &lc)) return;
 
 		LPCTSTR p = lc.GetLineData();
 		w = GetLineWidth(0, p, lc.LineLen());
@@ -978,4 +978,14 @@ void YAEditView::UpdateMaxLineWidth()
 void YAEditView::RedrawAllScreen()
 {
 	InvalidateRect(hViewWnd, &rClientRect, TRUE); 
+}
+
+BOOL YAEditView::IsVertScrollbarDisplayed()
+{
+	SCROLLINFO si;
+	si.cbSize = sizeof(si);
+	si.fMask = SIF_PAGE | SIF_POS | SIF_RANGE;
+
+	GetScrollInfo(hViewWnd, SB_VERT, &si);
+	return (si.nMin != si.nMax) && ((UINT)si.nMin <= si.nPage) && (si.nPage <= (UINT)si.nMax);
 }

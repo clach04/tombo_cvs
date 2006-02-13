@@ -63,7 +63,7 @@ LineWrapper::WrapResult SimpleLineWrapper::Wrap(DWORD nCurrentPos, LPCTSTR pBase
 // FixedLetterWrapper implimentation
 /////////////////////////////////////////////////////////////////////////////
 
-FixedLetterWrapper::FixedLetterWrapper(DWORD n) : nWidth(n) {}
+FixedLetterWrapper::FixedLetterWrapper(DWORD n) : nViewWidth(n) {}
 FixedLetterWrapper::~FixedLetterWrapper() {}
 
 LineWrapper::WrapResult FixedLetterWrapper::Wrap(DWORD nCurrentPos, LPCTSTR pBase, DWORD nLineLimit, LPDWORD pSepPos)
@@ -71,8 +71,8 @@ LineWrapper::WrapResult FixedLetterWrapper::Wrap(DWORD nCurrentPos, LPCTSTR pBas
 	LPCTSTR pStart = pBase + nCurrentPos;
 	DWORD nLen = nLineLimit - nCurrentPos;
 
-	if (nLen > nWidth) {
-		*pSepPos = nCurrentPos + nWidth;		
+	if (nLen > nViewWidth) {
+		*pSepPos = nCurrentPos + nViewWidth;		
 		return WRAPRESULT_CONT;
 	} else {
 		*pSepPos = nLineLimit;

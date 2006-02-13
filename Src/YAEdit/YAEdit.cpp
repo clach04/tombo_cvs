@@ -224,7 +224,7 @@ void YAEdit::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	pView->OnCreate(hWnd, wParam, lParam);
 
 	pView->ResetPosition();
-	pWrapper->SetViewWidth(pView->rClientRect.right - pView->rClientRect.left - pView->nMaxCharWidth);
+	pWrapper->SetViewWidth(pView->GetViewClientRect().right - pView->GetViewClientRect().left - pView->nMaxCharWidth);
 
 	// associate with default(empty) document.
 	// Since memory allocation check, object is created in Create(), and assoicated here.
@@ -381,10 +381,10 @@ BOOL YAEdit::OnKeyDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
 			pView->NextPage();
 			return TRUE;
 		case VK_HOME:
-			pView->MoveTOL();
+			MoveTOL();
 			break;
 		case VK_END:
-			pView->MoveEOL();
+			MoveEOL();
 			break;
 		default:
 			return FALSE;
@@ -559,9 +559,9 @@ void YAEdit::SetSelectionFromPoint(int xPos, int yPos)
 		pView->Prev1L();
 		yPos = 0;
 	}
-	if (xPos > pView->rClientRect.right) xPos = pView->rClientRect.right - 1;
-	if (yPos > pView->rClientRect.bottom) {
-		yPos = pView->rClientRect.bottom - 1;
+	if (xPos > pView->GetViewClientRect().right) xPos = pView->GetViewClientRect().right - 1;
+	if (yPos > pView->GetViewClientRect().bottom) {
+		yPos = pView->GetViewClientRect().bottom - 1;
 		pView->Next1L();
 	}
 
@@ -582,7 +582,7 @@ void YAEdit::OnMouseMove(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	int xPos = ptPos.x;
 	int yPos = ptPos.y;
 
-	if (xPos < 0 || yPos < 0 || xPos > pView->rClientRect.right || yPos > pView->rClientRect.bottom) {
+	if (xPos < 0 || yPos < 0 || xPos > pView->GetViewClientRect().right || yPos > pView->GetViewClientRect().bottom) {
 		if (!bScrollTimerOn) {
 			SetTimer(hWnd, IDT_SELSCROLL, 50, NULL);
 			bScrollTimerOn = TRUE;
@@ -637,24 +637,47 @@ void YAEdit::OnTimer(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 YAEditDoc *YAEdit::SetDoc(YAEditDoc *pNewDoc)
 {
+	// get current scrollbar status
+	BOOL bScrollDisplayedBefore = (pLineMgr->MaxLine() > pView->GetPageHeight());
+
 	// replace document and LineManager
 	YAEditDoc *pOldDoc = pDoc;
 	pDoc = pNewDoc;
 	pLineMgr->ReleaseBuffer();
+
+	// rewrap logical lines
 	pLineMgr->RecalcWrap(pWrapper);
-
-	// reset LineWrapper
-	pWrapper->SetViewWidth(pView->rClientRect.right - pView->rClientRect.left - pView->nMaxCharWidth);
-
 	// reset view
-	pView->ResetPosition();
 	pView->UpdateMaxLineWidth();	// UpdateMaxLineWidth depends on LineManager so call after updating LineManager.
 
+	BOOL bScrollDisplayedAfter = (pLineMgr->MaxLine() > pView->GetPageHeight());
+
+	// If scrollbar status is changed
+	if (bScrollDisplayedBefore != bScrollDisplayedAfter) {
+		if (bScrollDisplayedAfter) {
+			// Scrollbar is shown
+			pWrapper->SetViewWidth(pView->GetViewClientRect().right - pView->GetViewClientRect().left - pView->nMaxCharWidth - (DWORD)GetSystemMetrics(SM_CXVSCROLL));
+		} else {
+			// Scrollbar is hidden
+			pWrapper->SetViewWidth(pView->GetViewClientRect().right - pView->GetViewClientRect().left - pView->nMaxCharWidth);
+		}
+
+		// View size has changed due to vert scrollbar. Rewrap again
+		// rewrap logical lines
+		pLineMgr->RecalcWrap(pWrapper);
+		// reset view
+		pView->UpdateMaxLineWidth();	// UpdateMaxLineWidth depends on LineManager so call after updating LineManager.
+	}
+
+	// reset caret/region position
+	pView->ResetPosition();
 	pView->SetCaretPosition(Coordinate(0, 0));
 	ClearSelectedRegion();	
 
-	// update view
+	// update scrollbar
 	pView->ResetScrollbar();
+
+	// redraw screen
 	pView->RedrawAllScreen();
 	return pOldDoc;
 }
@@ -679,12 +702,35 @@ void YAEdit::ResizeWindow(int x, int y, int width, int height)
 	pLineMgr->LogicalPosToPhysicalPos(&(rSelRegion.posStart), &(rPhRgn.posStart));
 	pLineMgr->LogicalPosToPhysicalPos(&(rSelRegion.posEnd), &(rPhRgn.posEnd));
 
+	// get scroll status before resized
+	BOOL bScrollDisplayedBefore = (pLineMgr->MaxLine() > pView->GetPageHeight());
 
 	// resizing and re-configure logical lines
 	MoveWindow(pView->hViewWnd, x, y, width, height, FALSE);
-	pView->ResetParam();
-	pWrapper->SetViewWidth(pView->rClientRect.right - pView->rClientRect.left - pView->nMaxCharWidth);
+	pView->ResizeNotify();
+
+	// rewrap logical lines
+	pWrapper->SetViewWidth(pView->GetViewClientRect().right - pView->GetViewClientRect().left - pView->nMaxCharWidth);
 	pLineMgr->RecalcWrap(pWrapper);
+
+	// get scroll status after resized
+	BOOL bScrollDisplayedAfter = (pLineMgr->MaxLine() > pView->GetPageHeight());
+
+	// If scrollbar status is changed
+	if (bScrollDisplayedBefore != bScrollDisplayedAfter) {
+		if (bScrollDisplayedAfter) {
+			// Scrollbar is shown
+			pWrapper->SetViewWidth(pView->GetViewClientRect().right - pView->GetViewClientRect().left - pView->nMaxCharWidth - (DWORD)GetSystemMetrics(SM_CXVSCROLL));
+		} else {
+			// Scrollbar is hidden
+			pWrapper->SetViewWidth(pView->GetViewClientRect().right - pView->GetViewClientRect().left - pView->nMaxCharWidth);
+		}
+
+		// View size has changed due to vert scrollbar. Rewrap again
+		// rewrap logical lines
+		pLineMgr->RecalcWrap(pWrapper);
+	}
+
 	pView->ResetScrollbar();
 
 	// get cursor position after rewrapping.
@@ -787,7 +833,7 @@ DWORD YAEdit::GetRegionSize()
 		DWORD i;
 		for (i = rSelRegion.posStart.row; i <= rSelRegion.posEnd.row; i++) {
 			LineChunk lc;
-			if (!pDoc->GetLineChunk(i, &lc)) return 0;
+			if (!GetLgLineChunk(i, &lc)) return 0;
 
 			if (i == rSelRegion.posStart.row) {
 				nSize += lc.LineLen() - rSelRegion.posStart.col;
@@ -807,7 +853,7 @@ BOOL YAEdit::GetRegionString(LPTSTR pBuf)
 {
 	if (IsSelRegionOneLine()) {
 		LineChunk lc;
-		if (!pDoc->GetLineChunk(rSelRegion.posStart.row, &lc)) return FALSE;
+		if (!GetLgLineChunk(rSelRegion.posStart.row, &lc)) return FALSE;
 		DWORD n = rSelRegion.posEnd.col - rSelRegion.posStart.col;
 		_tcsncpy(pBuf, lc.GetLineData() + rSelRegion.posStart.col, n);
 		*(pBuf + n) = TEXT('\0');
@@ -819,7 +865,7 @@ BOOL YAEdit::GetRegionString(LPTSTR pBuf)
 		DWORD i;
 		for (i = rSelRegion.posStart.row; i <= rSelRegion.posEnd.row; i++) {
 			LineChunk lc;
-			if (!pDoc->GetLineChunk(i, &lc)) return FALSE;
+			if (!GetLgLineChunk(i, &lc)) return FALSE;
 
 			if (i == rSelRegion.posStart.row) {
 				n = lc.LineLen() - rSelRegion.posStart.col;
@@ -935,7 +981,7 @@ void YAEdit::SetFont(HFONT hFont)
 //	pView->hFont = hFont;
 
 //	pView->ResetFontInfo();
-	pWrapper->SetViewWidth(pView->rClientRect.right - pView->rClientRect.left - pView->nMaxCharWidth);
+	pWrapper->SetViewWidth(pView->GetViewClientRect().right - pView->GetViewClientRect().left - pView->nMaxCharWidth);
 
 	if (pLineMgr) delete pLineMgr;
 	pLineMgr = new LineManager();
@@ -969,4 +1015,43 @@ void YAEdit::SetCaretPos(DWORD n)
 
 	pView->SetCaretPosition(lgCur);
 	pView->ScrollCaret();
+}
+
+BOOL YAEdit::GetLgLineChunk(DWORD nLineNo, LineChunk *pChunk)
+{
+	// retrieve line data info.
+	if (!GetLineMgr()->GetLineChunk(nLineNo, pChunk)) return FALSE;
+	pChunk->SetSelRegion(&SelectedRegion());
+	return TRUE;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// get previous position
+/////////////////////////////////////////////////////////////////////////////
+// In DBCS char set, it is difficult to detmine previous char. It may be -1, or may be -2.
+// In Unicode(UCS-2), this is simply -1 letter(2 bytes).
+
+DWORD YAEdit::GetPrevOffset(DWORD n, DWORD nPos)
+{
+#if defined(PLATFORM_WIN32)
+	LineChunk lc;
+	if (!GetLineMgr()->GetLineChunk(n, &lc)) return FALSE;
+
+	const char *p = lc.GetLineData();
+	if (!p) return 0;
+
+	const char *r = p + nPos;
+	const char *q = p;
+	const char *pPrevChar = NULL;
+	while(*q && r > q) {
+		pPrevChar = q;
+		if (IsDBCSLeadByte(*q)) {
+			q++;
+		}
+		q++;
+	}
+	return pPrevChar ? nPos - (pPrevChar - p) : 0;
+#else
+	return 1;
+#endif
 }

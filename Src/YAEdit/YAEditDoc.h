@@ -2,10 +2,8 @@
 #define YAEDITDOC_H
 
 class YAEdit;
-class LineChunk;
 class Region;
 class PhysicalLineManager;
-class YAEDocCallbackHandler;
 class YAEditCallback;
 
 ////////////////////////////////////////////////////
@@ -43,8 +41,6 @@ public:
 	////////////////////////////////////////////////////
 	// retrieve & set line 
 
-	BOOL GetLineChunk(DWORD nLineNo, LineChunk *pChunk);
-	DWORD GetPrevOffset(DWORD nLineNo, DWORD nCurrentPos);
 	BOOL ReplaceString(const Region *pRegion, LPCTSTR pString);
 
 	BOOL IsModify() { return bModified; }

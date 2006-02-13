@@ -1144,3 +1144,14 @@ Some bugs are fixed.
 - Some fixes to YAE.
 	- Horiz scrollbar is displayed even though wrapping mode.
 	- Horiz scrollbar is displayed even though note is empty at startup.
+
+////////////////////////////////
+// B207
+////////////////////////////////
+
+- Fixes to YAE
+	- Recognized view width is incorrect when appearing/disappearing the vert scrollbar.
+	- Cursor has moved but insert position is not moved when pushing HOME/END key.
+	- Refactoring about FixedPixelLineWrapper.
+	- Refactoring remove YAEdit::GetLineMgr dependency of YAEditDoc.
+

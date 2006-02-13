@@ -6,6 +6,8 @@
 /////////////////////////////////////////////////////////////////////////////
 
 class LineWrapper {
+protected:
+	DWORD nViewWidth;
 public:
 	enum WrapResult {
 		WRAPRESULT_FAIL,
@@ -18,7 +20,6 @@ public:
 
 	/////////////////////////////////////////////////////////////////
 	// wrapping implimentaiton
-
 	// IN:
 	//		nCurrentPos
 	//		pBase
@@ -26,12 +27,29 @@ public:
 	// OUT:
 	//		pSepPos	
 	// RESULT:
-	//		WRAPRESULT_FINISH
-	//		WRAPRESULT_CONT
+	//		WRAPRESULT_FINISH	- returns when wrapping has finished.
+	//		WRAPRESULT_CONT		- returns when remain data exists.
 
 	virtual WrapResult Wrap(DWORD nCurrentPos, LPCTSTR pBase, DWORD nLineLimit, LPDWORD pSepPos) = 0;
 
+	/////////////////////////////////////////////////////////////////
+	// get wrapping info to line.
+	// Seek lines and calls Wrap(), summarise results to pLines.
+	//
+	// IN:
+	//		pData	- physical line data
+	//		nLen	- data length
+	//		nCalcStartPos - wrap start position
+	// OUT:
+	//		pLines	- array of wrapping points
+
 	BOOL GetNewMarkerList(TVector<DWORD> *pLines, DWORD nCalcStartPos, LPCTSTR pData, DWORD nLen);
+
+	/////////////////////////////////////////////////////////////////
+	// data accessors 
+
+	void SetViewWidth(DWORD nWidth) { nViewWidth = nWidth; }
+	DWORD GetViewWidth() { return nViewWidth; }
 };
 
 ////////////////////////////////////////////////////////////////////////////
@@ -52,7 +70,7 @@ public:
 /////////////////////////////////////////////////////////////////////////////
 
 class FixedLetterWrapper : public LineWrapper {
-	DWORD nWidth;
+	DWORD nViewWidth;
 public:
 	FixedLetterWrapper(DWORD n);
 	~FixedLetterWrapper();

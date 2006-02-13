@@ -86,49 +86,6 @@ BOOL YAEditDoc::ReleaseDoc()
 }
 
 /////////////////////////////////////////////////////////////////////////////
-// get line data
-/////////////////////////////////////////////////////////////////////////////
-
-BOOL YAEditDoc::GetLineChunk(DWORD nLineNo, LineChunk *pChunk) 
-{
-	// retrieve line data info.
-	if (!pView->GetLineMgr()->GetLineChunk(nLineNo, pChunk)) return FALSE;
-	pChunk->SetSelRegion(&pView->SelectedRegion());
-	return TRUE;
-}
-
-/////////////////////////////////////////////////////////////////////////////
-// get previous position
-/////////////////////////////////////////////////////////////////////////////
-// In DBCS char set, it is difficult to detmine previous char. It may be -1, or may be -2.
-// In Unicode(UCS-2), this is simply -1 letter(2 bytes).
-
-DWORD YAEditDoc::GetPrevOffset(DWORD n, DWORD nPos)
-{
-#if defined(PLATFORM_WIN32)
-	LineChunk lc;
-	if (!pView->GetLineMgr()->GetLineChunk(n, &lc)) return FALSE;
-
-	const char *p = lc.GetLineData();
-	if (!p) return 0;
-
-	const char *r = p + nPos;
-	const char *q = p;
-	const char *pPrevChar = NULL;
-	while(*q && r > q) {
-		pPrevChar = q;
-		if (IsDBCSLeadByte(*q)) {
-			q++;
-		}
-		q++;
-	}
-	return pPrevChar ? nPos - (pPrevChar - p) : 0;
-#else
-	return 1;
-#endif
-}
-
-/////////////////////////////////////////////////////////////////////////////
 // Replace string
 /////////////////////////////////////////////////////////////////////////////
 

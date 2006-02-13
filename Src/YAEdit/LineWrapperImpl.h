@@ -10,10 +10,8 @@ class YAEdit;
 class FixedPixelLineWrapper : public LineWrapper {
 protected:
 	YAEdit *pView;
-	DWORD nViewWidth;
 public:
 
-	
 	FixedPixelLineWrapper() {}
 	virtual ~FixedPixelLineWrapper() {}
 
@@ -21,8 +19,6 @@ public:
 
 	WrapResult Wrap(DWORD nCurrentPos, LPCTSTR pBase, DWORD nLineLimit, LPDWORD pSepPos);
 
-	void SetViewWidth(DWORD nWidth) { nViewWidth = nWidth; }
-	DWORD GetViewWidth() { return nViewWidth; }
 };
 
 

@@ -2,14 +2,12 @@
 #define YAEDIT_H
 
 class YAEditDoc;
-class FixedPixelLineWrapper;
+class LineWrapper;
 class LineChunk;
 class FontWidthCache;
 class YAEditView;
 class LineManager;
 class PhysicalLineManager;
-class YAECallbackHandler;
-class YAEDocCallbackHandler;
 
 //////////////////////////////////////////////////
 // callback class
@@ -54,8 +52,7 @@ protected:
 	// line management members
 
 	LineManager *pLineMgr;
-
-	FixedPixelLineWrapper *pWrapper;
+	LineWrapper *pWrapper;
 
 	BOOL bScrollTimerOn;
 	POINT ptMousePos;
@@ -155,7 +152,7 @@ public:
 
 	/////////////////////////////////
 	// Line wrapping 
-	FixedPixelLineWrapper *GetWrapper() { return pWrapper; }
+	LineWrapper *GetWrapper() { return pWrapper; }
 	DWORD GetLineWidth(DWORD nOffset, LPCTSTR pStr, DWORD nLen);
 
 	/////////////////////////////////
@@ -185,5 +182,11 @@ public:
 	////////////////////////////////////////////////////
 	// font
 	void SetFont(HFONT hFont);
+
+	////////////////////////////////////////////////////
+	// data access from YAEditView
+	BOOL GetLgLineChunk(DWORD nLineNo, LineChunk *pChunk);
+	DWORD GetPrevOffset(DWORD nLineNo, DWORD nCurrentPos);
+
 };
 #endif

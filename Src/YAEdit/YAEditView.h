@@ -47,9 +47,10 @@ protected:
 	BOOL DirectPaintLine(DWORD nLineNo);
 	void CalcInvalidateArea(DWORD nLine, DWORD nStart, DWORD nEnd);
 
+	RECT rClientRect;
+
 public:
 	HWND hViewWnd;
-	RECT rClientRect;
 
 	LONG nMaxCharWidth;
 	DWORD nMaxWidthPixel; // max line width(pixels) in the document
@@ -65,7 +66,7 @@ public:
 
 	BOOL ResetPosition();
 
-	void ResetParam();
+	void ResizeNotify();
 	BOOL ResetScrollbar();
 
 	///////////////////////////////////////
@@ -155,6 +156,15 @@ public:
 
 	void ResetFontInfo();
 	void SetFont(HFONT hFont);
+
+	///////////////////////////////////////
+	// scroll bar status
+	BOOL IsVertScrollbarDisplayed();
+
+	///////////////////////////////////////
+	// accessor
+	DWORD GetPageHeight() { return nPageHeight; }
+	const RECT& GetViewClientRect() { return rClientRect; }
 };
 
 #endif
