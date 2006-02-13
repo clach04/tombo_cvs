@@ -1,11 +1,11 @@
 #ifndef YAEDITVIEW_H
 #define YAEDITVIEW_H
 
-class YAEdit;
+class YAEditImpl;
 class YAEditDoc;
 
 class YAEditView {
-	YAEdit *pCtrl;
+	YAEditImpl *pCtrl;
 
 	///////////////////////////////////////
 	// cursor(caret) related members
@@ -61,7 +61,7 @@ public:
 	///////////////////////////////////////
 	// initializing
 
-	YAEditView(YAEdit *p) : pCtrl(p), pFontCache(NULL), hFont(NULL) {}
+	YAEditView(YAEditImpl *p) : pCtrl(p), pFontCache(NULL), hFont(NULL) {}
 	~YAEditView();
 
 	BOOL ResetPosition();

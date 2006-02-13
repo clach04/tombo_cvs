@@ -59,7 +59,7 @@ BOOL YAEdit::RegisterClass(HINSTANCE hInst)
 	wc.hCursor = NULL;
 	wc.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);
 #else
-	wc.hCursor = LoadCursor(NULL, IDC_ARROW);
+	wc.hCursor = LoadCursor(NULL, IDC_IBEAM);
 	wc.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);
 #endif
 	wc.lpszMenuName = NULL;
@@ -69,14 +69,34 @@ BOOL YAEdit::RegisterClass(HINSTANCE hInst)
 }
 
 /////////////////////////////////////////////////////////////////////////////
+// factory method
+/////////////////////////////////////////////////////////////////////////////
+
+YAEdit *YAEdit::GetInstance(YAEditCallback *pCallback)
+{
+	return new YAEditImpl(pCallback);
+}
+
+YAEditDoc *YAEditImpl::CreateDocument(const char *pStr, YAEditCallback* pCb)
+{
+	YAEditDoc *pDoc = new YAEditDoc();
+	if (pDoc == NULL) {
+		SetLastError(ERROR_NOT_ENOUGH_MEMORY);
+		return NULL;
+	}
+	if (pDoc->Init(pStr, this, pCb)) return pDoc;
+	return NULL;
+}
+
+/////////////////////////////////////////////////////////////////////////////
 // ctor & dtor
 /////////////////////////////////////////////////////////////////////////////
 
-YAEdit::YAEdit(YAEditCallback *pCB) : pWrapper(NULL), bScrollTimerOn(FALSE), pView(NULL), bMouseDown(FALSE), pLineMgr(NULL), pCallback(pCB)
+YAEditImpl::YAEditImpl(YAEditCallback *pCB) : pWrapper(NULL), bScrollTimerOn(FALSE), pView(NULL), bMouseDown(FALSE), pLineMgr(NULL), pCallback(pCB)
 {
 }
 
-YAEdit::~YAEdit()
+YAEditImpl::~YAEditImpl()
 {
 	if (pView) {
 		if (pView->hViewWnd) DestroyWindow(pView->hViewWnd);
@@ -92,13 +112,13 @@ LRESULT CALLBACK YAEditWndProc(HWND hWnd, UINT nMessage, WPARAM wParam, LPARAM l
 {
 	if (nMessage == WM_CREATE) {
 		LPCREATESTRUCT pCS = (LPCREATESTRUCT)lParam;
-		YAEdit *frm = (YAEdit*)pCS->lpCreateParams;
+		YAEditImpl *frm = (YAEditImpl*)pCS->lpCreateParams;
 		SetWindowLong(hWnd, 0, (LONG)frm);
 		frm->OnCreate(hWnd, wParam, lParam);
 		return 0;
 	}
 
-	YAEdit *frm = (YAEdit*)GetWindowLong(hWnd, 0);
+	YAEditImpl *frm = (YAEditImpl*)GetWindowLong(hWnd, 0);
 	if (frm == NULL) {
 		return DefWindowProc(hWnd, nMessage, wParam, lParam);
 	}
@@ -157,7 +177,7 @@ LRESULT CALLBACK YAEditWndProc(HWND hWnd, UINT nMessage, WPARAM wParam, LPARAM l
 // Create window
 /////////////////////////////////////////////////////////////////////////////
 
-BOOL YAEdit::Create(HINSTANCE hInst, HWND hParent, DWORD nId, RECT &r)
+BOOL YAEditImpl::Create(HINSTANCE hInst, HWND hParent, DWORD nId, RECT &r)
 {
 	hInstance = hInst;
 	pDoc = NULL;
@@ -219,7 +239,7 @@ BOOL YAEdit::Create(HINSTANCE hInst, HWND hParent, DWORD nId, RECT &r)
 /////////////////////////////////////////////////////////////////////////////
 // In this function, hViewWnd are not initialized yet.
 
-void YAEdit::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
+void YAEditImpl::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
 	pView->OnCreate(hWnd, wParam, lParam);
 
@@ -235,7 +255,7 @@ void YAEdit::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 // WM_VSCROLL handler
 /////////////////////////////////////////////////////////////////////////////
 
-void YAEdit::OnVScroll(HWND hWnd, WPARAM wParam, LPARAM lParam)
+void YAEditImpl::OnVScroll(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
 	int nScrollCode = LOWORD(wParam);
 	switch(nScrollCode) {
@@ -261,7 +281,7 @@ void YAEdit::OnVScroll(HWND hWnd, WPARAM wParam, LPARAM lParam)
 // WM_HSCROLL handler
 /////////////////////////////////////////////////////////////////////////////
 
-void YAEdit::OnHScroll(HWND hWnd, WPARAM wParam, LPARAM lParam)
+void YAEditImpl::OnHScroll(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
 	int nScrollCode = LOWORD(wParam);
 	switch(nScrollCode) {
@@ -290,7 +310,7 @@ void YAEdit::OnHScroll(HWND hWnd, WPARAM wParam, LPARAM lParam)
 // WM_MOUSEWHEEL
 /////////////////////////////////////////////////////////////////////////////
 #if defined(PLATFORM_WIN32)
-void YAEdit::OnMouseWheel(HWND hWnd, WPARAM wParam, LPARAM lParam)
+void YAEditImpl::OnMouseWheel(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
 	short delta = ((short) HIWORD(wParam))/WHEEL_DELTA;
 	pView->SetScrollVertByOffset(-delta * 2);
@@ -303,7 +323,7 @@ void YAEdit::OnMouseWheel(HWND hWnd, WPARAM wParam, LPARAM lParam)
 //////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////
 
-void YAEdit::OnPaint(HWND hWnd, WPARAM wParam, LPARAM lParam)
+void YAEditImpl::OnPaint(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
 	PAINTSTRUCT ps;
 	HDC hDC = BeginPaint(hWnd, &ps);
@@ -316,24 +336,24 @@ void YAEdit::OnPaint(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	EndPaint(hWnd, &ps);
 }
 
-void YAEdit::RequestRedraw(DWORD nLineNo, WORD nLeftPos, BOOL bToBottom) { pView->RequestRedraw(nLineNo, nLeftPos, bToBottom); }
-void YAEdit::RequestRedrawRegion(const Region *pRegion) { pView->RequestRedrawRegion(pRegion); }
+void YAEditImpl::RequestRedraw(DWORD nLineNo, WORD nLeftPos, BOOL bToBottom) { pView->RequestRedraw(nLineNo, nLeftPos, bToBottom); }
+void YAEditImpl::RequestRedrawRegion(const Region *pRegion) { pView->RequestRedrawRegion(pRegion); }
 
 /////////////////////////////////////////////////////////////////////////////
 // FOCUS
 /////////////////////////////////////////////////////////////////////////////
 
-void YAEdit::OnSetFocus()  { 
+void YAEditImpl::OnSetFocus()  { 
 	if (pView) pView->OnSetFocus();
 	if (pCallback) pCallback->OnGetFocus();
 }
 
-void YAEdit::OnKillFocus() { if (pView) pView->OnKillFocus(); }
+void YAEditImpl::OnKillFocus() { if (pView) pView->OnKillFocus(); }
 
 /////////////////////////////////////////////////////////////////////////////
 // WM_KEYDOWN
 /////////////////////////////////////////////////////////////////////////////
-BOOL YAEdit::OnKeyDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
+BOOL YAEditImpl::OnKeyDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
 	int nVertKey = (int)wParam;
 	BOOL bShiftDown = (GetKeyState(VK_SHIFT) & 0x8000) != 0;
@@ -395,7 +415,7 @@ BOOL YAEdit::OnKeyDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	return TRUE;
 }
 
-void YAEdit::UpdateSelRegion()
+void YAEditImpl::UpdateSelRegion()
 {
 	Coordinate nSelNow = pView->GetCaretPosition();
 	Coordinate nSelOld;
@@ -414,7 +434,7 @@ void YAEdit::UpdateSelRegion()
 // WM_CHAR
 /////////////////////////////////////////////////////////////////////////////
 
-void YAEdit::OnChar(HWND hWnd, WPARAM wParam, LPARAM lParam)
+void YAEditImpl::OnChar(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
 	TCHAR ch = (TCHAR)wParam;
 	if (ch == CHARA_BS) {
@@ -475,7 +495,7 @@ void YAEdit::OnChar(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	ReplaceText(SelectedRegion(), kbuf);
 }
 
-void YAEdit::KeyBS()
+void YAEditImpl::KeyBS()
 {
 	if (IsRegionSelected()) {
 		ReplaceText(SelectedRegion(), TEXT(""));
@@ -488,7 +508,7 @@ void YAEdit::KeyBS()
 	}
 }
 
-void YAEdit::DeleteKeyDown()
+void YAEditImpl::DeleteKeyDown()
 {
 	if (IsRegionSelected()) {
 		ReplaceText(SelectedRegion(), TEXT(""));
@@ -505,18 +525,18 @@ void YAEdit::DeleteKeyDown()
 // move cursor
 /////////////////////////////////////////////////////////////////////////////
 
-void YAEdit::MoveRight() { pView->ScrollCaret(); pView->MoveRight(); ClearRegion(); }
-void YAEdit::MoveLeft()  { pView->ScrollCaret(); pView->MoveLeft();  ClearRegion(); }
-void YAEdit::MoveUp()    { pView->ScrollCaret(); pView->MoveUp();    ClearRegion(); }
-void YAEdit::MoveEOL()   { pView->ScrollCaret(); pView->MoveEOL();   ClearRegion(); }
-void YAEdit::MoveTOL()   { pView->ScrollCaret(); pView->MoveTOL();   ClearRegion(); }
-void YAEdit::MoveDown()  { pView->ScrollCaret(); pView->MoveDown();  ClearRegion(); }
+void YAEditImpl::MoveRight() { pView->ScrollCaret(); pView->MoveRight(); ClearRegion(); }
+void YAEditImpl::MoveLeft()  { pView->ScrollCaret(); pView->MoveLeft();  ClearRegion(); }
+void YAEditImpl::MoveUp()    { pView->ScrollCaret(); pView->MoveUp();    ClearRegion(); }
+void YAEditImpl::MoveEOL()   { pView->ScrollCaret(); pView->MoveEOL();   ClearRegion(); }
+void YAEditImpl::MoveTOL()   { pView->ScrollCaret(); pView->MoveTOL();   ClearRegion(); }
+void YAEditImpl::MoveDown()  { pView->ScrollCaret(); pView->MoveDown();  ClearRegion(); }
 
 /////////////////////////////////////////////////////////////////////////////
 // WM_LBUTTONDOWN
 /////////////////////////////////////////////////////////////////////////////
 
-void YAEdit::OnLButtonDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
+void YAEditImpl::OnLButtonDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
 	WORD nMouseDrgStartX, nMouseDrgStartY;	// LButton down point by WM_LBUTTONDOWN
 
@@ -551,7 +571,7 @@ void YAEdit::OnLButtonDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
 #define MAKEPOINTS(l)   (*((POINTS FAR *) & (l))) 
 #endif
 
-void YAEdit::SetSelectionFromPoint(int xPos, int yPos)
+void YAEditImpl::SetSelectionFromPoint(int xPos, int yPos)
 {
 	// when SetCaptured, cursor pos may be negative.
 	if (xPos < 0) xPos = 0;
@@ -573,7 +593,7 @@ void YAEdit::SetSelectionFromPoint(int xPos, int yPos)
 	}
 }
 
-void YAEdit::OnMouseMove(HWND hWnd, WPARAM wParam, LPARAM lParam)
+void YAEditImpl::OnMouseMove(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
 	if (!bMouseDown) return;
 
@@ -602,7 +622,7 @@ void YAEdit::OnMouseMove(HWND hWnd, WPARAM wParam, LPARAM lParam)
 // WM_LBUTTONUP
 /////////////////////////////////////////////////////////////////////////////
 
-void YAEdit::OnLButtonUp(HWND hWnd, WPARAM wParam, LPARAM lParam)
+void YAEditImpl::OnLButtonUp(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
 	if (!bMouseDown) return;
 
@@ -621,7 +641,7 @@ void YAEdit::OnLButtonUp(HWND hWnd, WPARAM wParam, LPARAM lParam)
 // WM_TIMER
 /////////////////////////////////////////////////////////////////////////////
 
-void YAEdit::OnTimer(HWND hWnd, WPARAM wParam, LPARAM lParam)
+void YAEditImpl::OnTimer(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
 	switch(wParam) {
 	case IDT_SELSCROLL:
@@ -635,7 +655,7 @@ void YAEdit::OnTimer(HWND hWnd, WPARAM wParam, LPARAM lParam)
 // Set new document
 /////////////////////////////////////////////////////////////////////////////
 
-YAEditDoc *YAEdit::SetDoc(YAEditDoc *pNewDoc)
+YAEditDoc *YAEditImpl::SetDoc(YAEditDoc *pNewDoc)
 {
 	// get current scrollbar status
 	BOOL bScrollDisplayedBefore = (pLineMgr->MaxLine() > pView->GetPageHeight());
@@ -686,13 +706,13 @@ YAEditDoc *YAEdit::SetDoc(YAEditDoc *pNewDoc)
 // get max line width for decide hscroll range
 /////////////////////////////////////////////////////////////////////////////
 
-DWORD YAEdit::GetLineWidth(DWORD nOffset, LPCTSTR pStr, DWORD nLen) { return pView->GetLineWidth(nOffset, pStr, nLen); }
+DWORD YAEditImpl::GetLineWidth(DWORD nOffset, LPCTSTR pStr, DWORD nLen) { return pView->GetLineWidth(nOffset, pStr, nLen); }
 
 /////////////////////////////////////////////////////////////////////////////
 // Resize window
 /////////////////////////////////////////////////////////////////////////////
 
-void YAEdit::ResizeWindow(int x, int y, int width, int height) 
+void YAEditImpl::ResizeWindow(int x, int y, int width, int height) 
 {
 	Region rPhRgn;
 
@@ -747,7 +767,7 @@ void YAEdit::ResizeWindow(int x, int y, int width, int height)
 /////////////////////////////////////////////////////////////////////////////
 // Region
 /////////////////////////////////////////////////////////////////////////////
-void YAEdit::SetFocus()
+void YAEditImpl::SetFocus()
 {
 	::SetFocus(pView->hViewWnd);
 }
@@ -756,13 +776,13 @@ void YAEdit::SetFocus()
 // Region
 /////////////////////////////////////////////////////////////////////////////
 
-void YAEdit::ClearRegion()
+void YAEditImpl::ClearRegion()
 {
 	RequestRedrawRegion(&SelectedRegion());
 	ClearSelectedRegion();
 }
 
-void YAEdit::ClearSelectedRegion()
+void YAEditImpl::ClearSelectedRegion()
 {
 	rSelRegion.posEnd = pView->GetCaretPosition();
 	rSelRegion.posStart = rSelRegion.posEnd;
@@ -772,7 +792,7 @@ void YAEdit::ClearSelectedRegion()
 // Insert String considering cursor move
 /////////////////////////////////////////////////////////////////////////////
 
-BOOL YAEdit::ReplaceText(const Region &rLg, LPCTSTR pText)
+BOOL YAEditImpl::ReplaceText(const Region &rLg, LPCTSTR pText)
 {
 	Region r;
 	pLineMgr->LogicalPosToPhysicalPos(&(rLg.posStart), &(r.posStart));
@@ -784,7 +804,7 @@ BOOL YAEdit::ReplaceText(const Region &rLg, LPCTSTR pText)
 // Clipboard
 /////////////////////////////////////////////////////////////////////////////
 
-BOOL YAEdit::CopyToClipboard()
+BOOL YAEditImpl::CopyToClipboard()
 {
 	Tombo_Lib::Clipboard cb;
 
@@ -803,7 +823,7 @@ BOOL YAEdit::CopyToClipboard()
 	return TRUE;
 }
 
-BOOL YAEdit::InsertFromClipboard()
+BOOL YAEditImpl::InsertFromClipboard()
 {
 	// Get data from clipboard
 	Tombo_Lib::Clipboard cb;
@@ -824,7 +844,7 @@ BOOL YAEdit::InsertFromClipboard()
 // region
 /////////////////////////////////////////////////////////////////////////////
 
-DWORD YAEdit::GetRegionSize()
+DWORD YAEditImpl::GetRegionSize()
 {
 	if (IsSelRegionOneLine()) {
 		return rSelRegion.posEnd.col - rSelRegion.posStart.col;
@@ -849,7 +869,7 @@ DWORD YAEdit::GetRegionSize()
 	}
 }
 
-BOOL YAEdit::GetRegionString(LPTSTR pBuf)
+BOOL YAEditImpl::GetRegionString(LPTSTR pBuf)
 {
 	if (IsSelRegionOneLine()) {
 		LineChunk lc;
@@ -899,7 +919,7 @@ BOOL YAEdit::GetRegionString(LPTSTR pBuf)
 	}
 }
 
-void YAEdit::SelectRegion(const Coordinate &nCurrent, Coordinate *pPrev)
+void YAEditImpl::SelectRegion(const Coordinate &nCurrent, Coordinate *pPrev)
 {
 	if (!IsRegionSelected()) {
 		*pPrev = rSelRegion.posStart;
@@ -942,7 +962,7 @@ void YAEdit::SelectRegion(const Coordinate &nCurrent, Coordinate *pPrev)
 // Update notify from YAEditDoc
 /////////////////////////////////////////////////////////////////////////////
 
-BOOL YAEdit::UpdateNotify(PhysicalLineManager *pPhMgr, const Region *pOldRegion, const Region *pNewRegion, DWORD nBefPhLines, DWORD nAftPhLines, DWORD nAffeLines)
+BOOL YAEditImpl::UpdateNotify(PhysicalLineManager *pPhMgr, const Region *pOldRegion, const Region *pNewRegion, DWORD nBefPhLines, DWORD nAftPhLines, DWORD nAffeLines)
 {
 	DWORD nBefLgLines = pLineMgr->MaxLine();
 
@@ -971,7 +991,7 @@ BOOL YAEdit::UpdateNotify(PhysicalLineManager *pPhMgr, const Region *pOldRegion,
 // Set font
 /////////////////////////////////////////////////////////////////////////////
 
-void YAEdit::SetFont(HFONT hFont)
+void YAEditImpl::SetFont(HFONT hFont)
 {
 	if (hFont == NULL) {
 		hFont = (HFONT)GetStockObject(SYSTEM_FONT);
@@ -993,7 +1013,7 @@ void YAEdit::SetFont(HFONT hFont)
 // get caret position
 /////////////////////////////////////////////////////////////////////////////
 
-DWORD YAEdit::GetCaretPos()
+DWORD YAEditImpl::GetCaretPos()
 {
 	Coordinate lgCur = pView->GetCaretPosition();
 	Coordinate phCur;
@@ -1007,7 +1027,7 @@ DWORD YAEdit::GetCaretPos()
 	return pDoc->GetDataBytes(&r);
 }
 
-void YAEdit::SetCaretPos(DWORD n)
+void YAEditImpl::SetCaretPos(DWORD n)
 {
 	Coordinate phCur, lgCur;
 	pDoc->ConvertBytesToCoordinate(n, &phCur);
@@ -1017,7 +1037,7 @@ void YAEdit::SetCaretPos(DWORD n)
 	pView->ScrollCaret();
 }
 
-BOOL YAEdit::GetLgLineChunk(DWORD nLineNo, LineChunk *pChunk)
+BOOL YAEditImpl::GetLgLineChunk(DWORD nLineNo, LineChunk *pChunk)
 {
 	// retrieve line data info.
 	if (!GetLineMgr()->GetLineChunk(nLineNo, pChunk)) return FALSE;
@@ -1031,7 +1051,7 @@ BOOL YAEdit::GetLgLineChunk(DWORD nLineNo, LineChunk *pChunk)
 // In DBCS char set, it is difficult to detmine previous char. It may be -1, or may be -2.
 // In Unicode(UCS-2), this is simply -1 letter(2 bytes).
 
-DWORD YAEdit::GetPrevOffset(DWORD n, DWORD nPos)
+DWORD YAEditImpl::GetPrevOffset(DWORD n, DWORD nPos)
 {
 #if defined(PLATFORM_WIN32)
 	LineChunk lc;

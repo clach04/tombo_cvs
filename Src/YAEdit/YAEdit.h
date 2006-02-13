@@ -25,8 +25,48 @@ public:
 //////////////////////////////////////////////////
 // Controller class for YAE
 //////////////////////////////////////////////////
+// YAEdit is abstract class for hiding YAE internal methods.
 
 class YAEdit {
+public:
+
+	virtual BOOL Create(HINSTANCE hInst, HWND hWnd, DWORD nId, RECT &r) = 0;
+	virtual void SetFocus() = 0;
+	virtual void SetFont(HFONT hFont) = 0;
+
+	virtual void ResizeWindow(int x, int y, int width, int height) = 0;
+
+	virtual YAEditDoc *GetDoc() = 0;
+	virtual YAEditDoc *SetDoc(YAEditDoc *pNewDoc) = 0;
+
+
+	virtual DWORD GetCaretPos() = 0;
+	virtual void SetCaretPos(DWORD n) = 0;
+
+	///////////////////////////////////////
+	// register window class
+	static BOOL RegisterClass(HINSTANCE hInst);
+
+	///////////////////////////////////////
+	// factory method
+
+	// get YAEdit instance
+	static YAEdit *GetInstance(YAEditCallback *pCallback);
+
+	// get YAEditDoc instance
+	virtual YAEditDoc *CreateDocument(const char *pStr, YAEditCallback*pCb) = 0;
+};
+
+//////////////////////////////////////////////////
+// Controller class for YAE implementation
+//////////////////////////////////////////////////
+
+class YAEditListener {
+public:
+	virtual BOOL UpdateNotify(PhysicalLineManager *pPhMgr, const Region *pOldRegion, const Region *pNewRegion, DWORD nBefPhLines, DWORD nAftPhLines, DWORD nAffeLines) = 0;
+};
+
+class YAEditImpl : YAEdit, YAEditListener {
 protected:
 	///////////////////////////////////////
 	// callback handler
@@ -85,14 +125,12 @@ public:
 
 	///////////////////////////////////////
 	// ctor & initialize
-	YAEdit(YAEditCallback *pCb);
-	~YAEdit();
+	YAEditImpl(YAEditCallback *pCb);
+	virtual ~YAEditImpl();
+
 	BOOL Create(HINSTANCE hInst, HWND hWnd, DWORD nId, RECT &r);
 	void SetFocus();
 
-	///////////////////////////////////////
-	// initialize & register window class
-	static BOOL RegisterClass(HINSTANCE hInst);
 
 	/////////////////////////////////
 	// Event handler
@@ -188,5 +226,8 @@ public:
 	BOOL GetLgLineChunk(DWORD nLineNo, LineChunk *pChunk);
 	DWORD GetPrevOffset(DWORD nLineNo, DWORD nCurrentPos);
 
+	////////////////////////////////////////////////////
+	// 
+	YAEditDoc *CreateDocument(const char *pStr, YAEditCallback*pCb);
 };
 #endif

@@ -20,7 +20,7 @@
 #include "TomboLib/Clipboard.h"
 #include "TString.h"
 
-#define COLOR_EOL RGB(255, 0, 0)
+#define COLOR_EOL RGB(255, 128, 128)
 #define COLOR_LEOL RGB(255, 128, 128)
 #define COLOR_EOF RGB(0, 0, 255)
 

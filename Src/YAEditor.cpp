@@ -78,7 +78,7 @@ YAEditor::~YAEditor()
 BOOL YAEditor::Create(LPCTSTR pName, RECT &r, HWND hParent, HINSTANCE hInst, HFONT hFont)
 {
 	pYAECallback = new YAEDetailsViewCallback(this);
-	pEdit = new YAEdit(pYAECallback);
+	pEdit = YAEdit::GetInstance(pYAECallback);
 	pEdit->Create(hInst, hParent, nID, r);
 	pEdit->SetFont(hFont);
 	return TRUE;
@@ -121,13 +121,13 @@ void YAEditor::MoveWindow(DWORD x, DWORD y, DWORD nWidth, DWORD nHeight)
 
 BOOL YAEditor::SetMemo(LPCTSTR pMemoW, DWORD nPos, BOOL bReadOnly)
 {
-	YAEditDoc *pDoc = new YAEditDoc();
 #if defined(PLATFORM_WIN32)
 	const char *pMemo = pMemoW;
 #else
 	char *pMemo = ConvUnicode2SJIS(pMemoW);
 #endif
-	if (!pDoc->Init(pMemo, pEdit, pYAECallback)) return FALSE;
+	YAEditDoc *pDoc = pEdit->CreateDocument(pMemo, pYAECallback);
+	if (pDoc == NULL) return FALSE;
 
 #if !defined(PLATFORM_WIN32)
 	delete [] pMemo;

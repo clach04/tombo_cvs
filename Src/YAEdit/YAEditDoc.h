@@ -1,10 +1,11 @@
 #ifndef YAEDITDOC_H
 #define YAEDITDOC_H
 
-class YAEdit;
+class YAEditImpl;
 class Region;
 class PhysicalLineManager;
 class YAEditCallback;
+class YAEditListener;
 
 ////////////////////////////////////////////////////
 // Document container for YAE
@@ -13,7 +14,7 @@ class YAEditCallback;
 class YAEditDoc {
 protected:
 	PhysicalLineManager *pPhLineMgr;
-	YAEdit *pView;
+	YAEditListener *pListener;
 
 	YAEditCallback *pCallback;
 
@@ -28,7 +29,7 @@ public:
 	YAEditDoc();
 	~YAEditDoc();
 
-	BOOL Init(const char *pStr, YAEdit *pView, YAEditCallback*pCb);
+	BOOL Init(const char *pStr, YAEditListener *pListener, YAEditCallback*pCb);
 
 	PhysicalLineManager *GetPhMgr() { return pPhLineMgr; }
 

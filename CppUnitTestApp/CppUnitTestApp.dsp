@@ -173,10 +173,57 @@ SOURCE=.\test\VarBufferTest.cpp
 
 SOURCE=.\test\XXXTest.cpp
 # End Source File
+# Begin Source File
+
+SOURCE=.\test\YAEditDocTest.cpp
+# End Source File
 # End Group
 # Begin Group "Target"
 
 # PROP Default_Filter ""
+# Begin Group "YAEdit"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\Src\YAEdit\MemManager.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\Src\YAEdit\MemManager.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\Src\YAEdit\PhysicalLineManager.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\Src\YAEdit\PhysicalLineManager.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\Src\YAEdit\StringSplitter.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\Src\YAEdit\StringSplitter.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\Src\YAEdit\YAEditDoc.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\Src\YAEdit\YAEditDoc.h
+# End Source File
+# End Group
+# Begin Group "misc"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\Src\TomboLib\AutoPtr.cpp
+# End Source File
 # Begin Source File
 
 SOURCE=..\Src\GNUPG\bithelp.h
@@ -188,10 +235,6 @@ SOURCE=..\Src\GNUPG\blowfish.c
 # Begin Source File
 
 SOURCE=..\Src\Chipher.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\Src\regex\config.h
 # End Source File
 # Begin Source File
 
@@ -216,6 +259,30 @@ SOURCE=..\Src\TomboLib\File.cpp
 # Begin Source File
 
 SOURCE=..\Src\TomboLib\File.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\Src\TomboLib\HttpUtil.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\Src\TomboLib\HttpUtil.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\test\HttpUtilTest.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\Src\TSSRepository\LocalCache.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\Src\TSSRepository\LocalCache.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\test\LocalCacheTest.cpp
 # End Source File
 # Begin Source File
 
@@ -286,33 +353,6 @@ SOURCE=..\Src\TomboLib\VarBuffer.h
 SOURCE=..\oniguruma\win32\oniguruma.lib
 # End Source File
 # End Group
-# Begin Source File
-
-SOURCE=..\Src\TomboLib\AutoPtr.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\Src\TomboLib\HttpUtil.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\Src\TomboLib\HttpUtil.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\test\HttpUtilTest.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\Src\TSSRepository\LocalCache.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\Src\TSSRepository\LocalCache.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\test\LocalCacheTest.cpp
-# End Source File
+# End Group
 # End Target
 # End Project

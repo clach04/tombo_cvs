@@ -16,7 +16,7 @@
 // ctor & dtor
 /////////////////////////////////////////////////////////////////////////////
 
-YAEditDoc::YAEditDoc() : pView(NULL), pPhLineMgr(NULL), pCallback(NULL)
+YAEditDoc::YAEditDoc() : pPhLineMgr(NULL), pCallback(NULL), pListener(NULL)
 {
 }
 
@@ -25,10 +25,10 @@ YAEditDoc::~YAEditDoc()
 	if (pPhLineMgr) delete pPhLineMgr;
 }
 
-BOOL YAEditDoc::Init(const char *pStr, YAEdit *pV, YAEditCallback*pCb)
+BOOL YAEditDoc::Init(const char *pStr, YAEditListener *pL, YAEditCallback*pCb)
 {
 	pCallback = pCb;
-	pView = pV;
+	pListener = pL;
 	if (!ReleaseDoc()) return FALSE;
 	return LoadDoc(pStr);
 }
@@ -100,7 +100,7 @@ BOOL YAEditDoc::ReplaceString(const Region *pDelRegion, LPCTSTR pString)
 
 	DWORD nPhLinesAfter = pPhLineMgr->MaxLine();
 
-	if (!pView->UpdateNotify(pPhLineMgr, pDelRegion, &rNewRegion, nPhLinesBefore, nPhLinesAfter, nAffLines)) return FALSE;
+	if (!pListener->UpdateNotify(pPhLineMgr, pDelRegion, &rNewRegion, nPhLinesBefore, nPhLinesAfter, nAffLines)) return FALSE;
 	SetModify(TRUE);
 
 	return TRUE;
@@ -152,15 +152,20 @@ DWORD YAEditDoc::GetDataBytes(const Region *pRegion)
 
 void YAEditDoc::ConvertBytesToCoordinate(DWORD nPos, Coordinate *pPos)
 {
+	// +2 is CR LF. Hmm adhoc.
+
 	DWORD nBytes = 0;
 	LineInfo *p = NULL;
 	for (DWORD i = 0; i < pPhLineMgr->MaxLine(); i++) {
 		p = pPhLineMgr->GetLineInfo(i);
-		if (nBytes + p->pLine->nUsed + 1 > nPos) {
-			break;
+		if (nBytes + p->pLine->nUsed + 2 > nPos) {
+			pPos->row = i;
+			pPos->col = nPos - nBytes;
+			return;
 		}
-		nBytes += p->pLine->nUsed + 1;
+		nBytes += p->pLine->nUsed + 2;
 	}
-	pPos->row = i;
-	pPos->col = nPos - nBytes;
+
+	// if pos is grater than docment size, set EOL
+
 }

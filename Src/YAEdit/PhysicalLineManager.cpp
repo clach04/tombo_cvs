@@ -168,6 +168,7 @@ BOOL PhysicalLineManager::LoadDoc(LPCTSTR pStr)
 
 	MemBlock *pBlock;
 	// check empty document
+
 	if (*pStr == TEXT('\0')) {
 		pBlock = pMemMgr->Alloc(TEXT(""), 0);
 		if (pBlock == NULL || !AppendLine(pBlock)) return FALSE;
@@ -188,8 +189,14 @@ BOOL PhysicalLineManager::LoadDoc(LPCTSTR pStr)
 				q = CharNext(q);
 			}
 			q = CharNext(q);
-
 			pPrevTop = q;
+
+			if (*q == TEXT('\0')) {
+				pBlock = pMemMgr->Alloc(pPrevTop, 0);
+				if (pBlock == NULL || !AppendLine(pBlock)) return FALSE;				
+				return TRUE;
+			}
+
 			continue;
 		}
 		q = CharNext(q);
@@ -199,6 +206,7 @@ BOOL PhysicalLineManager::LoadDoc(LPCTSTR pStr)
 		pBlock = pMemMgr->Alloc(pPrevTop, q - pPrevTop);
 		if (pBlock == NULL || !AppendLine(pBlock)) return FALSE;
 	}
+
 	return TRUE;
 }
 

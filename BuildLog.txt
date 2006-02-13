@@ -1155,3 +1155,10 @@ Some bugs are fixed.
 	- Refactoring about FixedPixelLineWrapper.
 	- Refactoring remove YAEdit::GetLineMgr dependency of YAEditDoc.
 
+////////////////////////////////
+// B208
+////////////////////////////////
+
+- Fixes to YAE
+	- Refactoring: move contents of YAEdit to YAEditImpl and separate new YAEdit as interface. For testing.
+	- FIX ABEND if *.tdt is active and cursor position equals to file size

@@ -24,7 +24,7 @@ LineManager::~LineManager()
 {
 }
 
-BOOL LineManager::Init(YAEdit *pEd)
+BOOL LineManager::Init(YAEditImpl *pEd)
 {
 	pEdit = pEd;
 	if (!aliLine.Init(INITIAL_ARRAY_SIZE, ARRAY_DELTA)) return FALSE;

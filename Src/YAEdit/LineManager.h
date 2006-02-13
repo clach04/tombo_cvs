@@ -8,7 +8,7 @@ class MemBlock;
 class Coordinate;
 class Region;
 class YAEditDoc;
-class YAEdit;
+class YAEditImpl;
 
 /////////////////////////////////////////////////////////////////////////////
 // Line chunk
@@ -74,7 +74,7 @@ class LgLineInfo {
 class LineManager {
 	TVector<LgLineInfo> aliLine; // logical line index
 
-	YAEdit *pEdit;
+	YAEditImpl *pEdit;
 
 protected:
 
@@ -99,7 +99,7 @@ public:
 
 	LineManager();
 	~LineManager();
-	BOOL Init(YAEdit *pEdit);
+	BOOL Init(YAEditImpl *pEdit);
 	BOOL ReleaseBuffer();
 
 	////////////////////////////////////////////////////
