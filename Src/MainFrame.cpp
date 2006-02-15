@@ -180,7 +180,7 @@ static LRESULT CALLBACK MainFrameWndProc(HWND hWnd, UINT nMessage, WPARAM wParam
 		return 0;
 	case WM_SIZE:
 		frm->OnResize(wParam, lParam);
-		return 0;
+		break;
 	case WM_HOTKEY:
 		// ハンドルできるものについてのみハンドル
 		if (frm->OnHotKey(wParam, lParam)) return 0;

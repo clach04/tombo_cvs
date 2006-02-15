@@ -153,6 +153,7 @@ public:
 #endif
 
 	void OnTimer(HWND hWnd, WPARAM wParam, LPARAM lParam);
+	void OnResize(HWND hWnd, WPARAM wParam, LPARAM lParam);
 
 	/////////////////////////////////
 	// application funcs.

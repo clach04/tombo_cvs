@@ -53,7 +53,6 @@ BOOL YAEditDoc::LoadDoc(const char *pStr)
 #endif
 
 	SetModify(FALSE);
-
 	return TRUE;
 }
 
@@ -132,11 +131,11 @@ DWORD YAEditDoc::GetDataBytes(const Region *pRegion)
 		pInfo= pPhLineMgr->GetLineInfo(pRegion->posStart.row);
 
 		// first line
-		nBytes = pInfo->pLine->nUsed - pRegion->posStart.col + 1; // +1 means LF
+		nBytes = pInfo->pLine->nUsed - pRegion->posStart.col + 2; // +2 means CRLF
 
 		for (DWORD i = pRegion->posStart.row + 1; i < pRegion->posEnd.row; i++) {
 			pInfo = pPhLineMgr->GetLineInfo(i);
-			nBytes += pInfo->pLine->nUsed + 1;
+			nBytes += pInfo->pLine->nUsed + 2;
 		}
 
 		// last line
@@ -152,11 +151,46 @@ DWORD YAEditDoc::GetDataBytes(const Region *pRegion)
 
 void YAEditDoc::ConvertBytesToCoordinate(DWORD nPos, Coordinate *pPos)
 {
-	// +2 is CR LF. Hmm adhoc.
-
 	DWORD nBytes = 0;
 	LineInfo *p = NULL;
-	for (DWORD i = 0; i < pPhLineMgr->MaxLine(); i++) {
+
+	DWORD n = pPhLineMgr->MaxLine();
+	DWORD i = 0;
+
+	do {
+		p = pPhLineMgr->GetLineInfo(i);
+
+		if (nBytes + p->pLine->nUsed >= nPos) {
+			// in the line
+			pPos->row = i;
+			pPos->col = nPos - nBytes;
+			return;
+		}
+		nBytes += p->pLine->nUsed + 2;
+		i++;
+		if (i >= n) break;
+
+		if (nBytes >= nPos) {
+			pPos->row = i;
+			pPos->col = 0;
+			return;
+		}
+
+	} while (TRUE);
+
+	// if pos is grater than docment size, set EOL
+	pPos->row = n - 1;
+	pPos->col = p->pLine->nUsed;
+
+
+#ifdef COMMENT
+	DWORD nBytes = 0;
+	LineInfo *p = NULL;
+
+	// +2 is CR LF. Hmm adhoc.
+
+	DWORD n = pPhLineMgr->MaxLine();
+	for (DWORD i = 0; i < n - 1; i++) {
 		p = pPhLineMgr->GetLineInfo(i);
 		if (nBytes + p->pLine->nUsed + 2 > nPos) {
 			pPos->row = i;
@@ -166,6 +200,14 @@ void YAEditDoc::ConvertBytesToCoordinate(DWORD nPos, Coordinate *pPos)
 		nBytes += p->pLine->nUsed + 2;
 	}
 
-	// if pos is grater than docment size, set EOL
+	p = pPhLineMgr->GetLineInfo(n - 1);
+	if (nBytes + p->pLine->nUsed + 2 > nPos) {
+		pPos->row = i;
+		pPos->col = nPos - nBytes;
+		return;
+	}
 
+
+	// if pos is grater than docment size, set EOL
+#endif
 }

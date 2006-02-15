@@ -17,30 +17,6 @@
 // TomboDoc callback
 /////////////////////////////////////////////////////////////////////////////
 
-#ifdef COMMENT
-class TomboDocCallback : public YAEDocCallbackHandler {
-	MemoManager *pMgr;
-public:
-	TomboDocCallback(MemoManager *pMgr);
-
-	void OnModifyStatusChanged(YAEditDoc *pDoc, BOOL bOld, BOOL bNew);
-};
-
-
-TomboDocCallback::TomboDocCallback(MemoManager *p) : pMgr(p)
-{
-}
-
-void TomboDocCallback::OnModifyStatusChanged(YAEditDoc *pDoc, BOOL bOld, BOOL bNew)
-{
-	pMgr->GetMainFrame()->SetModifyStatus(pDoc->IsModify());
-}
-#endif
-
-/////////////////////////////////////////////////////////////////////////////
-// TomboDoc callback
-/////////////////////////////////////////////////////////////////////////////
-
 class YAEDetailsViewCallback : public YAEditCallback {
 	YAEditor *pEditor;
 public:

@@ -136,7 +136,8 @@ LRESULT CALLBACK YAEditWndProc(HWND hWnd, UINT nMessage, WPARAM wParam, LPARAM l
 		return 0;
 	case WM_PAINT:
 		frm->OnPaint(hWnd, wParam, lParam);
-		return 0;
+		break;
+//		return 0;
 	case WM_VSCROLL:
 		frm->OnVScroll(hWnd, wParam, lParam);
 		return 0;
@@ -161,6 +162,11 @@ LRESULT CALLBACK YAEditWndProc(HWND hWnd, UINT nMessage, WPARAM wParam, LPARAM l
 	case WM_TIMER:
 		frm->OnTimer(hWnd, wParam, lParam);
 		return 0;
+
+	case WM_SIZE:
+		frm->OnResize(hWnd, wParam, lParam);
+		break;
+
 #if defined(PLATFORM_WIN32)
 	case WM_MOUSEWHEEL:
 		frm->OnMouseWheel(hWnd, wParam, lParam);
@@ -193,8 +199,6 @@ BOOL YAEditImpl::Create(HINSTANCE hInst, HWND hParent, DWORD nId, RECT &r)
 
 	pDoc = new YAEditDoc(); 
 	if (!pDoc->Init("", this, pCallback)) return FALSE;
-
-//	if (!pView->ResetPosition()) return FALSE;
 	
 #if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
 	pView->hViewWnd = CreateWindowEx(WS_EX_CLIENTEDGE, YAEDIT_CLASS_NAME, TEXT(""),
@@ -657,37 +661,19 @@ void YAEditImpl::OnTimer(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 YAEditDoc *YAEditImpl::SetDoc(YAEditDoc *pNewDoc)
 {
-	// get current scrollbar status
-	BOOL bScrollDisplayedBefore = (pLineMgr->MaxLine() > pView->GetPageHeight());
-
 	// replace document and LineManager
 	YAEditDoc *pOldDoc = pDoc;
 	pDoc = pNewDoc;
 	pLineMgr->ReleaseBuffer();
 
+	RECT r;
+	GetClientRect(pView->hViewWnd, &r);
+
 	// rewrap logical lines
+	pWrapper->SetViewWidth(r.right - r.left - pView->nMaxCharWidth);
 	pLineMgr->RecalcWrap(pWrapper);
 	// reset view
 	pView->UpdateMaxLineWidth();	// UpdateMaxLineWidth depends on LineManager so call after updating LineManager.
-
-	BOOL bScrollDisplayedAfter = (pLineMgr->MaxLine() > pView->GetPageHeight());
-
-	// If scrollbar status is changed
-	if (bScrollDisplayedBefore != bScrollDisplayedAfter) {
-		if (bScrollDisplayedAfter) {
-			// Scrollbar is shown
-			pWrapper->SetViewWidth(pView->GetViewClientRect().right - pView->GetViewClientRect().left - pView->nMaxCharWidth - (DWORD)GetSystemMetrics(SM_CXVSCROLL));
-		} else {
-			// Scrollbar is hidden
-			pWrapper->SetViewWidth(pView->GetViewClientRect().right - pView->GetViewClientRect().left - pView->nMaxCharWidth);
-		}
-
-		// View size has changed due to vert scrollbar. Rewrap again
-		// rewrap logical lines
-		pLineMgr->RecalcWrap(pWrapper);
-		// reset view
-		pView->UpdateMaxLineWidth();	// UpdateMaxLineWidth depends on LineManager so call after updating LineManager.
-	}
 
 	// reset caret/region position
 	pView->ResetPosition();
@@ -712,8 +698,11 @@ DWORD YAEditImpl::GetLineWidth(DWORD nOffset, LPCTSTR pStr, DWORD nLen) { return
 // Resize window
 /////////////////////////////////////////////////////////////////////////////
 
-void YAEditImpl::ResizeWindow(int x, int y, int width, int height) 
+void YAEditImpl::OnResize(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
+	DWORD width = (DWORD)LOWORD(lParam);
+	DWORD height = (DWORD)HIWORD(lParam);
+
 	Region rPhRgn;
 
 	// Preserve absolute cursor position before rewrapping.
@@ -722,34 +711,14 @@ void YAEditImpl::ResizeWindow(int x, int y, int width, int height)
 	pLineMgr->LogicalPosToPhysicalPos(&(rSelRegion.posStart), &(rPhRgn.posStart));
 	pLineMgr->LogicalPosToPhysicalPos(&(rSelRegion.posEnd), &(rPhRgn.posEnd));
 
-	// get scroll status before resized
-	BOOL bScrollDisplayedBefore = (pLineMgr->MaxLine() > pView->GetPageHeight());
-
-	// resizing and re-configure logical lines
-	MoveWindow(pView->hViewWnd, x, y, width, height, FALSE);
 	pView->ResizeNotify();
 
+	RECT r;
+	GetClientRect(pView->hViewWnd, &r);
+
 	// rewrap logical lines
-	pWrapper->SetViewWidth(pView->GetViewClientRect().right - pView->GetViewClientRect().left - pView->nMaxCharWidth);
+	pWrapper->SetViewWidth(r.right - r.left - pView->nMaxCharWidth);
 	pLineMgr->RecalcWrap(pWrapper);
-
-	// get scroll status after resized
-	BOOL bScrollDisplayedAfter = (pLineMgr->MaxLine() > pView->GetPageHeight());
-
-	// If scrollbar status is changed
-	if (bScrollDisplayedBefore != bScrollDisplayedAfter) {
-		if (bScrollDisplayedAfter) {
-			// Scrollbar is shown
-			pWrapper->SetViewWidth(pView->GetViewClientRect().right - pView->GetViewClientRect().left - pView->nMaxCharWidth - (DWORD)GetSystemMetrics(SM_CXVSCROLL));
-		} else {
-			// Scrollbar is hidden
-			pWrapper->SetViewWidth(pView->GetViewClientRect().right - pView->GetViewClientRect().left - pView->nMaxCharWidth);
-		}
-
-		// View size has changed due to vert scrollbar. Rewrap again
-		// rewrap logical lines
-		pLineMgr->RecalcWrap(pWrapper);
-	}
 
 	pView->ResetScrollbar();
 
@@ -762,6 +731,13 @@ void YAEditImpl::ResizeWindow(int x, int y, int width, int height)
 
 	// redraw screen
 	pView->RedrawAllScreen();
+//	UpdateWindow(pView->hViewWnd);
+}
+
+void YAEditImpl::ResizeWindow(int x, int y, int width, int height) 
+{
+	// resizing and re-configure logical lines
+	MoveWindow(pView->hViewWnd, x, y, width, height, TRUE);
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -995,12 +971,8 @@ void YAEditImpl::SetFont(HFONT hFont)
 {
 	if (hFont == NULL) {
 		hFont = (HFONT)GetStockObject(SYSTEM_FONT);
-//		return;
 	}
 	pView->SetFont(hFont);
-//	pView->hFont = hFont;
-
-//	pView->ResetFontInfo();
 	pWrapper->SetViewWidth(pView->GetViewClientRect().right - pView->GetViewClientRect().left - pView->nMaxCharWidth);
 
 	if (pLineMgr) delete pLineMgr;
@@ -1032,8 +1004,8 @@ void YAEditImpl::SetCaretPos(DWORD n)
 	Coordinate phCur, lgCur;
 	pDoc->ConvertBytesToCoordinate(n, &phCur);
 	pLineMgr->PhysicalPosToLogicalPos(&phCur, &lgCur);
-
 	pView->SetCaretPosition(lgCur);
+	ClearRegion();
 	pView->ScrollCaret();
 }
 

@@ -1162,3 +1162,16 @@ Some bugs are fixed.
 - Fixes to YAE
 	- Refactoring: move contents of YAEdit to YAEditImpl and separate new YAEdit as interface. For testing.
 	- FIX ABEND if *.tdt is active and cursor position equals to file size
+
+////////////////////////////////
+// B209
+////////////////////////////////
+
+- Fixes to YAE
+	* FIX FREEZE if *.tdt value is invalid.
+	* Change mouse cursor to IBeam
+	* Change LgEOL mark color
+	* Keep cursor position support
+	- Trap WM_SIZE
+	- Change rewrapping timing
+

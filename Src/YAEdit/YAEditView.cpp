@@ -74,8 +74,8 @@ BOOL YAEditView::ResetScrollbar()
 
 	// horiz scroll bar
 	si.nMin = 0;
-	si.nMax = nMaxWidthPixel + (DWORD)GetSystemMetrics(SM_CXVSCROLL);
-	si.nPage = (rClientRect.right - rClientRect.left);
+	si.nMax = nMaxWidthPixel;
+	si.nPage = (rClientRect.right - rClientRect.right - nMaxCharWidth);
 	si.nPos = nColOffset;
 	::SetScrollInfo(hViewWnd, SB_HORZ, &si, TRUE);
 	
@@ -629,7 +629,6 @@ void YAEditView::SetCaretPosition(const Coordinate &pos)
 	if (!pCtrl->GetLgLineChunk(nCursorRow, &lc)) return;
 
 	nCursorColPos = GetLineWidth(0, lc.GetLineData(), nCursorCol);
-
 	SetCaretPos();
 }
 
@@ -977,7 +976,7 @@ void YAEditView::UpdateMaxLineWidth()
 
 void YAEditView::RedrawAllScreen()
 {
-	InvalidateRect(hViewWnd, &rClientRect, TRUE); 
+	InvalidateRect(hViewWnd, NULL, TRUE);
 }
 
 BOOL YAEditView::IsVertScrollbarDisplayed()
