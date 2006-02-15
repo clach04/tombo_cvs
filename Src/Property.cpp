@@ -618,7 +618,7 @@ BOOL Property::LoadFromReg(BOOL *pStrict)
 		pPLS++;
 	}
 
-	nUseYAEdit = GetDWORDFromReg(hTomboRoot, USEYAE_ATTR_NAME, FALSE);
+//	nUseYAEdit = GetDWORDFromReg(hTomboRoot, USEYAE_ATTR_NAME, FALSE);
 
 	delete[] pBookMark;
 	pBookMark = GetMultiSZFromReg(hTomboRoot, BOOKMARK_ATTR_NAME);

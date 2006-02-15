@@ -1187,3 +1187,10 @@ Some bugs are fixed.
 ////////////////////////////////
 
 * FIX: ABEND when property dialog closed at first time on H/PC devices.(#8040)
+
+////////////////////////////////
+// B212 (TOMBO 2.0 alpha 3)
+////////////////////////////////
+
+- Enable YAE Option
+
