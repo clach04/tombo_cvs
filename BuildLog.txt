@@ -1181,3 +1181,9 @@ Some bugs are fixed.
 
 * FIX: propery dialog is not displayed on some PocketPC 2000 devices.(#8038)
 * FIX: -root parameter no longer seems to work(#8030)
+
+////////////////////////////////
+// B211 (SNAPSHOT20060216)
+////////////////////////////////
+
+* FIX: ABEND when property dialog closed at first time on H/PC devices.(#8040)

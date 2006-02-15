@@ -769,18 +769,20 @@ BOOL Property::SaveToFile(File *pFile)
 	if (!SaveMultiSZToFile(pFile, TOPDIRHIST_ATTR_NAME, pTopDirHistory)) return FALSE;
 
 #if defined(PLATFORM_HPC)
-	LPCOMMANDBANDSRESTOREINFO p1 = pCmdBarInfo;
-	LPCOMMANDBANDSRESTOREINFO p2 = pCmdBarInfo + 1;
+	if (pCmdBarInfo != NULL) {
+		LPCOMMANDBANDSRESTOREINFO p1 = pCmdBarInfo;
+		LPCOMMANDBANDSRESTOREINFO p2 = pCmdBarInfo + 1;
 
-	char aCmdBarBuf[1024];
-	sprintf(aCmdBarBuf, "%d,%d,%d,%d,%d,%d,%d,%d",
-		p1->wID, p1->fStyle, p1->cxRestored, p1->fMaximized, 
-		p2->wID, p2->fStyle, p2->cxRestored, p2->fMaximized);
+		char aCmdBarBuf[1024];
+		sprintf(aCmdBarBuf, "%d,%d,%d,%d,%d,%d,%d,%d",
+			p1->wID, p1->fStyle, p1->cxRestored, p1->fMaximized, 
+			p2->wID, p2->fStyle, p2->cxRestored, p2->fMaximized);
 
-	const char *pRebarPropHdr = "  <rebar value=\"";
-	if (!pFile->Write((LPBYTE)pRebarPropHdr, strlen(pRebarPropHdr))) return FALSE;
-	if (!pFile->Write((LPBYTE)aCmdBarBuf, strlen(aCmdBarBuf))) return FALSE;
-	if (!pFile->Write((LPBYTE)pPropLst, nPropLst)) return FALSE;
+		const char *pRebarPropHdr = "  <rebar value=\"";
+		if (!pFile->Write((LPBYTE)pRebarPropHdr, strlen(pRebarPropHdr))) return FALSE;
+		if (!pFile->Write((LPBYTE)aCmdBarBuf, strlen(aCmdBarBuf))) return FALSE;
+		if (!pFile->Write((LPBYTE)pPropLst, nPropLst)) return FALSE;
+	}
 #endif
 
 	// footer
