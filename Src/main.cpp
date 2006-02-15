@@ -188,7 +188,7 @@ BOOL ParseCmdLine(LPTSTR pCmdLine)
 				DWORD nStart, nEnd;
 				LPTSTR pNext;
 				if (GetDefaultFolder(p + 6, &nStart, &nEnd, &pNext)) {
-					g_Property.SetDefaultTomboRoot(p + 6 + nStart, nEnd - nStart);
+					g_Property.SetCmdLineAssignedTomboRoot(p + 6 + nStart, nEnd - nStart);
 				}
 				p = pNext;
 //			} else if (_tcsnicmp(p+1, TEXT("ro"), 2) == 0) {

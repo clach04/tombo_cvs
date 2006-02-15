@@ -42,12 +42,8 @@
 //////////////////////////////////////////
 // property pages
 
-#if defined(PLATFORM_PKTPC) || (defined(PLATFORM_BE500) && defined(TOMBO_LANG_ENGLISH))
 #if defined(PLATFORM_PKTPC)
-#define PROPTAB_PAGES 9
-#else
-#define PROPTAB_PAGES 8
-#endif
+#define PROPTAB_PAGES 10
 #else
 #define PROPTAB_PAGES 8
 #endif
@@ -173,7 +169,7 @@ LPCTSTR GetString(UINT nID)
 // ctor
 //////////////////////////////////////////
 
-Property::Property() : pDefaultTopDir(NULL), pBookMark(NULL), pSearchHistory(NULL), pTopDirHistory(NULL)
+Property::Property() : pCmdlineAssignedTopDir(NULL), pBookMark(NULL), pSearchHistory(NULL), pTopDirHistory(NULL)
 #if defined(PLATFORM_HPC)
 	,pCmdBarInfo(NULL)
 #endif
@@ -195,7 +191,7 @@ Property::~Property()
 		delete [] pPropsStr[i];
 	}
 
-	delete [] pDefaultTopDir;
+	delete [] pCmdlineAssignedTopDir;
 	delete [] pBookMark;
 	delete [] pSearchHistory;
 	delete [] pTopDirHistory;
@@ -217,6 +213,18 @@ BOOL Property::SetStringProperty(DWORD nPropId, LPCTSTR pValue)
 	}
 	if ((pPropsStr[nPropId] = StringDup(pValue)) == NULL) return FALSE;
 	return TRUE;
+}
+
+//////////////////////////////////////////
+// topdir
+//////////////////////////////////////////
+
+LPCTSTR Property::GetTomboRoot()
+{
+	if (pCmdlineAssignedTopDir != NULL && _tcslen(pCmdlineAssignedTopDir) > 0) {
+		return pCmdlineAssignedTopDir;
+	}
+	return GetTopDir();
 }
 
 //////////////////////////////////////////
@@ -556,8 +564,8 @@ BOOL Property::LoadFromReg(BOOL *pStrict)
 
 	*pStrict = TRUE;
 
-	if (pDefaultTopDir) {
-		SetTopDir(pDefaultTopDir);
+	if (pCmdlineAssignedTopDir) {
+		SetTopDir(pCmdlineAssignedTopDir);
 	} else {
 		TCHAR buf[MAX_PATH];
 		siz = sizeof(buf);
@@ -1046,13 +1054,13 @@ BOOL Property::GetCommandbarInfo(LPCOMMANDBANDSRESTOREINFO p, DWORD n)
 
 #endif
 
-BOOL Property::SetDefaultTomboRoot(LPCTSTR p, DWORD nLen)
+BOOL Property::SetCmdLineAssignedTomboRoot(LPCTSTR p, DWORD nLen)
 {
-	pDefaultTopDir = new TCHAR[nLen + 1];
-	if (!pDefaultTopDir) return FALSE;
-	_tcsncpy(pDefaultTopDir, p, nLen);
-	pDefaultTopDir[nLen] = TEXT('\0');
-	ChopFileSeparator(pDefaultTopDir);
+	pCmdlineAssignedTopDir = new TCHAR[nLen + 1];
+	if (!pCmdlineAssignedTopDir) return FALSE;
+	_tcsncpy(pCmdlineAssignedTopDir, p, nLen);
+	pCmdlineAssignedTopDir[nLen] = TEXT('\0');
+	ChopFileSeparator(pCmdlineAssignedTopDir);
 	return TRUE;
 }
 

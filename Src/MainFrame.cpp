@@ -468,7 +468,7 @@ void MainFrame::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	roOpt.bKeepTitle = g_Property.GetKeepTitle();
 
 	roOpt.bSafeFileName = g_Property.GetUseSafeFileName();
-	roOpt.pTopDir = g_Property.GetTopDir();
+	roOpt.pTopDir = g_Property.GetTomboRoot();
 
 	g_Repository.Init(&roOpt);
 
@@ -1411,7 +1411,7 @@ void MainFrame::OnProperty()
 	roOpt.bKeepCaret = g_Property.GetKeepCaret();
 	roOpt.bKeepTitle = g_Property.GetKeepTitle();
 	roOpt.bSafeFileName = g_Property.GetUseSafeFileName();
-	roOpt.pTopDir = g_Property.GetTopDir();
+	roOpt.pTopDir = g_Property.GetTomboRoot();
 
 	g_Repository.SetRepositoryOption(&roOpt);
 

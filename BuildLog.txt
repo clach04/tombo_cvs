@@ -1175,3 +1175,9 @@ Some bugs are fixed.
 	- Trap WM_SIZE
 	- Change rewrapping timing
 
+////////////////////////////////
+// B210 (SNAPSHOT20060215)
+////////////////////////////////
+
+* FIX: propery dialog is not displayed on some PocketPC 2000 devices.(#8038)
+* FIX: -root parameter no longer seems to work(#8030)
