@@ -156,6 +156,12 @@ public:
 	void OnResize(HWND hWnd, WPARAM wParam, LPARAM lParam);
 
 	/////////////////////////////////
+	// forcus window
+	void OnSetFocus();
+	void OnKillFocus();
+	void OnGetFocus();
+
+	/////////////////////////////////
 	// application funcs.
 	YAEditDoc *SetDoc(YAEditDoc *pNewDoc);
 	YAEditDoc *GetDoc() { return pDoc; }
@@ -164,20 +170,35 @@ public:
 	///////////////////////////////////////
 	// cursor moving funcs.
 
-	void MoveRight();
-	void MoveLeft();
-	void MoveUp();
-	void MoveDown();
-	void MoveEOL();
-	void MoveTOL();
-
 	DWORD GetCaretPos();
 	void SetCaretPos(DWORD n);
 
 	/////////////////////////////////
-	// Key hander
-	void KeyBS();
-	void DeleteKeyDown();
+	// Commands
+
+	void CmdNOP();
+
+	void CmdBackSpace();
+	void CmdDeleteChar();
+	void CmdMoveRight();
+	void CmdMoveLeft();
+	void CmdMoveUp();
+	void CmdMoveDown();
+	void CmdMoveEOL();
+	void CmdMoveTOL();
+	
+	void CmdSelRight();
+	void CmdSelLeft();
+	void CmdSelUp();
+	void CmdSelDown();
+
+	void CmdScrollUp();
+	void CmdScrollDown();
+
+	void CmdReplaceString(LPCTSTR p);
+	void CmdCut();
+	void CmdCopy();
+	void CmdPaste();
 
 	/////////////////////////////////
 	// Move/Resize window
@@ -198,12 +219,6 @@ public:
 	// Clipboard
 	BOOL CopyToClipboard();
 	BOOL InsertFromClipboard();
-
-	/////////////////////////////////
-	// forcus window
-	void OnSetFocus();
-	void OnKillFocus();
-	void OnGetFocus();
 
 	////////////////////////////////////////////////////
 	// Region related members

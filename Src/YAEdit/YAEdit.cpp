@@ -137,7 +137,6 @@ LRESULT CALLBACK YAEditWndProc(HWND hWnd, UINT nMessage, WPARAM wParam, LPARAM l
 	case WM_PAINT:
 		frm->OnPaint(hWnd, wParam, lParam);
 		break;
-//		return 0;
 	case WM_VSCROLL:
 		frm->OnVScroll(hWnd, wParam, lParam);
 		return 0;
@@ -355,60 +354,73 @@ void YAEditImpl::OnSetFocus()  {
 void YAEditImpl::OnKillFocus() { if (pView) pView->OnKillFocus(); }
 
 /////////////////////////////////////////////////////////////////////////////
-// WM_KEYDOWN
+// Key handler
 /////////////////////////////////////////////////////////////////////////////
 BOOL YAEditImpl::OnKeyDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
 	int nVertKey = (int)wParam;
 	BOOL bShiftDown = (GetKeyState(VK_SHIFT) & 0x8000) != 0;
+	BOOL bCtrlDown = (GetKeyState(VK_CONTROL) & 0x8000) != 0;
+	BOOL bAltDown = (GetKeyState(VK_MENU) & 0x8000) != 0;
 
 	if (bShiftDown) {
 		switch (nVertKey) {
 		case VK_RIGHT:
-			pView->MoveRight();
-			UpdateSelRegion();
+			CmdSelRight();
 			break;
 		case VK_LEFT:
-			pView->MoveLeft();
-			UpdateSelRegion();
+			CmdSelLeft();
 			break;
 		case VK_UP:
-			pView->MoveUp();
-			UpdateSelRegion();
+			CmdSelUp();
 			break;
 		case VK_DOWN:
-			pView->MoveDown();
-			UpdateSelRegion();
+			CmdSelDown();
 			break;
 		}
+	} else if (bCtrlDown) {
+		switch (nVertKey) {
+		case 'C':
+			CmdCopy();
+			break;
+		case 'V':
+			CmdPaste();
+			break;
+		case 'X':
+			CmdCut();
+			break;
+		default:
+			CmdNOP();
+		}
+		return TRUE;
 	} else {
 		switch (nVertKey) {
 		case VK_DELETE:
-			DeleteKeyDown();
+			CmdDeleteChar();
 			break;
 		case VK_RIGHT:
-			MoveRight();
-			break;
+			CmdMoveRight();
+			return TRUE;
 		case VK_LEFT:
-			MoveLeft();
-			break;
+			CmdMoveLeft();
+			return TRUE;
 		case VK_UP:
-			MoveUp();
-			break;
+			CmdMoveUp();
+			return TRUE;
 		case VK_DOWN:
-			MoveDown();
-			break;
+			CmdMoveDown();
+			return TRUE;
 		case VK_PRIOR:
-			pView->PrevPage();
+			CmdScrollUp();
 			return TRUE;
 		case VK_NEXT:
-			pView->NextPage();
+			CmdScrollDown();
 			return TRUE;
 		case VK_HOME:
-			MoveTOL();
+			CmdMoveTOL();
 			break;
 		case VK_END:
-			MoveEOL();
+			CmdMoveEOL();
 			break;
 		default:
 			return FALSE;
@@ -419,65 +431,15 @@ BOOL YAEditImpl::OnKeyDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	return TRUE;
 }
 
-void YAEditImpl::UpdateSelRegion()
-{
-	Coordinate nSelNow = pView->GetCaretPosition();
-	Coordinate nSelOld;
-
-	Region r;
-	SelectRegion(nSelNow, &nSelOld);
-	if (nSelNow < nSelOld) {
-		r.posStart = nSelNow; r.posEnd = nSelOld;
-	} else {
-		r.posStart = nSelOld; r.posEnd = nSelNow;
-	}
-	RequestRedrawRegion(&r);
-}
-
-/////////////////////////////////////////////////////////////////////////////
-// WM_CHAR
-/////////////////////////////////////////////////////////////////////////////
-
 void YAEditImpl::OnChar(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
 	TCHAR ch = (TCHAR)wParam;
-	if (ch == CHARA_BS) {
-		KeyBS();
-		return;
-	}
-	if (ch == CHARA_ENTER) {
-		ReplaceText(SelectedRegion(), TEXT("\n"));
-		pView->ResetScrollbar();
-		return;
-	}
-	if (ch == CHARA_CTRL_C) {
-		if (!CopyToClipboard()) {
-			MessageBox(hWnd, TEXT("Copy to clipboard failed."), TEXT("ERROR"), MB_ICONWARNING | MB_OK);
-		}
-		return;
-	}
-	if (ch == CHARA_CTRL_X) {
-		if (IsRegionSelected()) {
-			if (!CopyToClipboard()) {
-				MessageBox(hWnd, TEXT("Copy to clipboard failed."), TEXT("ERROR"), MB_ICONWARNING | MB_OK);
-			}
-			ReplaceText(SelectedRegion(), TEXT(""));
-		}
-		return;
-	}
-	if (ch == CHARA_CTRL_V) {
-		if (!InsertFromClipboard()) {
-			MessageBox(hWnd, TEXT("Paste from clipboard failed."), TEXT("ERROR"), MB_ICONWARNING | MB_OK);
-		}
-		return;
-	}
-	if (ch == CHARA_CTRL_S) {
-		// nop
-		return;
-	}
-	if (ch == CHARA_ESC) {
-		return;
-	}
+
+	if (ch == CHARA_BS) { CmdBackSpace(); return; }
+	if (ch == CHARA_ENTER) { CmdReplaceString(TEXT("\n")); return; }
+	if (ch == CHARA_ESC) { /* nop */; return; }
+
+	if (ch <= 29) return;
 
 #if defined(PLATFORM_WIN32)
 	// if char is DBCS lead byte, buffering.
@@ -499,7 +461,76 @@ void YAEditImpl::OnChar(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	ReplaceText(SelectedRegion(), kbuf);
 }
 
-void YAEditImpl::KeyBS()
+/////////////////////////////////////////////////////////////////////////////
+// update selected region
+/////////////////////////////////////////////////////////////////////////////
+
+void YAEditImpl::UpdateSelRegion()
+{
+	Coordinate nSelNow = pView->GetCaretPosition();
+	Coordinate nSelOld;
+
+	Region r;
+	SelectRegion(nSelNow, &nSelOld);
+	if (nSelNow < nSelOld) {
+		r.posStart = nSelNow; r.posEnd = nSelOld;
+	} else {
+		r.posStart = nSelOld; r.posEnd = nSelNow;
+	}
+	RequestRedrawRegion(&r);
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// commands
+/////////////////////////////////////////////////////////////////////////////
+
+void YAEditImpl::CmdNOP() { /* NOP */ }
+void YAEditImpl::CmdMoveRight() { pView->ScrollCaret(); pView->MoveRight(); ClearRegion(); pView->ScrollCaret(); }
+void YAEditImpl::CmdMoveLeft()  { pView->ScrollCaret(); pView->MoveLeft();  ClearRegion(); pView->ScrollCaret(); }
+void YAEditImpl::CmdMoveUp()    { pView->ScrollCaret(); pView->MoveUp();    ClearRegion(); pView->ScrollCaret(); }
+void YAEditImpl::CmdMoveEOL()   { pView->ScrollCaret(); pView->MoveEOL();   ClearRegion(); pView->ScrollCaret(); }
+void YAEditImpl::CmdMoveTOL()   { pView->ScrollCaret(); pView->MoveTOL();   ClearRegion(); }
+void YAEditImpl::CmdMoveDown()  { pView->ScrollCaret(); pView->MoveDown();  ClearRegion(); }
+
+void YAEditImpl::CmdSelRight()	{ pView->MoveRight(); UpdateSelRegion(); }
+void YAEditImpl::CmdSelLeft()	{ pView->MoveLeft(); UpdateSelRegion(); }
+void YAEditImpl::CmdSelUp()		{ pView->MoveUp(); UpdateSelRegion(); }
+void YAEditImpl::CmdSelDown()	{ pView->MoveDown(); UpdateSelRegion(); }
+
+void YAEditImpl::CmdScrollUp()	{ pView->PrevPage(); }
+void YAEditImpl::CmdScrollDown(){ pView->NextPage(); }
+
+void YAEditImpl::CmdReplaceString(LPCTSTR p)
+{
+	ReplaceText(SelectedRegion(), p);
+	pView->ResetScrollbar();
+}
+
+void YAEditImpl::CmdCut()
+{
+	if (IsRegionSelected()) {
+		if (!CopyToClipboard()) {
+			MessageBox(pView->hViewWnd, TEXT("Copy to clipboard failed."), TEXT("ERROR"), MB_ICONWARNING | MB_OK);
+		}
+		ReplaceText(SelectedRegion(), TEXT(""));
+	}
+}
+
+void YAEditImpl::CmdCopy()
+{
+	if (!CopyToClipboard()) {
+		MessageBox(pView->hViewWnd, TEXT("Copy to clipboard failed."), TEXT("ERROR"), MB_ICONWARNING | MB_OK);
+	}
+}
+
+void YAEditImpl::CmdPaste()
+{
+	if (!InsertFromClipboard()) {
+		MessageBox(pView->hViewWnd, TEXT("Paste from clipboard failed."), TEXT("ERROR"), MB_ICONWARNING | MB_OK);
+	}
+}
+
+void YAEditImpl::CmdBackSpace()
 {
 	if (IsRegionSelected()) {
 		ReplaceText(SelectedRegion(), TEXT(""));
@@ -512,7 +543,7 @@ void YAEditImpl::KeyBS()
 	}
 }
 
-void YAEditImpl::DeleteKeyDown()
+void YAEditImpl::CmdDeleteChar()
 {
 	if (IsRegionSelected()) {
 		ReplaceText(SelectedRegion(), TEXT(""));
@@ -524,17 +555,6 @@ void YAEditImpl::DeleteKeyDown()
 		if (!r.IsEmptyRegion()) ReplaceText(r, TEXT(""));
 	}
 }
-
-/////////////////////////////////////////////////////////////////////////////
-// move cursor
-/////////////////////////////////////////////////////////////////////////////
-
-void YAEditImpl::MoveRight() { pView->ScrollCaret(); pView->MoveRight(); ClearRegion(); }
-void YAEditImpl::MoveLeft()  { pView->ScrollCaret(); pView->MoveLeft();  ClearRegion(); }
-void YAEditImpl::MoveUp()    { pView->ScrollCaret(); pView->MoveUp();    ClearRegion(); }
-void YAEditImpl::MoveEOL()   { pView->ScrollCaret(); pView->MoveEOL();   ClearRegion(); }
-void YAEditImpl::MoveTOL()   { pView->ScrollCaret(); pView->MoveTOL();   ClearRegion(); }
-void YAEditImpl::MoveDown()  { pView->ScrollCaret(); pView->MoveDown();  ClearRegion(); }
 
 /////////////////////////////////////////////////////////////////////////////
 // WM_LBUTTONDOWN

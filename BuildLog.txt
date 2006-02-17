@@ -1194,3 +1194,8 @@ Some bugs are fixed.
 
 - Enable YAE Option
 
+////////////////////////////////
+// B213 (TOMBO 1.17)
+////////////////////////////////
+
+- Disable YAE Option again
