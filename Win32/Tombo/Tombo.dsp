@@ -220,10 +220,6 @@ SOURCE=..\..\Src\TomboLib\PropertyPage.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\Src\YAEdit\Region.cpp
-# End Source File
-# Begin Source File
-
 SOURCE=..\..\Src\Repository.cpp
 # End Source File
 # Begin Source File
@@ -440,10 +436,6 @@ SOURCE=..\..\Src\RegexUtil.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\Src\YAEdit\Region.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\..\Src\Repository.h
 # End Source File
 # Begin Source File
@@ -633,6 +625,14 @@ SOURCE=..\..\Src\YAEdit\PhysicalLineManager.cpp
 # Begin Source File
 
 SOURCE=..\..\Src\YAEdit\PhysicalLineManager.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\YAEdit\Region.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\YAEdit\Region.h
 # End Source File
 # Begin Source File
 

@@ -3,6 +3,8 @@
 #include <commctrl.h>
 #include "YAEditor.h"
 
+#include "resource.h"
+
 #include "Tombo.h"
 #include "UniConv.h"
 #include "Property.h"
@@ -131,6 +133,14 @@ void YAEditor::ResetModify()
 
 BOOL YAEditor::OnCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
+	switch(LOWORD(wParam)) {
+	case IDM_INSDATE1:
+		InsertDate1();
+		return TRUE;
+	case IDM_INSDATE2:
+		InsertDate2();
+		return TRUE;
+	}
 	return FALSE;
 }
 
@@ -154,3 +164,8 @@ void YAEditor::ChangeModifyStatusNotify(BOOL bStatus)
 	pManager->GetMainFrame()->SetModifyStatus(bStatus);
 }
 
+BOOL YAEditor::ReplaceText(LPCTSTR p)
+{
+	pEdit->CmdReplaceString(p);
+	return TRUE;
+}

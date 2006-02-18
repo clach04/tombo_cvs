@@ -43,7 +43,7 @@ LPTSTR Clipboard::GetText()
 {
 	if (!bOpen) return NULL;
 
-	LPTSTR pText;
+	LPTSTR pText = NULL;
 #if defined(PLATFORM_WIN32)
 	HANDLE hText = GetClipboardData(CF_TEXT);
 	if (hText != NULL) {

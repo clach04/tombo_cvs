@@ -227,6 +227,7 @@ char *PhysicalLineManager::GetDocumentData(LPDWORD pLen)
 		nSize += p->nUsed;
 		nSize += 2;
 	}
+	nSize -= 2;
 
 	LPTSTR pData = new TCHAR[nSize + 1];
 	if (pData == NULL) return NULL;
@@ -236,9 +237,13 @@ char *PhysicalLineManager::GetDocumentData(LPDWORD pLen)
 
 		_tcsncpy(q, p->GetDataArea(), p->nUsed);
 		q += p->nUsed;
-		_tcscpy(q, TEXT("\r\n"));
-		q += 2;
+		if (i < nLine - 1) {
+			_tcscpy(q, TEXT("\r\n"));
+			q += 2;
+		}
 	}
+	*q = TEXT('\0');
+
 	char *pResultData;
 #ifdef _WIN32_WCE
 	pResultData = ConvUnicode2SJIS(pData);

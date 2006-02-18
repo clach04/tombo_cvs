@@ -181,33 +181,4 @@ void YAEditDoc::ConvertBytesToCoordinate(DWORD nPos, Coordinate *pPos)
 	// if pos is grater than docment size, set EOL
 	pPos->row = n - 1;
 	pPos->col = p->pLine->nUsed;
-
-
-#ifdef COMMENT
-	DWORD nBytes = 0;
-	LineInfo *p = NULL;
-
-	// +2 is CR LF. Hmm adhoc.
-
-	DWORD n = pPhLineMgr->MaxLine();
-	for (DWORD i = 0; i < n - 1; i++) {
-		p = pPhLineMgr->GetLineInfo(i);
-		if (nBytes + p->pLine->nUsed + 2 > nPos) {
-			pPos->row = i;
-			pPos->col = nPos - nBytes;
-			return;
-		}
-		nBytes += p->pLine->nUsed + 2;
-	}
-
-	p = pPhLineMgr->GetLineInfo(n - 1);
-	if (nBytes + p->pLine->nUsed + 2 > nPos) {
-		pPos->row = i;
-		pPos->col = nPos - nBytes;
-		return;
-	}
-
-
-	// if pos is grater than docment size, set EOL
-#endif
 }

@@ -34,6 +34,7 @@
 #define CHARA_BS 8
 #define CHARA_ENTER 13
 #define CHARA_ESC 27
+#define CHARA_TAB 9
 
 /////////////////////////////////////////////////////////////////////////////
 // static funcs/vars declarations
@@ -389,6 +390,9 @@ BOOL YAEditImpl::OnKeyDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		case 'X':
 			CmdCut();
 			break;
+		case 'A':
+			CmdSelAll();
+			break;
 		default:
 			CmdNOP();
 		}
@@ -439,7 +443,11 @@ void YAEditImpl::OnChar(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	if (ch == CHARA_ENTER) { CmdReplaceString(TEXT("\n")); return; }
 	if (ch == CHARA_ESC) { /* nop */; return; }
 
-	if (ch <= 29) return;
+	if (
+#if defined(PLATFORM_WIN32)
+		aKeyBuffer[0] == '\0' && 
+#endif
+		0 <= ch && ch <= 29 && ch != CHARA_TAB) return;
 
 #if defined(PLATFORM_WIN32)
 	// if char is DBCS lead byte, buffering.
@@ -471,7 +479,7 @@ void YAEditImpl::UpdateSelRegion()
 	Coordinate nSelOld;
 
 	Region r;
-	SelectRegion(nSelNow, &nSelOld);
+	ExtendSelectRegion(nSelNow, &nSelOld);
 	if (nSelNow < nSelOld) {
 		r.posStart = nSelNow; r.posEnd = nSelOld;
 	} else {
@@ -513,6 +521,7 @@ void YAEditImpl::CmdCut()
 			MessageBox(pView->hViewWnd, TEXT("Copy to clipboard failed."), TEXT("ERROR"), MB_ICONWARNING | MB_OK);
 		}
 		ReplaceText(SelectedRegion(), TEXT(""));
+		pView->ResetScrollbar();
 	}
 }
 
@@ -527,6 +536,8 @@ void YAEditImpl::CmdPaste()
 {
 	if (!InsertFromClipboard()) {
 		MessageBox(pView->hViewWnd, TEXT("Paste from clipboard failed."), TEXT("ERROR"), MB_ICONWARNING | MB_OK);
+	} else {
+		pView->ResetScrollbar();
 	}
 }
 
@@ -554,6 +565,16 @@ void YAEditImpl::CmdDeleteChar()
 		r.posEnd = pView->GetCaretPosition();
 		if (!r.IsEmptyRegion()) ReplaceText(r, TEXT(""));
 	}
+}
+
+void YAEditImpl::CmdSelAll()
+{
+	rSelRegion.posStart.Set(0, 0);
+
+	LineChunk lc;
+	pLineMgr->GetLineChunk(pLineMgr->MaxLine() - 1, &lc);
+	rSelRegion.posEnd.Set(lc.LineLen(), pLineMgr->MaxLine() - 1);
+	RequestRedrawRegion(&rSelRegion);
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -915,7 +936,7 @@ BOOL YAEditImpl::GetRegionString(LPTSTR pBuf)
 	}
 }
 
-void YAEditImpl::SelectRegion(const Coordinate &nCurrent, Coordinate *pPrev)
+void YAEditImpl::ExtendSelectRegion(const Coordinate &nCurrent, Coordinate *pPrev)
 {
 	if (!IsRegionSelected()) {
 		*pPrev = rSelRegion.posStart;

@@ -60,11 +60,15 @@ public:
 	// Is the note displayed in details view?
 	BOOL IsNoteDisplayed(const TomboURI *pURI);
 
-
 	BOOL StoreCursorPos();
 	BOOL DiscardMemo();
 
 	BOOL LoadNote(const TomboURI *pURI);
+
+	virtual BOOL ReplaceText(LPCTSTR p) = 0;
+
+	void InsertDate1();
+	void InsertDate2();
 };
 
 //////////////////////////////////////////
@@ -118,6 +122,8 @@ public:
 
 	BOOL OnCommand(HWND hWnd, WPARAM wParam, LPARAM lParam);
 	BOOL OnHotKey(HWND hWnd, WPARAM wParam);
+	UINT OnKeyDown(HWND hWnd, WPARAM wParam, LPARAM lParam);
+
 	void OnGetFocus();
 
 	////////////////////////////
@@ -136,8 +142,7 @@ public:
 
 	void SelectAll();
 
-	void InsertDate1();
-	void InsertDate2();
+	BOOL ReplaceText(LPCTSTR p);
 
 	////////////////////////////
 	// search

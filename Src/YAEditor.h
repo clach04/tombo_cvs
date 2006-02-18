@@ -62,6 +62,8 @@ public:
 	BOOL Search(BOOL bFirstSearch, BOOL bForward, BOOL bNFMsg, BOOL bSearchFromTop) { return FALSE; }
 
 	void ChangeModifyStatusNotify(BOOL bStatus);
+
+	BOOL ReplaceText(LPCTSTR p);
 };
 
 #endif

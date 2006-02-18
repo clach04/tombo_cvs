@@ -19,6 +19,9 @@
 #include "Repository.h"
 #include "MemoManager.h"
 
+#define KEY_COLON       0xBB
+#define KEY_SEMICOLON   0xBA
+
 static BOOL GetDateText(TString *pInsStr, LPCTSTR pFormat, TString *pPath);
 
 void SetWndProc(SUPER_WND_PROC wp);
@@ -137,6 +140,38 @@ BOOL MemoDetailsView::IsNoteDisplayed(const TomboURI *pURI)
 {
 	if (GetCurrentURI() == NULL) return FALSE;
 	return _tcsicmp(pURI->GetFullURI(), GetCurrentURI()->GetFullURI()) == 0;
+}
+
+////////////////////////////////////////////////////////
+// insert date
+////////////////////////////////////////////////////////
+
+void MemoDetailsView::InsertDate1()
+{
+	TString sDate;
+
+	TString sPathStr;
+	pManager->GetCurrentSelectedPath(&sPathStr);
+
+	if (!GetDateText(&sDate, g_Property.GetDateFormat1(), &sPathStr)) {
+		TomboMessageBox(NULL, MSG_GET_DATE_FAILED, TEXT("ERROR"), MB_ICONERROR | MB_OK);
+		return;
+	}
+	ReplaceText(sDate.Get());
+}
+
+void MemoDetailsView::InsertDate2()
+{
+	TString sDate;
+
+	TString sPathStr;
+	pManager->GetCurrentSelectedPath(&sPathStr);
+
+	if (!GetDateText(&sDate, g_Property.GetDateFormat2(), &sPathStr)) {
+		TomboMessageBox(NULL, MSG_GET_DATE_FAILED, TEXT("ERROR"), MB_ICONERROR | MB_OK);
+		return;
+	}
+	ReplaceText(sDate.Get());
 }
 
 ///////////////////////////////////////////
@@ -321,6 +356,79 @@ BOOL SimpleEditor::OnHotKey(HWND hWnd, WPARAM wParam)
 	default:
 		return FALSE;
 	}
+}
+
+///////////////////////////////////////////
+// Key handler
+///////////////////////////////////////////
+UINT SimpleEditor::OnKeyDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
+{
+	BOOL bShiftDown = (GetKeyState(VK_SHIFT) & 0x8000) != 0;
+	BOOL bCtrlKeyDown = (GetKeyState(VK_CONTROL) & 0x8000) != 0;
+
+#if defined(PLATFORM_SIG3)
+	if (bShiftDown && wParam == VK_UP) {
+		INT nPrevStart, nPrevEnd;
+		INT nAftStart, nAftEnd;
+		SendMessage(hwnd, EM_GETSEL, (WPARAM)&nPrevStart, (LPARAM)&nPrevEnd);
+		LRESULT lResult = CallWindowProc(gSuperProc, hwnd, msg, wParam, lParam);
+		SendMessage(hwnd, EM_GETSEL, (WPARAM)&nAftStart, (LPARAM)&nAftEnd);
+
+		if (nAftStart < nSelBase) {
+			SendMessage(hwnd, EM_SETSEL, (WPARAM)nSelBase, (LPARAM)nAftStart);
+			return lResult;
+		} else {
+			return lResult;
+		}
+	}
+	if (bShiftDown && wParam == VK_DOWN) {
+		INT nPrevStart, nPrevEnd;
+		INT nAftStart, nAftEnd;
+		SendMessage(hwnd, EM_GETSEL, (WPARAM)&nPrevStart, (LPARAM)&nPrevEnd);
+		LRESULT lResult = CallWindowProc(gSuperProc, hwnd, msg, wParam, lParam);
+		SendMessage(hwnd, EM_GETSEL, (WPARAM)&nAftStart, (LPARAM)&nAftEnd);
+
+		if (nAftStart < nSelBase) {
+			SendMessage(hwnd, EM_SETSEL, (WPARAM)nSelBase, (LPARAM)nAftEnd);
+			return lResult;
+		} else {
+			return lResult;
+		}
+	}
+
+	if (!(bShiftDown && wParam == VK_LEFT) && 
+		!(bShiftDown && wParam == VK_RIGHT)) {
+		POINT pt;
+		GetCaretPos(&pt);
+		LPARAM l = MAKELPARAM(pt.x, pt.y);
+		nSelBase = SendMessage(hwnd, EM_CHARFROMPOS, 0, l) & 0xFFFF;
+	}
+#endif
+
+	if (bCtrlKeyDown && wParam == TEXT('A')) {
+		SelectAll();
+		return 0;
+	}
+
+	if (IsReadOnly()) {
+		if (wParam == VK_DELETE) return 0;
+		if (wParam == VK_BACK || wParam == VK_CONVERT || wParam == VK_LEFT) {
+			SendMessage(hWnd, WM_KEYDOWN, VK_PRIOR, lParam);
+			return 0;
+		}
+		if (wParam == VK_SPACE || wParam == VK_RIGHT) {
+			SendMessage(hWnd, WM_KEYDOWN, VK_NEXT, lParam); 
+			return 0;
+		}
+	} else {
+		if (wParam == KEY_COLON && bCtrlKeyDown) {	// :
+			InsertDate1();
+		}
+		if (wParam == KEY_SEMICOLON && bCtrlKeyDown) {	// ;
+			InsertDate2();
+		}
+	}
+	return 1;
 }
 
 ///////////////////////////////////////////
@@ -777,30 +885,9 @@ void SimpleEditor::SetMDSearchFlg(BOOL bFlg)
 // Insert date
 /////////////////////////////////////////
 
-void SimpleEditor::InsertDate1()
+BOOL SimpleEditor::ReplaceText(LPCTSTR p)
 {
-	TString sDate;
-
-	TString sPathStr;
-	pManager->GetCurrentSelectedPath(&sPathStr);
-
-	if (!GetDateText(&sDate, g_Property.GetDateFormat1(), &sPathStr)) {
-		TomboMessageBox(NULL, MSG_GET_DATE_FAILED, TEXT("ERROR"), MB_ICONERROR | MB_OK);
-		return;
-	}
-	SendMessage(hViewWnd, EM_REPLACESEL, 0, (LPARAM)sDate.Get());
+	SendMessage(hViewWnd, EM_REPLACESEL, 0, (LPARAM)p);
+	return TRUE;
 }
 
-void SimpleEditor::InsertDate2()
-{
-	TString sDate;
-
-	TString sPathStr;
-	pManager->GetCurrentSelectedPath(&sPathStr);
-
-	if (!GetDateText(&sDate, g_Property.GetDateFormat2(), &sPathStr)) {
-		TomboMessageBox(NULL, MSG_GET_DATE_FAILED, TEXT("ERROR"), MB_ICONERROR | MB_OK);
-		return;
-	}
-	SendMessage(hViewWnd, EM_REPLACESEL, 0, (LPARAM)sDate.Get());
-}

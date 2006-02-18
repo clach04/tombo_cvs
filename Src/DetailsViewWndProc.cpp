@@ -12,13 +12,9 @@
 #include "PocketPCPlatform.h"
 #endif
 
-//#define PLATFORM_SIG3
-
 #include "Property.h"
 
 static SUPER_WND_PROC gSuperProc;
-
-static BOOL bCtrlKeyDown = FALSE;
 
 #define KEY_ESC 0x1B
 #define KEY_CTRL_A 1
@@ -71,75 +67,7 @@ LRESULT CALLBACK NewDetailsViewProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM l
 		if (pView->IsReadOnly()) return 0;
 		break;
 	case WM_KEYDOWN:
-#if defined(PLATFORM_SIG3)
-		{
-			BOOL bShiftDown = (GetKeyState(VK_SHIFT) & 0x8000) != 0;
-			if (bShiftDown && wParam == VK_UP) {
-				INT nPrevStart, nPrevEnd;
-				INT nAftStart, nAftEnd;
-				SendMessage(hwnd, EM_GETSEL, (WPARAM)&nPrevStart, (LPARAM)&nPrevEnd);
-				LRESULT lResult = CallWindowProc(gSuperProc, hwnd, msg, wParam, lParam);
-				SendMessage(hwnd, EM_GETSEL, (WPARAM)&nAftStart, (LPARAM)&nAftEnd);
-
-				if (nAftStart < nSelBase) {
-					SendMessage(hwnd, EM_SETSEL, (WPARAM)nSelBase, (LPARAM)nAftStart);
-					return lResult;
-				} else {
-					return lResult;
-				}
-			}
-			if (bShiftDown && wParam == VK_DOWN) {
-				INT nPrevStart, nPrevEnd;
-				INT nAftStart, nAftEnd;
-				SendMessage(hwnd, EM_GETSEL, (WPARAM)&nPrevStart, (LPARAM)&nPrevEnd);
-				LRESULT lResult = CallWindowProc(gSuperProc, hwnd, msg, wParam, lParam);
-				SendMessage(hwnd, EM_GETSEL, (WPARAM)&nAftStart, (LPARAM)&nAftEnd);
-
-				if (nAftStart < nSelBase) {
-					SendMessage(hwnd, EM_SETSEL, (WPARAM)nSelBase, (LPARAM)nAftEnd);
-					return lResult;
-				} else {
-					return lResult;
-				}
-
-			}
-
-			if (!(bShiftDown && wParam == VK_LEFT) && 
-				!(bShiftDown && wParam == VK_RIGHT)) {
-				POINT pt;
-				GetCaretPos(&pt);
-				LPARAM l = MAKELPARAM(pt.x, pt.y);
-				nSelBase = SendMessage(hwnd, EM_CHARFROMPOS, 0, l) & 0xFFFF;
-			}
-		}
-#endif
-
-		if (pView->IsReadOnly()) {
-			if (wParam == VK_DELETE) return 0;
-			if (wParam == VK_BACK || wParam == VK_CONVERT || wParam == VK_LEFT) {
-				SendMessage(hwnd, WM_KEYDOWN, VK_PRIOR, lParam);
-				return 0;
-			}
-			if (wParam == VK_SPACE || wParam == VK_RIGHT) {
-				SendMessage(hwnd, WM_KEYDOWN, VK_NEXT, lParam); 
-				return 0;
-			}
-		} else {
-			if (wParam == KEY_COLON && bCtrlKeyDown) {	// :
-				if (pView) pView->InsertDate1();
-			}
-			if (wParam == KEY_SEMICOLON && bCtrlKeyDown) {	// ;
-				if (pView) pView->InsertDate2();
-			}
-			if (wParam == VK_CONTROL) {
-				bCtrlKeyDown = TRUE;
-			}
-		}
-		break;
-	case WM_KEYUP:
-		if (wParam == VK_CONTROL) {
-			bCtrlKeyDown = FALSE;
-		}
+		if (pView->OnKeyDown(hwnd, wParam, lParam) == 0) return 0;
 		break;
 	case WM_CHAR:
 		pView->SetMDSearchFlg(TRUE); // clear search status flag
@@ -150,7 +78,7 @@ LRESULT CALLBACK NewDetailsViewProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM l
 			return 0;
 		}
 		// disable Ctrl-B(BELL)
-		if (wParam == KEY_CTRL_B) return 0;
+		if (wParam == KEY_CTRL_A || wParam == KEY_CTRL_B) return 0;
 		break;
 
 	case WM_COMMAND:

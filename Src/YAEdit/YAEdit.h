@@ -43,6 +43,11 @@ public:
 	virtual DWORD GetCaretPos() = 0;
 	virtual void SetCaretPos(DWORD n) = 0;
 
+
+	///////////////////////////////////////
+	// exported commands
+	virtual void CmdReplaceString(LPCTSTR p) = 0;
+
 	///////////////////////////////////////
 	// register window class
 	static BOOL RegisterClass(HINSTANCE hInst);
@@ -200,6 +205,8 @@ public:
 	void CmdCopy();
 	void CmdPaste();
 
+	void CmdSelAll();
+
 	/////////////////////////////////
 	// Move/Resize window
 	void ResizeWindow(int x, int y, int width, int height);
@@ -227,7 +234,8 @@ public:
 	BOOL IsSelRegionOneLine() { return rSelRegion.posStart.row == rSelRegion.posEnd.row; }
 	const Region& SelectedRegion() { return rSelRegion; }
 
-	void SelectRegion(const Coordinate &nCurrent, Coordinate *pPrev);
+	// Select [selected region] + nCurrent
+	void ExtendSelectRegion(const Coordinate &nCurrent, Coordinate *pPrev);
 
 	////////////////////////////////////////////////////
 	// callback from Document
