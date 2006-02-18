@@ -165,6 +165,9 @@ public:
 	// accessor
 	DWORD GetPageHeight() { return nPageHeight; }
 	const RECT& GetViewClientRect() { return rClientRect; }
+
+	// just debugging
+	FontWidthCache *GetFontCache() { return pFontCache; }
 };
 
 #endif

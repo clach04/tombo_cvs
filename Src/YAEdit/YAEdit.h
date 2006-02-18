@@ -147,6 +147,7 @@ public:
 	void OnChar(HWND hWnd, WPARAM wParam, LPARAM lParam);
 
 	void OnLButtonDown(HWND hWnd, WPARAM wParam, LPARAM lParam);
+	void OnLButtonDblClick(HWND hWnd, WPARAM wParam, LPARAM lParam);
 	void OnMouseMove(HWND hWnd, WPARAM wParam, LPARAM lParam);
 	void OnLButtonUp(HWND hWnd, WPARAM wParam, LPARAM lParam);
 

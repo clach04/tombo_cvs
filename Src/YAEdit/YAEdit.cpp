@@ -50,7 +50,7 @@ BOOL YAEdit::RegisterClass(HINSTANCE hInst)
 {
 	WNDCLASS wc;
 
-	wc.style = 0;
+	wc.style = CS_DBLCLKS;
 	wc.lpfnWndProc = (WNDPROC)YAEditWndProc;
 	wc.cbClsExtra = 0;
 	wc.cbWndExtra = sizeof(LONG);
@@ -146,6 +146,9 @@ LRESULT CALLBACK YAEditWndProc(HWND hWnd, UINT nMessage, WPARAM wParam, LPARAM l
 		return 0;
 	case WM_LBUTTONDOWN:
 		frm->OnLButtonDown(hWnd, wParam, lParam);
+		break;
+	case WM_LBUTTONDBLCLK:
+		frm->OnLButtonDblClick(hWnd, wParam, lParam);
 		break;
 	case WM_MOUSEMOVE:
 		frm->OnMouseMove(hWnd, wParam, lParam);
@@ -393,6 +396,16 @@ BOOL YAEditImpl::OnKeyDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		case 'A':
 			CmdSelAll();
 			break;
+		case 'T':
+			{
+				FontWidthCache *pCache = pView->GetFontCache();
+				DWORD nMon = pCache->GetWideCharWidth(TEXT('–â'));
+				DWORD nDai = pCache->GetWideCharWidth(TEXT('‘è'));
+				TCHAR buf[1024];
+				wsprintf(buf, TEXT("%d %d"), nMon, nDai);
+				MessageBox(NULL, buf, TEXT("DEBUG"), MB_OK);
+			}
+			break;
 		default:
 			CmdNOP();
 		}
@@ -607,6 +620,107 @@ void YAEditImpl::OnLButtonDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	bMouseDown = TRUE;
 }
 
+// Hiragana = 3040 - 309F
+// Hankaku-Katakana = FF71-FF9F
+
+// 0 = control code
+// 1 = SPC
+// 2 = mark
+// 3 = number
+// 4 = alpha
+// 5 = DBCS
+static const BYTE codeType[] = {
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+  3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2, 2, 2, 2, 2, 2,
+  2, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
+  4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 2, 2, 2, 2, 2,
+  2, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
+  4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 2, 2, 2, 2, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+};
+
+#if defined(PLATFORM_WIN32)
+static BYTE getCharType(BYTE b)
+{
+	if (IsDBCSLeadByte(b)) {
+		return 5;
+	} else {
+		return codeType[b];
+	}
+}
+
+inline LPCTSTR NextLetter(LPCTSTR p) {
+	return CharNext(p);
+}
+
+#else
+static BYTE getCharType(WCHAR c)
+{
+	if (c < 0x7F) {
+		return codeType[c];
+	}
+	return 5;
+}
+
+inline LPCTSTR NextLetter(LPCTSTR p) {
+	return p+1;
+}
+#endif
+
+void YAEditImpl::OnLButtonDblClick(HWND hWnd, WPARAM wParam, LPARAM lParam)
+{
+	LineChunk lc;
+	pLineMgr->GetLineChunk(rSelRegion.posStart.row, &lc);
+
+	LPCTSTR pLine = lc.GetLineData();
+	LPCTSTR pCur = pLine + rSelRegion.posStart.col;
+	DWORD nCol = rSelRegion.posStart.col;
+	BYTE nCurType;
+
+	// get start position
+	nCurType = getCharType(*pCur);
+
+	LPCTSTR p = pLine;
+	LPCTSTR q = p;
+	while (p < pCur) {
+		if (getCharType(*p) != nCurType) {
+			q = p;
+		}
+		p = NextLetter(p);
+	}
+	if (q < pCur && getCharType(*q) != nCurType) q = NextLetter(q);
+	DWORD nStartPos = q - pLine;
+
+	// get end position
+	LPCTSTR pEnd = pLine + lc.LineLen();
+	p = pCur;
+	q = pEnd;
+
+	while (p < pEnd) {
+		if (getCharType(*p) != nCurType) {
+			q = p;
+			break;
+		}
+		p = NextLetter(p);
+	}
+	DWORD nEndPos = q - pLine;
+
+	// update select region
+	rSelRegion.posEnd.row = rSelRegion.posStart.row;
+	rSelRegion.posStart.col = nStartPos;
+	rSelRegion.posEnd.col = nEndPos;
+	RequestRedrawRegion(&rSelRegion);
+
+}
 
 /////////////////////////////////////////////////////////////////////////////
 //  Mouse move

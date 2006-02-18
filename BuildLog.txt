@@ -109,5 +109,16 @@
 	* Insert date (Ctrl-1, Ctrl-2) support
 	* ABEND when clipborad item is not text
 	* CRLF was always inserted when saving
-	* Vert scrollbar is not shown when pasting long texts
+	* Vert scrollbar is not shown when paste long texts
 
+////////////////////////////////
+// B215
+////////////////////////////////
+
+- Fixes to YAE
+	* Double click support
+	* FIX: some letter's width is incorrect.
+
+////////////////////////////////
+// 
+////////////////////////////////

@@ -38,23 +38,15 @@ BYTE FontWidthCache::GetOnebyteCharWidth(const char c)
 {
 	DWORD nIdx = c;
 
-//	if (bWidthTable[nIdx]) return bWidthTable[nIdx];
-
 	SIZE size;
 	GetTextExtentPoint32(hRefDC, &c, 1, &size);
-//	bWidthTable[nIdx] = (BYTE)size.cx;
 	return (BYTE)size.cx;
 }
 
 BYTE FontWidthCache::GetTwobyteCharWidth(const char *p)
 {
-//	DWORD nIdx = ((const unsigned char)c2) << 8 | ((const unsigned char)c1);
-
-//	if (bWidthTable[nIdx]) return bWidthTable[nIdx];
-
 	SIZE size;
 	GetTextExtentPoint32(hRefDC, p, 2, &size);
-//	bWidthTable[nIdx] = (BYTE)size.cx;
 	return (BYTE)size.cx;
 }
 
@@ -62,15 +54,12 @@ BYTE FontWidthCache::GetTwobyteCharWidth(const char *p)
 
 BYTE FontWidthCache::GetWideCharWidth(const WCHAR c)
 {
-	DWORD nIdx = c;
-
-	if (bWidthTable[nIdx]) return bWidthTable[nIdx];
+	if (bWidthTable[c]) return bWidthTable[c];
 
 	SIZE size;
 	GetTextExtentPoint32(hRefDC, &c, 1, &size);
-	bWidthTable[nIdx] = (BYTE)size.cx;
+	bWidthTable[c] = (BYTE)size.cx;
 	return (BYTE)size.cx;
 }
-
 #endif
 
