@@ -257,6 +257,71 @@ char *PhysicalLineManager::GetDocumentData(LPDWORD pLen)
 }
 
 /////////////////////////////////////////////////////////////////////////////
+// Get string in the region
+/////////////////////////////////////////////////////////////////////////////
+
+LPTSTR PhysicalLineManager::GetRegionString(const Region *pRegion)
+{
+	if (pRegion->posStart.row == pRegion->posEnd.row) {
+		MemBlock *pBlock = aliLine.GetUnit(pRegion->posStart.row)->pLine;
+
+		DWORD nLen = pBlock->nUsed;
+		LPTSTR pLine = pBlock->GetDataArea();
+
+		DWORD nRegionSize = pRegion->posEnd.col - pRegion->posStart.col;
+		LPTSTR p = new TCHAR[nRegionSize + 1];
+		if (p == NULL) { SetLastError(ERROR_NOT_ENOUGH_MEMORY); return NULL; }
+
+		_tcsncpy(p, pLine + pRegion->posStart.col, nRegionSize);
+		*(p + nRegionSize) = TEXT('\0');
+		return p;
+
+	} else {
+		// get data size
+		DWORD nRegionSize = 0;
+
+		MemBlock *pFirstBlock = aliLine.GetUnit(pRegion->posStart.row)->pLine;
+		DWORD nFirstLen = pFirstBlock->nUsed - pRegion->posStart.col;
+		nRegionSize += nFirstLen;
+
+		nRegionSize += 2;	// CRLF
+		MemBlock *pLastBlock = aliLine.GetUnit(pRegion->posEnd.row)->pLine;
+		DWORD nLastLen = pRegion->posEnd.col;
+		nRegionSize += nLastLen;
+
+		for (DWORD i = pRegion->posStart.row + 1; i < pRegion->posEnd.row; i++) {
+			MemBlock *pBlock = aliLine.GetUnit(i)->pLine;
+			DWORD nLen = pBlock->nUsed;
+			nRegionSize += nLen;
+			nRegionSize += 2; // CRLF;
+		}
+
+		// allocate buffer
+		LPTSTR p = new TCHAR[nRegionSize + 1];
+		if (p == NULL) { SetLastError(ERROR_NOT_ENOUGH_MEMORY); return NULL; }
+
+		// padding data
+		LPTSTR q = p;
+		_tcsncpy(q, pFirstBlock->GetDataArea() + pRegion->posStart.col, nFirstLen);
+		q += nFirstLen;
+
+		_tcsncpy(q, TEXT("\r\n"), 2); q += 2;
+
+		for (i = pRegion->posStart.row + 1; i < pRegion->posEnd.row; i++) {
+			MemBlock *pBlock = aliLine.GetUnit(i)->pLine;
+			_tcsncpy(q, pBlock->GetDataArea(), pBlock->nUsed);
+			q += pBlock->nUsed;
+			_tcsncpy(q, TEXT("\r\n"), 2); q += 2;			
+		}
+
+		_tcsncpy(q, pLastBlock->GetDataArea(), nLastLen);
+		q += nLastLen;
+		*q = TEXT('\0');
+		return p;
+	}
+}
+
+/////////////////////////////////////////////////////////////////////////////
 // Replace string
 /////////////////////////////////////////////////////////////////////////////
 
@@ -351,3 +416,4 @@ BOOL PhysicalLineManager::ReplaceRegion(const Region *pRegion, LPCTSTR pString, 
 
 	return TRUE;
 }
+

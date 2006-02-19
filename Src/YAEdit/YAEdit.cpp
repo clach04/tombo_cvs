@@ -396,15 +396,8 @@ BOOL YAEditImpl::OnKeyDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		case 'A':
 			CmdSelAll();
 			break;
-		case 'T':
-			{
-				FontWidthCache *pCache = pView->GetFontCache();
-				DWORD nMon = pCache->GetWideCharWidth(TEXT('–â'));
-				DWORD nDai = pCache->GetWideCharWidth(TEXT('‘è'));
-				TCHAR buf[1024];
-				wsprintf(buf, TEXT("%d %d"), nMon, nDai);
-				MessageBox(NULL, buf, TEXT("DEBUG"), MB_OK);
-			}
+		case 'Z':
+			CmdUndo();
 			break;
 		default:
 			CmdNOP();
@@ -508,7 +501,15 @@ void YAEditImpl::UpdateSelRegion()
 void YAEditImpl::CmdNOP() { /* NOP */ }
 void YAEditImpl::CmdMoveRight() { pView->ScrollCaret(); pView->MoveRight(); ClearRegion(); pView->ScrollCaret(); }
 void YAEditImpl::CmdMoveLeft()  { pView->ScrollCaret(); pView->MoveLeft();  ClearRegion(); pView->ScrollCaret(); }
-void YAEditImpl::CmdMoveUp()    { pView->ScrollCaret(); pView->MoveUp();    ClearRegion(); pView->ScrollCaret(); }
+
+void YAEditImpl::CmdMoveUp()
+{
+	pView->ScrollCaret(); 
+	pView->MoveUp();
+	ClearRegion();
+	pView->ScrollCaret(); 
+}
+
 void YAEditImpl::CmdMoveEOL()   { pView->ScrollCaret(); pView->MoveEOL();   ClearRegion(); pView->ScrollCaret(); }
 void YAEditImpl::CmdMoveTOL()   { pView->ScrollCaret(); pView->MoveTOL();   ClearRegion(); }
 void YAEditImpl::CmdMoveDown()  { pView->ScrollCaret(); pView->MoveDown();  ClearRegion(); }
@@ -590,6 +591,10 @@ void YAEditImpl::CmdSelAll()
 	RequestRedrawRegion(&rSelRegion);
 }
 
+void YAEditImpl::CmdUndo()
+{
+	pDoc->Undo();
+}
 /////////////////////////////////////////////////////////////////////////////
 // WM_LBUTTONDOWN
 /////////////////////////////////////////////////////////////////////////////

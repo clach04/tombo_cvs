@@ -140,6 +140,8 @@ BOOL YAEditor::OnCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	case IDM_INSDATE2:
 		InsertDate2();
 		return TRUE;
+	case IDM_UNDO:
+		pEdit->CmdUndo();
 	}
 	return FALSE;
 }

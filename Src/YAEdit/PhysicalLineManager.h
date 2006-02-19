@@ -54,6 +54,8 @@ public:
 
 	BOOL ReplaceRegion(const Region *pRegion, LPCTSTR pStr, LPDWORD pAffectedLines, Region *pNewRegion);
 
+	LPTSTR GetRegionString(const Region *pRegion);
+
 	friend class PhysicalLineManagerTest;
 };
 

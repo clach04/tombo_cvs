@@ -1,5 +1,6 @@
 #include <windows.h>
 #include <tchar.h>
+#include "AutoPtr.h"
 #include "Region.h"
 #include "VarBuffer.h"
 #include "YAEditDoc.h"
@@ -13,16 +14,47 @@
 #include "StringSplitter.h"
 
 /////////////////////////////////////////////////////////////////////////////
+// undo info
+/////////////////////////////////////////////////////////////////////////////
+
+class UndoInfo {
+public:
+	LPTSTR pUndoStr;
+	Region rRegion;
+
+	UndoInfo(LPTSTR pUndoStr);
+	~UndoInfo();
+};
+
+UndoInfo::UndoInfo(LPTSTR p) : pUndoStr(p)
+{
+}
+
+UndoInfo::~UndoInfo()
+{
+	delete[] pUndoStr;
+}
+
+LPCTSTR YAEditDoc::GetUndoStr() { if (pUndo) return pUndo->pUndoStr; else return NULL; }
+const Region YAEditDoc::GetUndoRegion()
+{
+	Region r(0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF);
+	if (pUndo) return pUndo->rRegion; 
+	else return r;
+}
+
+/////////////////////////////////////////////////////////////////////////////
 // ctor & dtor
 /////////////////////////////////////////////////////////////////////////////
 
-YAEditDoc::YAEditDoc() : pPhLineMgr(NULL), pCallback(NULL), pListener(NULL)
+YAEditDoc::YAEditDoc() :	pPhLineMgr(NULL), pCallback(NULL), pListener(NULL), pUndo(NULL)
 {
 }
 
 YAEditDoc::~YAEditDoc()
 {
 	if (pPhLineMgr) delete pPhLineMgr;
+	if (pUndo) delete pUndo;
 }
 
 BOOL YAEditDoc::Init(const char *pStr, YAEditListener *pL, YAEditCallback*pCb)
@@ -92,15 +124,47 @@ BOOL YAEditDoc::ReplaceString(const Region *pDelRegion, LPCTSTR pString)
 {
 	DWORD nPhLinesBefore = pPhLineMgr->MaxLine();
 
+	LPTSTR pOldTxt = pPhLineMgr->GetRegionString(pDelRegion);
+	ArrayAutoPointer<TCHAR> ap(pOldTxt);
+
+	if (pUndo != NULL && pUndo->rRegion.posEnd !=  pDelRegion->posEnd) {
+		delete pUndo;
+		pUndo = NULL;
+	}
+
 	// delete region and insert string
 	Region rNewRegion;
 	DWORD nAffLines;
-	if (!pPhLineMgr->ReplaceRegion(pDelRegion, pString, &nAffLines, &rNewRegion)) return FALSE;
-
+	if (!pPhLineMgr->ReplaceRegion(pDelRegion, pString, &nAffLines, &rNewRegion)) {
+		return FALSE;
+	}
 	DWORD nPhLinesAfter = pPhLineMgr->MaxLine();
 
-	if (!pListener->UpdateNotify(pPhLineMgr, pDelRegion, &rNewRegion, nPhLinesBefore, nPhLinesAfter, nAffLines)) return FALSE;
+	if (pUndo == NULL) {
+		pUndo = new UndoInfo(pOldTxt);
+		ap.set(NULL);
+		if (pUndo == NULL) { SetLastError(ERROR_NOT_ENOUGH_MEMORY); return FALSE; }
+		pUndo->rRegion = rNewRegion;
+	} else if (*pOldTxt == TEXT('\0')) {
+		pUndo->rRegion.posEnd = rNewRegion.posEnd;
+	}
+
+	if (pListener && !pListener->UpdateNotify(pPhLineMgr, pDelRegion, &rNewRegion, nPhLinesBefore, nPhLinesAfter, nAffLines)) {
+		return FALSE;
+	}
 	SetModify(TRUE);
+
+	return TRUE;
+}
+
+BOOL YAEditDoc::Undo()
+{
+	if (pUndo == NULL) return TRUE;
+	UndoInfo *p = pUndo;
+	AutoPointer<UndoInfo> ap(p);
+	pUndo = NULL;
+
+	if (!ReplaceString(&(p->rRegion), p->pUndoStr)) return FALSE;
 
 	return TRUE;
 }
@@ -181,4 +245,13 @@ void YAEditDoc::ConvertBytesToCoordinate(DWORD nPos, Coordinate *pPos)
 	// if pos is grater than docment size, set EOL
 	pPos->row = n - 1;
 	pPos->col = p->pLine->nUsed;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// 
+/////////////////////////////////////////////////////////////////////////////
+
+BOOL YAEditDoc::InsertUndoPoint()
+{
+	return TRUE;
 }

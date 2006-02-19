@@ -7,6 +7,8 @@ class PhysicalLineManager;
 class YAEditCallback;
 class YAEditListener;
 
+class UndoInfo;
+
 ////////////////////////////////////////////////////
 // Document container for YAE
 ////////////////////////////////////////////////////
@@ -17,6 +19,9 @@ protected:
 	YAEditListener *pListener;
 
 	YAEditCallback *pCallback;
+
+	// undo related
+	UndoInfo *pUndo;
 
 	// this member should not to edit directry. use SetModify().
 	BOOL bModified;
@@ -43,6 +48,7 @@ public:
 	// retrieve & set line 
 
 	BOOL ReplaceString(const Region *pRegion, LPCTSTR pString);
+	BOOL Undo();
 
 	BOOL IsModify() { return bModified; }
 	void SetModify(BOOL b);
@@ -51,6 +57,16 @@ public:
 	// Data size related functions
 	DWORD GetDataBytes(const Region *pRegion);
 	void ConvertBytesToCoordinate(DWORD nPos, Coordinate *pPos);
+
+	////////////////////////////////////////////////////
+	// set current document status as undo point
+	BOOL InsertUndoPoint();
+
+	////////////////////////////////////////////////////
+	// only for testing
+
+	LPCTSTR GetUndoStr();
+	const Region GetUndoRegion();
 };
 
 #endif

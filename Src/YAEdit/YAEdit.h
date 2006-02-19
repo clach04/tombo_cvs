@@ -47,6 +47,7 @@ public:
 	///////////////////////////////////////
 	// exported commands
 	virtual void CmdReplaceString(LPCTSTR p) = 0;
+	virtual void CmdUndo() = 0;
 
 	///////////////////////////////////////
 	// register window class
@@ -207,6 +208,7 @@ public:
 	void CmdPaste();
 
 	void CmdSelAll();
+	void CmdUndo();
 
 	/////////////////////////////////
 	// Move/Resize window

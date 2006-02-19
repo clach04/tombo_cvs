@@ -120,5 +120,9 @@
 	* FIX: some letter's width is incorrect.
 
 ////////////////////////////////
-// 
+// B216
 ////////////////////////////////
+
+- Fixes to YAE
+	* Single undo support but under testing
+
