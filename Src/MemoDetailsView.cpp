@@ -174,6 +174,52 @@ void MemoDetailsView::InsertDate2()
 	ReplaceText(sDate.Get());
 }
 
+/////////////////////////////////////////
+// 検索
+/////////////////////////////////////////
+//
+// RESULT: return TRUE if matched.
+//
+// bFirstSearch : 検索開始位置: TRUE = メモ先頭 FALSE = 現在のカーソル位置 + 1
+// bForward : 検索の向き: TRUE = 順方向 FALSE = 逆方向
+// bNFMsg: 見つからなかった場合にメッセージを出すか
+// pFound: if string is found, set TRUE otherwise set FALSE.
+
+
+BOOL MemoDetailsView::Search(BOOL bFirstSearch, BOOL bForward, BOOL bNFMsg, BOOL bSearchFromTop)
+{
+	SearchEngineA *pSE;
+	pSE = pManager->GetSearchEngine();
+	if (pSE == NULL) return FALSE;
+
+	LPTSTR pT = GetMemo();
+	SecureBufferAutoPointerT sb(pT);
+
+	DWORD nSearchStart;
+	BOOL bShift = FALSE;
+
+	if (bFirstSearch) {
+		nSearchStart = 0;
+	} else {
+		nSearchStart = GetCursorPos();
+		bShift = TRUE;
+	}
+
+	BOOL bMatch;
+	bMatch = pSE->SearchTextT(pT, nSearchStart, bForward, bShift);
+
+	if (bMatch) {
+		DWORD nStart = pSE->MatchStart();
+		DWORD nEnd = pSE->MatchEnd();
+
+		SetSelectRegion(nStart, nEnd);
+	} else {
+		if (bNFMsg) MessageBox(NULL, MSG_STRING_NOT_FOUND, TOMBO_APP_NAME, MB_OK | MB_ICONINFORMATION);
+	}
+
+	return bMatch;
+}
+
 ///////////////////////////////////////////
 // initializer
 ///////////////////////////////////////////
@@ -370,9 +416,9 @@ UINT SimpleEditor::OnKeyDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	if (bShiftDown && wParam == VK_UP) {
 		INT nPrevStart, nPrevEnd;
 		INT nAftStart, nAftEnd;
-		SendMessage(hwnd, EM_GETSEL, (WPARAM)&nPrevStart, (LPARAM)&nPrevEnd);
+		SendMessage(hWnd, EM_GETSEL, (WPARAM)&nPrevStart, (LPARAM)&nPrevEnd);
 		LRESULT lResult = CallWindowProc(gSuperProc, hwnd, msg, wParam, lParam);
-		SendMessage(hwnd, EM_GETSEL, (WPARAM)&nAftStart, (LPARAM)&nAftEnd);
+		SendMessage(hWnd, EM_GETSEL, (WPARAM)&nAftStart, (LPARAM)&nAftEnd);
 
 		if (nAftStart < nSelBase) {
 			SendMessage(hwnd, EM_SETSEL, (WPARAM)nSelBase, (LPARAM)nAftStart);
@@ -815,54 +861,6 @@ void SimpleEditor::SetTabstop() {
 }
 
 /////////////////////////////////////////
-// 検索
-/////////////////////////////////////////
-//
-// RESULT: return TRUE if matched.
-//
-// bFirstSearch : 検索開始位置: TRUE = メモ先頭 FALSE = 現在のカーソル位置 + 1
-// bForward : 検索の向き: TRUE = 順方向 FALSE = 逆方向
-// bNFMsg: 見つからなかった場合にメッセージを出すか
-// pFound: if string is found, set TRUE otherwise set FALSE.
-
-
-BOOL SimpleEditor::Search(BOOL bFirstSearch, BOOL bForward, BOOL bNFMsg, BOOL bSearchFromTop)
-{
-	SearchEngineA *pSE;
-	pSE = pManager->GetSearchEngine();
-	if (pSE == NULL) return FALSE;
-
-	LPTSTR pT = GetMemo();
-	SecureBufferAutoPointerT sb(pT);
-
-	DWORD nSearchStart;
-	BOOL bShift = FALSE;
-
-	if (bFirstSearch) {
-		nSearchStart = 0;
-	} else {
-		nSearchStart = GetCursorPos();
-		bShift = TRUE;
-	}
-
-	BOOL bMatch;
-	bMatch = pSE->SearchTextT(pT, nSearchStart, bForward, bShift);
-
-	if (bMatch) {
-		DWORD nStart = pSE->MatchStart();
-		DWORD nEnd = pSE->MatchEnd();
-
-		SendMessage(hViewWnd, EM_SETSEL, (WPARAM)nStart, (LPARAM)nEnd);
-		SendMessage(hViewWnd, EM_SCROLLCARET, 0, 0);
-
-	} else {
-		if (bNFMsg) MessageBox(NULL, MSG_STRING_NOT_FOUND, TOMBO_APP_NAME, MB_OK | MB_ICONINFORMATION);
-	}
-
-	return bMatch;
-}
-
-/////////////////////////////////////////
 // change read only mode
 /////////////////////////////////////////
 
@@ -891,3 +889,8 @@ BOOL SimpleEditor::ReplaceText(LPCTSTR p)
 	return TRUE;
 }
 
+void SimpleEditor::SetSelectRegion(DWORD nStart, DWORD nEnd)
+{
+	SendMessage(hViewWnd, EM_SETSEL, (WPARAM)nStart, (LPARAM)nEnd);
+	SendMessage(hViewWnd, EM_SCROLLCARET, 0, 0);
+}

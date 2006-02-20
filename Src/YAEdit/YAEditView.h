@@ -164,6 +164,7 @@ public:
 	///////////////////////////////////////
 	// accessor
 	DWORD GetPageHeight() { return nPageHeight; }
+	DWORD GetBaseLineNo() { return nBaseLineNo; }
 	const RECT& GetViewClientRect() { return rClientRect; }
 
 	// just debugging

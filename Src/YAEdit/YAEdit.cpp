@@ -217,7 +217,7 @@ BOOL YAEditImpl::Create(HINSTANCE hInst, HWND hParent, DWORD nId, RECT &r)
 	DWORD nx = GetLastError();
 #else
 	pView->hViewWnd = CreateWindow(YAEDIT_CLASS_NAME, TEXT(""),
-						WS_CHILD | WS_VISIBLE | WS_VSCROLL | WS_HSCROLL,
+						WS_BORDER | WS_CHILD | WS_VISIBLE | WS_VSCROLL | WS_HSCROLL,
 						r.left,
 						r.top,
 						r.right,
@@ -611,6 +611,10 @@ void YAEditImpl::OnLButtonDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	// move caret
 	DWORD nNewRow = pView->DpLinePixelToLgLineNo(nMouseDrgStartY);
 	if (nNewRow < pLineMgr->MaxLine()) {
+		if (nNewRow > 0 && nNewRow - pView->GetBaseLineNo() >= pView->GetPageHeight()) {
+			nNewRow--;
+		}
+
 		pView->SetNearCursorPos(nMouseDrgStartX, nNewRow);
 
 		Region rOldRgn = SelectedRegion();
@@ -724,6 +728,10 @@ void YAEditImpl::OnLButtonDblClick(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	rSelRegion.posStart.col = nStartPos;
 	rSelRegion.posEnd.col = nEndPos;
 	RequestRedrawRegion(&rSelRegion);
+
+	// update caret position
+	pView->SetCaretPosition(rSelRegion.posEnd);
+	pView->ScrollCaret();
 
 }
 
@@ -1206,4 +1214,31 @@ DWORD YAEditImpl::GetPrevOffset(DWORD n, DWORD nPos)
 #else
 	return 1;
 #endif
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// select region
+/////////////////////////////////////////////////////////////////////////////
+
+void YAEditImpl::SetSelectRegion(DWORD nStartPos, DWORD nEndPos)
+{
+	Coordinate phCur;
+
+	Coordinate lgStartPos;
+	pDoc->ConvertBytesToCoordinate(nStartPos, &phCur);
+	pLineMgr->PhysicalPosToLogicalPos(&phCur, &lgStartPos);
+
+	Coordinate lgEndPos;
+	pDoc->ConvertBytesToCoordinate(nEndPos, &phCur);
+	pLineMgr->PhysicalPosToLogicalPos(&phCur, &lgEndPos);
+
+	ClearRegion();
+	// set selected region
+	rSelRegion.posStart = lgStartPos;
+	rSelRegion.posEnd = lgEndPos;
+
+	RequestRedrawRegion(&rSelRegion);
+	pView->SetCaretPosition(lgEndPos);
+	pView->ScrollCaret();
+
 }

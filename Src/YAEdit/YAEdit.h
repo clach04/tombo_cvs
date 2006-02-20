@@ -36,16 +36,25 @@ public:
 
 	virtual void ResizeWindow(int x, int y, int width, int height) = 0;
 
+	///////////////////////////////////////
+	// document related funcs
+
 	virtual YAEditDoc *GetDoc() = 0;
 	virtual YAEditDoc *SetDoc(YAEditDoc *pNewDoc) = 0;
 
 
+	///////////////////////////////////////
+	// caret position/selection related funcs
+
 	virtual DWORD GetCaretPos() = 0;
 	virtual void SetCaretPos(DWORD n) = 0;
+
+	virtual void SetSelectRegion(DWORD nStart, DWORD nEnd) = 0;
 
 
 	///////////////////////////////////////
 	// exported commands
+
 	virtual void CmdReplaceString(LPCTSTR p) = 0;
 	virtual void CmdUndo() = 0;
 
@@ -239,6 +248,8 @@ public:
 
 	// Select [selected region] + nCurrent
 	void ExtendSelectRegion(const Coordinate &nCurrent, Coordinate *pPrev);
+
+	void SetSelectRegion(DWORD nStart, DWORD nEnd);
 
 	////////////////////////////////////////////////////
 	// callback from Document

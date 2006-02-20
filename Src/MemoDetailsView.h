@@ -50,7 +50,7 @@ public:
 
 	virtual void SelectAll() = 0;
 
-	virtual BOOL Search(BOOL bFirstSearch, BOOL bForward, BOOL bNFMsg, BOOL bSearchFromTop) = 0;
+	BOOL Search(BOOL bFirstSearch, BOOL bForward, BOOL bNFMsg, BOOL bSearchFromTop);
 
 	BOOL Save(const TomboURI *pCurrentURI, TomboURI *pNewURI, TString *pNewHeadLine, LPCTSTR pText);
 
@@ -66,6 +66,7 @@ public:
 	BOOL LoadNote(const TomboURI *pURI);
 
 	virtual BOOL ReplaceText(LPCTSTR p) = 0;
+	virtual void SetSelectRegion(DWORD nStart, DWORD nEnd) = 0;
 
 	void InsertDate1();
 	void InsertDate2();
@@ -143,11 +144,7 @@ public:
 	void SelectAll();
 
 	BOOL ReplaceText(LPCTSTR p);
-
-	////////////////////////////
-	// search
-
-	BOOL Search(BOOL bFirstSearch, BOOL bForward, BOOL bNFMsg, BOOL bSearchFromTop);
+	void SetSelectRegion(DWORD nStart, DWORD nEnd);
 };
 
 #endif

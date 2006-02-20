@@ -126,3 +126,9 @@
 - Fixes to YAE
 	* Single undo support but under testing
 
+////////////////////////////////
+// B217 (TOMBO 2.0 alpha 4)
+////////////////////////////////
+
+- Enable YAE Option
+

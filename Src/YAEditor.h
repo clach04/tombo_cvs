@@ -59,9 +59,8 @@ public:
 
 	void SelectAll() {}
 
-	BOOL Search(BOOL bFirstSearch, BOOL bForward, BOOL bNFMsg, BOOL bSearchFromTop) { return FALSE; }
-
 	void ChangeModifyStatusNotify(BOOL bStatus);
+	void SetSelectRegion(DWORD nStart, DWORD nEnd);
 
 	BOOL ReplaceText(LPCTSTR p);
 };

@@ -171,3 +171,8 @@ BOOL YAEditor::ReplaceText(LPCTSTR p)
 	pEdit->CmdReplaceString(p);
 	return TRUE;
 }
+
+void YAEditor::SetSelectRegion(DWORD nStart, DWORD nEnd)
+{
+	pEdit->SetSelectRegion(nStart, nEnd);
+}
