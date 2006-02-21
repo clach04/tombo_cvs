@@ -132,3 +132,10 @@
 
 - Enable YAE Option
 
+////////////////////////////////
+// B218
+////////////////////////////////
+
+- Fixes to YAE
+	* Context menu support
+

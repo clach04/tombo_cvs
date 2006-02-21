@@ -8,6 +8,7 @@ class FontWidthCache;
 class YAEditView;
 class LineManager;
 class PhysicalLineManager;
+struct YAEContextMenu;
 
 //////////////////////////////////////////////////
 // callback class
@@ -30,7 +31,7 @@ public:
 class YAEdit {
 public:
 
-	virtual BOOL Create(HINSTANCE hInst, HWND hWnd, DWORD nId, RECT &r) = 0;
+	virtual BOOL Create(HINSTANCE hInst, HWND hWnd, DWORD nId, RECT &r, const YAEContextMenu* menu) = 0;
 	virtual void SetFocus() = 0;
 	virtual void SetFont(HFONT hFont) = 0;
 
@@ -56,7 +57,15 @@ public:
 	// exported commands
 
 	virtual void CmdReplaceString(LPCTSTR p) = 0;
+	virtual void CmdBackSpace() = 0;
+
 	virtual void CmdUndo() = 0;
+
+	virtual void CmdCut() = 0;
+	virtual void CmdCopy() = 0;
+	virtual void CmdPaste() = 0;
+
+	virtual void CmdSelAll() = 0;
 
 	///////////////////////////////////////
 	// register window class
@@ -73,6 +82,17 @@ public:
 };
 
 //////////////////////////////////////////////////
+// for Context menu 
+//////////////////////////////////////////////////
+
+typedef void (YAEdit::*YAEditCommandFunc)();
+
+struct YAEContextMenu {
+	LPCTSTR pItemName;
+	YAEditCommandFunc pFunc;
+};
+
+//////////////////////////////////////////////////
 // Controller class for YAE implementation
 //////////////////////////////////////////////////
 
@@ -81,11 +101,19 @@ public:
 	virtual BOOL UpdateNotify(PhysicalLineManager *pPhMgr, const Region *pOldRegion, const Region *pNewRegion, DWORD nBefPhLines, DWORD nAftPhLines, DWORD nAffeLines) = 0;
 };
 
+//////////////////////////////////////////////////
+// YAE implementation
+//////////////////////////////////////////////////
+
 class YAEditImpl : YAEdit, YAEditListener {
 protected:
 	///////////////////////////////////////
 	// callback handler
 	YAEditCallback *pCallback;
+
+	///////////////////////////////////////
+	// context menu
+	const YAEContextMenu *pContextMenu;
 
 	///////////////////////////////////////
 	// window related members
@@ -143,7 +171,7 @@ public:
 	YAEditImpl(YAEditCallback *pCb);
 	virtual ~YAEditImpl();
 
-	BOOL Create(HINSTANCE hInst, HWND hWnd, DWORD nId, RECT &r);
+	BOOL Create(HINSTANCE hInst, HWND hWnd, DWORD nId, RECT &r, const YAEContextMenu* menu);
 	void SetFocus();
 
 
@@ -158,6 +186,7 @@ public:
 
 	void OnLButtonDown(HWND hWnd, WPARAM wParam, LPARAM lParam);
 	void OnLButtonDblClick(HWND hWnd, WPARAM wParam, LPARAM lParam);
+	void OnRbuttonDown(HWND hWnd, WPARAM wParam, LPARAM lParam);
 	void OnMouseMove(HWND hWnd, WPARAM wParam, LPARAM lParam);
 	void OnLButtonUp(HWND hWnd, WPARAM wParam, LPARAM lParam);
 

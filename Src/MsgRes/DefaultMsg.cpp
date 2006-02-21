@@ -299,4 +299,5 @@ static LPCTSTR defaultMsg[] = {
 	TEXT("Unicode(UTF16LE)"),
 	TEXT("UTF-8"),
 	TEXT("Set file encoding. Auto detection/conversion is not supported, so do not change if you hanve already some notes."),
+	TEXT("Undo"),
 };

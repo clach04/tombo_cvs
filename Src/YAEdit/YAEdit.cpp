@@ -93,7 +93,7 @@ YAEditDoc *YAEditImpl::CreateDocument(const char *pStr, YAEditCallback* pCb)
 // ctor & dtor
 /////////////////////////////////////////////////////////////////////////////
 
-YAEditImpl::YAEditImpl(YAEditCallback *pCB) : pWrapper(NULL), bScrollTimerOn(FALSE), pView(NULL), bMouseDown(FALSE), pLineMgr(NULL), pCallback(pCB)
+YAEditImpl::YAEditImpl(YAEditCallback *pCB) : pWrapper(NULL), bScrollTimerOn(FALSE), pView(NULL), bMouseDown(FALSE), pLineMgr(NULL), pCallback(pCB), pContextMenu(NULL)
 {
 }
 
@@ -165,11 +165,12 @@ LRESULT CALLBACK YAEditWndProc(HWND hWnd, UINT nMessage, WPARAM wParam, LPARAM l
 	case WM_TIMER:
 		frm->OnTimer(hWnd, wParam, lParam);
 		return 0;
-
 	case WM_SIZE:
 		frm->OnResize(hWnd, wParam, lParam);
 		break;
-
+	case WM_RBUTTONDOWN:
+		frm->OnRbuttonDown(hWnd, wParam, lParam);
+		return 0;
 #if defined(PLATFORM_WIN32)
 	case WM_MOUSEWHEEL:
 		frm->OnMouseWheel(hWnd, wParam, lParam);
@@ -186,10 +187,12 @@ LRESULT CALLBACK YAEditWndProc(HWND hWnd, UINT nMessage, WPARAM wParam, LPARAM l
 // Create window
 /////////////////////////////////////////////////////////////////////////////
 
-BOOL YAEditImpl::Create(HINSTANCE hInst, HWND hParent, DWORD nId, RECT &r)
+BOOL YAEditImpl::Create(HINSTANCE hInst, HWND hParent, DWORD nId, RECT &r, const YAEContextMenu* menu)
 {
 	hInstance = hInst;
 	pDoc = NULL;
+
+	pContextMenu = menu;
 
 	pLineMgr = new LineManager();
 	if (!pLineMgr->Init(this)) return FALSE;
@@ -735,6 +738,39 @@ void YAEditImpl::OnLButtonDblClick(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 }
 
+/////////////////////////////////////////////////////////////////////////////
+//  RButton
+/////////////////////////////////////////////////////////////////////////////
+
+void YAEditImpl::OnRbuttonDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
+{
+	if (pContextMenu == NULL) return;
+
+	RECT rWinRect;
+	GetWindowRect(hWnd, &rWinRect);
+
+	// create context menu
+	HMENU hMenu = CreatePopupMenu();
+	DWORD nItems = 1;
+	const YAEContextMenu *p = pContextMenu;
+	while (p->pItemName != NULL) {
+		if (*(p->pItemName) == TEXT('\0')) {
+			InsertMenu(hMenu, nItems, MF_BYPOSITION | MF_SEPARATOR, 0, NULL);
+		} else {
+			InsertMenu(hMenu, nItems, MF_BYPOSITION | MF_STRING, nItems, p->pItemName);
+		}
+		p++;
+		nItems++;
+	}
+
+	DWORD id = TrackPopupMenuEx(hMenu, TPM_RETURNCMD | TPM_TOPALIGN | TPM_LEFTALIGN, rWinRect.left + LOWORD(lParam), rWinRect.top + HIWORD(lParam), hWnd, NULL);
+	if (id > 0 && id < nItems) {
+		YAEditCommandFunc f = pContextMenu[id - 1].pFunc;
+		(this->*f)();
+	}
+
+	DestroyMenu(hMenu);
+}
 /////////////////////////////////////////////////////////////////////////////
 //  Mouse move
 /////////////////////////////////////////////////////////////////////////////
