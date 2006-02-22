@@ -19,8 +19,11 @@ public:
 	// called when get screen forcus
 	virtual void OnGetFocus() = 0;
 
-	// called from YAEditDoc when the document is modified.
+	// called from YAE when the document is modified.
 	virtual void ChangeModifyStatusNotify(BOOL bStatus) = 0;
+
+	// called from YAE when the document read only flag is changed
+	virtual void ChangeReadOnlyStatusNotify(BOOL bStatus) = 0;
 };
 
 //////////////////////////////////////////////////
@@ -31,7 +34,7 @@ public:
 class YAEdit {
 public:
 
-	virtual BOOL Create(HINSTANCE hInst, HWND hWnd, DWORD nId, RECT &r, const YAEContextMenu* menu) = 0;
+	virtual BOOL Create(HINSTANCE hInst, HWND hWnd, DWORD nId, RECT &r, const YAEContextMenu* menu, BOOL bWrap) = 0;
 	virtual void SetFocus() = 0;
 	virtual void SetFont(HFONT hFont) = 0;
 
@@ -66,6 +69,7 @@ public:
 	virtual void CmdPaste() = 0;
 
 	virtual void CmdSelAll() = 0;
+	virtual void CmdToggleWrapMode(BOOL bFold) = 0;
 
 	///////////////////////////////////////
 	// register window class
@@ -141,6 +145,9 @@ protected:
 	POINT ptMousePos;
 	BOOL bMouseDown;
 
+	BOOL bWrapLine;
+	BOOL bInsertMode;
+
 	// value is by logical coordinate, 
 	// (nSelStartCol, nSelStartRow) < (nSelEndCol, nSelEndRow) is always TRUE.
 	Region rSelRegion;
@@ -164,6 +171,10 @@ protected:
 	void ClearRegion();
 	void ClearSelectedRegion();
 
+	void ShowExecContextMenu(WORD x, WORD y);
+
+	BOOL SetWrapper();
+
 public:
 
 	///////////////////////////////////////
@@ -171,9 +182,8 @@ public:
 	YAEditImpl(YAEditCallback *pCb);
 	virtual ~YAEditImpl();
 
-	BOOL Create(HINSTANCE hInst, HWND hWnd, DWORD nId, RECT &r, const YAEContextMenu* menu);
+	BOOL Create(HINSTANCE hInst, HWND hWnd, DWORD nId, RECT &r, const YAEContextMenu* menu, BOOL bWrap);
 	void SetFocus();
-
 
 	/////////////////////////////////
 	// Event handler
@@ -247,6 +257,10 @@ public:
 
 	void CmdSelAll();
 	void CmdUndo();
+
+	void CmdToggleReadOnly();
+	void CmdToggleWrapMode(BOOL bWrap);
+	void CmdToggleInsertMode();
 
 	/////////////////////////////////
 	// Move/Resize window

@@ -25,6 +25,7 @@ protected:
 
 	// this member should not to edit directry. use SetModify().
 	BOOL bModified;
+	BOOL bReadOnly;
 
 	BOOL ReleaseDoc();
 public:
@@ -52,6 +53,9 @@ public:
 
 	BOOL IsModify() { return bModified; }
 	void SetModify(BOOL b);
+
+	BOOL IsReadOnly() { return bReadOnly; }
+	void SetReadOnly(BOOL b);
 
 	////////////////////////////////////////////////////
 	// Data size related functions

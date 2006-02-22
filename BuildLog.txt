@@ -137,5 +137,14 @@
 ////////////////////////////////
 
 - Fixes to YAE
-	* Context menu support
+	* Context menu support(Win32)
 
+////////////////////////////////
+// B219 (TOMBO 2.0 alpha 5)
+////////////////////////////////
+
+- Fixes to YAE
+	* Context menu support(PocketPC)
+	* Read only mode support
+	* Wrapping support
+	* INS key support

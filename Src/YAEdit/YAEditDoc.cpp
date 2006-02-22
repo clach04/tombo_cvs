@@ -47,7 +47,9 @@ const Region YAEditDoc::GetUndoRegion()
 // ctor & dtor
 /////////////////////////////////////////////////////////////////////////////
 
-YAEditDoc::YAEditDoc() :	pPhLineMgr(NULL), pCallback(NULL), pListener(NULL), pUndo(NULL)
+YAEditDoc::YAEditDoc() : 
+	pPhLineMgr(NULL), pCallback(NULL), pListener(NULL), 
+	pUndo(NULL), bReadOnly(FALSE)
 {
 }
 
@@ -170,7 +172,7 @@ BOOL YAEditDoc::Undo()
 }
 
 /////////////////////////////////////////////////////////////////////////////
-// update modify status
+// update status
 /////////////////////////////////////////////////////////////////////////////
 
 void YAEditDoc::SetModify(BOOL b)
@@ -179,6 +181,11 @@ void YAEditDoc::SetModify(BOOL b)
 	BOOL bOld = bModified;
 	bModified = b;
 	if (pCallback) pCallback->ChangeModifyStatusNotify(bModified);
+}
+
+void YAEditDoc::SetReadOnly(BOOL b)
+{
+	bReadOnly = b;
 }
 
 /////////////////////////////////////////////////////////////////////////////

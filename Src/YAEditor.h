@@ -42,8 +42,8 @@ public:
 	BOOL Show(int nCmdShow) { return TRUE; }
 
 	void SetTabstop() {}
-	BOOL SetFolding(BOOL bFold) { return TRUE; }
-	void SetReadOnly(BOOL bReadOnly) {}
+	BOOL SetFolding(BOOL bFold);
+	void SetReadOnly(BOOL bReadOnly);
 	BOOL IsReadOnly() { return FALSE; }
 
 	void SetModifyStatus() {}

@@ -27,7 +27,7 @@ public:
 	Region(const Region& r) { posStart = r.posStart; posEnd = r.posEnd; }
 	Region(DWORD cs, DWORD rs, DWORD ce, DWORD re) { posStart.Set(cs, rs); posEnd.Set(ce, re); }
 
-	BOOL IsEmptyRegion() { return posStart == posEnd; }
+	BOOL IsEmptyRegion() const { return posStart == posEnd; }
 
 };
 

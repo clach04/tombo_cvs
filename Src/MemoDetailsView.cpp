@@ -417,7 +417,7 @@ UINT SimpleEditor::OnKeyDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		INT nPrevStart, nPrevEnd;
 		INT nAftStart, nAftEnd;
 		SendMessage(hWnd, EM_GETSEL, (WPARAM)&nPrevStart, (LPARAM)&nPrevEnd);
-		LRESULT lResult = CallWindowProc(gSuperProc, hwnd, msg, wParam, lParam);
+		LRESULT lResult = CallWindowProc(gSuperProc, hWnd, msg, wParam, lParam);
 		SendMessage(hWnd, EM_GETSEL, (WPARAM)&nAftStart, (LPARAM)&nAftEnd);
 
 		if (nAftStart < nSelBase) {
@@ -453,6 +453,9 @@ UINT SimpleEditor::OnKeyDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 	if (bCtrlKeyDown && wParam == TEXT('A')) {
 		SelectAll();
+		return 0;
+	} else if (bCtrlKeyDown && wParam == TEXT('B')) {
+		SetReadOnly(!IsReadOnly());
 		return 0;
 	}
 

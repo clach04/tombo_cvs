@@ -99,7 +99,6 @@ LRESULT CALLBACK NewDetailsViewProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM l
 			rgi.ptDown.y = HIWORD(lParam);
 			rgi.dwFlags = SHRG_RETURNCMD;
 
-
 			if (SHRecognizeGesture(&rgi) == GN_CONTEXTMENU) {
 				HMENU hPopup = PocketPCPlatform::LoadDetailsViewPopupMenu();
 

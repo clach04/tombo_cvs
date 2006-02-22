@@ -21,11 +21,13 @@
 
 class YAEDetailsViewCallback : public YAEditCallback {
 	YAEditor *pEditor;
+	MemoManager *pManager;
 public:
-	YAEDetailsViewCallback(YAEditor *pSelf) : pEditor(pSelf) {}
+	YAEDetailsViewCallback(YAEditor *pSelf, MemoManager *pmm) : pEditor(pSelf), pManager(pmm) {}
 
 	void OnGetFocus();
 	void ChangeModifyStatusNotify(BOOL bStatus);
+	void ChangeReadOnlyStatusNotify(BOOL bStatus);
 };
 
 void YAEDetailsViewCallback::OnGetFocus()
@@ -37,6 +39,12 @@ void YAEDetailsViewCallback::ChangeModifyStatusNotify(BOOL bStatus)
 {
 	pEditor->ChangeModifyStatusNotify(bStatus);
 }
+
+void YAEDetailsViewCallback::ChangeReadOnlyStatusNotify(BOOL bStatus)
+{
+	pManager->GetMainFrame()->SetReadOnlyStatus(bStatus);
+}
+
 
 /////////////////////////////////////////////////////////////////////////////
 // YAEditor implimentation 
@@ -53,7 +61,6 @@ YAEditor::~YAEditor()
 	delete pYAECallback;
 }
 
-
 BOOL YAEditor::Create(LPCTSTR pName, RECT &r, HWND hParent, HINSTANCE hInst, HFONT hFont)
 {
 	// MSG_xx needs initializ after initialized message resources. 
@@ -69,9 +76,9 @@ BOOL YAEditor::Create(LPCTSTR pName, RECT &r, HWND hParent, HINSTANCE hInst, HFO
 		{ NULL,							NULL },
 	};
 
-	pYAECallback = new YAEDetailsViewCallback(this);
+	pYAECallback = new YAEDetailsViewCallback(this, pManager);
 	pEdit = YAEdit::GetInstance(pYAECallback);
-	pEdit->Create(hInst, hParent, nID, r, contextMenu);
+	pEdit->Create(hInst, hParent, nID, r, contextMenu, g_Property.GetWrapText());
 	pEdit->SetFont(hFont);
 	return TRUE;
 }
@@ -189,4 +196,15 @@ BOOL YAEditor::ReplaceText(LPCTSTR p)
 void YAEditor::SetSelectRegion(DWORD nStart, DWORD nEnd)
 {
 	pEdit->SetSelectRegion(nStart, nEnd);
+}
+
+void YAEditor::SetReadOnly(BOOL bReadOnly)
+{
+	pEdit->GetDoc()->SetReadOnly(bReadOnly);
+}
+
+BOOL YAEditor::SetFolding(BOOL bFold)
+{
+	pEdit->CmdToggleWrapMode(bFold);
+	return TRUE;
 }

@@ -6,6 +6,9 @@
 #if defined(PLATFORM_WIN32)
 #include <zmouse.h>
 #endif
+#if defined(PLATFORM_PKTPC)
+#include <aygshell.h>
+#endif
 #include "resource.h"
 #include "Region.h"
 #include "YAEdit.h"
@@ -93,7 +96,10 @@ YAEditDoc *YAEditImpl::CreateDocument(const char *pStr, YAEditCallback* pCb)
 // ctor & dtor
 /////////////////////////////////////////////////////////////////////////////
 
-YAEditImpl::YAEditImpl(YAEditCallback *pCB) : pWrapper(NULL), bScrollTimerOn(FALSE), pView(NULL), bMouseDown(FALSE), pLineMgr(NULL), pCallback(pCB), pContextMenu(NULL)
+YAEditImpl::YAEditImpl(YAEditCallback *pCB) : 
+	pWrapper(NULL), bScrollTimerOn(FALSE), pView(NULL), 
+	bMouseDown(FALSE), pLineMgr(NULL), pCallback(pCB), 
+	pContextMenu(NULL), bInsertMode(FALSE)
 {
 }
 
@@ -187,7 +193,7 @@ LRESULT CALLBACK YAEditWndProc(HWND hWnd, UINT nMessage, WPARAM wParam, LPARAM l
 // Create window
 /////////////////////////////////////////////////////////////////////////////
 
-BOOL YAEditImpl::Create(HINSTANCE hInst, HWND hParent, DWORD nId, RECT &r, const YAEContextMenu* menu)
+BOOL YAEditImpl::Create(HINSTANCE hInst, HWND hParent, DWORD nId, RECT &r, const YAEContextMenu* menu, BOOL bWrap)
 {
 	hInstance = hInst;
 	pDoc = NULL;
@@ -199,9 +205,8 @@ BOOL YAEditImpl::Create(HINSTANCE hInst, HWND hParent, DWORD nId, RECT &r, const
 
 	pView = new YAEditView(this);
 
-	FixedPixelLineWrapper *pWw = new FixedPixelLineWrapper();
-	if (pWw == NULL || !pWw->Init(this)) return FALSE;
-	pWrapper = pWw;
+	bWrapLine = bWrap;
+	if (!SetWrapper()) return FALSE;
 
 	pDoc = new YAEditDoc(); 
 	if (!pDoc->Init("", this, pCallback)) return FALSE;
@@ -241,6 +246,27 @@ BOOL YAEditImpl::Create(HINSTANCE hInst, HWND hParent, DWORD nId, RECT &r, const
 	rSelRegion.posStart.Set(0, 0);
 	rSelRegion.posEnd.Set(0, 0);
 
+	return TRUE;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// set wrapper
+/////////////////////////////////////////////////////////////////////////////
+
+BOOL YAEditImpl::SetWrapper()
+{
+	if (bWrapLine) {
+		// allocate wrapper
+		FixedPixelLineWrapper *pWw = new FixedPixelLineWrapper();
+		if (pWw == NULL || !pWw->Init(this)) return FALSE;
+		delete pWrapper;
+		pWrapper = pWw;
+	} else {
+		SimpleLineWrapper *pWw = new SimpleLineWrapper();
+		if (pWw == NULL) return FALSE;
+		delete pWrapper;
+		pWrapper = pWw;
+	}
 	return TRUE;
 }
 
@@ -347,7 +373,10 @@ void YAEditImpl::OnPaint(HWND hWnd, WPARAM wParam, LPARAM lParam)
 }
 
 void YAEditImpl::RequestRedraw(DWORD nLineNo, WORD nLeftPos, BOOL bToBottom) { pView->RequestRedraw(nLineNo, nLeftPos, bToBottom); }
-void YAEditImpl::RequestRedrawRegion(const Region *pRegion) { pView->RequestRedrawRegion(pRegion); }
+void YAEditImpl::RequestRedrawRegion(const Region *pRegion) 
+{ 
+	pView->RequestRedrawRegion(pRegion); 
+}
 
 /////////////////////////////////////////////////////////////////////////////
 // FOCUS
@@ -402,6 +431,9 @@ BOOL YAEditImpl::OnKeyDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		case 'Z':
 			CmdUndo();
 			break;
+		case 'B':
+			CmdToggleReadOnly();
+			break;
 		default:
 			CmdNOP();
 		}
@@ -435,6 +467,9 @@ BOOL YAEditImpl::OnKeyDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		case VK_END:
 			CmdMoveEOL();
 			break;
+		case VK_INSERT:
+			CmdToggleInsertMode();
+			break;
 		default:
 			return FALSE;
 		}
@@ -448,10 +483,13 @@ void YAEditImpl::OnChar(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
 	TCHAR ch = (TCHAR)wParam;
 
+	if (pDoc->IsReadOnly()) return;
+
 	if (ch == CHARA_BS) { CmdBackSpace(); return; }
 	if (ch == CHARA_ENTER) { CmdReplaceString(TEXT("\n")); return; }
 	if (ch == CHARA_ESC) { /* nop */; return; }
 
+	// if control char, nothing to do
 	if (
 #if defined(PLATFORM_WIN32)
 		aKeyBuffer[0] == '\0' && 
@@ -459,14 +497,17 @@ void YAEditImpl::OnChar(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		0 <= ch && ch <= 29 && ch != CHARA_TAB) return;
 
 #if defined(PLATFORM_WIN32)
-	// if char is DBCS lead byte, buffering.
 	if (aKeyBuffer[0] != '\0') {
 		aKeyBuffer[1] = ch;
 		aKeyBuffer[2] = TEXT('\0');
+		if (bInsertMode && SelectedRegion().IsEmptyRegion()) {
+			CmdSelRight();
+		}
 		ReplaceText(SelectedRegion(), aKeyBuffer);
 		aKeyBuffer[0] = aKeyBuffer[1] = '\0';
 		return;
 	} else {
+		// if char is DBCS lead byte, buffering.
 		if (IsDBCSLeadByte(ch)) {
 			aKeyBuffer[0] = ch;
 			return;
@@ -475,6 +516,10 @@ void YAEditImpl::OnChar(HWND hWnd, WPARAM wParam, LPARAM lParam)
 #endif
 	TCHAR kbuf[2];
 	kbuf[0] = ch; kbuf[1] = TEXT('\0');
+	if (bInsertMode && SelectedRegion().IsEmptyRegion()) {
+		CmdSelRight();
+	}
+
 	ReplaceText(SelectedRegion(), kbuf);
 }
 
@@ -533,6 +578,8 @@ void YAEditImpl::CmdReplaceString(LPCTSTR p)
 
 void YAEditImpl::CmdCut()
 {
+	if (pDoc->IsReadOnly()) return;
+
 	if (IsRegionSelected()) {
 		if (!CopyToClipboard()) {
 			MessageBox(pView->hViewWnd, TEXT("Copy to clipboard failed."), TEXT("ERROR"), MB_ICONWARNING | MB_OK);
@@ -551,6 +598,8 @@ void YAEditImpl::CmdCopy()
 
 void YAEditImpl::CmdPaste()
 {
+	if (pDoc->IsReadOnly()) return;
+
 	if (!InsertFromClipboard()) {
 		MessageBox(pView->hViewWnd, TEXT("Paste from clipboard failed."), TEXT("ERROR"), MB_ICONWARNING | MB_OK);
 	} else {
@@ -560,6 +609,8 @@ void YAEditImpl::CmdPaste()
 
 void YAEditImpl::CmdBackSpace()
 {
+	if (pDoc->IsReadOnly()) return;
+
 	if (IsRegionSelected()) {
 		ReplaceText(SelectedRegion(), TEXT(""));
 	} else {
@@ -573,6 +624,8 @@ void YAEditImpl::CmdBackSpace()
 
 void YAEditImpl::CmdDeleteChar()
 {
+	if (pDoc->IsReadOnly()) return;
+
 	if (IsRegionSelected()) {
 		ReplaceText(SelectedRegion(), TEXT(""));
 	} else {
@@ -596,8 +649,93 @@ void YAEditImpl::CmdSelAll()
 
 void YAEditImpl::CmdUndo()
 {
+	if (pDoc->IsReadOnly()) return;
+
 	pDoc->Undo();
 }
+
+void YAEditImpl::CmdToggleReadOnly()
+{
+	pDoc->SetReadOnly(!pDoc->IsReadOnly());
+
+	if (pCallback) {
+		pCallback->ChangeReadOnlyStatusNotify(pDoc->IsReadOnly());
+	}
+}
+
+void YAEditImpl::CmdToggleWrapMode(BOOL bWrap)
+{
+	bWrapLine = bWrap;
+	SetWrapper();
+
+	RECT r;
+	GetClientRect(pView->hViewWnd, &r);
+	// rewrap logical lines
+	pWrapper->SetViewWidth(r.right - r.left - pView->nMaxCharWidth);
+	pLineMgr->RecalcWrap(pWrapper);
+	// reset view
+	pView->UpdateMaxLineWidth();	// UpdateMaxLineWidth depends on LineManager so call after updating LineManager.
+
+	// reset caret/region position
+	pView->ResetPosition();
+	pView->SetCaretPosition(Coordinate(0, 0));
+	ClearSelectedRegion();	
+
+	// update scrollbar
+	pView->ResetScrollbar();
+
+	// redraw screen
+	pView->RedrawAllScreen();
+}
+
+void YAEditImpl::CmdToggleInsertMode()
+{
+	bInsertMode = !bInsertMode;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//  RButton
+/////////////////////////////////////////////////////////////////////////////
+
+void YAEditImpl::ShowExecContextMenu(WORD x, WORD y)
+{
+	if (pContextMenu == NULL) return;
+
+	// create context menu
+	HMENU hMenu = CreatePopupMenu();
+	DWORD nItems = 1;
+
+	const YAEContextMenu *p = pContextMenu;
+	while (p->pItemName != NULL) {
+		if (*(p->pItemName) == TEXT('\0')) {
+			InsertMenu(hMenu, nItems - 1, MF_BYPOSITION | MF_SEPARATOR, 0, NULL);
+		} else {
+			InsertMenu(hMenu, nItems - 1, MF_BYPOSITION | MF_STRING, nItems, p->pItemName);
+		}
+		p++;
+		nItems++;
+	}
+
+	DWORD id = TrackPopupMenuEx(hMenu, TPM_RETURNCMD | TPM_TOPALIGN | TPM_LEFTALIGN, x, y, pView->hViewWnd, NULL);
+	if (id > 0 && id < nItems) {
+		YAEditCommandFunc f = pContextMenu[id - 1].pFunc;
+		(this->*f)();
+	}
+
+	DestroyMenu(hMenu);
+}
+
+void YAEditImpl::OnRbuttonDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
+{
+	RECT rWinRect;
+	GetWindowRect(hWnd, &rWinRect);
+
+	WORD x = rWinRect.left + LOWORD(lParam);
+	WORD y = rWinRect.top + HIWORD(lParam);
+
+	ShowExecContextMenu(x, y);
+}
+
 /////////////////////////////////////////////////////////////////////////////
 // WM_LBUTTONDOWN
 /////////////////////////////////////////////////////////////////////////////
@@ -610,6 +748,25 @@ void YAEditImpl::OnLButtonDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 	nMouseDrgStartX = LOWORD(lParam);
 	nMouseDrgStartY = HIWORD(lParam);
+
+#if defined(PLATFORM_PKTPC)
+	// Tap&hold
+	SHRGINFO rgi;
+	rgi.cbSize = sizeof(SHRGINFO);
+	rgi.hwndClient = hWnd;
+	rgi.ptDown.x = LOWORD(lParam);
+	rgi.ptDown.y = HIWORD(lParam);
+	rgi.dwFlags = SHRG_RETURNCMD;
+
+	if (SHRecognizeGesture(&rgi) == GN_CONTEXTMENU) {
+		RECT r;
+		GetWindowRect(hWnd, &r);
+
+		ShowExecContextMenu(r.left + rgi.ptDown.x, r.top + rgi.ptDown.y);
+		return;
+	}
+
+#endif
 
 	// move caret
 	DWORD nNewRow = pView->DpLinePixelToLgLineNo(nMouseDrgStartY);
@@ -739,39 +896,6 @@ void YAEditImpl::OnLButtonDblClick(HWND hWnd, WPARAM wParam, LPARAM lParam)
 }
 
 /////////////////////////////////////////////////////////////////////////////
-//  RButton
-/////////////////////////////////////////////////////////////////////////////
-
-void YAEditImpl::OnRbuttonDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
-{
-	if (pContextMenu == NULL) return;
-
-	RECT rWinRect;
-	GetWindowRect(hWnd, &rWinRect);
-
-	// create context menu
-	HMENU hMenu = CreatePopupMenu();
-	DWORD nItems = 1;
-	const YAEContextMenu *p = pContextMenu;
-	while (p->pItemName != NULL) {
-		if (*(p->pItemName) == TEXT('\0')) {
-			InsertMenu(hMenu, nItems, MF_BYPOSITION | MF_SEPARATOR, 0, NULL);
-		} else {
-			InsertMenu(hMenu, nItems, MF_BYPOSITION | MF_STRING, nItems, p->pItemName);
-		}
-		p++;
-		nItems++;
-	}
-
-	DWORD id = TrackPopupMenuEx(hMenu, TPM_RETURNCMD | TPM_TOPALIGN | TPM_LEFTALIGN, rWinRect.left + LOWORD(lParam), rWinRect.top + HIWORD(lParam), hWnd, NULL);
-	if (id > 0 && id < nItems) {
-		YAEditCommandFunc f = pContextMenu[id - 1].pFunc;
-		(this->*f)();
-	}
-
-	DestroyMenu(hMenu);
-}
-/////////////////////////////////////////////////////////////////////////////
 //  Mouse move
 /////////////////////////////////////////////////////////////////////////////
 
@@ -845,6 +969,7 @@ void YAEditImpl::OnLButtonUp(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	bMouseDown = FALSE;
 }
 
+
 /////////////////////////////////////////////////////////////////////////////
 // WM_TIMER
 /////////////////////////////////////////////////////////////////////////////
@@ -857,7 +982,6 @@ void YAEditImpl::OnTimer(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		break;
 	}
 }
-
 
 /////////////////////////////////////////////////////////////////////////////
 // Set new document
@@ -935,7 +1059,6 @@ void YAEditImpl::OnResize(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 	// redraw screen
 	pView->RedrawAllScreen();
-//	UpdateWindow(pView->hViewWnd);
 }
 
 void YAEditImpl::ResizeWindow(int x, int y, int width, int height) 
