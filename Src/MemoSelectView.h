@@ -60,8 +60,6 @@ public:
 	/////////////////////////////
 	// display related funcs
 
-	HWND GetHWnd() { return hViewWnd; }
-
 	BOOL Show(int nCmdShow);
 	void SetFocus();
 	void SetFont(HFONT hFont);
@@ -97,7 +95,6 @@ public:
 
 	MemoManager *GetManager() { return pMemoMgr; }
 
-	// 自動切換えモード
 	void SetAutoLoadMode(BOOL bMode) { bAutoLoadMode = bMode; }
 	BOOL IsAutoLoadMode() { return bAutoLoadMode; }
 
@@ -111,7 +108,7 @@ public:
 	void SelPrevBrother();
 
 	/////////////////////////////
-	// ビューアイテム操作関連
+	// item ops
 
 	BOOL InitTree(VFManager *pManager);
 	BOOL DeleteAllItem();
@@ -125,13 +122,15 @@ public:
 
 	HIMAGELIST GetImageList() { return hSelectViewImgList; }
 
+	// Insert file node
 	HTREEITEM InsertFile(HTREEITEM hParent, const TomboURI *pURI, LPCTSTR pTitle, BOOL bInsertLast, BOOL bLink);
+
+	// Insert folder node
+	// if bInsertLast is TRUE, Insert folder without sorting.
+	HTREEITEM InsertFolder(HTREEITEM hParent, LPCTSTR pName, TreeViewItem *tvi, BOOL bInsertLast);
 
 	// update headline string
 	BOOL UpdateHeadLine(LPCTSTR pOldURI, TomboURI *pNewURI, LPCTSTR pNewHeadLine);
-
-	// if bInsertLast is TRUE, Insert folder without sorting.
-	HTREEITEM InsertFolder(HTREEITEM hParent, LPCTSTR pName, TreeViewItem *tvi, BOOL bInsertLast);
 
 	// TreeViewItemの状態が変わったことによるビューへの変更依頼
 	BOOL UpdateItemStatusNotify(TreeViewItem *pItem, LPCTSTR pNewHeadLine);
@@ -145,27 +144,26 @@ public:
 	BOOL CreateNewFolder(HTREEITEM hItem, LPCTSTR pFolder);
 	BOOL MakeNewFolder(HWND hWnd, TreeViewItem *pItem);
 
-
 	// Search tree and get HTREEITEM
 	HTREEITEM GetItemFromURI(LPCTSTR pURI);
 
-	// 現在選択されているアイテムと関連付けられているTreeViewItemを返す。
-	// pItemが指定されている場合にはHTREEITEMも返す。
-	// 選択されていない場合には戻り値としてNULLを返す。
+	// returns TreeViewItem associated with current selected node.
+	// if pItem is not null set HTREEITEM current selected.
+	// if no node is selected, return NULL.
 	TreeViewItem *GetCurrentItem(HTREEITEM *pItem = NULL);
+
+	// returns current selected node's URI.
+	// if no node is selected, return NULL.
+	// Be careful the return value may be released by MemoSelectView when closing tree
+	// so if you want to keep it, copy the instance in the situation.
+	const TomboURI *GetCurrentSelectedURI();
 
 	TreeViewItem *GetTVItem(HTREEITEM h);
 
 	BOOL IsCliped(TreeViewItem* p) { return p == pClipItem; }
 	LONG GetItem(TV_ITEM *p) { return TreeView_GetItem(hViewWnd, p); }
-	BOOL SetTVItem(HTREEITEM h, TreeViewItem *p);
 
 	LPTSTR GeneratePath(HTREEITEM hItem, LPTSTR pBuf, DWORD nSiz);
-
-	BOOL GetURI(TString *pURI, HTREEITEM hTarget = NULL);
-	BOOL GetURI(TomboURI *pURI, HTREEITEM hTarget = NULL);
-
-	BOOL GetURINodeName(HTREEITEM h, LPTSTR pBuf, DWORD nBufLen);
 
 	// Choose specified notes. if tree is collapsed, expand one.
 	HTREEITEM ShowItemByURI(const TomboURI *pURI, BOOL bSelChange = TRUE, BOOL bOpenNotes = TRUE);
@@ -183,17 +181,17 @@ public:
 };
 
 /////////////////////////////////////////
-// メモの(アイコン)状態定義
+// Node status definitions
 /////////////////////////////////////////
 
-// 初期化時
+// initialized
 #define MEMO_VIEW_STATE_INIT			1
 
-// クリップボードに入っている
+// in clipboard
 #define MEMO_VIEW_STATE_CLIPED_SET		(1 << 1)
 #define MEMO_VIEW_STATE_CLIPED_CLEAR	(1 << 2)
 
-// 開かれている
+// opened
 #define MEMO_VIEW_STATE_OPEN_SET		(1 << 3)
 #define MEMO_VIEW_STATE_OPEN_CLEAR		(1 << 4)
 

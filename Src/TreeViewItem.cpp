@@ -73,21 +73,27 @@ BOOL TreeViewItem::LoadMemo(MemoSelectView *pView, BOOL bAskPass)
 	return TRUE;
 }
 
+void TreeViewItem::SetURI(const TomboURI *p)
+{
+	loc.set(p);
+}
+
+TreeViewItem::Locator::~Locator()
+{
+	delete pURI;
+}
+
+void TreeViewItem::Locator::set(const TomboURI *p)
+{
+	delete pURI;
+	pURI = new TomboURI(*p);	// share string buffer
+}
+
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 //  File
 /////////////////////////////////////////////
 /////////////////////////////////////////////
-TreeViewFileItem::Locator::~Locator()
-{
-	delete pURI;
-}
-
-void TreeViewFileItem::Locator::set(const TomboURI *p)
-{
-	delete pURI;
-	pURI = new TomboURI(*p);	// share string buffer
-}
 
 TreeViewFileItem::TreeViewFileItem() : TreeViewItem(FALSE)
 {
@@ -97,18 +103,15 @@ TreeViewFileItem::~TreeViewFileItem()
 {
 }
 
-void TreeViewFileItem::SetNote(const TomboURI *p)
-{
-	loc.set(p);
-	bIsEncrypted = g_Repository.IsEncrypted(loc.getURI());
-}
-
 BOOL TreeViewFileItem::CopyMove(BOOL bCopy, MemoManager *pMgr, MemoSelectView *pView)
 {
 	TomboURI sCopyToURI;
 	TomboURI sCurURI;
 
-	if (!pView->GetURI(&sCurURI)) return FALSE;
+	const TomboURI *pCurSelURI = pView->GetCurrentSelectedURI();
+	if (pCurSelURI == NULL) return FALSE;
+	sCurURI = *pCurSelURI;
+
 	if (!g_Repository.GetAttachURI(&sCurURI, &sCopyToURI)) return FALSE;
 
 	HTREEITEM hParent = pView->ShowItemByURI(&sCopyToURI, FALSE, FALSE);
@@ -176,7 +179,6 @@ BOOL TreeViewFileItem::Encrypt(MemoManager *pMgr, MemoSelectView *pView)
 	}
 	// replace URI that TreeViewItem have
 	loc.set(opt.pNewURI);
-	bIsEncrypted = TRUE;
 	pView->GetManager()->ChangeURINotify(opt.pNewURI);
 
 	// update icon and headline string
@@ -214,7 +216,6 @@ BOOL TreeViewFileItem::Decrypt(MemoManager *pMgr, MemoSelectView *pView)
 
 	// replace URI that TreeViewItem have
 	loc.set(opt.pNewURI);
-	bIsEncrypted = FALSE;
 	pView->GetManager()->ChangeURINotify(opt.pNewURI);
 
 	// update icon and headline string
@@ -226,10 +227,14 @@ BOOL TreeViewFileItem::Decrypt(MemoManager *pMgr, MemoSelectView *pView)
 
 BOOL TreeViewFileItem::IsOperationEnabled(MemoSelectView *pView, OpType op)
 {
+	URIOption opt(NOTE_OPTIONMASK_ENCRYPTED);
+	const TomboURI *pURI = GetRealURI();
+	if (!g_Repository.GetOption(pURI, &opt)) return FALSE;
+
 	if (op == OpEncrypt) {
-		return !bIsEncrypted;
+		return !opt.bEncrypt;
 	} else if (op == OpDecrypt) {
-		return bIsEncrypted;
+		return opt.bEncrypt;
 	} else {
 		DWORD nOpMatrix = OpDelete | OpRename | OpNewMemo | OpNewFolder | OpCut | OpCopy | OpPaste;
 		return (nOpMatrix & op) != 0;
@@ -266,8 +271,12 @@ BOOL TreeViewFileItem::Rename(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR 
 
 DWORD TreeViewFileItem::GetIcon(MemoSelectView *, DWORD nStatus)
 {
+	URIOption opt(NOTE_OPTIONMASK_ENCRYPTED);
+	const TomboURI *pURI = GetRealURI();
+	if (!g_Repository.GetOption(pURI, &opt)) return FALSE;
+
 	if (nStatus & MEMO_VIEW_STATE_INIT) {
-		if (bIsEncrypted) {
+		if (opt.bEncrypt) {
 			return IMG_ARTICLE_ENCRYPTED;
 		} else {
 			return IMG_ARTICLE;
@@ -275,13 +284,13 @@ DWORD TreeViewFileItem::GetIcon(MemoSelectView *, DWORD nStatus)
 	}
 
 	if (nStatus & MEMO_VIEW_STATE_CLIPED_SET) {
-		if (bIsEncrypted) {
+		if (opt.bEncrypt) {
 			return IMG_ARTICLE_ENC_MASKED;
 		} else {
 			return IMG_ARTICLE_MASKED;
 		}
 	} else {
-		if (bIsEncrypted) {
+		if (opt.bEncrypt) {
 			return IMG_ARTICLE_ENCRYPTED;
 		} else {
 			return IMG_ARTICLE;
@@ -292,22 +301,6 @@ DWORD TreeViewFileItem::GetIcon(MemoSelectView *, DWORD nStatus)
 DWORD TreeViewFileItem::ItemOrder()
 {
 	return ITEM_ORDER_FILE;
-}
-
-BOOL TreeViewFileItem::GetURIItem(MemoSelectView *pView, TString *pItem)
-{
-	return FALSE;
-}
-
-BOOL TreeViewFileItem::GetURI(TString *pURI)
-{
-	if (!pURI->Set(loc.getURI()->GetFullURI())) return FALSE;
-	return TRUE;
-}
-
-TreeViewFileItem::IsUseDetailsView()
-{
-	return TRUE;
 }
 
 BOOL TreeViewFileItem::OpenMemo(MemoSelectView *pView, DWORD nOption)
@@ -356,12 +349,13 @@ BOOL TreeViewFolderItem::CopyMove(BOOL bCopy, MemoManager *pMgr, MemoSelectView 
 	// convert to URI
 	TomboURI sSrcURI, sDstURI;
 	HTREEITEM hSrcItem = GetViewItem();
-	if (!pView->GetURI(&sSrcURI, hSrcItem)) return FALSE;
+	sSrcURI = *GetRealURI();
 
-	HTREEITEM hDstItem;
 	TomboURI sSelURI;
-	if (!pView->GetCurrentItem(&hDstItem)) return FALSE;
-	if (!pView->GetURI(&sSelURI, hDstItem)) return FALSE;
+	const TomboURI *pCurSel = pView->GetCurrentSelectedURI();
+	if (pCurSel == NULL) return FALSE;
+	sSelURI = *pCurSel;
+
 	if (!g_Repository.GetAttachURI(&sSelURI, &sDstURI)) return FALSE;
 	HTREEITEM hParentX = pView->ShowItemByURI(&sDstURI, FALSE, FALSE);
 
@@ -398,7 +392,8 @@ BOOL TreeViewFolderItem::Copy(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR 
 BOOL TreeViewFolderItem::Delete(MemoManager *pMgr, MemoSelectView *pView)
 {
 	TomboURI sURI;
-	if (!pView->GetURI(&sURI, GetViewItem())) return FALSE;
+	sURI = *GetRealURI();
+
 	if (sURI.IsRoot()) return TRUE;
 	if (TomboMessageBox(NULL, MSG_CONFIRM_DEL_FOLDER, MSG_DEL_FOLDER_TTL, MB_ICONQUESTION | MB_OKCANCEL) != IDOK) return FALSE;
 
@@ -432,7 +427,7 @@ BOOL TreeViewFolderItem::Delete(MemoManager *pMgr, MemoSelectView *pView)
 BOOL TreeViewFolderItem::Encrypt(MemoManager *pMgr, MemoSelectView *pView)
 {
 	TomboURI sURI;
-	if (!pView->GetURI(&sURI, GetViewItem())) return FALSE;
+	sURI = *GetRealURI();
 
 	if (sURI.IsRoot()) return TRUE;
 	if (TomboMessageBox(NULL, MSG_CONFIRM_ENCRYPT_FOLDER, MSG_CONFIRM_ENCRYPT_FOLDER_TTL, MB_ICONQUESTION | MB_OKCANCEL) != IDOK) return TRUE;
@@ -459,7 +454,7 @@ BOOL TreeViewFolderItem::Encrypt(MemoManager *pMgr, MemoSelectView *pView)
 BOOL TreeViewFolderItem::Decrypt(MemoManager *pMgr, MemoSelectView *pView)
 {
 	TomboURI sURI;
-	if (!pView->GetURI(&sURI, GetViewItem())) return FALSE;
+	sURI = *GetRealURI();
 
 	if (sURI.IsRoot()) return TRUE;
 	if (TomboMessageBox(NULL, MSG_CONFIRM_DECRYPT_FOLDER, MSG_CONFIRM_DECRYPT_FOLDER_TTL, MB_ICONQUESTION | MB_OKCANCEL) != IDOK) return TRUE;
@@ -539,17 +534,10 @@ BOOL TreeViewFolderItem::IsOperationEnabled(MemoSelectView *pView, OpType op)
 	}
 }
 
-BOOL TreeViewFolderItem::GetURIItem(MemoSelectView *pView, TString *pItem)
-{
-	TCHAR buf[MAX_PATH];
-	if (!pView->GetURINodeName(GetViewItem(), buf, MAX_PATH)) return FALSE;
-	return pItem->Set(buf);
-}
-
 BOOL TreeViewFolderItem::Rename(MemoManager *pMgr, MemoSelectView *pView, LPCTSTR pNewName)
 {
 	TomboURI sCurrentURI;
-	if (!pView->GetURI(&sCurrentURI, GetViewItem())) return FALSE;
+	sCurrentURI = *GetRealURI();
 	
 	if (sCurrentURI.IsRoot()) return FALSE;
 
@@ -589,7 +577,7 @@ BOOL TreeViewFolderItem::Expand(MemoSelectView *pView)
 	HTREEITEM hParent = GetViewItem();
 
 	TomboURI sURI;
-	if (!pView->GetURI(&sURI, hParent)) return FALSE;
+	sURI = *GetRealURI();
 
 	BOOL bLoose;
 	URIList *pURIList = g_Repository.GetChild(&sURI, FALSE, TRUE, &bLoose);
@@ -606,6 +594,7 @@ BOOL TreeViewFolderItem::Expand(MemoSelectView *pView)
 		if (!g_Repository.GetOption(pURIList->GetURI(i), &opt)) return FALSE;
 		if (opt.bFolder) {
 			TreeViewFolderItem *pItem = new TreeViewFolderItem();
+			pItem->SetURI(pURIList->GetURI(i));
 			pView->InsertFolder(hParent, pURIList->GetTitle(i), pItem, TRUE);
 		} else {
 			if (!pView->InsertFile(hParent, pURIList->GetURI(i), pURIList->GetTitle(i), TRUE, FALSE)) return FALSE;
@@ -618,7 +607,7 @@ BOOL TreeViewFolderItem::Expand(MemoSelectView *pView)
 BOOL TreeViewFolderItem::ExecApp(MemoManager *pMgr, MemoSelectView *pView, ExeAppType nType)
 {
 	TomboURI sURI;
-	if (!pView->GetURI(&sURI, GetViewItem())) return FALSE;
+	sURI = *GetRealURI();
 	g_Repository.ExecuteAssoc(&sURI, nType);
 	return TRUE;
 }
@@ -635,15 +624,13 @@ BOOL TreeViewFileLink::IsOperationEnabled(MemoSelectView *pView, OpType op)
 	return (nOpMatrix & op) != 0;
 }
 
-
-
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 //  Virtual folder(Root)
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 
-TreeViewVirtualFolderRoot::TreeViewVirtualFolderRoot()
+TreeViewVirtualFolderRoot::TreeViewVirtualFolderRoot() : TreeViewFolderItem()
 {
 }
 
@@ -742,18 +729,13 @@ BOOL TreeViewVirtualFolderRoot::IsOperationEnabled(MemoSelectView *pView, OpType
 	return (nOpMatrix & op) != 0;
 }
 
-BOOL TreeViewVirtualFolderRoot::GetURIItem(MemoSelectView *pView, TString *pItem)
-{
-	return pItem->Set(TEXT("@vfolder"));
-}
-
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 //  Virtual folder (non-root)
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 
-TreeViewVirtualFolder::TreeViewVirtualFolder() : pGenerator(NULL), pStore(NULL)
+TreeViewVirtualFolder::TreeViewVirtualFolder() : TreeViewFolderItem(), pGenerator(NULL), pStore(NULL)
 {
 }
 

@@ -109,7 +109,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPTSTR pCmdLine, int nCmdSh
 	if (!bResult || g_Property.IsNeedAskUser()) {
 		BOOL bPrev = bDisableHotKey;
 		bDisableHotKey = TRUE;
-		DWORD nResult = g_Property.Popup(hInst, NULL, TEXT(""));
+		DWORD nResult = g_Property.Popup(hInst, NULL, NULL);
 		bDisableHotKey = bPrev;
 		if (nResult == IDCANCEL) {
 			return 1;

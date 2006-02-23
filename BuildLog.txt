@@ -148,3 +148,10 @@
 	* Read only mode support
 	* Wrapping support
 	* INS key support
+
+////////////////////////////////
+// B220
+////////////////////////////////
+
+- Refactoring about TreeViewItem
+	- now each node have its URI

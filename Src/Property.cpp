@@ -23,6 +23,7 @@
 #include "File.h"
 #include "AutoPtr.h"
 #include "List.h"
+#include "TomboURI.h"
 
 //////////////////////////////////////////
 // Attribute definitions
@@ -249,11 +250,18 @@ HFONT Property::DetailsViewFont()
 // Popup property dialog
 //////////////////////////////////////////
 
-DWORD Property::Popup(HINSTANCE hInst, HWND hWnd, LPCTSTR pSelPath)
+DWORD Property::Popup(HINSTANCE hInst, HWND hWnd, const TomboURI *pCurrentSelectedURI)
 {
+	TString sSelPath;
+	if (pCurrentSelectedURI == NULL) {
+		sSelPath.Set(TEXT(""));
+	} else {
+		sSelPath.Set(pCurrentSelectedURI->GetFullURI());
+	}
+
 	PropertyTab *pages[PROPTAB_PAGES];
 	FolderTab pgFolder(this);
-	DefaultNoteTab pgDefNote(this, pSelPath);
+	DefaultNoteTab pgDefNote(this, sSelPath.Get());
 	PassTimeoutTab pgTimeout(this);
 	FontTab pgFont(this);
 	DateFormatTab pgDate(this);

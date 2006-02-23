@@ -579,9 +579,12 @@ void MainFrame::SetNewMemoStatus(BOOL bNew)
 
 BOOL MainFrame::OnExit()
 {
-	TomboURI uri;
-	msView.GetURI(&uri);
-	g_Property.SetLastOpenURI(uri.GetFullURI());
+	const TomboURI *p = msView.GetCurrentSelectedURI();
+	if (p == NULL) {
+		g_Property.SetLastOpenURI(NULL);
+	} else {
+		g_Property.SetLastOpenURI(p->GetFullURI());
+	}
 
 	DWORD nYNC;
 	if (!mmMemoManager.SaveIfModify(&nYNC, FALSE)) {
@@ -1397,12 +1400,7 @@ void MainFrame::OnProperty()
 	// when calling OnProperty, select view is activated and saving check is finished.
 	pDetailsView->DiscardMemo();
 
-	TString sPath;
-	if (!msView.GetURI(&sPath)) {
-		sPath.Set(TEXT(""));
-	}
-
-	int nResult = g_Property.Popup(hInstance, hMainWnd, sPath.Get());
+	int nResult = g_Property.Popup(hInstance, hMainWnd, msView.GetCurrentSelectedURI());
 	bDisableHotKey = bPrev;
 	if (nResult != IDOK) return;
 
@@ -1656,8 +1654,11 @@ void MainFrame::DoSearchTree(BOOL bFirst, BOOL bForward)
 {
 	SearchEngineA *pSE = mmMemoManager.GetSearchEngine();
 
+	const TomboURI *pCurSelected = msView.GetCurrentSelectedURI();
+	if (pCurSelected == NULL) return;
+
 	TomboURI sURI;
-	if (!msView.GetURI(&sURI)) return;
+	sURI = *pCurSelected;
 
 	// Create dialog and do search.
 	SearchTree st;
@@ -1840,11 +1841,11 @@ void MainFrame::OnVFolderDef()
 void MainFrame::OnBookMarkAdd(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
 	// get note's path
-	TString sURI;
-	if (!msView.GetURI(&sURI)) return;
+	const TomboURI *pURI = msView.GetCurrentSelectedURI();
+	if (pURI == NULL) return;
 
 	// add to bookmark manager
-	const BookMarkItem *pItem = pBookMark->Assign(sURI.Get());
+	const BookMarkItem *pItem = pBookMark->Assign(pURI->GetFullURI());
 	if (pItem == NULL) return;
 
 	AppendBookMark(pPlatform->GetMSBookMarkMenu(), pItem);

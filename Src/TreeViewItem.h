@@ -26,6 +26,18 @@ class TreeViewItem {
 	BOOL bHasMultiItem;
 	HTREEITEM hItem;
 
+protected:
+	class Locator {
+		TomboURI *pURI;
+	public:
+		Locator() : pURI(NULL) {}
+		~Locator();
+		const TomboURI *getURI() const { return pURI; }
+		void set(const TomboURI *pURI);
+	};
+
+	Locator loc;
+
 public:
 	///////////////////////////////////////////////////////
 	// constants
@@ -55,6 +67,12 @@ public:
 
 	BOOL HasMultiItem() { return bHasMultiItem; }
 
+	////////////////////////////////
+	// location related members
+
+	void SetURI(const TomboURI *p);
+	const TomboURI *GetRealURI() const { return loc.getURI(); }
+
 	///////////////////////////////////////////////////////
 
 	// is operation enabled?
@@ -78,10 +96,6 @@ public:
 
 	// Get path information
 
-	// if the URI is tombo://default/aaa/bbb/ccc/ddd.txt ,
-	// result of the GetFolderPath is \aaa\bbb\ccc\ 
-	virtual BOOL GetURIItem(MemoSelectView *pView, TString *pItem) = 0;
-
 	virtual BOOL OpenMemo(MemoSelectView *pView, DWORD nOption);
 	virtual BOOL LoadMemo(MemoSelectView *pView, BOOL bAskPass);
 	virtual BOOL IsUseDetailsView();
@@ -92,28 +106,11 @@ public:
 /////////////////////////////////////////////
 class TreeViewFileItem : public TreeViewItem {
 protected:
-	class Locator {
-		TomboURI *pURI;
-	public:
-		Locator() : pURI(NULL) {}
-		~Locator();
-		const TomboURI *getURI() const { return pURI; }
-		void set(const TomboURI *pURI);
-	};
-
-	Locator loc;
-	BOOL bIsEncrypted;
 
 	BOOL CopyMove(BOOL bCopy, MemoManager *pMgr, MemoSelectView *pView);
 public:
 	TreeViewFileItem();
 	~TreeViewFileItem();
-
-	////////////////////////////////
-	// class specific methods
-
-	void SetNote(const TomboURI *p);
-	const TomboURI *GetRealURI() const { return loc.getURI(); }
 
 	////////////////////////////////
 	// inherited methods
@@ -131,15 +128,9 @@ public:
 	DWORD GetIcon(MemoSelectView *pView, DWORD nStatus);
 	DWORD ItemOrder();
 
-	BOOL GetURIItem(MemoSelectView *pView, TString *pItem);
-
 	BOOL OpenMemo(MemoSelectView *pView, DWORD nOption);
 	BOOL LoadMemo(MemoSelectView *pView, BOOL bAskPass);
 
-	BOOL GetURI(TString *pURI); 
-
-	BOOL IsUseDetailsView();
-	BOOL IsEncrypted() { return bIsEncrypted; }
 };
 
 /////////////////////////////////////////////
@@ -173,9 +164,7 @@ public:
 	DWORD GetIcon(MemoSelectView *pView, DWORD nStatus);
 	DWORD ItemOrder();
 
-	BOOL GetURIItem(MemoSelectView *pView, TString *pItem);
 };
-
 
 /////////////////////////////////////////////
 //  File link
@@ -217,7 +206,6 @@ public:
 	BOOL IsOperationEnabled(MemoSelectView *pView, OpType op);
 
 	DWORD GetIcon(MemoSelectView *pView, DWORD nStatus);
-	BOOL GetURIItem(MemoSelectView *pView, TString *pItem);
 };
 
 

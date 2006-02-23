@@ -75,6 +75,7 @@
 	void Set##NAME##(DWORD n) { nPropsNum[ATTR] = n; }
 
 class File;
+class TomboURI;
 ////////////////////////////////////
 // Property data
 ////////////////////////////////////
@@ -170,9 +171,9 @@ public:
 	STR_ACCESSOR(ExtApp2, PROP_S_EXTAPP2)
 
 	// Use YAEDIT component. On 1.x, always FALSE.
-//	NUM_ACCESSOR(UseYAEdit, PROP_N_USE_YAE)
-	void SetUseYAEdit(DWORD n) {}
-	DWORD GetUseYAEdit() { return TRUE; }
+	NUM_ACCESSOR(UseYAEdit, PROP_N_USE_YAE)
+//	void SetUseYAEdit(DWORD n) {}
+//	DWORD GetUseYAEdit() { return TRUE; }
 
 	NUM_ACCESSOR(AppButton1, PROP_N_APP_BUTTON1)	// application buttons
 	NUM_ACCESSOR(AppButton2, PROP_N_APP_BUTTON2)
@@ -234,7 +235,7 @@ public:
 	// main op
 
 	// popup property dialog
-	DWORD Popup(HINSTANCE hInst, HWND hWnd, LPCTSTR pSelPath);
+	DWORD Popup(HINSTANCE hInst, HWND hWnd, const TomboURI *pCurrentSelectedURI);
 
 	// load properties
 	BOOL Load();

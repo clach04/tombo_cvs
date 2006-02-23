@@ -1126,7 +1126,6 @@ BOOL LocalFileRepository::ExecuteAssoc(const TomboURI *pURI, ExeAppType nType)
 			return TRUE;
 #endif
 #if defined(PLATFORM_BE500)
-//			return CoshExecute(pView->GetHWnd(), pExeFile, sFullPath.Get());
 			return CoshExecute(NULL, pExeFile, sFullPath.Get());
 #endif
 		} else {

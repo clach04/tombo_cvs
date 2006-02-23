@@ -51,18 +51,18 @@ BOOL MemoManager::Init(MainFrame *mf, MemoDetailsView *md, MemoSelectView *ms)
 
 BOOL MemoManager::GetCurrentSelectedPath(TString *pPath)
 {
-	LPCTSTR pURI;
 	TString sURIstr;
+	TomboURI sURI;
 
 	if (pMemoDetailsView->GetCurrentURI()) {
-		pURI = pMemoDetailsView->GetCurrentURI()->GetFullURI();
+		sURI = (*pMemoDetailsView->GetCurrentURI());
 	} else {
-		if (!pMemoSelectView->GetURI(&sURIstr)) return FALSE;
-		pURI = sURIstr.Get();
+		if (pMemoSelectView->GetCurrentSelectedURI()) {
+			sURI = (*pMemoSelectView->GetCurrentSelectedURI());
+		} else {
+			return FALSE;
+		}
 	}
-
-	TomboURI sURI;
-	if (!sURI.Init(pURI)) return FALSE;
 
 	if (sURI.IsLeaf()) {
 		TomboURI sParent;
@@ -159,9 +159,12 @@ BOOL MemoManager::AllocNewMemo(LPCTSTR pText, BOOL bCopy)
 
 	// get note path
 	TomboURI sAttachFolder;
-
 	TomboURI sSelected;
-	if (!pMemoSelectView->GetURI(&sSelected)) return FALSE;
+
+	const TomboURI *pCurSelectedURI = pMemoSelectView->GetCurrentSelectedURI();
+	if (pCurSelectedURI == NULL) return FALSE;
+	sSelected = *pCurSelectedURI;
+
 	if (!sSelected.GetAttachFolder(&sAttachFolder)) return FALSE;
 
 	// allocate new instance and associate to tree view

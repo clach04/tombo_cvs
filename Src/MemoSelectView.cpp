@@ -169,7 +169,7 @@ HTREEITEM MemoSelectView::InsertFile(HTREEITEM hParent, const TomboURI *pURI,
 
 	if (!tvi) return NULL;
 
-	tvi->SetNote(pURI);
+	tvi->SetURI(pURI);
 	ti.item.lParam = (LPARAM)tvi;
 
 	ti.item.pszText = (LPTSTR)pTitle;
@@ -220,7 +220,10 @@ BOOL MemoSelectView::InitTree(VFManager *pManager)
 	DeleteAllItem();
 
 	// Insert main tree
+	TomboURI sURI;
+	if (!sURI.Init(TEXT("tombo://default/"))) return FALSE;
 	TreeViewFolderItem *pItem = new TreeViewFolderItem();
+	pItem->SetURI(&sURI);
 	hMemoRoot = InsertFolder(TVI_ROOT, MSG_MEMO, pItem, TRUE);
 	TreeView_Expand(hViewWnd, hMemoRoot, TVE_EXPAND);
 
@@ -310,8 +313,16 @@ BOOL MemoSelectView::IsExpand(HTREEITEM hItem)
 }
 
 /////////////////////////////////////////
-// 現在選択されているアイテムの取得
+// get item current selected
 /////////////////////////////////////////
+
+const TomboURI* MemoSelectView::GetCurrentSelectedURI()
+{
+	TreeViewItem *pItem = GetCurrentItem();
+	if (pItem == NULL) return NULL;
+
+	return pItem->GetRealURI();
+}
 
 TreeViewItem* MemoSelectView::GetCurrentItem(HTREEITEM *pItem)
 {
@@ -529,8 +540,13 @@ void MemoSelectView::OnNotify_RClick(POINT pt)
 	if (pItem->HasMultiItem()) {
 		nFlg = CTXMENU_DIR;
 	} else {
+		TreeViewFileItem *pFileItem = (TreeViewFileItem*)pItem;
+		const TomboURI *pURI = pFileItem->GetRealURI();
+		URIOption opt(NOTE_OPTIONMASK_ENCRYPTED);
+		g_Repository.GetOption(pURI, &opt);
+
 		nFlg = CTXMENU_FILE | (g_Property.GetUseAssociation() ? CTXMENU_USEASSOC : 0);
-		if (!((TreeViewFileItem*)pItem)->IsEncrypted()) {
+		if (!opt.bEncrypt) {
 			nFlg |= CTXMENU_ENABLEEXTAPP;
 		}
 	}
@@ -779,87 +795,6 @@ LPTSTR MemoSelectView::GeneratePath(HTREEITEM hItem, LPTSTR pBuf, DWORD nSiz)
 	return pPrev;
 }
 
-BOOL MemoSelectView::GetURI(TomboURI *pURI, HTREEITEM hTarget)
-{
-	TString sCur;
-	if (!GetURI(&sCur, hTarget)) return FALSE;
-	return pURI->Init(sCur.Get());
-}
-
-BOOL MemoSelectView::GetURI(TString *pURI, HTREEITEM hTarget)
-{
-	HTREEITEM hBase;
-	TreeViewItem *pItem;
-	if (hTarget == NULL) {
-		pItem = GetCurrentItem(&hBase);
-		if (pItem == NULL) return FALSE;
-	} else {
-		hBase = hTarget;
-		pItem = GetTVItem(hTarget);
-	}
-	if (!pItem->HasMultiItem()) {
-		// this node is leaf -> TreeViewFileItem
-		TreeViewFileItem *pfi = (TreeViewFileItem*)pItem;
-		pfi->GetURI(pURI);
-		return TRUE;
-	}
-
-	HTREEITEM h;
-	// count length 
-	h = hBase;
-	TString s;
-	DWORD n = 0;
-	while(h) {
-		TreeViewItem *pItem = GetTVItem(h);
-
-		if (!pItem->GetURIItem(this, &s)) return FALSE;
-		n += _tcslen(s.Get());
-		if (pItem->HasMultiItem()) n++;
-
-		h = TreeView_GetParent(hViewWnd, h);
-	}
-	if (!pURI->Alloc(n + 8 + 1)) return FALSE;
-
-	// copy to buffer
-	h = hBase;
-	LPTSTR pTail = pURI->Get() + n + 8;
-	*pTail = TEXT('\0');
-	while(h) {
-		TreeViewItem *pItem = GetTVItem(h);
-
-		if (pItem->HasMultiItem()) {
-			*--pTail = TEXT('/');
-		}
-		if (!pItem->GetURIItem(this, &s)) return FALSE;
-		pTail -= _tcslen(s.Get());
-		_tcsncpy(pTail, s.Get(), _tcslen(s.Get()));
-
-		h = TreeView_GetParent(hViewWnd, h);
-	}
-	pTail -= 8;
-	_tcsncpy(pTail, TEXT("tombo://"), 8);
-	return TRUE;
-}
-
-BOOL MemoSelectView::GetURINodeName(HTREEITEM h, LPTSTR pBuf, DWORD nBufLen)
-{
-	if (h == hMemoRoot) {
-		_tcsncpy(pBuf, TEXT("default"), nBufLen);
-		return TRUE;
-	}
-	if (h == hSearchRoot) {
-		_tcsncpy(pBuf, TEXT("@vfolder"), nBufLen);
-		return TRUE;
-	}
-	TV_ITEM ti;
-	ti.mask = TVIF_TEXT;
-	ti.hItem = h;
-	ti.pszText = pBuf;
-	ti.cchTextMax = nBufLen;
-
-	return TreeView_GetItem(hViewWnd, &ti);
-}
-
 void MemoSelectView::TreeExpand(HTREEITEM hItem)
 {
 	// delete dummy child nodes.
@@ -1007,7 +942,16 @@ BOOL MemoSelectView::CreateNewFolder(HTREEITEM hItem, LPCTSTR pFolder)
 		TreeView_Expand(hViewWnd, hItem, TVE_EXPAND);
 	} else {
 		// if node is already expanded, insert it
+
+		TreeViewItem *pParent = GetTVItem(hItem);
+		const TomboURI *pParentURI = pParent->GetRealURI();
+		TString s;
+		if (!s.Join(pParentURI->GetFullURI(), pFolder, TEXT("/"))) return FALSE;
+		TomboURI sNewURI;
+		if (!sNewURI.Init(s.Get())) return FALSE;
+
 		TreeViewFolderItem *pItem = new TreeViewFolderItem();
+		pItem->SetURI(&sNewURI);
 		InsertFolder(hItem, pFolder, pItem, FALSE);
 		if (TreeView_GetChild(hViewWnd, hItem) != NULL) {
 			TreeView_Expand(hViewWnd, hItem, TVE_EXPAND);
@@ -1028,9 +972,11 @@ BOOL MemoSelectView::MakeNewFolder(HWND hWnd, TreeViewItem *pItem)
 
 		TomboURI sBaseURI, sURI;
 		if (pItem) {
-			if (!GetURI(&sBaseURI, pItem->GetViewItem())) return FALSE;
+			sBaseURI = *(pItem->GetRealURI());
 		} else {
-			if (!GetURI(&sBaseURI, NULL)) return FALSE;
+			const TomboURI *pCurSel = GetCurrentSelectedURI();
+			if (pCurSel == NULL) return FALSE;
+			sBaseURI = *pCurSel;
 		}			
 
 		if (!g_Repository.GetAttachURI(&sBaseURI, &sURI)) return FALSE;
@@ -1291,20 +1237,6 @@ TreeViewItem *MemoSelectView::GetTVItem(HTREEITEM h)
 	ti.hItem = h;
 	TreeView_GetItem(hViewWnd, &ti);
 	return (TreeViewItem*)ti.lParam;
-}
-
-/////////////////////////////////////////////
-// associate HTREEITEM to TreeViewItem*
-/////////////////////////////////////////////
-
-BOOL MemoSelectView::SetTVItem(HTREEITEM h, TreeViewItem *p)
-{
-	TV_ITEM ti;
-	ti.mask = TVIF_PARAM;
-	ti.hItem = h;
-	ti.lParam = (LPARAM)p;
-	TreeView_SetItem(hViewWnd, &ti);
-	return TRUE;
 }
 
 /////////////////////////////////////////////
