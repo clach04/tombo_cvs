@@ -114,7 +114,7 @@ struct PropListNum {
 #endif
 	{ PROP_N_CODEPAGE,					TEXT("CodePage"),					0 },
 #if defined(PLATFORM_PKTPC)
-	{ PROP_N_DISABLEEXTRAACTIONBUTTON,	TEXT("DisableExtraActionButton"),	0},
+	{ PROP_N_DISABLEEXTRAACTIONBUTTON,	TEXT("DisableExtraActionButton"),	1},
 #endif
 #if defined(PLATFORM_HPC) || defined(PLATFORM_WIN32)
 	{ PROP_N_HIDESTATUSBAR,				TEXT("HideStatusBar"),				0 },

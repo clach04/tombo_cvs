@@ -257,60 +257,6 @@ int MainFrame::MainLoop() {
 			pmPasswordMgr.UpdateAccess();
 		}
 	
-#if defined(PLATFORM_PKTPC) || defined(PLATFORM_PSPC) || defined(PLATFORM_BE500)
-		// アクションキー押下に伴うVK_RETURNの無視
-
-#if defined(PLATFORM_PKTPC)
-		// On PocketPC devices, you can select enable/disable about this feature.
-		if (!g_Property.GetDisableExtraActionButton()) {
-		//disable logic begin
-#endif
-
-		if (msg.message == WM_KEYDOWN) {
-			WPARAM w = msg.wParam;
-			if (w == VK_PROCESSKEY) {
-				w = ImmGetVirtualKey(msg.hwnd);
-			}
-			if (w == VK_F23) {
-				bIgnoreReturnKeyDown = bIgnoreReturnKeyUp = TRUE;
-				continue;
-			}
-			if (w == VK_F24) {
-				bIgnoreEscKeyDown = bIgnoreEscKeyUp = TRUE;
-				continue;
-			}
-			if (bIgnoreReturnKeyDown && w == VK_RETURN) {
-				bIgnoreReturnKeyDown = FALSE;
-				continue;
-			}
-			if (bIgnoreEscKeyDown && w == VK_ESCAPE) {
-				bIgnoreEscKeyDown = FALSE;
-				continue;
-			}
-		}
-		if (msg.message == WM_KEYUP) {
-			if (msg.wParam == VK_F23) {
-				continue;
-			}
-			if (bIgnoreReturnKeyUp && msg.wParam == VK_RETURN) {
-				bIgnoreReturnKeyUp = FALSE;
-				PostMessage(hMainWnd, WM_COMMAND, MAKEWPARAM(IDM_ACTIONBUTTON, 0), 0);
-				continue;
-			}
-			if (msg.wParam == VK_F24) {
-				continue;
-			}
-			if (bIgnoreEscKeyUp && msg.wParam == VK_ESCAPE) {
-				bIgnoreEscKeyUp = FALSE;
-				PostMessage(hMainWnd, WM_COMMAND, MAKEWPARAM(IDM_RETURNLIST, 0), 0);
-				continue;
-			}
-		}
-#if defined(PLATFORM_PKTPC)
-		} // disable logic end
-#endif
-
-#endif
 		// 本来の処理
 		if (!TranslateAccelerator(hMainWnd, SelectViewActive() ? hAccelSv : hAccelDv, &msg)) {
 			TranslateMessage(&msg);
