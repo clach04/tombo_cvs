@@ -86,14 +86,13 @@ BOOL TomboURI::Init(const TomboURI &u)
 /////////////////////////////////////////////
 // This function is obsoleted and will be removed in the future.
 
-BOOL TomboURI::InitByNotePath(LPCTSTR pNotePath)
+BOOL TomboURI::InitByNotePath(LPCTSTR pRepoName, LPCTSTR pNotePath)
 {
 	TString s;
-	LPCTSTR pPrefix = TEXT("tombo://default/");
-	if (!s.Alloc(_tcslen(pPrefix) + _tcslen(pNotePath) + 1)) return FALSE;
+	if (!s.Alloc(9 + _tcslen(pRepoName) + _tcslen(pNotePath) + 1)) return FALSE;
+	wsprintf(s.Get(), TEXT("tombo://%s/"), pRepoName);
+	LPTSTR p = s.Get() + 9 + _tcslen(pRepoName);
 
-	_tcscpy(s.Get(), pPrefix);
-	LPTSTR p = s.Get() + _tcslen(pPrefix);
 	LPCTSTR q = pNotePath;
 	if (*q == TEXT('\\')) q++;
 

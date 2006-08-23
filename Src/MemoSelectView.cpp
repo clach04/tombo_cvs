@@ -41,6 +41,16 @@
 #define NUM_MEMOSELECT_BITMAPS 10
 
 /////////////////////////////////////////
+//  root info
+/////////////////////////////////////////
+
+struct MSViewRootInfo {
+	TomboURI uri;
+	HTREEITEM hItem;
+	DWORD nType;
+};
+
+/////////////////////////////////////////
 //  static functions
 /////////////////////////////////////////
 
@@ -51,8 +61,13 @@ LRESULT CALLBACK NewSelectViewProc( HWND hwnd, UINT msg, WPARAM wParam, LPARAM l
 static HIMAGELIST CreateSelectViewImageList(HINSTANCE hInst);
 
 /////////////////////////////////////////
-// create window
+// init
 /////////////////////////////////////////
+
+MemoSelectView::~MemoSelectView()
+{
+	delete [] pRoots;
+}
 
 BOOL MemoSelectView::Create(LPCTSTR pName, RECT &r, HWND hParent, DWORD nID, HINSTANCE hInst, HFONT hFont)
 {
@@ -219,19 +234,37 @@ BOOL MemoSelectView::InitTree(VFManager *pManager)
 {
 	DeleteAllItem();
 
-	// Insert main tree
-	TomboURI sURI;
-	if (!sURI.Init(TEXT("tombo://default/"))) return FALSE;
-	TreeViewFolderItem *pItem = new TreeViewFolderItem();
-	pItem->SetURI(&sURI);
-	hMemoRoot = InsertFolder(TVI_ROOT, MSG_MEMO, pItem, TRUE);
-	TreeView_Expand(hViewWnd, hMemoRoot, TVE_EXPAND);
+	nNumRoots = g_Repository.GetNumOfSubRepository();
+	pRoots = new MSViewRootInfo[nNumRoots];
 
-	// Insert virtual tree
-	TreeViewVirtualFolderRoot *pVFRoot = new TreeViewVirtualFolderRoot();
-	if (!pVFRoot || !pVFRoot->Init(pManager)) return FALSE;
-	hSearchRoot = InsertFolder(TVI_ROOT, MSG_VIRTUAL_FOLDER, pVFRoot, TRUE);
+	for (DWORD i = 0; i < nNumRoots; i++) {
+		const TomboURI *pSubRootURI = g_Repository.GetSubRepositoryRootURI(i);
+		LPCTSTR pSubRootName = g_Repository.GetSubRepositoryName(i);
+		DWORD nSubRootType = g_Repository.GetSubRepositoryType(i);
 
+		pRoots[i].uri = *g_Repository.GetSubRepositoryRootURI(i);
+		pRoots[i].nType = nSubRootType;
+
+		switch(nSubRootType) {
+		case TOMBO_REPO_SUBREPO_TYPE_LOCALFILE:
+			{
+				TreeViewFolderItem *pItem = new TreeViewFolderItem();
+				pItem->SetURI(pSubRootURI);
+				pRoots[i].hItem = InsertFolder(TVI_ROOT, pSubRootName, pItem, TRUE);
+			}
+			break;
+		case TOMBO_REPO_SUBREPO_TYPE_VFOLDER:
+			{
+				TreeViewVirtualFolderRoot *pVFRoot = new TreeViewVirtualFolderRoot();
+				if (!pVFRoot || !pVFRoot->Init(pSubRootURI, pManager)) return FALSE;
+				pRoots[i].hItem = InsertFolder(TVI_ROOT, pSubRootName, pVFRoot, TRUE);
+			}
+			break;
+		default:
+			return FALSE;
+		}
+		TreeView_Expand(hViewWnd, pRoots[i].hItem, TVE_EXPAND);
+	}
 	return TRUE;
 }
 
@@ -370,7 +403,6 @@ static void ControlSubMenu(HMENU hMenu, UINT nID, BOOL bEnable)
 	}
 }
 
-#include "Logger.h"
 ///////////////////////////////////////////
 // OnNotify Handler
 ///////////////////////////////////////////
@@ -1056,14 +1088,12 @@ HTREEITEM MemoSelectView::GetItemFromURI(LPCTSTR pURI)
 
 HTREEITEM MemoSelectView::GetRootItem(LPCTSTR pRep)
 {
-	// In current version, pRep takes only  "default" or "@vfolder".
-	if (_tcscmp(pRep, TEXT("default")) == 0) {
-		return hMemoRoot;
-	} else if (_tcscmp(pRep, TEXT("@vfolder")) == 0) {
-		return hSearchRoot;
-	} else {
-		return NULL;
+	for (DWORD i = 0; i < nNumRoots; i++) {
+		TString repName;
+		if (!pRoots[i].uri.GetRepositoryName(&repName)) return NULL;
+		if (_tcsicmp(repName.Get(), pRep) == 0) return pRoots[i].hItem;
 	}
+	return NULL;
 }
 
 /////////////////////////////////////////
@@ -1357,6 +1387,7 @@ HTREEITEM MemoSelectView::ShowItemByURI(const TomboURI *pURI, BOOL bSelChange, B
 
 BOOL MemoSelectView::InsertVirtualFolder(const VFInfo *pInfo)
 {
+	HTREEITEM hSearchRoot = GetRootItem(VFOLDER_REPO_NAME);
 	TreeViewVirtualFolderRoot *pVFRoot = (TreeViewVirtualFolderRoot*)GetTVItem(hSearchRoot);
 	return pVFRoot->AddSearchResult(this, pInfo);
 }
@@ -1364,17 +1395,9 @@ BOOL MemoSelectView::InsertVirtualFolder(const VFInfo *pInfo)
 /////////////////////////////////////////////
 // Get virtual folder root instance
 /////////////////////////////////////////////
-
-TreeViewVirtualFolderRoot *MemoSelectView::GetVirtualFolderRoot()
-{
-	if (!IsExpand(hSearchRoot)) {
-		TreeView_Expand(hViewWnd, hSearchRoot, TVE_EXPAND);
-	}
-	return (TreeViewVirtualFolderRoot*)GetTVItem(hSearchRoot);
-}
-
 void MemoSelectView::CloseVFRoot()
 {
+	HTREEITEM hSearchRoot = GetRootItem(VFOLDER_REPO_NAME);
 	if (IsExpand(hSearchRoot)) {
 		TreeCollapse(hSearchRoot);
 	}

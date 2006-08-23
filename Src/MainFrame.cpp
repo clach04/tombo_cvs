@@ -462,15 +462,13 @@ void MainFrame::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	RECT r;
 	GetClientRect(hWnd, &r);
 
-	// Initialize RepositoryFactory
-	RepositoryOption roOpt;
-	roOpt.bKeepCaret = g_Property.GetKeepCaret();
-	roOpt.bKeepTitle = g_Property.GetKeepTitle();
-
-	roOpt.bSafeFileName = g_Property.GetUseSafeFileName();
-	roOpt.pTopDir = g_Property.GetTomboRoot();
-
-	g_Repository.Init(&roOpt);
+	// Initialize repository
+	g_Repository.Init();
+	DWORD n = g_Property.GetNumSubRepository();
+	for (DWORD i = 0; i < n; i++) {
+		RepositoryImpl *pImpl = g_Property.GetSubRepository(i);
+		g_Repository.AddSubRepository(pImpl);
+	}
 
 	// create toolbar
 	pPlatform->Create(hWnd, pcs->hInstance);
@@ -1404,14 +1402,12 @@ void MainFrame::OnProperty()
 	bDisableHotKey = bPrev;
 	if (nResult != IDOK) return;
 
-	// Repository setting
-	RepositoryOption roOpt;
-	roOpt.bKeepCaret = g_Property.GetKeepCaret();
-	roOpt.bKeepTitle = g_Property.GetKeepTitle();
-	roOpt.bSafeFileName = g_Property.GetUseSafeFileName();
-	roOpt.pTopDir = g_Property.GetTomboRoot();
-
-	g_Repository.SetRepositoryOption(&roOpt);
+	g_Repository.ClearSubRepository();
+	DWORD n = g_Property.GetNumSubRepository();
+	for (DWORD i = 0; i < n; i++) {
+		RepositoryImpl *pImpl = g_Property.GetSubRepository(i);
+		g_Repository.AddSubRepository(pImpl);
+	}
 
 	// font setting
 	msView.SetFont(g_Property.SelectViewFont());

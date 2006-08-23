@@ -496,10 +496,6 @@ SOURCE=..\..\Src\URIScanner.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\Src\TomboLib\VarBuffer.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\..\Src\VFManager.h
 # End Source File
 # Begin Source File
@@ -717,6 +713,10 @@ SOURCE=..\..\Src\TomboLib\Uniconv.cpp
 # Begin Source File
 
 SOURCE=..\..\Src\TomboLib\Uniconv.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Src\TomboLib\VarBuffer.h
 # End Source File
 # End Group
 # Begin Source File

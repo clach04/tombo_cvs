@@ -70,7 +70,7 @@ public:
 
 	LPCTSTR MemoPath() const { return pPath; }
 	BOOL SetMemoPath(LPCTSTR p);
-	BOOL GetURI(TomboURI *pURI) const;
+	BOOL GetURI(LPCTSTR pRepoName, TomboURI *pURI) const;
 
 	//////////////////////////////////
 	// notes attributes

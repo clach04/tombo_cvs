@@ -5,10 +5,11 @@ class TString;
 class TomboURI;
 class RepositoryImpl;
 class URIOption;
-class RepositoryOption;
 class URIList;
 
 class NoteAttribute;
+
+#include "VarBuffer.h"
 
 /////////////////////////////////////////
 // Option flag definitions
@@ -39,22 +40,21 @@ class NoteAttribute;
 #define ERROR_TOMBO_I_OPERATION_NOT_PERFORMED (ERROR_TOMBO_REP_CODE_BASE_INFO + 1)
 #define ERROR_TOMBO_I_GET_PASSWORD_CANCELED   (ERROR_TOMBO_REP_CODE_BASE_INFO + 2)
 
+/////////////////////////////////////////
+// GetList results
+/////////////////////////////////////////
+
 #define TOMBO_REPO_GETLIST_FAIL 0
 #define TOMBO_REPO_GETLIST_SUCCESS 1
 #define TOMBO_REPO_GETLIST_PARTIAL 2
 
 /////////////////////////////////////////
-// Repository options
+// Sub repository type 
 /////////////////////////////////////////
 
-class RepositoryOption {
-public:
-	BOOL bKeepTitle;
-	BOOL bKeepCaret;
-	BOOL bSafeFileName; // scramble filename
-
-	LPCTSTR pTopDir;
-};
+#define TOMBO_REPO_SUBREPO_TYPE_INVALID		0
+#define TOMBO_REPO_SUBREPO_TYPE_LOCALFILE	1
+#define TOMBO_REPO_SUBREPO_TYPE_VFOLDER		2
 
 //////////////////////////////////////////////////////////////
 // Repository enumeration interface
@@ -76,26 +76,28 @@ class Repository : public IEnumRepository {
 
 protected:
 	RepositoryImpl *pDefaultImpl;
-	RepositoryOption roOption;
+	TVector<RepositoryImpl*> vSubRepository;
 
 	// Get real physical path from URI.
 	//
 	// This method may be not supported by some RepositoryImpl type.
 	BOOL GetPhysicalPath(const TomboURI *pURI, TString *pFullPath);
 
+	// get sub repository reference assciated with the URI
+	RepositoryImpl *GetAssocSubRepository(const TomboURI *pURI);
 public:
 
 	Repository();
 	~Repository();
 
-	BOOL Init(const RepositoryOption *pOpt);
+	BOOL Init();
+	BOOL ClearSubRepository();
 
-	BOOL SetRepositoryOption(const RepositoryOption *pOpt);
+	// Add sub repository. pImpl instance is controled under Repository so do not delete pImpl by caller.
+	BOOL AddSubRepository(RepositoryImpl *pImpl);
 
 	////////////////////////////
 	// Note/folder operations
-
-	BOOL Create(const TomboURI *pTemplate, LPCTSTR pData, TString *pRealHeadLine, TomboURI *pAllocedURI);
 
 	BOOL Update(const TomboURI *pCurrentURI, LPCTSTR pData, TomboURI *pNewURI, TString *pNewHeadLine);
 	BOOL GetHeadLine(const TomboURI *pURI, TString *pHeadLine);
@@ -158,6 +160,16 @@ public:
 
 	// Check the URI data is encrypted
 	BOOL IsEncrypted(const TomboURI *pURI);
+
+	/////////////////////////////
+	// sub repository IF
+	DWORD GetNumOfSubRepository();
+	DWORD GetSubRepositoryType(DWORD nIndex);
+	LPCTSTR GetSubRepositoryName(DWORD nIndex);
+	const TomboURI *GetSubRepositoryRootURI(DWORD nIndex);
+	LPTSTR GetSubRepoXMLSaveString(DWORD nIndex);
+
+	static RepositoryImpl *CreateSubRepo(LPCWSTR pName, const WCHAR **atts);
 };
 
 //////////////////////////////////////////////////////////////
@@ -193,7 +205,6 @@ public:
 	DWORD nCursorPos;
 	BOOL bReadOnly;
 };
-
 
 //////////////////////////////////////////////////////////////
 // Global definitions

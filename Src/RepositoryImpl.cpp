@@ -23,6 +23,8 @@
 #if defined(PLATFORM_BE500)
 #include <CoShellapi.h>
 #endif
+
+
 /////////////////////////////////////////
 // static funcs
 /////////////////////////////////////////
@@ -36,8 +38,29 @@ static BOOL IsFileExist(LPCTSTR pFileName);
 // Repository ctor & dtor, initializer
 /////////////////////////////////////////
 
-RepositoryImpl::RepositoryImpl() {}
-RepositoryImpl::~RepositoryImpl() {}
+RepositoryImpl::RepositoryImpl() : pRepName(NULL), pDispName(NULL), pRootURI(NULL) {}
+RepositoryImpl::~RepositoryImpl() 
+{
+	delete [] pRepName;
+	delete [] pDispName;
+	delete pRootURI;
+}
+
+BOOL RepositoryImpl::Init(LPCTSTR rep, LPCTSTR disp, DWORD ntype)
+{
+	pRepName = StringDup(rep);
+	pDispName = StringDup(disp);
+	nRepNameLen = _tcslen(pRepName);
+	
+	nRepType = ntype;
+
+	TString sStrURI;
+	if (!sStrURI.Join(TEXT("tombo://"), rep, TEXT("/"))) return FALSE;
+	pRootURI = new TomboURI();
+	if (!pRootURI->Init(sStrURI.Get())) return FALSE;
+
+	return (pRepName != NULL) && (pDispName != NULL);
+}
 
 /////////////////////////////////////////
 // Is the note encrypted?
@@ -63,27 +86,53 @@ LocalFileRepository::~LocalFileRepository()
 	delete[] pTopDir;
 }
 
-BOOL LocalFileRepository::Init(const RepositoryOption *p)
+BOOL LocalFileRepository::Init(LPCTSTR rep, LPCTSTR disp, LPCTSTR dir, 
+							   BOOL title, BOOL caret, BOOL safefile) 
 {
-	pOpt = p;
-	pTopDir = StringDup(pOpt->pTopDir);
+	if (!RepositoryImpl::Init(rep, disp, TOMBO_REPO_SUBREPO_TYPE_LOCALFILE)) return FALSE;
+
+	pTopDir = StringDup(dir);
+	bKeepTitle = title;
+	bKeepCaret = caret;
+	bSafeFileName = safefile;
 	return TRUE;
 }
 
-BOOL LocalFileRepository::SetRepositoryOption(const RepositoryOption *p)
+RepositoryImpl *LocalFileRepository::Clone()
 {
-	pOpt = p;
-	pTopDir = StringDup(pOpt->pTopDir);
-	return TRUE;
+	LocalFileRepository *pImpl = new LocalFileRepository();
+	if (pImpl == NULL) {
+		SetLastError(ERROR_NOT_ENOUGH_MEMORY);
+		return NULL;
+	}
+	if (!pImpl->Init(GetRepositoryName(), GetDisplayName(), pTopDir, bKeepTitle, bKeepCaret, bSafeFileName)) {
+		delete[] pImpl;
+		return NULL;
+	}
+	return pImpl;
 }
 
-/////////////////////////////////////////
-// Create note
-/////////////////////////////////////////
-
-BOOL LocalFileRepository::Create(const TomboURI *pTemplate, LPCTSTR pData, TString *pRealHeadLine, TomboURI *pAllocedURI)
+LPTSTR LocalFileRepository::GetXMLSaveString()
 {
-	return TRUE;
+	TString sXMLStr;
+	if (!sXMLStr.Join(TEXT("      <localfile name=\""), GetRepositoryName(), TEXT("\" dispname=\""), GetDisplayName())) return NULL;
+	if (!sXMLStr.StrCat(TEXT("\" path=\""))) return NULL;
+	if (!sXMLStr.StrCat(pTopDir)) return NULL;
+	if (!sXMLStr.StrCat(TEXT("\" keeptitle=\""))) return NULL;
+	if (!sXMLStr.StrCat(bKeepTitle ? TEXT("1") : TEXT("0"))) return NULL;
+	if (!sXMLStr.StrCat(TEXT("\" keepcaret=\""))) return NULL;
+	if (!sXMLStr.StrCat(bKeepCaret ? TEXT("1") : TEXT("0"))) return NULL;
+	if (!sXMLStr.StrCat(TEXT("\" safefilename=\""))) return NULL;
+	if (!sXMLStr.StrCat(bSafeFileName ? TEXT("1") : TEXT("0"))) return NULL;
+	if (!sXMLStr.StrCat(TEXT("\"/>\n"))) return NULL;
+	return StringDup(sXMLStr.Get());
+}
+
+BOOL LocalFileRepository::SetTopDir(LPCTSTR pDir)
+{
+	delete [] pTopDir;
+	pTopDir = StringDup(pDir);
+	return pTopDir != NULL;
 }
 
 /////////////////////////////////////////
@@ -138,7 +187,7 @@ BOOL LocalFileRepository::Save(const TomboURI *pCurrentURI, LPCTSTR pMemo,
 	URIOption opt(NOTE_OPTIONMASK_SAFEFILE);
 	if (!GetOption(pCurrentURI, &opt)) return FALSE;
 
-	if (pOpt->bKeepTitle || opt.bSafeFileName) {
+	if (bKeepTitle || opt.bSafeFileName) {
 		if (!SaveIfHeadLineIsNotChanged(pNote, pMemo, sOrigFile.Get())) return FALSE;
 
 		// URI is not changed.
@@ -161,7 +210,7 @@ BOOL LocalFileRepository::Save(const TomboURI *pCurrentURI, LPCTSTR pMemo,
 										 sHeadLine.Get(), pNewHeadLine);
 		}
 		if (bResult) {
-			bResult = pNote->GetURI(pNewURI);
+			bResult = pNote->GetURI(GetRepositoryName(), pNewURI);
 		}
 		return bResult;
 	}
@@ -188,7 +237,7 @@ BOOL LocalFileRepository::SaveIfHeadLineIsChanged(
 			DeleteFile(pOrigFile);
 
 			// Additionally, rename memo info(*.tdt) file.
-			if (pOpt->bKeepCaret) {
+			if (bKeepCaret) {
 				MemoInfo mi(pTopDir);
 				mi.RenameInfo(pOrigFile, sNewFile.Get());
 			}
@@ -231,7 +280,7 @@ BOOL LocalFileRepository::SaveIfHeadLineIsNotChanged(MemoNote *pNote, LPCTSTR pM
 }
 
 ////////////////////////////////////////////////////////
-// ヘッドライン文字列から"(n)"部分を取り除く
+// remove "(n)" from headline
 ////////////////////////////////////////////////////////
 
 static int ChopFileNumberLen(LPTSTR pHeadLine)
@@ -253,7 +302,7 @@ static int ChopFileNumberLen(LPTSTR pHeadLine)
 }
 
 /////////////////////////////////////////////
-// ファイルの存在チェック
+// file existance check
 /////////////////////////////////////////////
 
 static BOOL IsFileExist(LPCTSTR pFileName)
@@ -271,9 +320,6 @@ static BOOL IsFileExist(LPCTSTR pFileName)
 /////////////////////////////////////////
 // Get Headline string
 /////////////////////////////////////////
-// HEADLINE is 
-//   
-//
 // This method ask password if it need.
 
 BOOL LocalFileRepository::GetHeadLine(const TomboURI *pURI, TString *pHeadLine)
@@ -441,7 +487,7 @@ BOOL LocalFileRepository::NegotiateNewName(LPCTSTR pMemoPath, LPCTSTR pText, LPC
 {
 	TString sHeadLine;
 
-	if (pOpt->bSafeFileName) {
+	if (bSafeFileName) {
 		TString sBase;
 		TString sNewName;
 		if (!sBase.Join(pTopDir, TEXT("\\"), pMemoDir)) return FALSE;
@@ -452,7 +498,7 @@ BOOL LocalFileRepository::NegotiateNewName(LPCTSTR pMemoPath, LPCTSTR pText, LPC
 		*ppNotePath = pFullPath->Get() + _tcslen(pTopDir) + 1;
 		if (!MemoNote::GetHeadLineFromMemoText(pText, pNewHeadLine)) return FALSE;
 	} else {
-		if (pOpt->bKeepTitle) {
+		if (bKeepTitle) {
 			if (!MemoNote::GetHeadLineFromFilePath(pMemoPath, &sHeadLine)) return FALSE;
 		} else {
 			if (!MemoNote::GetHeadLineFromMemoText(pText, &sHeadLine)) return FALSE;
@@ -508,7 +554,7 @@ TomboURI *LocalFileRepository::DoEncryptFile(const TomboURI *pOldURI, MemoNote *
 
 	// generate new URI
 	TomboURI *pURI = new TomboURI();
-	if (pURI == NULL || !p->GetURI(pURI)) return NULL;
+	if (pURI == NULL || !p->GetURI(GetRepositoryName(), pURI)) return NULL;
 
 	return pURI;
 }
@@ -546,7 +592,7 @@ BOOL LocalFileRepository::DecryptLeaf(const TomboURI *pCurrentURI, URIOption *pO
 
 	pOption->pNewURI = new TomboURI();
 	if (pOption->pNewURI == NULL) return FALSE;
-	if (!p->GetURI(pOption->pNewURI)) return FALSE;
+	if (!p->GetURI(GetRepositoryName(), pOption->pNewURI)) return FALSE;
 
 	// rename TDT
 	TString sOrigTDT;
@@ -734,7 +780,7 @@ BOOL LocalFileRepository::Copy(const TomboURI *pCopyFrom, const TomboURI *pCopyT
 			if (pNewNote == NULL) return FALSE;
 			AutoPointer<MemoNote> ap2(pNewNote);
 
-			pNewNote->GetURI(pOption->pNewURI);
+			pNewNote->GetURI(GetRepositoryName(), pOption->pNewURI);
 			return TRUE;
 		}
 	}
@@ -786,7 +832,7 @@ BOOL LocalFileRepository::ChangeHeadLine(const TomboURI *pURI, LPCTSTR pReqNewHe
 		if (!pNote->Rename(pTopDir, pReqNewHeadLine)) return FALSE;
 
 		TomboURI *p = new TomboURI();
-		if (p == NULL || !pNote->GetURI(p)) {
+		if (p == NULL || !pNote->GetURI(GetRepositoryName(), p)) {
 			delete p;
 			return FALSE;
 		}
@@ -897,7 +943,7 @@ BOOL LocalFileRepository::RequestAllocateURI(const TomboURI *pBaseURI, LPCTSTR p
 									pNote->GetExtension(), &sFullPath, &pNotePath, pHeadLine)) return FALSE;
 	if (!pNote->Init(pNotePath)) return FALSE;
 
-	if (!pNote->GetURI(pURI)) return FALSE;
+	if (!pNote->GetURI(GetRepositoryName(), pURI)) return FALSE;
 
 	return TRUE;
 }
@@ -1149,3 +1195,73 @@ BOOL LocalFileRepository::MakeFolder(const TomboURI *pURI, LPCTSTR pFolderName)
 	ChopFileSeparator(sPath.Get());
 	return CreateDirectory(sPath.Get(), NULL);
 }
+
+/////////////////////////////////////////
+// Virtual folder
+/////////////////////////////////////////
+
+VFolderRepository::VFolderRepository()
+{
+}
+
+VFolderRepository::~VFolderRepository()
+{
+}
+
+BOOL VFolderRepository::Init(LPCTSTR pRepName, LPCTSTR pDispName)
+{
+	return RepositoryImpl::Init(pRepName, pDispName, TOMBO_REPO_SUBREPO_TYPE_VFOLDER);
+}
+
+RepositoryImpl *VFolderRepository::Clone()
+{
+	VFolderRepository *pImpl = new VFolderRepository();
+	if (pImpl == NULL) {
+		SetLastError(ERROR_NOT_ENOUGH_MEMORY);
+		return NULL;
+	}
+	if (!pImpl->Init(GetRepositoryName(), GetDisplayName())) {
+		return NULL;
+	}
+	return pImpl;
+}
+
+LPTSTR VFolderRepository::GetXMLSaveString()
+{
+	TString sXMLStr;
+	if (!sXMLStr.Join(TEXT("      <vfolder name=\""), GetRepositoryName(), TEXT("\" dispname=\""), GetDisplayName())) return NULL;
+	if (!sXMLStr.StrCat(TEXT("\"/>\n"))) return NULL;
+	return StringDup(sXMLStr.Get());
+}
+
+BOOL VFolderRepository::Update(const TomboURI *pCurrentURI, LPCTSTR pData, TomboURI *pNewURI, TString *pNewHeadLine){ return FALSE; }
+BOOL VFolderRepository::Delete(const TomboURI *pURI, URIOption *pOption){ return FALSE; }
+BOOL VFolderRepository::Copy(const TomboURI *pCopyFrom, const TomboURI *pCopyTo, URIOption *pOption){ return FALSE; }
+BOOL VFolderRepository::Move(const TomboURI *pMoveFrom, const TomboURI *pMoveTo, URIOption *pOption){ return FALSE; }
+
+BOOL VFolderRepository::ChangeHeadLine(const TomboURI *pURI, LPCTSTR pReqNewHeadLine, URIOption *pOption){ return FALSE; }
+
+BOOL VFolderRepository::GetHeadLine(const TomboURI *pURI, TString *pHeadLine){ return FALSE; }
+
+BOOL VFolderRepository::GetOption(const TomboURI *pURI, URIOption *pOption) const{ return FALSE; }
+BOOL VFolderRepository::SetOption(const TomboURI *pCurrentURI, URIOption *pOption){ return FALSE; }
+
+BOOL VFolderRepository::GetPhysicalPath(const TomboURI *pURI, TString *pFullPath){ return FALSE; }
+
+URIList *VFolderRepository::GetChild(const TomboURI *pFolder, BOOL bSkipEncrypt, BOOL bLooseDecrypt, BOOL *pLoose) { return NULL; }
+
+BOOL VFolderRepository::RequestAllocateURI(const TomboURI *pBaseURI, LPCTSTR pText, TString *pHeadLine, TomboURI *pURI, const TomboURI *pTemplateURI){ return FALSE; }
+
+BOOL VFolderRepository::GetAttribute(const TomboURI *pURI, NoteAttribute *pAttribute){ return FALSE; }
+BOOL VFolderRepository::SetAttribute(const TomboURI *pURI, const NoteAttribute *pAttribute){ return FALSE; }
+BOOL VFolderRepository::GetNoteAttribute(const TomboURI *pURI, UINT64 *pLastUpdate, UINT64 *pCreateDate, UINT64 *pFileSize){ return FALSE; }
+
+LPTSTR VFolderRepository::GetNoteData(const TomboURI *pURI) { return NULL; }
+LPBYTE VFolderRepository::GetNoteDataNative(const TomboURI *pURI, LPDWORD pSize) { return NULL; }
+
+BOOL VFolderRepository::ExecuteAssoc(const TomboURI *pURI, ExeAppType nType){ return FALSE; }
+BOOL VFolderRepository::MakeFolder(const TomboURI *pURI, LPCTSTR pFolderName){ return FALSE; }
+
+
+
+

@@ -11,4 +11,5 @@ public:
 	BOOL Encrypt(byte *chipher, byte *plain, int len);
 	BOOL Decrypt(byte *plain, byte *chipher);
 };
+
 #endif

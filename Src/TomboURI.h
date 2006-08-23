@@ -20,7 +20,7 @@ public:
 
 	BOOL Init(LPCTSTR pURI);
 	BOOL Init(const TomboURI&);
-	BOOL InitByNotePath(LPCTSTR pNotePath);
+	BOOL InitByNotePath(LPCTSTR pRepoName, LPCTSTR pNotePath);
 
 	///////////////////////////////
 	// accessor

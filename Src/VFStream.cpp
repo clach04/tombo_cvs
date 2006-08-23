@@ -176,7 +176,8 @@ BOOL VFDirectoryGenerator::SetDirPath(LPCTSTR pPath)
 	delete pURI;
 	pURI = new TomboURI();
 	if (pURI == NULL) { SetLastError(ERROR_NOT_ENOUGH_MEMORY); return FALSE; }
-	if (!pURI->InitByNotePath(pPath)) return FALSE;
+	// XXXX get repo name and set it
+	if (!pURI->InitByNotePath(TEXT("default"), pPath)) return FALSE;
 	return TRUE;
 }
 
@@ -199,7 +200,6 @@ BOOL VFDirectoryGenerator::Activate()
 		bCE = FALSE;
 		VFStream *p = pNext;
 		while(p) {
-			Sleep(1);
 			if (p->NeedEncryptedNote()) {
 				bCE = TRUE;
 			}

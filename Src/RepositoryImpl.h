@@ -16,17 +16,33 @@ class MemoNote;
 // The base class of implimentation
 
 class RepositoryImpl {
-public:
+private:
+	LPTSTR pRepName;
+	LPTSTR pDispName;
+	TomboURI *pRootURI;
+	DWORD nRepType;
+	DWORD nRepNameLen;
+
 public:
 	RepositoryImpl();
 	virtual ~RepositoryImpl();
 
+	BOOL Init(LPCTSTR pRepName, LPCTSTR pDispName, DWORD nRepType);
+
+	LPCTSTR GetRepositoryName() { return pRepName; }
+	LPCTSTR GetDisplayName() { return pDispName; }
+	const TomboURI *GetRootURI() { return pRootURI; }
+	DWORD GetRepNameLen() { return nRepNameLen; }
+	DWORD GetRepositoryType() { return nRepType; }
+
 	////////////////////////////
 	// Interface definitions
 
-	virtual BOOL SetRepositoryOption(const RepositoryOption *pOpt) = 0;
+	// clone this instance
+	virtual RepositoryImpl *Clone() = 0;
 
-	virtual BOOL Create(const TomboURI *pTemplate, LPCTSTR pData, TString *pRealHeadLine, TomboURI *pAllocedURI) = 0;
+	// get XML string to restore this subrepository
+	virtual LPTSTR GetXMLSaveString() = 0;
 
 	virtual BOOL Update(const TomboURI *pCurrentURI, LPCTSTR pData, TomboURI *pNewURI, TString *pNewHeadLine) = 0;
 	virtual BOOL Delete(const TomboURI *pURI, URIOption *pOption) = 0;
@@ -68,7 +84,10 @@ public:
 
 class LocalFileRepository : public RepositoryImpl {
 	LPTSTR pTopDir;
-	const RepositoryOption *pOpt;
+
+	BOOL bKeepTitle;
+	BOOL bKeepCaret;
+	BOOL bSafeFileName;
 
 protected:
 	//////////////////////////////////////////
@@ -101,14 +120,18 @@ public:
 	LocalFileRepository();
 	virtual ~LocalFileRepository();
 
-	BOOL Init(const RepositoryOption *pOpt);
+	BOOL Init(LPCTSTR pRepName, LPCTSTR pDispName, LPCTSTR pTopDir, 
+				BOOL bKeepTitle, BOOL bKeepCaret, BOOL bSafeFileName);
+
+	// temporary method for refactoring
+	BOOL SetTopDir(LPCTSTR pDir);
 
 	///////////////////////////////
 	// impliment RepositoryImpl methods
 
-	BOOL SetRepositoryOption(const RepositoryOption *pOpt);
+	RepositoryImpl *Clone();
+	LPTSTR GetXMLSaveString();
 
-	BOOL Create(const TomboURI *pTemplate, LPCTSTR pData, TString *pRealHeadLine, TomboURI *pAllocedURI);
 	BOOL Update(const TomboURI *pCurrentURI, LPCTSTR pData, TomboURI *pNewURI, TString *pNewHeadLine);
 	BOOL Delete(const TomboURI *pURI, URIOption *pOption);
 	BOOL Copy(const TomboURI *pCopyFrom, const TomboURI *pCopyTo, URIOption *pOption);
@@ -139,5 +162,49 @@ public:
 	BOOL ExecuteAssoc(const TomboURI *pURI, ExeAppType nType);
 	BOOL MakeFolder(const TomboURI *pURI, LPCTSTR pFolderName);
 };
+
+///////////////////////////////////////////////////////////////////
+// virtual folder repository implimentation
+///////////////////////////////////////////////////////////////////
+// in this time, VFolderRepository is psudo implementation.
+
+class VFolderRepository : public RepositoryImpl {
+public:
+	VFolderRepository();
+	virtual ~VFolderRepository();
+	BOOL Init(LPCTSTR pRepName, LPCTSTR pDispName);
+
+	RepositoryImpl *Clone();
+	LPTSTR GetXMLSaveString();
+
+	BOOL Update(const TomboURI *pCurrentURI, LPCTSTR pData, TomboURI *pNewURI, TString *pNewHeadLine);
+	BOOL Delete(const TomboURI *pURI, URIOption *pOption);
+	BOOL Copy(const TomboURI *pCopyFrom, const TomboURI *pCopyTo, URIOption *pOption);
+	BOOL Move(const TomboURI *pMoveFrom, const TomboURI *pMoveTo, URIOption *pOption);
+
+	BOOL ChangeHeadLine(const TomboURI *pURI, LPCTSTR pReqNewHeadLine, URIOption *pOption);
+
+	BOOL GetHeadLine(const TomboURI *pURI, TString *pHeadLine);
+
+	BOOL GetOption(const TomboURI *pURI, URIOption *pOption) const;
+	BOOL SetOption(const TomboURI *pCurrentURI, URIOption *pOption);
+
+	BOOL GetPhysicalPath(const TomboURI *pURI, TString *pFullPath);
+
+	URIList *GetChild(const TomboURI *pFolder, BOOL bSkipEncrypt, BOOL bLooseDecrypt, BOOL *pLoose);
+
+	BOOL RequestAllocateURI(const TomboURI *pBaseURI, LPCTSTR pText, TString *pHeadLine, TomboURI *pURI, const TomboURI *pTemplateURI);
+
+	BOOL GetAttribute(const TomboURI *pURI, NoteAttribute *pAttribute);
+	BOOL SetAttribute(const TomboURI *pURI, const NoteAttribute *pAttribute);
+	BOOL GetNoteAttribute(const TomboURI *pURI, UINT64 *pLastUpdate, UINT64 *pCreateDate, UINT64 *pFileSize);
+
+	LPTSTR GetNoteData(const TomboURI *pURI);
+	LPBYTE GetNoteDataNative(const TomboURI *pURI, LPDWORD pSize);
+
+	BOOL ExecuteAssoc(const TomboURI *pURI, ExeAppType nType);
+	BOOL MakeFolder(const TomboURI *pURI, LPCTSTR pFolderName);
+};
+
 
 #endif

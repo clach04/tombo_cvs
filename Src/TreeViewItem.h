@@ -187,7 +187,7 @@ class TreeViewVirtualFolderRoot : public TreeViewFolderItem {
 public:
 	TreeViewVirtualFolderRoot();
 	~TreeViewVirtualFolderRoot();
-	BOOL Init(VFManager *pManager);
+	BOOL Init(const TomboURI *pURI, VFManager *pManager);
 
 	////////////////////////////
 	// class specific methods

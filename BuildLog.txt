@@ -155,3 +155,19 @@
 
 - Refactoring about TreeViewItem
 	- now each node have its URI
+
+////////////////////////////////
+// B221 (TOMBO 1.17.1)
+////////////////////////////////
+
+Based on B217(TOMBO 1.17)
+- FIX: Input method ATOK is not work good on W-ZERO3[es]
+
+////////////////////////////////
+// B222
+////////////////////////////////
+
+- Multi repository support(yet completed)
+- Fixes to YAE
+	* Hang up when *.tdt points invalid position.
+

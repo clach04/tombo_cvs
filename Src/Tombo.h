@@ -103,4 +103,5 @@ typedef FARPROC SUPER_WND_PROC;
 
 #define NUM_RETRY_INVALID_PASSWORD 3
 
+#define VFOLDER_REPO_NAME TEXT("@vfolder")
 #endif

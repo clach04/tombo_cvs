@@ -638,9 +638,10 @@ TreeViewVirtualFolderRoot::~TreeViewVirtualFolderRoot()
 {
 }
 
-BOOL TreeViewVirtualFolderRoot::Init(VFManager *p)
+BOOL TreeViewVirtualFolderRoot::Init(const TomboURI *pURI, VFManager *p)
 {
 	pManager = p;
+	SetURI(pURI);
 	return TRUE;
 }
 

@@ -76,6 +76,8 @@
 
 class File;
 class TomboURI;
+class RepositoryImpl;
+
 ////////////////////////////////////
 // Property data
 ////////////////////////////////////
@@ -109,6 +111,8 @@ class Property {
 	BOOL LoadProperties();
 	BOOL LoadDefaultProperties();
 
+	RepositoryImpl **pRepos;
+	DWORD nNumRepos;
 
 public:
 	Property();
@@ -123,6 +127,11 @@ public:
 	/////////////////////////////////
 	// accessor
 
+	// Repository related
+	DWORD GetNumSubRepository() { return nNumRepos; }
+	// Clone RepsitoryImpl and return it
+	RepositoryImpl *GetSubRepository(DWORD nIndex);
+
 	// startup related
 
 	STR_ACCESSOR(TopDir, PROP_S_TOPDIR)		// TOMBO root directory
@@ -132,7 +141,6 @@ public:
 	STR_ACCESSOR(LastOpenURI, PROP_S_LAST_OPEN_URI) // notes store folder
 	NUM_ACCESSOR(KeepLastOpen, PROP_N_KEEP_LAST_OPEN)	// when starting, the note last open is opened.
 	STR_ACCESSOR(DefaultNote, PROP_S_DEFAULTNOTE)	// use this uri when starting tombo
-
 
 	// font related
 	STR_ACCESSOR(SelectViewFontName, PROP_S_SELECTVIEW_FONTNAME)

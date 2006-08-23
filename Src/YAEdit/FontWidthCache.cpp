@@ -45,6 +45,7 @@ BYTE FontWidthCache::GetOnebyteCharWidth(const char c)
 
 BYTE FontWidthCache::GetTwobyteCharWidth(const char *p)
 {
+	if (*p == '\0') return 0;
 	SIZE size;
 	GetTextExtentPoint32(hRefDC, p, 2, &size);
 	return (BYTE)size.cx;

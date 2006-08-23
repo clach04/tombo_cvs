@@ -22,6 +22,7 @@
 
 #define COLOR_EOL RGB(255, 128, 128)
 #define COLOR_LEOL RGB(255, 128, 128)
+#define COLOR_TAB RGB(255, 128, 128)
 #define COLOR_EOF RGB(0, 0, 255)
 
 #define CHAR_TYPE_NORMAL 0
@@ -102,7 +103,7 @@ static void DrawZenkakuSpace(HDC hDC, RECT *pRect, COLORREF color)
 
 static void DrawTab(HDC hDC, RECT *pRect, COLORREF color)
 {
-	COLORREF crDefault = SetTextColor(hDC, COLOR_EOF);
+	COLORREF crDefault = SetTextColor(hDC, COLOR_TAB);
 	DrawText(hDC, TEXT(">"), 1, pRect, DT_TOP | DT_SINGLELINE);
 	SetTextColor(hDC, crDefault);
 }
@@ -478,68 +479,6 @@ void YAEditView::RequestRedrawRegion(const Region *pRegion)
 
 	}
 }
-#ifdef COMMENT
-void YAEditView::RequestRedrawRegion(const Region *pRegion)
-{
-	Region rgn = *pRegion;
-
-	// replace Region::COL_EOL
-	if (rgn.posEnd.col == Region::COL_EOL) {
-		LineChunk lc2;
-		pCtrl->GetLgLineChunk(rgn.posEnd.row, &lc2);
-		rgn.posEnd.col = lc2.LineLen();
-	}
-
-	if (rgn.posEnd.row < nBaseLineNo ||
-		rgn.posStart.row > nBaseLineNo + nPageHeight) {
-		// selected area is out of screen
-		return;
-	}
-
-	if (rgn.posStart.row == rgn.posEnd.row) {
-		// region is in one line
-		CalcInvalidateArea(rgn.posStart.row, rgn.posStart.col, rgn.posEnd.col);
-	} else {
-		// top of line
-		if (rgn.posStart.row >= nBaseLineNo && rgn.posStart.row <= nBaseLineNo + nPageHeight) {
-			LineChunk lc;
-			pCtrl->GetLgLineChunk(rgn.posStart.row, &lc);
-			CalcInvalidateArea(rgn.posStart.row, 0, lc.LineLen());
-		}
-
-		// end of line
-		if (rgn.posEnd.row >= nBaseLineNo && rgn.posEnd.row <= nBaseLineNo + nPageHeight) {
-			CalcInvalidateArea(rgn.posEnd.row, 0, rgn.posEnd.col);
-		}
-
-		// rest area
-
-		// select lines that in the view
-		DWORD nStartRow = rgn.posStart.row + 1;
-		DWORD nEndRow = rgn.posEnd.row - 1;
-		if (nStartRow > nEndRow) return;
-		if (nStartRow < nBaseLineNo) nStartRow = nBaseLineNo;
-		if (nEndRow > nBaseLineNo + nPageHeight) nEndRow = nBaseLineNo + nPageHeight;
-
-		// request update
-		RECT r;
-		r.left = rClientRect.left; r.right = rClientRect.right;
-		r.top = (nStartRow - nBaseLineNo) * nLineH;
-		r.bottom = r.top + (nEndRow - nStartRow + 1) * nLineH;
-		InvalidateRect(hViewWnd, &r, TRUE);
-	}
-
-	//
-	if (rgn.posEnd.row == GetMaxLine() - 1) {
-		RECT r;
-		r.left = rClientRect.left; r.right = rClientRect.right;
-		r.top = (rgn.posEnd.row - nBaseLineNo) * nLineH;
-		r.bottom = rClientRect.bottom;
-		InvalidateRect(hViewWnd, &r, TRUE);
-
-	}
-}
-#endif
 
 void YAEditView::CalcInvalidateArea(DWORD nLine, DWORD nStart, DWORD nEnd)
 {
@@ -688,6 +627,10 @@ void YAEditView::SetCaretPosition(const Coordinate &pos)
 
 	LineChunk lc;
 	if (!pCtrl->GetLgLineChunk(nCursorRow, &lc)) return;
+
+	if (nCursorCol >= lc.LineLen()) {
+		nCursorCol = lc.LineLen();
+	}
 
 	nCursorColPos = GetLineWidth(0, lc.GetLineData(), nCursorCol);
 	SetCaretPos();

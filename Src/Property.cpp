@@ -24,6 +24,9 @@
 #include "AutoPtr.h"
 #include "List.h"
 #include "TomboURI.h"
+#include "Repository.h"
+#include "VarBuffer.h"
+#include "RepositoryImpl.h"
 
 //////////////////////////////////////////
 // Attribute definitions
@@ -66,6 +69,7 @@
 #define DEFAULTDATEFORMAT2 TEXT("%h:%m:%s")
 
 //////////////////////////////////////////
+class RepositoryImpl;
 
 static HKEY GetTomboRootKey();
 
@@ -170,7 +174,7 @@ LPCTSTR GetString(UINT nID)
 // ctor
 //////////////////////////////////////////
 
-Property::Property() : pCmdlineAssignedTopDir(NULL), pBookMark(NULL), pSearchHistory(NULL), pTopDirHistory(NULL)
+Property::Property() : pCmdlineAssignedTopDir(NULL), pBookMark(NULL), pSearchHistory(NULL), pTopDirHistory(NULL), pRepos(NULL), nNumRepos(0)
 #if defined(PLATFORM_HPC)
 	,pCmdBarInfo(NULL)
 #endif
@@ -191,6 +195,11 @@ Property::~Property()
 	for (DWORD i = 0; i < NUM_PROPS_STR; i++) {
 		delete [] pPropsStr[i];
 	}
+
+	for (i = 0; i < nNumRepos; i++) {
+		delete pRepos[i];
+	}
+	delete [] pRepos;
 
 	delete [] pCmdlineAssignedTopDir;
 	delete [] pBookMark;
@@ -294,6 +303,19 @@ DWORD Property::Popup(HINSTANCE hInst, HWND hWnd, const TomboURI *pCurrentSelect
 
 	PropertyPage pp;
 	if (pp.Popup(hInst, hWnd, pages, n, MSG_PROPTAB_TITLE, MAKEINTRESOURCE(IDI_TOMBO)) == IDOK) {
+		////////////////////////////////////
+		// sync Topdir <-> rep array settings
+		// XXXX: this code are temporary till changing property dialog
+		LPCTSTR pTopDir = GetTopDir();
+		for (DWORD i = 0; i < GetNumSubRepository(); i++) {
+			RepositoryImpl *pImpl = pRepos[i];
+			if (pImpl->GetRepositoryType() == TOMBO_REPO_SUBREPO_TYPE_LOCALFILE && _tcscmp(pImpl->GetRepositoryName(), TEXT("default")) == 0) {
+				LocalFileRepository *pDefaultRep = (LocalFileRepository*)pImpl;
+				pDefaultRep->SetTopDir(pTopDir);
+			}
+		}
+		////////////////////////////////////
+
 		if (!Save()) {
 			MessageBox(NULL, MSG_SAVE_DATA_FAILED, TEXT("ERROR"), MB_ICONSTOP | MB_OK);
 		}
@@ -352,7 +374,11 @@ struct PropFileParseInfo {
 	LPTSTR pMultiName;
 	List lMultiItem;
 
-	PropFileParseInfo() : pMultiName(NULL) {}
+	BOOL bInTomboRoot;
+
+	TVector<RepositoryImpl*> vSubRepos;
+
+	PropFileParseInfo() : pMultiName(NULL), bInTomboRoot(FALSE) {}
 	~PropFileParseInfo() { delete[] pMultiName; }
 
 	void SetMultiName(LPTSTR p) { delete[] pMultiName; pMultiName = p; }
@@ -368,8 +394,15 @@ static void StartElement(void *userData, const XML_Char *name, const XML_Char **
 	LPTSTR pKey;
 	LPTSTR pValue;
 
-	if (wcscmp(pName, L"tomboprop") == 0) {
-		// NOP in current version
+	if (wcscmp(pName, L"tomboroot") == 0) {
+		pParseInfo->bInTomboRoot = TRUE;
+	} else if (pParseInfo->bInTomboRoot) {
+		RepositoryImpl *pImpl = Repository::CreateSubRepo((LPCWSTR)name, (const WCHAR **)atts);
+		if (pImpl != NULL) {
+			pParseInfo->vSubRepos.Add(&pImpl);
+		}
+	} else if (wcscmp(pName, L"tomboprop") == 0) {
+		// XXXX: NOP in current version
 		// for future version, version check will be added.
 	} else if (wcscmp(pName, L"num") == 0) {
 		GetNameAndValue(atts, &pKey, &pValue);
@@ -432,7 +465,9 @@ static void EndElement(void *userData, const XML_Char *name)
 {
 	PropFileParseInfo *pParseInfo = (PropFileParseInfo*)userData;
 
-	if (wcscmp((LPCWSTR)name, L"multistr") == 0) {
+	if (wcscmp((LPCWSTR)name, L"tomboroot") == 0) {
+		pParseInfo->bInTomboRoot = FALSE;
+	} else if (wcscmp((LPCWSTR)name, L"multistr") == 0) {
 		List *pList = &(pParseInfo->lMultiItem);
 
 		DWORD n = 0;
@@ -498,6 +533,28 @@ BOOL Property::LoadDefaultProperties()
 BOOL Property::Load()
 {
 	BOOL bResult = LoadProperties();
+
+	// Convert topdir value to repository value
+	LPCTSTR pTopDir = GetTopDir();
+	if (pTopDir != NULL && GetNumSubRepository() == 0) {
+		pRepos = new RepositoryImpl*[2];
+		nNumRepos = 2;
+
+		LocalFileRepository *pLocalImpl = new LocalFileRepository();
+//		if (!pLocalImpl->Init(TEXT("default"), , pTopDir, bKeepTitle, bKeepCaret, bSafeFileName)) {
+		// XXXX : 
+		if (!pLocalImpl->Init(TEXT("default"), MSG_MEMO, pTopDir, FALSE, TRUE, TRUE)) {
+			return FALSE;
+		}
+		pRepos[0] = pLocalImpl;
+
+		VFolderRepository *pVImpl = new VFolderRepository();
+		if (!pVImpl->Init(TEXT("@vfolder"), MSG_VIRTUAL_FOLDER)) {
+			return FALSE;
+		}
+		pRepos[1] = pVImpl;
+	}
+
 	if (!bResult) {
 		// set default value
 		bNeedAsk = TRUE;
@@ -537,6 +594,7 @@ BOOL Property::LoadProperties()
 
 	PropFileParseInfo ppi;
 	ppi.pProperty = this;
+	if (!ppi.vSubRepos.Init(5, 5)) return FALSE;
 
 	XML_SetElementHandler(pParser, StartElement, EndElement);
 	XML_SetUserData(pParser, &ppi);
@@ -555,6 +613,18 @@ BOOL Property::LoadProperties()
 		return FALSE;
 	}
 	XML_ParserFree(pParser);
+
+	for (i = 0; i < nNumRepos; i++) {
+		delete pRepos[i];
+	}
+	delete [] pRepos;
+
+	nNumRepos = ppi.vSubRepos.NumItems();
+	pRepos = new RepositoryImpl*[nNumRepos];
+	for (i = 0; i < ppi.vSubRepos.NumItems(); i++) {
+		RepositoryImpl *pImpl = *ppi.vSubRepos.GetUnit(i);
+		pRepos[i] = pImpl;
+	}
 
 	bNeedAsk = FALSE;
 	bLoad = TRUE;
@@ -704,8 +774,7 @@ BOOL Property::SaveToFile(File *pFile)
 		// TODO: DTD
 		"<tomboprop version=\"" TOMBO_PROP_VERSION "\">\n";
 
-	const char *pFooter =
-		"</tomboprop>\n";
+	const char *pFooter = "</tomboprop>\n";
 
 	if (!pFile->Write((LPBYTE)pHeader, strlen(pHeader))) return FALSE;
 
@@ -720,6 +789,22 @@ BOOL Property::SaveToFile(File *pFile)
 	DWORD nPropLst = strlen(pPropLst);
 	
 	char buf[128];
+
+	const char *pTomboRootStart = "  <tomboroot>\n";
+	const char *pTomboRootEnd   = "  </tomboroot>\n";
+
+	if (!pFile->Write((LPBYTE)pTomboRootStart, strlen(pTomboRootStart))) return FALSE;
+	for (DWORD i = 0; i < g_Repository.GetNumOfSubRepository(); i++) {
+		LPTSTR pSaveStr = g_Repository.GetSubRepoXMLSaveString(i);
+		AutoPointer<TCHAR> ap(pSaveStr);
+		if (pSaveStr == NULL) return FALSE;
+		char *pSaveStrA = ConvTCharToUTF8(pSaveStr);
+		AutoPointer<char> ap2(pSaveStrA);
+
+		if (!pFile->Write((LPBYTE)pSaveStrA, strlen(pSaveStrA))) return FALSE;
+	}
+	if (!pFile->Write((LPBYTE)pTomboRootEnd, strlen(pTomboRootEnd))) return FALSE;
+
 
 	// save number props.
 	PropListNum *pNum = propListNum;
@@ -1142,4 +1227,11 @@ LPTSTR ConvFileEncodingToTChar(LPBYTE p)
 	default:
 		return ConvSJIS2Unicode((const char*)p);	
 	}
+}
+
+RepositoryImpl *Property::GetSubRepository(DWORD nIndex) 
+{ 
+	RepositoryImpl *pImpl = pRepos[nIndex];
+	if (pImpl == NULL) return NULL;
+	return pImpl->Clone(); 
 }

@@ -9,6 +9,7 @@ class TreeViewVirtualFolderRoot;
 class VFManager;
 class VFInfo;
 class TomboURI;
+struct MSViewRootInfo;
 
 class MemoSelectView {
 
@@ -18,8 +19,8 @@ class MemoSelectView {
 	HWND hViewWnd;
 
 	// root node
-	HTREEITEM hMemoRoot;
-	HTREEITEM hSearchRoot;
+	MSViewRootInfo *pRoots;
+	DWORD nNumRoots;
 
 	HIMAGELIST hSelectViewImgList;
 
@@ -53,7 +54,8 @@ public:
 	/////////////////////////////
 	// Initialize functions
 
-	MemoSelectView() : hViewWnd(NULL), pMemoMgr(NULL), bAutoLoadMode(FALSE), bSingleClickMode(FALSE), hMemoRoot(NULL), hSearchRoot(NULL) {}
+	MemoSelectView() : hViewWnd(NULL), pMemoMgr(NULL), bAutoLoadMode(FALSE), bSingleClickMode(FALSE), pRoots(NULL), nNumRoots(0) {}
+	~MemoSelectView();
 	BOOL Init(MemoManager *p) { pMemoMgr = p; bCut = FALSE; pClipItem = NULL; return TRUE; }
 	BOOL Create(LPCTSTR pName, RECT &r, HWND hParent, DWORD nID, HINSTANCE hInst, HFONT hFont);
 
@@ -172,7 +174,6 @@ public:
 	// Virtual folder
 	BOOL InsertVirtualFolder(const VFInfo *pInfo);
 
-	TreeViewVirtualFolderRoot *GetVirtualFolderRoot();
 	void CloseVFRoot();
 
 	/////////////////////////////

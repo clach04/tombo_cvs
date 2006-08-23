@@ -143,6 +143,10 @@ SOURCE=.\res\CppUnitTestApp.rc2
 # PROP Default_Filter ""
 # Begin Source File
 
+SOURCE=.\test\CryptTest.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\test\MemoInfoTest.cpp
 # End Source File
 # Begin Source File
@@ -358,5 +362,13 @@ SOURCE=..\oniguruma\win32\oniguruma.lib
 # End Source File
 # End Group
 # End Group
+# Begin Source File
+
+SOURCE=..\Src\TSSRepository\TSSCrypt.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\Src\TSSRepository\TSSCrypt.h
+# End Source File
 # End Target
 # End Project

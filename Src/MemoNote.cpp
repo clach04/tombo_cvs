@@ -43,10 +43,9 @@ BOOL MemoNote::Init(LPCTSTR p)
 /////////////////////////////////////////////
 // get note's URI
 /////////////////////////////////////////////
-
-BOOL MemoNote::GetURI(TomboURI *pURI) const
+BOOL MemoNote::GetURI(LPCTSTR pRepoName, TomboURI *pURI) const
 {
-	return pURI->InitByNotePath(pPath);
+	return pURI->InitByNotePath(pRepoName, pPath);
 }
 
 /////////////////////////////////////////////
