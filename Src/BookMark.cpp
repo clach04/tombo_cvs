@@ -163,7 +163,7 @@ LPTSTR BookMark::ExportToMultiSZ()
 	if (pMarks == NULL) return NULL;
 
 	LPTSTR pCur = pMarks;
-	for (i = 0; i < n; i++) {
+	for (DWORD i = 0; i < n; i++) {
 		p = vBookMark.GetUnit(i);
 
 		if (_tcslen(p->pPath) == 0) {

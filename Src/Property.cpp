@@ -196,7 +196,7 @@ Property::~Property()
 		delete [] pPropsStr[i];
 	}
 
-	for (i = 0; i < nNumRepos; i++) {
+	for (DWORD i = 0; i < nNumRepos; i++) {
 		delete pRepos[i];
 	}
 	delete [] pRepos;
@@ -614,14 +614,14 @@ BOOL Property::LoadProperties()
 	}
 	XML_ParserFree(pParser);
 
-	for (i = 0; i < nNumRepos; i++) {
+	for (WORD i = 0; i < nNumRepos; i++) {
 		delete pRepos[i];
 	}
 	delete [] pRepos;
 
 	nNumRepos = ppi.vSubRepos.NumItems();
 	pRepos = new RepositoryImpl*[nNumRepos];
-	for (i = 0; i < ppi.vSubRepos.NumItems(); i++) {
+	for (DWORD i = 0; i < ppi.vSubRepos.NumItems(); i++) {
 		RepositoryImpl *pImpl = *ppi.vSubRepos.GetUnit(i);
 		pRepos[i] = pImpl;
 	}
@@ -1041,15 +1041,16 @@ BOOL Property::GetWinSize(UINT *pFlags, UINT *pShowCmd, LPRECT pWinRect, LPWORD 
 		return FALSE;
 	}
 
+	DWORD n;
 	if (_stscanf(pPropsStr[PROP_S_WINSIZE], TEXT("%d,%d,%d,%d,%d,%d,%d"),
 		pFlags, pShowCmd,
 		&(pWinRect->left), &(pWinRect->top),
 		&(pWinRect->right), &(pWinRect->bottom),
-		pSelectViewWidth) != 7) {
-
+		&n) != 7) {
 		SetLastError(ERROR_INVALID_DATA);
 		return FALSE;
 	}
+	*pSelectViewWidth = n;
 	// check and modify window position
 	if (pWinRect->left < 0) pWinRect->left = 0;
 	if (pWinRect->top < 0) pWinRect->top = 0;

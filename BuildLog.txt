@@ -171,3 +171,9 @@ Based on B217(TOMBO 1.17)
 - Fixes to YAE
 	* Hang up when *.tdt points invalid position.
 
+////////////////////////////////
+// B223
+////////////////////////////////
+
+- Migrate VC6 to VisualStudio2005 (win32).
+- replace expat libs (win32).

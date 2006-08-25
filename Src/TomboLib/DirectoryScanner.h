@@ -19,8 +19,10 @@
 // 実行される。(メモリ開放処理等が行われる可能性があるため)
 // 必要であればDirectoryScanner::IsStopScan()で判定し、処理をスキップさせること
 
+#define SCANPATH_LEN (MAX_PATH * 2)
+
 class DirectoryScanner {
-	TCHAR aScanPath[MAX_PATH * 2]; // サイズに余裕を見るため*2している
+	TCHAR aScanPath[SCANPATH_LEN]; // サイズに余裕を見るため*2している
 
 	BOOL bContinue;
 	DWORD nScanFlag;

@@ -1583,7 +1583,7 @@ BOOL WipeOutAndDeleteFile(LPCTSTR pFile)
 	BYTE buf[64];
 	for (DWORD i = 0; i < 64; i++) buf[i] = 0;
 
-	for (i = 0; i < nSize; i++) {
+	for (DWORD i = 0; i < nSize; i++) {
 		delf.Write(buf, 64);
 	}
 	delf.Close();

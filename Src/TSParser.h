@@ -1,6 +1,7 @@
 #ifndef TSCOMPILER_H
 #define TSCOMPILER_H
 
+#include <expat.h>
 class MemoSelectView;
 class ParseInfo;
 class VFStream;
@@ -51,7 +52,7 @@ public:
 
 	////////////////////////
 	// Start element
-	virtual BOOL StartElement(ParseInfo *p, const unsigned short **atts);
+	virtual BOOL StartElement(ParseInfo *p, const XML_Char **atts);
 
 	////////////////////////
 	// End element

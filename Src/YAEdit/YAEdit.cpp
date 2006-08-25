@@ -730,8 +730,8 @@ void YAEditImpl::OnRbuttonDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	RECT rWinRect;
 	GetWindowRect(hWnd, &rWinRect);
 
-	WORD x = rWinRect.left + LOWORD(lParam);
-	WORD y = rWinRect.top + HIWORD(lParam);
+	WORD x = (WORD)(rWinRect.left + LOWORD(lParam));
+	WORD y = (WORD)(rWinRect.top + HIWORD(lParam));
 
 	ShowExecContextMenu(x, y);
 }

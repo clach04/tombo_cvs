@@ -307,7 +307,7 @@ LPTSTR PhysicalLineManager::GetRegionString(const Region *pRegion)
 
 		_tcsncpy(q, TEXT("\r\n"), 2); q += 2;
 
-		for (i = pRegion->posStart.row + 1; i < pRegion->posEnd.row; i++) {
+		for (DWORD i = pRegion->posStart.row + 1; i < pRegion->posEnd.row; i++) {
 			MemBlock *pBlock = aliLine.GetUnit(i)->pLine;
 			_tcsncpy(q, pBlock->GetDataArea(), pBlock->nUsed);
 			q += pBlock->nUsed;

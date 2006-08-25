@@ -454,7 +454,8 @@ BOOL LocalFileRepository::GetSafeFileName(const TString *pBasePath, TString *pNe
 {
 	TString s;
 
-	if (!s.Alloc(_tcslen(pBasePath->Get()) + 20 + 1)) return FALSE;
+	DWORD l = _tcslen(pBasePath->Get()) + 20 + 1;
+	if (!s.Alloc(l)) return FALSE;
 	_tcscpy(s.Get(), pBasePath->Get());
 	_tcscat(s.Get(), TEXT("0000000000000000.chs"));
 

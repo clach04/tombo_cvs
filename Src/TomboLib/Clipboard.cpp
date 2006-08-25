@@ -81,7 +81,8 @@ BOOL Clipboard::SetText(LPCTSTR pText)
 	}
 	if (!EmptyClipboard()) return FALSE;
 
-	HANDLE hText = LocalAlloc(LMEM_MOVEABLE , (_tcslen(pText) + 1) * sizeof(TCHAR));
+	DWORD nLen = (_tcslen(pText) + 1) * sizeof(TCHAR);
+	HANDLE hText = LocalAlloc(LMEM_MOVEABLE , nLen);
 	if (hText == NULL) return FALSE;
 
 	LPTSTR p = (LPTSTR)LocalLock(hText);

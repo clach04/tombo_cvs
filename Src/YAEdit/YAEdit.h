@@ -109,7 +109,7 @@ public:
 // YAE implementation
 //////////////////////////////////////////////////
 
-class YAEditImpl : YAEdit, YAEditListener {
+class YAEditImpl : public YAEdit, YAEditListener {
 protected:
 	///////////////////////////////////////
 	// callback handler

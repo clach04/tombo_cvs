@@ -1540,7 +1540,7 @@ void MainFrame::SaveWinSize()
 #if defined(PLATFORM_PKTPC) || defined(PLATFORM_BE500) || defined(PLATFORM_PSPC)
 			nPane = (r.bottom - r.top) / 3 * 2;
 #else
-			nPane = (r.right - r.left) / 3;	
+			nPane = (WORD)(r.right - r.left) / 3;	
 #endif
 		}
 	}
@@ -1565,7 +1565,7 @@ void MainFrame::LoadWinSize(HWND hWnd)
 #if defined(PLATFORM_PKTPC) || defined(PLATFORM_BE500) || defined(PLATFORM_PSPC)
 		nSplitterSize = (rClientRect.right - rClientRect.left) / 3 * 2;
 #else
-		nSplitterSize = (rClientRect.right - rClientRect.left) / 3;
+		nSplitterSize = (WORD)(rClientRect.right - rClientRect.left) / 3;
 #endif
 	}
 #if defined(PLATFORM_PKTPC) && defined(FOR_VGA)
@@ -1922,7 +1922,7 @@ void MainFrame::LoadBookMark(LPCTSTR pBookMarks)
 
 	// add to menu
 	n = pBookMark->NumItems();
-	for (i = 0; i < n; i++) {
+	for (DWORD i = 0; i < n; i++) {
 		p = pBookMark->GetUnit(i);
 		AppendBookMark(hBookMark, p);
 	}

@@ -65,14 +65,14 @@ BOOL YAEditor::Create(LPCTSTR pName, RECT &r, HWND hParent, HINSTANCE hInst, HFO
 {
 	// MSG_xx needs initializ after initialized message resources. 
 	static YAEContextMenu contextMenu[] = {
-		{ MSG_MENUITEM_UNDO,			YAEdit::CmdUndo },
+		{ MSG_MENUITEM_UNDO,			&YAEdit::CmdUndo },
 		{ TEXT(""),						NULL },
-		{ MSG_MENUITEM_MAIN_CUT,		YAEdit::CmdCut },
-		{ MSG_MENUITEM_MAIN_COPY,		YAEdit::CmdCopy },
-		{ MSG_MENUITEM_MAIN_PASTE,		YAEdit::CmdPaste },
-		{ MSG_MENUITEM_MAIN_DELETE,		YAEdit::CmdBackSpace },
+		{ MSG_MENUITEM_MAIN_CUT,		&YAEdit::CmdCut },
+		{ MSG_MENUITEM_MAIN_COPY,		&YAEdit::CmdCopy },
+		{ MSG_MENUITEM_MAIN_PASTE,		&YAEdit::CmdPaste },
+		{ MSG_MENUITEM_MAIN_DELETE,		&YAEdit::CmdBackSpace },
 		{ TEXT(""),						NULL },
-		{ MSG_MENUITEM_DETAILS_SELALL,	YAEdit::CmdSelAll },
+		{ MSG_MENUITEM_DETAILS_SELALL,	&YAEdit::CmdSelAll },
 		{ NULL,							NULL },
 	};
 
