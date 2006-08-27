@@ -1,7 +1,7 @@
 #include <windows.h>
 #include <commctrl.h>
 #include <tchar.h>
-#if defined(PLATFORM_PKTPC)
+#if defined(PLATFORM_PKTPC) || defined(PLATFORM_WM5)
 #include <aygshell.h>
 #endif
 
@@ -376,7 +376,7 @@ TreeViewItem* MemoSelectView::GetCurrentItem(HTREEITEM *pItem)
 BOOL MemoSelectView::Show(int nCmdShow)
 {
 	ShowWindow(hViewWnd, nCmdShow);
-#if defined(PLATFORM_PKTPC)
+#if defined(PLATFORM_PKTPC) || defined(PLATFORM_WM5)
 	// close menu if switch to other view
 	if (nCmdShow == SW_HIDE) {
 		ReleaseCapture();
@@ -413,7 +413,7 @@ LRESULT MemoSelectView::OnNotify(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
 	LPNM_TREEVIEW pHdr = (LPNM_TREEVIEW)lParam;
 
-#if defined(PLATFORM_PKTPC)
+#if defined(PLATFORM_PKTPC) || defined(PLATFORM_WM5)
 	NMRGINFO *pnmrginfo = (PNMRGINFO)lParam;
 	if (pnmrginfo->hdr.code == GN_CONTEXTMENU) {
 		// tap & hold
@@ -552,12 +552,12 @@ LRESULT MemoSelectView::OnNotify(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	return 0xFFFFFFFF;
 }
 
-#if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC) || defined(PLATFORM_PKTPC)
+#if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC) || defined(PLATFORM_PKTPC) || defined(PLATFORM_WM5)
 void MemoSelectView::OnNotify_RClick(POINT pt)
 {
 	TV_HITTESTINFO hti;
 	POINT cpt = pt;
-#if defined(PLATFORM_WIN32) || defined(PLATFORM_PKTPC)
+#if defined(PLATFORM_WIN32) || defined(PLATFORM_PKTPC) || defined(PLATFORM_WM5)
 	ScreenToClient(hViewWnd, &cpt);
 #endif
 	hti.pt = cpt;

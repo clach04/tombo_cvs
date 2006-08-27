@@ -46,7 +46,7 @@
 //////////////////////////////////////////
 // property pages
 
-#if defined(PLATFORM_PKTPC)
+#if defined(PLATFORM_PKTPC) || defined(PLATFORM_WM5)
 #define PROPTAB_PAGES 10
 #else
 #define PROPTAB_PAGES 8
@@ -106,10 +106,10 @@ struct PropListNum {
 	{ PROP_N_SINGLECLICK_MODE,			TEXT("SingleClickMode"),			TRUE },
 	{ PROP_N_USE_TWO_PANE,				TEXT("UseTwoPane"),					TRUE },
 	{ PROP_N_KEEP_TITLE,				TEXT("KeepTitle"),					FALSE },
-#if defined(PLATFORM_PKTPC) || defined(PLATFORM_WIN32)
+#if defined(PLATFORM_PKTPC) || defined(PLATFORM_WIN32) || defined(PLATFORM_WM5)
 	{ PROP_N_SWITCH_WINDOW_TITLE,		TEXT("SwitchWindowTitle"),			TRUE },
 #endif
-#if defined(PLATFORM_PKTPC)
+#if defined(PLATFORM_PKTPC) || defined(PLATFORM_WM5)
 	{ PROP_N_APP_BUTTON1,				TEXT("AppButton1"),					APPBUTTON_ACTION_DISABLE },
 	{ PROP_N_APP_BUTTON2,				TEXT("AppButton2"),					APPBUTTON_ACTION_DISABLE },
 	{ PROP_N_APP_BUTTON3,				TEXT("AppButton3"),					APPBUTTON_ACTION_DISABLE },
@@ -118,7 +118,7 @@ struct PropListNum {
 	{ PROP_N_SIPSIZE_DELTA,				TEXT("SipSizeDelta"),				0},
 #endif
 	{ PROP_N_CODEPAGE,					TEXT("CodePage"),					0 },
-#if defined(PLATFORM_PKTPC)
+#if defined(PLATFORM_PKTPC) || defined(PLATFORM_WM5)
 	{ PROP_N_DISABLEEXTRAACTIONBUTTON,	TEXT("DisableExtraActionButton"),	0},
 #endif
 #if defined(PLATFORM_HPC) || defined(PLATFORM_WIN32)
@@ -133,7 +133,7 @@ struct PropListNum {
 	{ PROP_N_DISABLESAVEDLG,			TEXT("DisableSaveDlg"),				FALSE },
 	{ PROP_N_USEASSOC,					TEXT("UseSoftwareAssoc"),			FALSE },
 	{ PROP_N_SAFEFILENAME,				TEXT("UseSafeFileName"),			FALSE },
-#if defined(PLATFORM_PKTPC) && defined(FOR_VGA)
+#if (defined(PLATFORM_PKTPC) || defined(PLATFORM_WM5)) && defined(FOR_VGA)
 	{ PROP_N_TOMBO_WINSIZE3,			TEXT("WinSize3"),					0xFFFF },
 #endif
 	{ PROP_N_KEEP_LAST_OPEN,			TEXT("UseLastOpenNote"),			FALSE },
@@ -275,7 +275,7 @@ DWORD Property::Popup(HINSTANCE hInst, HWND hWnd, const TomboURI *pCurrentSelect
 	FontTab pgFont(this);
 	DateFormatTab pgDate(this);
 	KeepCaretTab pgKeepCaret(this);
-#if defined(PLATFORM_PKTPC)
+#if defined(PLATFORM_PKTPC) || defined(PLATFORM_WM5)
 	AppButtonTab pgAppButton(this);
 	SipTab pgSip(this);
 #endif
@@ -295,7 +295,7 @@ DWORD Property::Popup(HINSTANCE hInst, HWND hWnd, const TomboURI *pCurrentSelect
 #if !defined(PLATFORM_PSPC)
 	pages[n++] = &pgExtApp;
 #endif
-#if defined(PLATFORM_PKTPC)
+#if defined(PLATFORM_PKTPC) || defined(PLATFORM_WM5)
 	pages[n++] = &pgAppButton;
 	pages[n++] = &pgSip;
 #endif
@@ -672,7 +672,7 @@ BOOL Property::LoadFromReg(BOOL *pStrict)
 		pNum++;
 	}
 
-#if !(defined(PLATFORM_WIN32) || defined(PLATFORM_PKTPC))
+#if !(defined(PLATFORM_WIN32) || defined(PLATFORM_PKTPC) || defined(PLATFORM_WM5))
 	SetSwitchWindowTitle(FALSE);
 #endif
 

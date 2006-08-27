@@ -1,6 +1,6 @@
 #ifndef POCKETPCPLATFORM_H
 #define POCKETPCPLATFORM_H
-#if defined(PLATFORM_PKTPC)
+#if defined(PLATFORM_PKTPC) || defined(PLATFORM_WM5)
 
 #define PLATFORM_TYPE PocketPCPlatform
 

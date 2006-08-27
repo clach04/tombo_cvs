@@ -1093,7 +1093,7 @@ BOOL LocalFileRepository::ExecuteAssoc(const TomboURI *pURI, ExeAppType nType)
 		TString sCurrentPath;
 		if (!GetPhysicalPath(pURI, &sCurrentPath)) return FALSE;
 
-#if defined(PLATFORM_PKTPC)
+#if defined(PLATFORM_PKTPC) || defined(PLATFORM_WM5)
 		STARTUPINFO si;
 		PROCESS_INFORMATION pi;
 		memset(&si, 0, sizeof(si));
@@ -1164,7 +1164,7 @@ BOOL LocalFileRepository::ExecuteAssoc(const TomboURI *pURI, ExeAppType nType)
 			return TRUE;
 
 #endif
-#if defined(PLATFORM_PKTPC)
+#if defined(PLATFORM_PKTPC) || defined(PLATFORM_WM5)
 			if (!sExe.Set(pExeFile)) return FALSE;
 			if (!sCmdLine.Set(sFullPath.Get())) return FALSE;
 			if (!CreateProcess(sExe.Get(), sCmdLine.Get(), NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi)) return FALSE;

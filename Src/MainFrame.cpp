@@ -31,13 +31,12 @@
 #include "TomboURI.h"
 #include "Repository.h"
 
-#if defined(PLATFORM_PKTPC)
+#if defined(PLATFORM_PKTPC) || defined(PLATFORM_WM5)
 #include "DialogTemplate.h"
 #include "DetailsViewDlg.h"
 #endif
 
-#ifdef _WIN32_WCE
-#if defined(PLATFORM_PKTPC)
+#if defined(PLATFORM_PKTPC) || defined(PLATFORM_WM5)
 #include <Aygshell.h>
 #include <Imm.h>
 #endif
@@ -47,7 +46,6 @@ extern "C" {
 	// ?? may be deleted Imm.h ??
 UINT WINAPI ImmGetVirtualKey(HWND);
 };
-#endif
 #endif
 
 #include "AboutDialog.h"
@@ -72,7 +70,7 @@ static HIMAGELIST CreateSelectViewImageList(HINSTANCE hInst);
 #if defined(PLATFORM_WIN32)
 #define BORDER_WIDTH 2
 #endif
-#if defined(PLATFORM_HPC) || defined(PLATFORM_PKTPC) || defined(PLATFORM_PSPC) || defined(PLATFORM_BE500)
+#if defined(PLATFORM_HPC) || defined(PLATFORM_PKTPC) || defined(PLATFORM_PSPC) || defined(PLATFORM_BE500)  || defined(PLATFORM_WM5)
 #if defined(FOR_VGA)
 #define BORDER_WIDTH 10
 #else
@@ -243,7 +241,7 @@ int MainFrame::MainLoop() {
 	HACCEL hAccelSv = LoadAccelerators(g_hInstance, MAKEINTRESOURCE(IDR_ACCEL_SELECT));
 	HACCEL hAccelDv = LoadAccelerators(g_hInstance, MAKEINTRESOURCE(IDR_ACCEL_DETAIL));
 
-#if defined(PLATFORM_PKTPC) || defined(PLATFORM_PSPC) || defined(PLATFORM_BE500)
+#if defined(PLATFORM_PKTPC) || defined(PLATFORM_PSPC) || defined(PLATFORM_BE500) || defined(PLATFORM_WM5)
 	BOOL bIgnoreReturnKeyDown = FALSE;
 	BOOL bIgnoreReturnKeyUp = FALSE;
 	BOOL bIgnoreEscKeyDown = FALSE;
@@ -257,10 +255,10 @@ int MainFrame::MainLoop() {
 			pmPasswordMgr.UpdateAccess();
 		}
 	
-#if defined(PLATFORM_PKTPC) || defined(PLATFORM_PSPC) || defined(PLATFORM_BE500)
+#if defined(PLATFORM_PKTPC) || defined(PLATFORM_PSPC) || defined(PLATFORM_BE500) || defined(PLATFORM_WM5)
 		// アクションキー押下に伴うVK_RETURNの無視
 
-#if defined(PLATFORM_PKTPC)
+#if defined(PLATFORM_PKTPC) || defined(PLATFORM_WM5)
 		// On PocketPC devices, you can select enable/disable about this feature.
 		if (!g_Property.GetDisableExtraActionButton()) {
 		//disable logic begin
@@ -306,7 +304,7 @@ int MainFrame::MainLoop() {
 				continue;
 			}
 		}
-#if defined(PLATFORM_PKTPC)
+#if defined(PLATFORM_PKTPC) || defined(PLATFORM_WM5)
 		} // disable logic end
 #endif
 
@@ -515,7 +513,7 @@ void MainFrame::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	}
 
 	LoadWinSize(hWnd);
-#if defined(PLATFORM_PKTPC) && defined(FOR_VGA)
+#if (defined(PLATFORM_PKTPC)  || defined(PLATFORM_WM5)) && defined(FOR_VGA)
 	// initialize bLandScapeMode
 	bLandscapeMode = (r.right - r.left > r.bottom - r.top);
 #endif
@@ -756,7 +754,7 @@ BOOL MainFrame::OnNotify(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 void MainFrame::OnSettingChange(WPARAM wParam)
 {
-#if defined(PLATFORM_PKTPC) || defined(PLATFORM_PSPC) || defined(PLATFORM_BE500)
+#if defined(PLATFORM_PKTPC) || defined(PLATFORM_PSPC) || defined(PLATFORM_BE500) || defined(PLATFORM_WM5)
 	BOOL bStat;
 	SipControl sc;
 	if (!sc.Init()) return;
@@ -781,7 +779,7 @@ void MainFrame::OnSettingChange(WPARAM wParam)
 
 void MainFrame::OnSIPResize(BOOL bImeOn, RECT *pSipRect)
 {
-#if defined(PLATFORM_PKTPC) || defined(PLATFORM_BE500)
+#if defined(PLATFORM_PKTPC) || defined(PLATFORM_BE500) || defined(PLATFORM_WM5)
 	SetLayout();
 #endif
 }
@@ -885,7 +883,7 @@ void MainFrame::OnLButtonUp(WPARAM wParam, LPARAM lParam)
 	}
 	MovePane(xPos);
 #endif 
-#if (defined(PLATFORM_PKTPC) && !defined(FOR_VGA)) || defined(PLATFORM_PSPC) || defined(PLATFORM_BE500)
+#if ((defined(PLATFORM_PKTPC)  || defined(PLATFORM_WM5)) && !defined(FOR_VGA)) || defined(PLATFORM_PSPC) || defined(PLATFORM_BE500)
 	RECT r;
 	GetClientRect(hMainWnd, &r);
 	WORD wTotalHeight = (WORD)(r.bottom - r.top);
@@ -897,7 +895,7 @@ void MainFrame::OnLButtonUp(WPARAM wParam, LPARAM lParam)
 	}
 	MovePane(yPos);
 #endif 
-#if defined(PLATFORM_PKTPC) && defined(FOR_VGA)
+#if (defined(PLATFORM_PKTPC)  || defined(PLATFORM_WM5)) && defined(FOR_VGA)
 	RECT r;
 	GetClientRect(hMainWnd, &r);
 	if (bLandscapeMode) {
@@ -930,7 +928,7 @@ void MainFrame::OnLButtonUp(WPARAM wParam, LPARAM lParam)
 void MainFrame::MovePane(WORD nSplit)
 {
 	if (!g_Property.GetUseTwoPane()) return;
-#if defined(PLATFORM_PKTPC) && defined(FOR_VGA)
+#if (defined(PLATFORM_PKTPC)  || defined(PLATFORM_WM5)) && defined(FOR_VGA)
 	if (bLandscapeMode) {
 		nSplitterSizeWidth = nSplit;
 	} else {
@@ -1016,7 +1014,7 @@ void MainFrame::About()
 
 void MainFrame::SetWindowTitle(const TomboURI *pURI)
 {
-#if defined(PLATFORM_WIN32) || defined(PLATFORM_PKTPC)
+#if defined(PLATFORM_WIN32) || defined(PLATFORM_PKTPC) || defined(PLATFORM_WM5)
 	if (g_Property.GetSwitchWindowTitle()) {
 		if (pURI == NULL) {
 			SetWindowText(hMainWnd, TOMBO_APP_NAME);
@@ -1033,7 +1031,7 @@ void MainFrame::SetWindowTitle(const TomboURI *pURI)
 			pBase = TEXT("");
 		}
 		LPCTSTR pWinTitle;
-#if defined(PLATFORM_PKTPC)
+#if defined(PLATFORM_PKTPC) || defined(PLATFORM_WM5)
 		pWinTitle = pBase;
 #else
 		TString sWinTitle;
@@ -1055,7 +1053,7 @@ void MainFrame::SetWindowTitle(const TomboURI *pURI)
 #ifdef COMMENT
 void MainFrame::PopupEditViewDlg()
 {
-#if defined(PLATFORM_PKTPC)
+#if defined(PLATFORM_PKTPC) || defined(PLATFORM_WM5)
 	LPTSTR p = pDetailsView->GetMemo(); // p is deleted by DetailsViewDlg
 
 	DetailsViewDlg dlg;
@@ -1182,7 +1180,7 @@ void MainFrame::LeaveDetailsView(BOOL bAskSave)
 		SetNewMemoStatus(FALSE);
 	}
 
-#if defined(PLATFORM_PKTPC)
+#if defined(PLATFORM_PKTPC) || defined(PLATFORM_WM5)
 	SetWindowTitle(NULL);
 #endif
 	SetFocus();
@@ -1214,7 +1212,7 @@ void MainFrame::SetLayout()
 #if defined(PLATFORM_HPC) || defined(PLATFORM_WIN32)
 		ChangeLayout(LT_TwoPane);
 #endif
-#if defined(PLATFORM_PKTPC) || defined(PLATFORM_PSPC) || defined(PLATFORM_BE500)
+#if defined(PLATFORM_PKTPC) || defined(PLATFORM_PSPC) || defined(PLATFORM_BE500) || defined(PLATFORM_WM5)
 		switch(vtFocusedView) {
 		case VT_SelectView:
 			ChangeLayout(LT_TwoPane);
@@ -1278,14 +1276,14 @@ void MainFrame::ChangeLayout(LayoutType layout)
 			msView.MoveWindow(rc.left, rc.top , nSplitterSize, rc.bottom);
 			pDetailsView->MoveWindow(nSplitterSize + BORDER_WIDTH, rc.top, rc.right - nSplitterSize - BORDER_WIDTH, rc.bottom);
 #endif
-#if defined(PLATFORM_BE500) || (defined(PLATFORM_PKTPC) && !defined(FOR_VGA))
+#if defined(PLATFORM_BE500) || ((defined(PLATFORM_PKTPC) || defined(PLATFORM_WM5)) && !defined(FOR_VGA))
 			// split horizontal
 			msView.MoveWindow(rc.left, rc.top , rc.right, nSplitterSize);
 			pDetailsView->MoveWindow(
 				rc.left, rc.top + nSplitterSize + BORDER_WIDTH, 
 				rc.right, rc.bottom - nSplitterSize - BORDER_WIDTH);
 #endif
-#if defined(PLATFORM_PKTPC) && defined(FOR_VGA)
+#if (defined(PLATFORM_PKTPC) || defined(PLATFORM_WM5)) && defined(FOR_VGA)
 			if (r.bottom - r.top > r.right - r.left) {
 				// portrait mode
 				bLandscapeMode = FALSE;
@@ -1419,7 +1417,7 @@ void MainFrame::OnProperty()
 	// reload notes and folders
 	msView.DeleteAllItem();
 	msView.InitTree(pVFManager);
-#if defined(PLATFORM_WIN32) || defined(PLATFORM_PKTPC)
+#if defined(PLATFORM_WIN32) || defined(PLATFORM_PKTPC) || defined(PLATFORM_WM5)
 	if (!g_Property.GetSwitchWindowTitle()) {
 		SetWindowText(hMainWnd, TOMBO_APP_NAME);
 	}
@@ -1471,7 +1469,7 @@ typedef BOOL (__stdcall *UnregisterFunc1Proc)(UINT, UINT);
 
 BOOL MainFrame::EnableApplicationButton(HWND hWnd)
 {
-#if defined(PLATFORM_PKTPC)
+#if defined(PLATFORM_PKTPC) || defined(PLATFORM_WM5)
 	HINSTANCE hCoreDll;
 	UnregisterFunc1Proc procUnregisterFunc;
 	hCoreDll = LoadLibrary(TEXT("coredll.dll"));
@@ -1518,7 +1516,7 @@ void MainFrame::SaveWinSize()
 	RECT r;
 	UINT flags, showCmd;
 
-#if defined(PLATFORM_HPC) || defined(PLATFORM_PKTPC) || defined(PLATFORM_PSPC) || defined(PLATFORM_BE500)
+#if defined(PLATFORM_HPC) || defined(PLATFORM_PKTPC) || defined(PLATFORM_PSPC) || defined(PLATFORM_BE500) || defined(PLATFORM_WM5)
 	GetWindowRect(hMainWnd,&r);
 	flags = showCmd = 0;
 #else
@@ -1537,7 +1535,7 @@ void MainFrame::SaveWinSize()
 		UINT u1, u2;
 		RECT r2;
 		if (!g_Property.GetWinSize(&u1, &u2, &r2, &nPane)) {
-#if defined(PLATFORM_PKTPC) || defined(PLATFORM_BE500) || defined(PLATFORM_PSPC)
+#if defined(PLATFORM_PKTPC) || defined(PLATFORM_BE500) || defined(PLATFORM_PSPC) || defined(PLATFORM_WM5)
 			nPane = (r.bottom - r.top) / 3 * 2;
 #else
 			nPane = (WORD)(r.right - r.left) / 3;	
@@ -1545,7 +1543,7 @@ void MainFrame::SaveWinSize()
 		}
 	}
 	g_Property.SaveWinSize(flags, showCmd, &r, nPane);
-#if defined(PLATFORM_PKTPC) && defined(FOR_VGA)
+#if (defined(PLATFORM_PKTPC) || defined(PLATFORM_WM5)) && defined(FOR_VGA)
 	g_Property.SetWinSize2(nSplitterSizeWidth);
 #endif
 }
@@ -1562,13 +1560,13 @@ void MainFrame::LoadWinSize(HWND hWnd)
 
 	UINT u1, u2;
 	if (!g_Property.GetWinSize(&u1, &u2, &rMainFrame, &nSplitterSize)) {
-#if defined(PLATFORM_PKTPC) || defined(PLATFORM_BE500) || defined(PLATFORM_PSPC)
+#if defined(PLATFORM_PKTPC) || defined(PLATFORM_BE500) || defined(PLATFORM_PSPC) || defined(PLATFORM_WM5)
 		nSplitterSize = (rClientRect.right - rClientRect.left) / 3 * 2;
 #else
 		nSplitterSize = (WORD)(rClientRect.right - rClientRect.left) / 3;
 #endif
 	}
-#if defined(PLATFORM_PKTPC) && defined(FOR_VGA)
+#if (defined(PLATFORM_PKTPC) || defined(PLATFORM_WM5)) && defined(FOR_VGA)
 	WORD w = (WORD)g_Property.GetWinSize2();
 	if (w == 0xFFFF || w < 0 || w > rClientRect.right - 20) {
 		nSplitterSizeWidth = (rClientRect.bottom - rClientRect.top) / 3;
@@ -1899,7 +1897,7 @@ void MainFrame::AppendBookMark(HMENU hMenu, const BookMarkItem *pItem)
 #if defined(PLATFORM_WIN32)
 	if (!InsertMenuItem(hMenu, pItem->nID - pBookMark->GetBaseID() + NUM_BOOKMARK_SUBMENU_DEFAULT, TRUE, &mii)) return;
 #endif
-#if defined(PLATFORM_HPC) || defined(PLATFORM_PKTPC) || defined(PLATFORM_PSPC) || defined(PLATFORM_BE500)
+#if defined(PLATFORM_HPC) || defined(PLATFORM_PKTPC) || defined(PLATFORM_PSPC) || defined(PLATFORM_BE500) || defined(PLATFORM_WM5)
 	if (!AppendMenu(hMenu, MF_STRING, pItem->nID, pItem->pName)) return;
 #endif
 }

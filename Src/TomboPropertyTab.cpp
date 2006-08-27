@@ -518,7 +518,7 @@ void KeepCaretTab::Init(HWND hDlg)
 	wsprintf(buf, TEXT("%d"), pProperty->GetTabstop());
 	SetWindowText(hTabWnd, buf);
 
-#if defined(PLATFORM_WIN32) || defined(PLATFORM_PKTPC)
+#if defined(PLATFORM_WIN32) || defined(PLATFORM_PKTPC) || defined(PLATFORM_WM5)
 	HWND hSwitchTitleWnd = GetDlgItem(hDlg, IDC_PROP_SWITCHTITLE);
 	if (pProperty->GetSwitchWindowTitle()) {
 		SendMessage(hSwitchTitleWnd, BM_SETCHECK, BST_CHECKED, 0);
@@ -558,7 +558,7 @@ BOOL KeepCaretTab::Apply(HWND hDlg)
 	}
 	pProperty->SetTabstop(n);
 
-#if defined(PLATFORM_WIN32) || defined(PLATFORM_PKTPC)
+#if defined(PLATFORM_WIN32) || defined(PLATFORM_PKTPC) || defined(PLATFORM_WM5)
 	HWND hSwitchWnd = GetDlgItem(hDlg, IDC_PROP_SWITCHTITLE);
 	if (SendMessage(hSwitchWnd, BM_GETCHECK, 0, 0) == BST_CHECKED) {
 		pProperty->SetSwitchWindowTitle(TRUE);
@@ -581,7 +581,7 @@ BOOL KeepCaretTab::Apply(HWND hDlg)
 // Action buttons
 //////////////////////////////////////////
 
-#if defined(PLATFORM_PKTPC)
+#if defined(PLATFORM_PKTPC) || defined(PLATFORM_WM5)
 static DlgMsgRes aAppButtonRes[] = {
 	{ IDC_PROP_APPBUTTON1,       MSG_ID_DLG_PROPTAB_APPBTN_BUTTON1 }, 
 	{ IDC_PROP_APPBUTTON2,       MSG_ID_DLG_PROPTAB_APPBTN_BUTTON2 },
@@ -687,7 +687,7 @@ BOOL AppButtonTab::Apply(HWND hDlg)
 // SIP tab
 //////////////////////////////////////////
 
-#if defined(PLATFORM_PKTPC)
+#if defined(PLATFORM_PKTPC) || defined(PLATFORM_WM5)
 static DlgMsgRes aSIPRes[] = {
 	{ IDC_PROP_SIPDELTA, MSG_ID_DLG_PROPTAB_SIP_SHIFT },
 };

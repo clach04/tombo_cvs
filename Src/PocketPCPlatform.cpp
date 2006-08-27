@@ -1,4 +1,4 @@
-#if defined(PLATFORM_PKTPC)
+#if defined(PLATFORM_PKTPC) || defined(PLATFORM_WM5)
 
 #include <windows.h>
 #include <tchar.h>

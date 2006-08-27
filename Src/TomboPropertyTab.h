@@ -83,7 +83,7 @@ public:
 // Action buttons
 //////////////////////////////////////////
 
-#if defined(PLATFORM_PKTPC)
+#if defined(PLATFORM_PKTPC) || defined(PLATFORM_WM5)
 class AppButtonTab : public TomboPropertyTab {
 public:
 	AppButtonTab(Property *p) :
@@ -98,7 +98,7 @@ public:
 // SIP tab
 //////////////////////////////////////////
 
-#if defined(PLATFORM_PKTPC)
+#if defined(PLATFORM_PKTPC) || defined(PLATFORM_WM5)
 
 class SipTab : public TomboPropertyTab {
 public:

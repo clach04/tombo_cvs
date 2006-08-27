@@ -189,7 +189,7 @@ public:
 	NUM_ACCESSOR(AppButton4, PROP_N_APP_BUTTON4)
 	NUM_ACCESSOR(AppButton5, PROP_N_APP_BUTTON5)
 
-#if defined(PLATFORM_PKTPC)
+#if defined(PLATFORM_PKTPC) || defined(PLATFORM_WM5)
 	NUM_ACCESSOR(SipSizeDelta, PROP_N_SIPSIZE_DELTA)
 
 	// Disable open/close notes when action button pushed
@@ -216,7 +216,7 @@ public:
 	BOOL SaveWinSize(UINT flags, UINT showCmd, LPRECT pWinRect, WORD nSelectViewWidth);
 	BOOL GetWinSize(UINT *pFlags, UINT *pShowCmd, LPRECT pWinRect, LPWORD pSelectViewWidth);
 
-#if defined(PLATFORM_PKTPC) && defined(FOR_VGA)
+#if (defined(PLATFORM_PKTPC) || defined(PLATFORM_WM5)) && defined(FOR_VGA)
 	NUM_ACCESSOR(WinSize2, PROP_N_TOMBO_WINSIZE3)	// horizontal pane size
 #endif
 

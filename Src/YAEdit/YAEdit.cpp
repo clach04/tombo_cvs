@@ -6,7 +6,7 @@
 #if defined(PLATFORM_WIN32)
 #include <zmouse.h>
 #endif
-#if defined(PLATFORM_PKTPC)
+#if defined(PLATFORM_PKTPC) || defined(PLATFORM_WM5)
 #include <aygshell.h>
 #endif
 #include "resource.h"
@@ -749,7 +749,7 @@ void YAEditImpl::OnLButtonDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	nMouseDrgStartX = LOWORD(lParam);
 	nMouseDrgStartY = HIWORD(lParam);
 
-#if defined(PLATFORM_PKTPC)
+#if defined(PLATFORM_PKTPC) || defined(PLATFORM_WM5)
 	// Tap&hold
 	SHRGINFO rgi;
 	rgi.cbSize = sizeof(SHRGINFO);

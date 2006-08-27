@@ -68,7 +68,7 @@ public:
 
 	LRESULT OnNotify(HWND hWnd, WPARAM wParam, LPARAM lParam);
 
-#if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC) || defined(PLATFORM_PKTPC)
+#if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC) || defined(PLATFORM_PKTPC) || defined(PLATFORM_WM5)
 	void OnNotify_RClick(POINT pt);
 #endif
 	BOOL OnCommand(HWND hWnd, WPARAM wParam, LPARAM lParam);

@@ -177,3 +177,11 @@ Based on B217(TOMBO 1.17)
 
 - Migrate VC6 to VisualStudio2005 (win32).
 - replace expat libs (win32).
+
+////////////////////////////////
+// B224
+////////////////////////////////
+
+- Create new project for WM5 platform.
+	In current version, feature is same as PocketPC.
+

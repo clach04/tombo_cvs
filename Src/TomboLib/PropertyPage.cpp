@@ -8,7 +8,7 @@
 LPCTSTR GetString(UINT nID);
 
 // from http://sourceforge.jp/forum/message.php?msg_id=11376
-#if defined(_WIN32_WCE) && defined(PLATFORM_PKTPC)
+#if defined(PLATFORM_PKTPC) || defined(PLATFORM_WM5)
 #include <aygshell.h>
 static
 int CALLBACK PropSheetProc(HWND hDlg, UINT uMsg, LPARAM lParam)
@@ -60,7 +60,7 @@ DWORD PropertyPage::Popup(HINSTANCE hInst, HWND hWnd, PPropertyTab *ppPage, DWOR
     psh.dwSize = sizeof(PROPSHEETHEADER);
 
 	// from http://sourceforge.jp/forum/message.php?msg_id=11376
-#if defined(_WIN32_WCE) && defined(PLATFORM_PKTPC)
+#if defined(PLATFORM_PKTPC) || defined(PLATFORM_WM5)
 	psh.dwFlags = PSH_PROPSHEETPAGE | PSH_MAXIMIZE | PSH_USECALLBACK;
     psh.pfnCallback = PropSheetProc;
 #else

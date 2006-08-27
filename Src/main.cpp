@@ -1,7 +1,7 @@
 #include <windows.h>
 #include <commctrl.h>
 #include <tchar.h>
-#if defined(PLATFORM_PKTPC)
+#if defined(PLATFORM_PKTPC) || defined(PLATFORM_WM5)
 #include <aygshell.h>
 #endif
 
@@ -82,7 +82,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPTSTR pCmdLine, int nCmdSh
 
 	bDisableHotKey = FALSE;
 
-#if defined(PLATFORM_PSPC) || defined(PLATFORM_PKTPC) || defined(PLATFORM_BE500)
+#if defined(PLATFORM_PSPC) || defined(PLATFORM_PKTPC) || defined(PLATFORM_BE500) || defined(PLATFORM_WM5)
 	InitCommonControls();
 #endif
 #if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
@@ -93,7 +93,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPTSTR pCmdLine, int nCmdSh
    InitCommonControlsEx(&icex);
 #endif
 
-#if defined(PLATFORM_PKTPC)
+#if defined(PLATFORM_PKTPC) || defined(PLATFORM_WM5)
 	SHInitExtraControls();
 #endif
 

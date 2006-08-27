@@ -1,7 +1,7 @@
 #include <windows.h>
 #include <commctrl.h>
 #include <tchar.h>
-#if defined(_WIN32_WCE) && defined(PLATFORM_PKTPC)
+#if defined(PLATFORM_PKTPC) || defined(PLATFORM_WM5)
 #include <aygshell.h>
 #endif
 #include "Tombo.h"
@@ -320,7 +320,7 @@ BOOL SimpleEditor::Show(int nCmdShow)
 		bShowStatus = FALSE;
 	}
 
-#if defined(PLATFORM_PKTPC)
+#if defined(PLATFORM_PKTPC) || defined(PLATFORM_WM5)
 	// タップ&ホールドメニューが出たまま画面が切り替わった際にメニューを閉じさせる
 	if (nCmdShow == SW_HIDE) {
 		ReleaseCapture();

@@ -1,5 +1,5 @@
 #include <windows.h>
-#if defined(PLATFORM_PKTPC) || defined(PLATFORM_PSPC)
+#if defined(PLATFORM_PKTPC) || defined(PLATFORM_PSPC) || defined(PLATFORM_WM5)
 #include <aygshell.h>
 #endif
 #if defined(PLATFORM_BE500)
@@ -10,7 +10,7 @@
 
 BOOL SipControl::GetSipStat(BOOL *pStatus)
 {
-#if defined(PLATFORM_PKTPC) || defined(PLATFORM_PSPC) || defined(PLATFORM_BE500)
+#if defined(PLATFORM_PKTPC) || defined(PLATFORM_PSPC) || defined(PLATFORM_BE500) || defined(PLATFORM_WM5)
 	SIPINFO sip;
 	memset(&sip, 0, sizeof(sip));
 	sip.cbSize = sizeof(sip);
@@ -30,7 +30,7 @@ BOOL SipControl::GetSipStat(BOOL *pStatus)
 
 BOOL SipControl::SetSipStat(BOOL bActive)
 {
-#if defined(PLATFORM_PKTPC) || defined(PLATFORM_PSPC) || defined(PLATFORM_BE500)
+#if defined(PLATFORM_PKTPC) || defined(PLATFORM_PSPC) || defined(PLATFORM_BE500) || defined(PLATFORM_WM5)
 	SIPINFO sip;
 	memset(&sip, 0, sizeof(sip));
 	sip.cbSize = sizeof(sip);

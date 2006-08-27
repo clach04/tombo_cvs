@@ -2,7 +2,7 @@
 #include <commctrl.h>
 #include <tchar.h>
 
-#if defined(_WIN32_WCE) && defined(PLATFORM_PKTPC)
+#if defined(PLATFORM_PKTPC) || defined(PLATFORM_WM5)
 #include <aygshell.h>
 #endif
 #include "Tombo.h"

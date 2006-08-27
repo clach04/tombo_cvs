@@ -1,13 +1,13 @@
 #include <windows.h>
 #include <tchar.h>
-#if defined(_WIN32_WCE) && defined(PLATFORM_PKTPC)
+#if defined(PLATFORM_PKTPC) || defined(PLATFORM_WM5)
 #include <aygshell.h>
 #endif
 #include "Tombo.h"
 #include "resource.h"
 #include "MemoDetailsView.h"
 
-#if defined(PLATFORM_PKTPC)
+#if defined(PLATFORM_PKTPC) || defined(PLATFORM_WM5)
 #include "PlatformLayer.h"
 #include "PocketPCPlatform.h"
 #endif
@@ -85,7 +85,7 @@ LRESULT CALLBACK NewDetailsViewProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM l
 		pView->OnCommand(hwnd, wParam, lParam);
 		break;
 
-#if defined(PLATFORM_PKTPC)
+#if defined(PLATFORM_PKTPC) || defined(PLATFORM_WM5)
 	case WM_LBUTTONDOWN:
 		{
 			// clear search status

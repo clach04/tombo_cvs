@@ -2,7 +2,7 @@
 #include "Tombo.h"
 
 #ifdef _WIN32_WCE
-#ifdef PLATFORM_PKTPC
+#if defined(PLATFORM_PKTPC) || defined(PLATFORM_WM5)
 #include <aygshell.h>
 #endif
 #endif
@@ -80,7 +80,7 @@ static LRESULT CALLBACK AboutDlgProc(HWND hDlg, UINT message, WPARAM wParam, LPA
 {
 	switch (message) {
 	case WM_INITDIALOG:
-#if defined(_WIN32_WCE) && defined(PLATFORM_PKTPC)
+#if defined(PLATFORM_PKTPC) || defined(PLATFORM_WM5)
 		SHINITDLGINFO shidi;
 		shidi.dwMask = SHIDIM_FLAGS;
 		shidi.dwFlags = SHIDIF_DONEBUTTON | SHIDIF_SIPDOWN | SHIDIF_SIZEDLGFULLSCREEN;
