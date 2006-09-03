@@ -4,6 +4,7 @@
 	Version="8.00"
 	Name="Tombo"
 	ProjectGUID="{76A9052E-F103-4BED-AA59-FF2326589D44}"
+	RootNamespace="Tombo"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -359,10 +360,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\Src\PocketPCPlatform.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\Src\Property.cpp"
 				>
 			</File>
@@ -459,7 +456,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\Src\Win32Platform.cpp"
+				RelativePath="..\..\..\Src\WM5Platform.cpp"
 				>
 			</File>
 			<File
@@ -657,10 +654,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\Src\PocketPCPlatform.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\Src\Property.h"
 				>
 			</File>
@@ -686,6 +679,10 @@
 			</File>
 			<File
 				RelativePath="..\..\..\Src\RepositoryImpl.h"
+				>
+			</File>
+			<File
+				RelativePath="..\res\resource.h"
 				>
 			</File>
 			<File
@@ -757,7 +754,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\Src\Win32Platform.h"
+				RelativePath="..\..\..\Src\WM5Platform.h"
 				>
 			</File>
 			<File
@@ -783,7 +780,35 @@
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
 			<File
+				RelativePath="..\..\..\Src\image\draftimg.bmp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\Src\image\memoimg.bmp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\Src\image\memoimg24.bmp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\Src\image\Tombo.ICO"
+				>
+			</File>
+			<File
 				RelativePath="..\res\Tombo.rc"
+				>
+			</File>
+			<File
+				RelativePath="..\res\Tombo.rc2"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\Src\image\toolbar.bmp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\Src\image\toolbarlarge.bmp"
 				>
 			</File>
 		</Filter>

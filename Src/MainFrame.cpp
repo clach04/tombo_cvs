@@ -23,11 +23,6 @@
 #include "BookMarkDlg.h"
 #include "StatusBar.h"
 #include "PlatformLayer.h"
-#include "Win32Platform.h"
-#include "PocketPCPlatform.h"
-#include "PsPCPlatform.h"
-#include "HPCPlatform.h"
-#include "LagendaPlatform.h"
 #include "TomboURI.h"
 #include "Repository.h"
 
@@ -241,7 +236,7 @@ int MainFrame::MainLoop() {
 	HACCEL hAccelSv = LoadAccelerators(g_hInstance, MAKEINTRESOURCE(IDR_ACCEL_SELECT));
 	HACCEL hAccelDv = LoadAccelerators(g_hInstance, MAKEINTRESOURCE(IDR_ACCEL_DETAIL));
 
-#if defined(PLATFORM_PKTPC) || defined(PLATFORM_PSPC) || defined(PLATFORM_BE500) || defined(PLATFORM_WM5)
+#if defined(PLATFORM_PKTPC) || defined(PLATFORM_PSPC) || defined(PLATFORM_BE500)
 	BOOL bIgnoreReturnKeyDown = FALSE;
 	BOOL bIgnoreReturnKeyUp = FALSE;
 	BOOL bIgnoreEscKeyDown = FALSE;
@@ -254,11 +249,11 @@ int MainFrame::MainLoop() {
 		if (msg.message == WM_KEYDOWN || msg.message == WM_LBUTTONDOWN) {
 			pmPasswordMgr.UpdateAccess();
 		}
-	
-#if defined(PLATFORM_PKTPC) || defined(PLATFORM_PSPC) || defined(PLATFORM_BE500) || defined(PLATFORM_WM5)
+
+#if defined(PLATFORM_PKTPC) || defined(PLATFORM_PSPC) || defined(PLATFORM_BE500)
 		// アクションキー押下に伴うVK_RETURNの無視
 
-#if defined(PLATFORM_PKTPC) || defined(PLATFORM_WM5)
+#if defined(PLATFORM_PKTPC)
 		// On PocketPC devices, you can select enable/disable about this feature.
 		if (!g_Property.GetDisableExtraActionButton()) {
 		//disable logic begin
@@ -304,7 +299,7 @@ int MainFrame::MainLoop() {
 				continue;
 			}
 		}
-#if defined(PLATFORM_PKTPC) || defined(PLATFORM_WM5)
+#if defined(PLATFORM_PKTPC)
 		} // disable logic end
 #endif
 
@@ -526,7 +521,6 @@ void MainFrame::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 #if defined(PLATFORM_WIN32)
 	SetTopMost();
 #endif
-//	ActivateView(TRUE);
 	ActivateView(VT_SelectView);
 
 
@@ -652,6 +646,11 @@ void MainFrame::OnCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	case IDM_ABOUT:
 		About();
 		break;
+#if defined(PLATFORM_WM5)
+	case IDOK:
+		LeaveDetailsView(TRUE);
+		break;
+#endif
 	case IDM_RETURNLIST:
 		LeaveDetailsView(TRUE);
 		break;
@@ -1045,26 +1044,6 @@ void MainFrame::SetWindowTitle(const TomboURI *pURI)
 	}
 #endif
 }
-
-///////////////////////////////////////////////////
-// popup edit dialog
-///////////////////////////////////////////////////
-
-#ifdef COMMENT
-void MainFrame::PopupEditViewDlg()
-{
-#if defined(PLATFORM_PKTPC) || defined(PLATFORM_WM5)
-	LPTSTR p = pDetailsView->GetMemo(); // p is deleted by DetailsViewDlg
-
-	DetailsViewDlg dlg;
-	int result = dlg.Popup(g_hInstance, hMainWnd, &mmMemoManager, p);
-
-	if (result == IDYES) {
-	}
-
-#endif
-}
-#endif
 
 void MainFrame::PostSwitchView() 
 {
@@ -1536,7 +1515,7 @@ void MainFrame::SaveWinSize()
 		RECT r2;
 		if (!g_Property.GetWinSize(&u1, &u2, &r2, &nPane)) {
 #if defined(PLATFORM_PKTPC) || defined(PLATFORM_BE500) || defined(PLATFORM_PSPC) || defined(PLATFORM_WM5)
-			nPane = (r.bottom - r.top) / 3 * 2;
+			nPane = (WORD)((r.bottom - r.top) / 3 * 2);
 #else
 			nPane = (WORD)(r.right - r.left) / 3;	
 #endif
@@ -1561,7 +1540,7 @@ void MainFrame::LoadWinSize(HWND hWnd)
 	UINT u1, u2;
 	if (!g_Property.GetWinSize(&u1, &u2, &rMainFrame, &nSplitterSize)) {
 #if defined(PLATFORM_PKTPC) || defined(PLATFORM_BE500) || defined(PLATFORM_PSPC) || defined(PLATFORM_WM5)
-		nSplitterSize = (rClientRect.right - rClientRect.left) / 3 * 2;
+		nSplitterSize = (WORD)((rClientRect.right - rClientRect.left) / 3 * 2);
 #else
 		nSplitterSize = (WORD)(rClientRect.right - rClientRect.left) / 3;
 #endif
@@ -1569,7 +1548,7 @@ void MainFrame::LoadWinSize(HWND hWnd)
 #if (defined(PLATFORM_PKTPC) || defined(PLATFORM_WM5)) && defined(FOR_VGA)
 	WORD w = (WORD)g_Property.GetWinSize2();
 	if (w == 0xFFFF || w < 0 || w > rClientRect.right - 20) {
-		nSplitterSizeWidth = (rClientRect.bottom - rClientRect.top) / 3;
+		nSplitterSizeWidth = (WORD)((rClientRect.bottom - rClientRect.top) / 3);
 	} else {
 		nSplitterSizeWidth = w;
 	}
@@ -1880,6 +1859,7 @@ void MainFrame::OnBookMark(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 void MainFrame::AppendBookMark(HMENU hMenu, const BookMarkItem *pItem)
 {
+#if defined(PLATFORM_WIN32)
 	// add to menu
 	MENUITEMINFO mii;
 
@@ -1893,11 +1873,9 @@ void MainFrame::AppendBookMark(HMENU hMenu, const BookMarkItem *pItem)
 	mii.wID = pItem->nID;
 	mii.dwTypeData = pItem->pName;
 	mii.cch = _tcslen(pItem->pName);
-
-#if defined(PLATFORM_WIN32)
 	if (!InsertMenuItem(hMenu, pItem->nID - pBookMark->GetBaseID() + NUM_BOOKMARK_SUBMENU_DEFAULT, TRUE, &mii)) return;
 #endif
-#if defined(PLATFORM_HPC) || defined(PLATFORM_PKTPC) || defined(PLATFORM_PSPC) || defined(PLATFORM_BE500) || defined(PLATFORM_WM5)
+#if defined(PLATFORM_HPC) || defined(PLATFORM_PKTPC) || defined(PLATFORM_PSPC) || defined(PLATFORM_BE500)  || defined(PLATFORM_WM5)
 	if (!AppendMenu(hMenu, MF_STRING, pItem->nID, pItem->pName)) return;
 #endif
 }

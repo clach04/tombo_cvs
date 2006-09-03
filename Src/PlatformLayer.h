@@ -48,8 +48,29 @@ struct MenuMsgRes {
 	int iMenuID;
 	int iExtOpt;
 	int iMsgID;
+	MenuMsgRes *pSubMenu;
 };
 
+void AddMenuItemByMsgRes(HMENU hMenu, MenuMsgRes *pRes);
 void OverrideMenuTitle(HMENU hMenu, MenuMsgRes *pRes, int nNumRes);
+
+#if defined(PLATFORM_WIN32)
+#include "Win32Platform.h"
+#endif
+#if defined(PLATFORM_PKTPC)
+#include "PocketPCPlatform.h"
+#endif
+#if defined(PLATFORM_WM5)
+#include "WM5Platform.h"
+#endif
+#if defined(PLATFORM_PSPC)
+#include "PsPCPlatform.h"
+#endif
+#if defined(PLATFORM_HPC)
+#include "HPCPlatform.h"
+#endif
+#if defined(PLATFORM_BE500)
+#include "LagendaPlatform.h"
+#endif
 
 #endif

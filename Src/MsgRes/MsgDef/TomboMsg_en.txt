@@ -298,3 +298,4 @@ MSG_CODEPAGE_UTF16	Unicode(UTF16LE)
 MSG_CODEPAGE_UTF8	UTF-8
 MSG_DLG_PROPTAB_CODEPAGE_NOTICE	Set file encoding. Auto detection/conversion is not supported, so do not change if you hanve already some notes.
 MSG_MENUITEM_UNDO	Undo
+MSG_MENUITEM_FILE	File

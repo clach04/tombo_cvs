@@ -55,6 +55,27 @@ void SetAppIcon(HINSTANCE hInst, HWND hWnd)
 // menu helper
 ///////////////////////////////////////////////////
 
+void AddMenuItemByMsgRes(HMENU hMenu, MenuMsgRes *pRes)
+{
+	int i = 0;
+	while(1) {
+		if (pRes[i].iPos == -1) break;
+
+		if (pRes[i].iMenuID == -1) {
+			InsertMenu(hMenu,  pRes[i].iPos, MF_BYPOSITION | MF_SEPARATOR, 0, NULL);
+		} else if (pRes[i].pSubMenu != NULL) {
+			HMENU hSubMenu = CreatePopupMenu();
+			AddMenuItemByMsgRes(hSubMenu, pRes[i].pSubMenu);
+
+			InsertMenu(hMenu, pRes[i].iPos, MF_BYPOSITION | MF_STRING | MF_POPUP | pRes[i].iExtOpt, (UINT)hSubMenu, g_mMsgRes.GetMsg(pRes[i].iMsgID));
+		} else {
+			InsertMenu(hMenu,  pRes[i].iPos, MF_BYPOSITION | MF_STRING | pRes[i].iExtOpt, pRes[i].iMenuID, g_mMsgRes.GetMsg(pRes[i].iMsgID));
+		}
+
+		i++;
+	}
+}
+
 void OverrideMenuTitle(HMENU hMenu, MenuMsgRes *pRes, int nNumRes)
 {
 	for (int i = 0; i < nNumRes; i++) {

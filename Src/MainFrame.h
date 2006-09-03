@@ -13,13 +13,7 @@ class BookMark;
 struct BookMarkItem;
 
 class StatusBar;
-
 #include "PlatformLayer.h"
-#include "Win32Platform.h"
-#include "PocketPCPlatform.h"
-#include "PsPCPlatform.h"
-#include "HPCPlatform.h"
-#include "LagendaPlatform.h"
 
 ///////////////////////////////////////
 // Main frame window

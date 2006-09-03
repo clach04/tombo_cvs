@@ -185,3 +185,13 @@ Based on B217(TOMBO 1.17)
 - Create new project for WM5 platform.
 	In current version, feature is same as PocketPC.
 
+////////////////////////////////
+// B225
+////////////////////////////////
+
+* In edit view, display "OK" button insted of "x" on title bar.
+* Support WM5 style menubar(WM5 version).
+* FIX: Input method ATOK is not work good on W-ZERO3[es].
+	This fix is port from B221.
+
+- L9N is not completed(menubar label)

@@ -9,7 +9,6 @@
 
 #if defined(PLATFORM_PKTPC) || defined(PLATFORM_WM5)
 #include "PlatformLayer.h"
-#include "PocketPCPlatform.h"
 #endif
 
 #include "Property.h"
@@ -100,7 +99,7 @@ LRESULT CALLBACK NewDetailsViewProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM l
 			rgi.dwFlags = SHRG_RETURNCMD;
 
 			if (SHRecognizeGesture(&rgi) == GN_CONTEXTMENU) {
-				HMENU hPopup = PocketPCPlatform::LoadDetailsViewPopupMenu();
+				HMENU hPopup = PLATFORM_TYPE::LoadDetailsViewPopupMenu();
 
 				int x, y;
 				UINT nFlg = TPM_RETURNCMD | TPM_LEFTALIGN | TPM_TOPALIGN;
