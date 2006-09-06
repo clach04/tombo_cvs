@@ -195,3 +195,12 @@ Based on B217(TOMBO 1.17)
 	This fix is port from B221.
 
 - L9N is not completed(menubar label)
+
+////////////////////////////////
+// B226 (TOMBO 2.0 beta 1)
+////////////////////////////////
+
+* disable open note when starting.
+- support menubar label's L9N.
+- FIX: Menu checking is not worked.(WM5)
+

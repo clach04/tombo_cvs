@@ -1579,11 +1579,12 @@ BOOL WipeOutAndDeleteFile(LPCTSTR pFile)
 	File delf;
 	if (!delf.Open(pFile, GENERIC_WRITE, 0, OPEN_ALWAYS)) return FALSE;
 
+	DWORD i;
 	DWORD nSize = delf.FileSize() / 64 + 1;
 	BYTE buf[64];
-	for (DWORD i = 0; i < 64; i++) buf[i] = 0;
+	for (i = 0; i < 64; i++) buf[i] = 0;
 
-	for (DWORD i = 0; i < nSize; i++) {
+	for (i = 0; i < nSize; i++) {
 		delf.Write(buf, 64);
 	}
 	delf.Close();

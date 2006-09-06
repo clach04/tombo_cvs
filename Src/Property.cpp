@@ -138,6 +138,7 @@ struct PropListNum {
 #endif
 	{ PROP_N_KEEP_LAST_OPEN,			TEXT("UseLastOpenNote"),			FALSE },
 	{ PROP_N_USE_YAE,					TEXT("UseYAE"),						FALSE },
+	{ PROP_N_DISABLE_YAE,				TEXT("DisableYAE"),					FALSE },
 	{ 0xFFFFFFFF,						NULL,								NULL},
 };
 
@@ -192,11 +193,12 @@ Property::Property() : pCmdlineAssignedTopDir(NULL), pBookMark(NULL), pSearchHis
 
 Property::~Property()
 {
-	for (DWORD i = 0; i < NUM_PROPS_STR; i++) {
+	DWORD i;
+	for (i = 0; i < NUM_PROPS_STR; i++) {
 		delete [] pPropsStr[i];
 	}
 
-	for (DWORD i = 0; i < nNumRepos; i++) {
+	for (i = 0; i < nNumRepos; i++) {
 		delete pRepos[i];
 	}
 	delete [] pRepos;
@@ -573,7 +575,7 @@ BOOL Property::LoadProperties()
 	if (!sPropFile.Join(pathbuf2, PROP_FILE_NAME)) return FALSE;
 
 	File fFile;
-
+	DWORD i;
 	if (!fFile.Open(sPropFile.Get(), GENERIC_READ, FILE_SHARE_READ, OPEN_EXISTING)) {
 		BOOL bStrict;
 		BOOL bResult = LoadFromReg(&bStrict);
@@ -604,7 +606,7 @@ BOOL Property::LoadProperties()
 
 	if (!fFile.Read((LPBYTE)pBuf, &nFileSize)) return FALSE;
 
-	for (DWORD i = 0; i < NUM_PROPS_STR; i++) {
+	for (i = 0; i < NUM_PROPS_STR; i++) {
 		delete [] pPropsStr[i];
 		pPropsStr[i] = NULL;
 	}
@@ -614,14 +616,14 @@ BOOL Property::LoadProperties()
 	}
 	XML_ParserFree(pParser);
 
-	for (WORD i = 0; i < nNumRepos; i++) {
+	for (i = 0; i < nNumRepos; i++) {
 		delete pRepos[i];
 	}
 	delete [] pRepos;
 
 	nNumRepos = ppi.vSubRepos.NumItems();
 	pRepos = new RepositoryImpl*[nNumRepos];
-	for (DWORD i = 0; i < ppi.vSubRepos.NumItems(); i++) {
+	for (i = 0; i < ppi.vSubRepos.NumItems(); i++) {
 		RepositoryImpl *pImpl = *ppi.vSubRepos.GetUnit(i);
 		pRepos[i] = pImpl;
 	}

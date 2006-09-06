@@ -288,8 +288,8 @@ LPTSTR PhysicalLineManager::GetRegionString(const Region *pRegion)
 		MemBlock *pLastBlock = aliLine.GetUnit(pRegion->posEnd.row)->pLine;
 		DWORD nLastLen = pRegion->posEnd.col;
 		nRegionSize += nLastLen;
-
-		for (DWORD i = pRegion->posStart.row + 1; i < pRegion->posEnd.row; i++) {
+		DWORD i;
+		for (i = pRegion->posStart.row + 1; i < pRegion->posEnd.row; i++) {
 			MemBlock *pBlock = aliLine.GetUnit(i)->pLine;
 			DWORD nLen = pBlock->nUsed;
 			nRegionSize += nLen;
@@ -307,7 +307,7 @@ LPTSTR PhysicalLineManager::GetRegionString(const Region *pRegion)
 
 		_tcsncpy(q, TEXT("\r\n"), 2); q += 2;
 
-		for (DWORD i = pRegion->posStart.row + 1; i < pRegion->posEnd.row; i++) {
+		for (i = pRegion->posStart.row + 1; i < pRegion->posEnd.row; i++) {
 			MemBlock *pBlock = aliLine.GetUnit(i)->pLine;
 			_tcsncpy(q, pBlock->GetDataArea(), pBlock->nUsed);
 			q += pBlock->nUsed;

@@ -224,6 +224,7 @@ void PocketPCPlatform::EnableMenu(UINT uid, BOOL bEnable)
 void PocketPCPlatform::CheckMenu(UINT uid, BOOL bCheck)
 {
 	HWND hTB;
+	HMENU hMenu = NULL;
 	BOOL bCBS = FALSE;
 	switch(uid) {
 	case IDM_TOGGLEPANE:
@@ -231,12 +232,19 @@ void PocketPCPlatform::CheckMenu(UINT uid, BOOL bCheck)
 		hTB = hMSCmdBar;
 		bCheck = !bCheck;
 		break;
+	case IDM_DETAILS_HSCROLL:
+		bCBS = FALSE;
+		hMenu = GetMDToolMenu();
+		break;
 	default:
 		return;
 	}
 
 	if (bCBS) {
 		SendMessage(hTB, TB_CHECKBUTTON, uid, MAKELONG(bCheck, 0));
+	}
+	if (hMenu) {
+		CheckMenuItem(hMenu, uid, MF_BYCOMMAND | (bCheck ? MF_CHECKED : MF_UNCHECKED));
 	}
 }
 

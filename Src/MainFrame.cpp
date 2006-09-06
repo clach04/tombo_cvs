@@ -343,7 +343,7 @@ BOOL MainFrame::Create(LPCTSTR pWndName, HINSTANCE hInst, int nCmdShow)
 
 	YAEditor *pYAE;
 	SimpleEditor *pSe;
-	if (g_Property.GetUseYAEdit()) {
+	if (!g_Property.GetDisableYAEdit()) {
 		YAEdit::RegisterClass(hInst);
 
 		pYAE = new YAEditor(&mmMemoManager);
@@ -358,7 +358,7 @@ BOOL MainFrame::Create(LPCTSTR pWndName, HINSTANCE hInst, int nCmdShow)
 	mmMemoManager.Init(this, pDetailsView, &msView);
 	msView.Init(&mmMemoManager);
 
-	if (g_Property.GetUseYAEdit()) {
+	if (!g_Property.GetDisableYAEdit()) {
 		pYAE->Init(IDC_TOMBOEDIT);
 	} else {
 		pSe->Init(IDC_MEMODETAILSVIEW, IDC_MEMODETAILSVIEW_NF);
@@ -530,16 +530,22 @@ void MainFrame::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		LoadBookMark(pBM);
 	}
 
+	BOOL bOpenNote;
+#if defined(PLATFORM_WM5)
+	bOpenNote = FALSE;
+#else
+	bOpenNote = TRUE;
+#endif
 	// open top page
 	if (g_Property.GetKeepLastOpen()) {
 		if (g_Property.GetLastOpenURI() == NULL) return;
 		TomboURI sURI;
 		if (!sURI.Init(g_Property.GetLastOpenURI())) return;
-		msView.ShowItemByURI(&sURI);
+		msView.ShowItemByURI(&sURI, TRUE, bOpenNote);
 	} else if (_tcslen(g_Property.GetDefaultNote()) != 0) {
 		TomboURI sURI;
 		if (!sURI.Init(g_Property.GetDefaultNote())) return;
-		msView.ShowItemByURI(&sURI);
+		msView.ShowItemByURI(&sURI, TRUE, bOpenNote);
 	}
 }
 
@@ -1567,17 +1573,7 @@ void MainFrame::SetWrapText(BOOL bWrap)
 		return;
 	}
 
-	UINT uCheckFlg;
-
-	HMENU hMenu = pPlatform->GetMDToolMenu();
-	if (bWrap) {
-		uCheckFlg = MF_CHECKED;
-	} else {
-		uCheckFlg = MF_UNCHECKED;
-	}
-
-	// CheckMenuItem is superseded, but CE don't have SetMenuItemInfo.
-	CheckMenuItem(hMenu, IDM_DETAILS_HSCROLL, MF_BYCOMMAND | uCheckFlg);
+	pPlatform->CheckMenu(IDM_DETAILS_HSCROLL, bWrap);
 }
 
 ///////////////////////////////////////////////////
@@ -1886,9 +1882,10 @@ void MainFrame::LoadBookMark(LPCTSTR pBookMarks)
 
 	HMENU hBookMark = pPlatform->GetMSBookMarkMenu();
 
+	DWORD i;
 	// release current bookmark
 	DWORD n = pBookMark->NumItems();
-	for (DWORD i = 0; i < n; i++) {
+	for (i = 0; i < n; i++) {
 		p = pBookMark->GetUnit(i);
 		DeleteMenu(hBookMark, p->nID, MF_BYCOMMAND);
 	}
@@ -1898,7 +1895,7 @@ void MainFrame::LoadBookMark(LPCTSTR pBookMarks)
 
 	// add to menu
 	n = pBookMark->NumItems();
-	for (DWORD i = 0; i < n; i++) {
+	for (i = 0; i < n; i++) {
 		p = pBookMark->GetUnit(i);
 		AppendBookMark(hBookMark, p);
 	}

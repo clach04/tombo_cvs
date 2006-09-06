@@ -50,11 +50,11 @@ static MenuMsgRes aMSRightFindSubMenu[] = {
 };
 
 static MenuMsgRes aMSRightSecuritySubMenu[] = {
-	{  0, IDM_ENCRYPT,    0, MSG_ID_MENUITEM_MAIN_ENCRYPT,  NULL },
-	{  1, IDM_DECRYPT,    0, MSG_ID_MENUITEM_MAIN_DECRYPT,  NULL },
-	{  2, -1,             0, 0,                             NULL },
-	{  3, IDM_FORGETPASS, 0, MSG_ID_PROPTAB_PASS_TIMEOUT,   NULL },
-	{ -1, 0,              0, 0,                             NULL },
+	{  0, IDM_ENCRYPT,    0, MSG_ID_MENUITEM_MAIN_ENCRYPT,      NULL },
+	{  1, IDM_DECRYPT,    0, MSG_ID_MENUITEM_MAIN_DECRYPT,      NULL },
+	{  2, -1,             0, 0,                                 NULL },
+	{  3, IDM_FORGETPASS, 0, MSG_ID_MENUITEM_TOOL_FORGETPASS,   NULL },
+	{ -1, 0,              0, 0,                                 NULL },
 };
 
 static MenuMsgRes aMSRightFileSubMenu[] = {
@@ -186,6 +186,19 @@ void WM5Platform::Create(HWND hWnd, HINSTANCE hInst)
 	hMSCmdBar = CreateMenubar(hWnd, hInst, IDM_MAIN_MENU, aMSLeftMenu, aMSRightMenu);
 	hMDCmdBar = CreateMenubar(hWnd, hInst, IDM_DETAILS_MENU, NULL, aMDRightMenu);
 
+	TBBUTTONINFO tbi;
+	ZeroMemory(&tbi, sizeof(tbi));
+	tbi.cbSize = sizeof(tbi);
+	tbi.dwMask = TBIF_BYINDEX | TBIF_TEXT;
+
+	tbi.pszText = (LPTSTR)MSG_MEMO;
+	tbi.cchText = _tcslen(MSG_MEMO);
+	SendMessage(hMSCmdBar, TB_SETBUTTONINFO, 0, (LPARAM)&tbi);
+	tbi.pszText = (LPTSTR)MSG_TOOL;
+	tbi.cchText = _tcslen(MSG_TOOL);
+	SendMessage(hMSCmdBar, TB_SETBUTTONINFO, 1, (LPARAM)&tbi);
+	SendMessage(hMDCmdBar, TB_SETBUTTONINFO, 1, (LPARAM)&tbi);
+
 	ShowWindow(hMDCmdBar, SW_HIDE);
 }
 
@@ -246,8 +259,19 @@ void WM5Platform::EnableMenu(UINT uid, BOOL bEnable)
 
 void WM5Platform::CheckMenu(UINT uid, BOOL bCheck)
 {
-	if (uid == IDM_TOGGLEPANE) {
-		HMENU hMenu = GetMenuFromMenubar(hMDCmdBar, MENUBAR_MENU_RIGHT);
+	HMENU hMenu = NULL;
+	switch (uid) {
+	case IDM_TOGGLEPANE:
+		hMenu = GetMenuFromMenubar(hMSCmdBar, MENUBAR_MENU_RIGHT);
+		break;
+	case IDM_DETAILS_HSCROLL:
+		hMenu = GetMenuFromMenubar(hMDCmdBar, MENUBAR_MENU_RIGHT);
+		break;
+	default:
+		return;
+	}
+
+	if (hMenu) {
 		CheckMenuItem(hMenu, uid, MF_BYCOMMAND | (bCheck ? MF_CHECKED : MF_UNCHECKED));
 	}
 }

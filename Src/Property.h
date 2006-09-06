@@ -40,8 +40,9 @@
 #define PROP_N_TOMBO_WINSIZE3			28	// PKTPCVGA
 #define PROP_N_KEEP_LAST_OPEN			29
 #define PROP_N_USE_YAE					30
+#define PROP_N_DISABLE_YAE              31
 
-#define NUM_PROPS_NUM 31
+#define NUM_PROPS_NUM 32
 
 #define PROP_S_TOPDIR					 0
 #define PROP_S_SELECTVIEW_FONTNAME		 1
@@ -180,8 +181,8 @@ public:
 
 	// Use YAEDIT component. On 1.x, always FALSE.
 	NUM_ACCESSOR(UseYAEdit, PROP_N_USE_YAE)
-//	void SetUseYAEdit(DWORD n) {}
-//	DWORD GetUseYAEdit() { return TRUE; }
+	NUM_ACCESSOR(DisableYAEdit, PROP_N_DISABLE_YAE)
+
 
 	NUM_ACCESSOR(AppButton1, PROP_N_APP_BUTTON1)	// application buttons
 	NUM_ACCESSOR(AppButton2, PROP_N_APP_BUTTON2)

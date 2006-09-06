@@ -220,18 +220,22 @@ void Win32Platform::AdjustUserRect(RECT *pRect)
 
 void Win32Platform::CheckMenu(UINT uid, BOOL bCheck)
 {
+	HMENU hMenu;
 	BOOL bNegButton = FALSE;
 	switch(uid) {
 	case IDM_TOGGLEPANE:
 		bNegButton = TRUE;
+		hMenu = GetMainMenu();
+		break;
+	case IDM_DETAILS_HSCROLL:
+		hMenu = GetMDToolMenu();
 		break;
 	default:
-		break;
+		return;
 	}
 
 	BOOL bButton = bNegButton ? !bCheck : bCheck;
 
-	HMENU hMenu = GetMainMenu();
 	// CheckMenuItem is superseeded funcs, but in CE, SetMenuItemInfo can't set values, so use it.
 	CheckMenuItem(hMenu, uid, MF_BYCOMMAND | (bCheck ? MF_CHECKED : MF_UNCHECKED));
 	SendMessage(hToolBar, TB_PRESSBUTTON, uid, MAKELONG(bButton, 0));

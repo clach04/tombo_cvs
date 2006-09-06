@@ -1,8 +1,7 @@
 #
 # TOMBO Build program for ActivePerl(Win32)
 
-$version = "Tombo_1_17";
-# $version = "Tombo_20060216";
+$version = "Tombo_2_0b1";
 
 ##########################################################################
 # Tool definition
@@ -22,9 +21,6 @@ $zippg = "\"C:\\Program Files\\mzp\\mzp.exe\"";
 $buildroot = "C:\\work2\\SF\\TOMBO";
 $docroot = "C:\\work2\\SF\\Docs";
 $builddir  = "C:\\temp\\Tombo-Rel";
-
-$be500root = "E:\\work2\\BE500SDK\\Installer\\Japanese PC Tools";
-$be300root = "E:\\work2\\BE300SDK_1012\\Installer\\English PC Tools";
 
 @docsJP = (
 	["", "$docroot\\Jp\\COPYING-2_0.txt"],
@@ -63,10 +59,10 @@ $be300root = "E:\\work2\\BE300SDK_1012\\Installer\\English PC Tools";
 	["Bin\\HPCPro\\SH4", "$buildroot\\oniguruma\\sh4\\oniguruma.dll"],
 	["Bin\\HPCPro\\SH4", "$buildroot\\HpcPro\\RegErase\\SH4Rel\\RegErase.exe"],
 
-	["Bin\\HPCPro\\Sig3", "$buildroot\\HpcPro\\Tombo\\ARMSig3\\Tombo.exe"],
-	["Bin\\HPCPro\\Sig3", "$buildroot\\Src\\MsgRes\\TomboMsg\\jp\\TomboMsg.txt"],
-	["Bin\\HPCPro\\Sig3", "$buildroot\\oniguruma\\arm\\oniguruma.dll"],
-	["Bin\\HPCPro\\Sig3", "$buildroot\\HpcPro\\RegErase\\ARMRel\\RegErase.exe"],
+#	["Bin\\HPCPro\\Sig3", "$buildroot\\HpcPro\\Tombo\\ARMSig3\\Tombo.exe"],
+#	["Bin\\HPCPro\\Sig3", "$buildroot\\Src\\MsgRes\\TomboMsg\\jp\\TomboMsg.txt"],
+#	["Bin\\HPCPro\\Sig3", "$buildroot\\oniguruma\\arm\\oniguruma.dll"],
+#	["Bin\\HPCPro\\Sig3", "$buildroot\\HpcPro\\RegErase\\ARMRel\\RegErase.exe"],
 
 	["Bin\\PocketPC\\MIPS", "$buildroot\\PocketPC\\CabWiz\\Tombo.mips.CAB"],
 
@@ -75,6 +71,8 @@ $be300root = "E:\\work2\\BE300SDK_1012\\Installer\\English PC Tools";
 	["Bin\\PocketPC\\ARM", "$buildroot\\PocketPC\\CabWiz\\Tombo.arm.CAB"],
 	["Bin\\PocketPC\\ARM", "$buildroot\\PocketPC\\CabWiz\\TomboVGA_jp.arm.CAB"],
 
+	
+	["Bin\\WindowsMobile5", "$buildroot\\WindowsMobile5PPC\\CabWiz\\Tombo_jp.arm.CAB"],
 
 	["Bin\\BE500", "$buildroot\\BE300\\Tombo\\MIPSRel\\Tombo.exe"],
 	["Bin\\BE500", "$buildroot\\Src\\MsgRes\\TomboMsg\\jp\\TomboMsg.txt"],
@@ -93,14 +91,19 @@ $be300root = "E:\\work2\\BE300SDK_1012\\Installer\\English PC Tools";
 
 );
 
-@bin_sig3 = (
-	["", "$buildroot\\HpcPro\\Tombo\\ARMSig3\\Tombo.exe"],
-	["", "$buildroot\\Src\\MsgRes\\TomboMsg\\jp\\TomboMsg.txt"],
-	["", "$buildroot\\oniguruma\\arm\\oniguruma.dll"],
-	["", "$buildroot\\HpcPro\\RegErase\\ARMRel\\RegErase.exe"],
-
+@bin_wm5_arm_jp = (
+	["", "$buildroot\\WindowsMobile5PPC\\CabWiz\\Tombo_jp.arm.CAB"],
 	@docsJP
 );
+
+#@bin_sig3 = (
+#	["", "$buildroot\\HpcPro\\Tombo\\ARMSig3\\Tombo.exe"],
+#	["", "$buildroot\\Src\\MsgRes\\TomboMsg\\jp\\TomboMsg.txt"],
+#	["", "$buildroot\\oniguruma\\arm\\oniguruma.dll"],
+#	["", "$buildroot\\HpcPro\\RegErase\\ARMRel\\RegErase.exe"],
+#
+#	@docsJP
+#);
 
 @bin_win32_jp = (
 	["", "$buildroot\\Win32\\Tombo\\Release\\Tombo.exe"],
@@ -139,6 +142,8 @@ $be300root = "E:\\work2\\BE300SDK_1012\\Installer\\English PC Tools";
 	["Bin\\PocketPC\\ARM", "$buildroot\\PocketPC\\CabWiz\\TomboE.arm.CAB"],
 	["Bin\\PocketPC\\ARM", "$buildroot\\PocketPC\\CabWiz\\TomboVGA_en.arm.CAB"],
 
+	["Bin\\WindowsMobile5", "$buildroot\\WindowsMobile5PPC\\CabWiz\\Tombo_en.arm.CAB"],
+
 	["Bin\\BE300", "$buildroot\\BE300\\Tombo\\MIPSRel\\Tombo.exe"],
 	["Bin\\BE300", "$buildroot\\Src\\MsgRes\\TomboMsg\\en\\TomboMsg.txt"],
 	["Bin\\BE300", "$buildroot\\oniguruma\\mips\\oniguruma.dll"],
@@ -151,6 +156,11 @@ $be300root = "E:\\work2\\BE300SDK_1012\\Installer\\English PC Tools";
 	["", "$buildroot\\PocketPC\\CabWiz\\TomboE.arm.CAB"],
 	["", "$buildroot\\PocketPC\\CabWiz\\TomboVGA_en.arm.CAB"],
 
+	@docsEN
+);
+
+@bin_wm5_arm_en = (
+	["", "$buildroot\\WindowsMobile5PPC\\CabWiz\\Tombo_en.arm.CAB"],
 	@docsEN
 );
 
@@ -175,7 +185,11 @@ $be300root = "E:\\work2\\BE300SDK_1012\\Installer\\English PC Tools";
 
 	[\@bin_pktpc_arm_jp,"PKTPC-ARM-JP", "_pktpc_arm_jp"],
 	[\@bin_pktpc_arm_en,"PKTPC-ARM-EN", "_pktpc_arm_en"],
-	[\@bin_sig3, "SIG3", "_sig3"],
+
+	[\@bin_wm5_arm_jp, "WM5-ARM-JP", "_wm5_jp"],
+	[\@bin_wm5_arm_en, "WM5-ARM-EN", "_wm5_en"],
+
+#	[\@bin_sig3, "SIG3", "_sig3"],
 
 );
 

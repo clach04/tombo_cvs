@@ -161,6 +161,10 @@ void LagendaPlatform::CheckMenu(UINT uid, BOOL bCheck)
 		bCBS = TRUE;
 		hMenu = hMSToolMenu;
 		break;
+//	case IDM_DETAILS_HSCROLL:
+//		hMenu = hMDToolMenu;
+//		bCBS = TRUE;
+//		break;
 	default:
 		return;
 	}
