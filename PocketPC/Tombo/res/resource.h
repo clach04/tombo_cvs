@@ -1,5 +1,5 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Visual C++ generated include file.
+// Microsoft Developer Studio generated include file.
 // Used by Tombo.rc
 //
 #define IDS_APP_TITLE                   1
@@ -50,7 +50,6 @@
 #define IDD_BOOKMARK_EDIT               134
 #define IDD_PROPTAB_EXTAPP              135
 #define IDD_PROPTAB_CODEPAGE            136
-#define IDR_MENU1                       137
 #define IDD_FILTERDEF_SRC               138
 #define IDD_FILTERDEF_FILTER            139
 #define IDD_FILTERDEF_ADD_REGEX         140
@@ -58,16 +57,13 @@
 #define IDD_FILTERDEF_ADD_TIMESTAMP     142
 #define IDD_FILTERDEF_ADD_SORT          143
 #define IDD_LANG_DLG                    149
-#define IDS_TREEVIEW_SOFTBUTTON_LEFT    200
-#define IDS_TREEVIEW_SOFTBUTTON_RIGHT   201
-#define IDS_EDITVIEW_SOFTBUTTON_LEFT    202
-#define IDS_EDITVIEW_SOFTBUTTON_RIGHT   203
 #define IDM_MAIN_MENUITEM1              401
 #define IDM_MAIN_MENUITEM2              402
 #define IDS_MAIN_MENUITEM1              410
 #define IDS_MAIN_MENUITEM2              412
 #define IDM_MAIN_MENU                   450
 #define IDM_DETAILS_MENU                460
+#define IDM_DETAILSDLG_MENU             461
 #define IDC_PASS                        1001
 #define IDC_TOPFOLDER                   1002
 #define IDC_FOLDERSEL                   1003
@@ -221,8 +217,11 @@
 #define IDM_FORGETPASS                  40036
 #define IDS_MENUITEM40037               40038
 #define IDS_MENUITEM40039               40040
+#define IDM_COPY                        40041
 #define IDS_MENUITEM40041               40041
+#define IDM_PASTE                       40042
 #define IDS_PROPTAB_FONT                40042
+#define IDM_CUT                         40043
 #define IDM_SAVE                        40044
 #define IDS_MENUITEM40045               40046
 #define IDM_POPUP                       40047
@@ -236,7 +235,9 @@
 #define ID_MENUITEM40055                40055
 #define IDS_MENUITEM40056               40057
 #define IDS_PROPTAB_KEEPCARET           40058
+#define IDM_SELALL                      40058
 #define IDS_PROPTAB_APPBUTTON           40059
+#define IDM_DETAILS_HSCROLL             40059
 #define IDM_DETAILS_TOOL                40060
 #define IDS_GREPTAB_MAIN                40060
 #define IDS_GREPTAB_PERSIST             40061
@@ -258,30 +259,13 @@
 #define IDS_MENUITEM40079               40080
 #define IDS_MENUITEM40081               40082
 #define IDS_MENUITEM40083               40084
-#define ID_RIGHT_EXIT                   40085
-#define IDM_EDIT_MENU                   40086
-#define IDM_CUT                         40087
-#define IDM_COPY                        40088
-#define IDM_PASTE                       40089
-#define IDM_SELALL                      40090
-#define IDM_DETAILS_HSCROLL             40091
-#define IDM_FIND_MENU                   40092
-#define ID_LEFT                         40093
-#define IDM_FIND                        40094
-#define IDM_FIND_NEXT                   40095
-#define IDM_FILE_MENU                   40096
-#define IDM_VERSION                     40097
-#define IDM_SECURITY_MENU               40098
-#define IDM_BOOKMARK                    40099
-#define IDM_OPTIONS_MENU                40100
-#define ID_NEW                          40101
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        139
-#define _APS_NEXT_COMMAND_VALUE         40102
+#define _APS_NEXT_RESOURCE_VALUE        137
+#define _APS_NEXT_COMMAND_VALUE         40085
 #define _APS_NEXT_CONTROL_VALUE         1083
 #define _APS_NEXT_SYMED_VALUE           113
 #endif
