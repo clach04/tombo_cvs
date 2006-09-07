@@ -413,6 +413,12 @@ BOOL YAEditImpl::OnKeyDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		case VK_DOWN:
 			CmdSelDown();
 			break;
+		case VK_DELETE:
+			CmdCut();
+			break;
+		case VK_INSERT:
+			CmdPaste();
+			break;
 		}
 	} else if (bCtrlDown) {
 		switch (nVertKey) {
@@ -433,6 +439,9 @@ BOOL YAEditImpl::OnKeyDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
 			break;
 		case 'B':
 			CmdToggleReadOnly();
+			break;
+		case VK_INSERT:
+			CmdCopy();
 			break;
 		default:
 			CmdNOP();

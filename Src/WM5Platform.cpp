@@ -34,10 +34,10 @@ static MenuMsgRes aMSLeftMenu[] = {
 };
 
 static MenuMsgRes aMSRightEditSubMenu[] = {
-	{  0, IDM_CUT,   0, MSG_ID_MENUITEM_MAIN_CUT,   NULL },
-	{  1, IDM_COPY,  0, MSG_ID_MENUITEM_MAIN_COPY,  NULL },
-	{  2, IDM_PASTE, 0, MSG_ID_MENUITEM_MAIN_PASTE, NULL },
-	{ -1, 0,         0, 0,                          NULL },
+	{  0, IDM_CUT,      0, MSG_ID_MENUITEM_MAIN_CUT,    NULL },
+	{  1, IDM_COPY,     0, MSG_ID_MENUITEM_MAIN_COPY,   NULL },
+	{  2, IDM_PASTE,    0, MSG_ID_MENUITEM_MAIN_PASTE,  NULL },
+	{ -1, 0,            0, 0,                           NULL },
 };
 
 static MenuMsgRes aMSRightFindSubMenu[] = {
@@ -94,10 +94,13 @@ static MenuMsgRes aMSRightMenu[] = {
 // Editview
 
 static MenuMsgRes aMDRightEditSubMenu[] = {
-	{  0, IDM_CUT,   0, MSG_ID_MENUITEM_MAIN_CUT,   NULL },
-	{  1, IDM_COPY,  0, MSG_ID_MENUITEM_MAIN_COPY,  NULL },
-	{  2, IDM_PASTE, 0, MSG_ID_MENUITEM_MAIN_PASTE, NULL },
-	{ -1, 0,         0, 0,                          NULL },
+	{  0, IDM_CUT,      0, MSG_ID_MENUITEM_MAIN_CUT,   NULL },
+	{  1, IDM_COPY,     0, MSG_ID_MENUITEM_MAIN_COPY,  NULL },
+	{  2, IDM_PASTE,    0, MSG_ID_MENUITEM_MAIN_PASTE, NULL },
+	{  3, -1,           0, 0,                          NULL },
+	{  4, IDM_INSDATE1, 0, MSG_ID_TOOLTIPS_INSDATE1,   NULL },
+	{  5, IDM_INSDATE2, 0, MSG_ID_TOOLTIPS_INSDATE2,   NULL },
+	{ -1, 0,            0, 0,                          NULL },
 };
 
 static MenuMsgRes aMDRightFindSubMenu[] = {

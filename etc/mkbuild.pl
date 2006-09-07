@@ -1,7 +1,7 @@
 #
 # TOMBO Build program for ActivePerl(Win32)
 
-$version = "Tombo_2_0b1";
+$version = "Tombo_2_0b2";
 
 ##########################################################################
 # Tool definition
@@ -110,6 +110,7 @@ $builddir  = "C:\\temp\\Tombo-Rel";
 	["", "$buildroot\\Src\\MsgRes\\TomboMsg\\jp\\TomboMsg.txt"],
 	["", "$buildroot\\oniguruma\\win32\\oniguruma.dll"],
 	["", "$buildroot\\Win32\\RegErase\\Release\\RegErase.exe"],
+	["", "$buildroot\\expat\\lib\\Win32\\libexpatw.dll"],
 
 	@docsJP
 );
@@ -169,6 +170,7 @@ $builddir  = "C:\\temp\\Tombo-Rel";
 	["", "$buildroot\\Src\\MsgRes\\TomboMsg\\en\\TomboMsg.txt"],
 	["", "$buildroot\\oniguruma\\win32\\oniguruma.dll"],
 	["", "$buildroot\\Win32\\RegErase\\Release\\RegErase.exe"],
+	["", "$buildroot\\expat\\lib\\Win32\\libexpatw.dll"],
 
 	@docsEN
 );

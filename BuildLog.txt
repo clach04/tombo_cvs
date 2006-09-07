@@ -204,3 +204,10 @@ Based on B217(TOMBO 1.17)
 - support menubar label's L9N.
 - FIX: Menu checking is not worked.(WM5)
 
+////////////////////////////////
+// B227 (TOMBO 2.0 beta 2)
+////////////////////////////////
+
+* FIX: libexpatw.dll was not included in desktop version.
+* Add insert date menu to wm5 version.
+* Add Ctrl+Insert, Ctrl+Delete, Shift+Insert key binding.
