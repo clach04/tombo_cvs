@@ -211,3 +211,10 @@ Based on B217(TOMBO 1.17)
 * FIX: libexpatw.dll was not included in desktop version.
 * Add insert date menu to wm5 version.
 * Add Ctrl+Insert, Ctrl+Delete, Shift+Insert key binding.
+
+////////////////////////////////
+// B228
+////////////////////////////////
+
+* Add Shift+Home, Shift+End, Shift+Ctrl+Home, Shift+Ctrl+End key binding.
+- Add project to build installer (Win32).

@@ -419,6 +419,20 @@ BOOL YAEditImpl::OnKeyDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		case VK_INSERT:
 			CmdPaste();
 			break;
+		case VK_HOME:
+			if (bCtrlDown) {
+				CmdSelTopOfDoc();
+			} else {
+				CmdSelTopOfLogicalLine();
+			}
+			break;
+		case VK_END:
+			if (bCtrlDown) {
+				CmdSelEndOfDoc();
+			} else {
+				CmdSelEndOfLogicalLine();
+			}
+			break;
 		}
 	} else if (bCtrlDown) {
 		switch (nVertKey) {
@@ -578,6 +592,61 @@ void YAEditImpl::CmdSelDown()	{ pView->MoveDown(); UpdateSelRegion(); }
 
 void YAEditImpl::CmdScrollUp()	{ pView->PrevPage(); }
 void YAEditImpl::CmdScrollDown(){ pView->NextPage(); }
+
+void YAEditImpl::CmdSelTopOfLogicalLine() 
+{
+	Region rNewRegion;
+
+	rNewRegion.posEnd = rSelRegion.posStart;
+	rNewRegion.posStart.Set(0, rSelRegion.posStart.row);
+
+	ClearRegion();
+	rSelRegion = rNewRegion;
+	RequestRedrawRegion(&rSelRegion);
+	pView->SetCaretPosition(rSelRegion.posStart);
+}
+
+void YAEditImpl::CmdSelEndOfLogicalLine()
+{
+	Region rNewRegion;
+	rNewRegion.posStart = rSelRegion.posEnd;
+
+	LineChunk lc;
+	pLineMgr->GetLineChunk(rSelRegion.posEnd.row, &lc);
+	rNewRegion.posEnd.Set(lc.LineLen(), rSelRegion.posEnd.row);
+
+	ClearRegion();
+	rSelRegion = rNewRegion;
+	RequestRedrawRegion(&rSelRegion);
+	pView->SetCaretPosition(rSelRegion.posEnd);
+}
+
+void YAEditImpl::CmdSelTopOfDoc()
+{
+	Region rNewRegion;
+	rNewRegion.posEnd = rSelRegion.posStart;
+	rNewRegion.posStart.Set(0, 0);
+
+	ClearRegion();
+	rSelRegion = rNewRegion;
+	RequestRedrawRegion(&rSelRegion);
+	pView->SetCaretPosition(rSelRegion.posStart);
+}
+
+void YAEditImpl::CmdSelEndOfDoc()
+{
+	Region rNewRegion;
+	rNewRegion.posStart = rSelRegion.posEnd;
+
+	LineChunk lc;
+	pLineMgr->GetLineChunk(pLineMgr->MaxLine() - 1, &lc);
+	rNewRegion.posEnd.Set(lc.LineLen(), pLineMgr->MaxLine() - 1);
+
+	ClearRegion();
+	rSelRegion = rNewRegion;
+	RequestRedrawRegion(&rSelRegion);
+	pView->SetCaretPosition(rSelRegion.posEnd);
+}
 
 void YAEditImpl::CmdReplaceString(LPCTSTR p)
 {

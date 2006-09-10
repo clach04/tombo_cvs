@@ -247,6 +247,11 @@ public:
 	void CmdSelUp();
 	void CmdSelDown();
 
+	void CmdSelEndOfLogicalLine();
+	void CmdSelTopOfLogicalLine();
+	void CmdSelTopOfDoc();
+	void CmdSelEndOfDoc();
+
 	void CmdScrollUp();
 	void CmdScrollDown();
 
