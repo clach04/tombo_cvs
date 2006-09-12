@@ -21,7 +21,6 @@ public:
 	virtual ~YAEditor();
 	BOOL Init(DWORD nID);
 
-
 	BOOL Create(LPCTSTR pName, RECT &r, HWND hParent, HINSTANCE hInst, HFONT hFont);
 	void SetFocus();
 	void MoveWindow(DWORD x, DWORD y, DWORD nWidth, DWORD nHeight);
@@ -31,13 +30,7 @@ public:
 
 	void SetMDSearchFlg(BOOL bFlg);
 
-	//////////////////////////
-	// implimenting
-
 	LPTSTR GetMemo();
-
-	//////////////////////////
-	// not implimented yet
 
 	BOOL Show(int nCmdShow) { return TRUE; }
 
@@ -63,6 +56,15 @@ public:
 	void SetSelectRegion(DWORD nStart, DWORD nEnd);
 
 	BOOL ReplaceText(LPCTSTR p);
+
+	//////////////////////////
+	// commands
+	void CmdUndo();
+	void CmdCut();
+	void CmdCopy();
+	void CmdPaste();
+	void CmdBackSpace();
+	void CmdSelAll();
 };
 
 #endif

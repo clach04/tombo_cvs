@@ -24,6 +24,8 @@ public:
 
 	// called from YAE when the document read only flag is changed
 	virtual void ChangeReadOnlyStatusNotify(BOOL bStatus) = 0;
+
+	virtual void OnContextMenu(HWND hWnd, WORD x, WORD y) = 0;
 };
 
 //////////////////////////////////////////////////
@@ -34,7 +36,7 @@ public:
 class YAEdit {
 public:
 
-	virtual BOOL Create(HINSTANCE hInst, HWND hWnd, DWORD nId, RECT &r, const YAEContextMenu* menu, BOOL bWrap) = 0;
+	virtual BOOL Create(HINSTANCE hInst, HWND hWnd, DWORD nId, RECT &r, BOOL bWrap) = 0;
 	virtual void SetFocus() = 0;
 	virtual void SetFont(HFONT hFont) = 0;
 
@@ -85,16 +87,6 @@ public:
 	virtual YAEditDoc *CreateDocument(const char *pStr, YAEditCallback*pCb) = 0;
 };
 
-//////////////////////////////////////////////////
-// for Context menu 
-//////////////////////////////////////////////////
-
-typedef void (YAEdit::*YAEditCommandFunc)();
-
-struct YAEContextMenu {
-	LPCTSTR pItemName;
-	YAEditCommandFunc pFunc;
-};
 
 //////////////////////////////////////////////////
 // Controller class for YAE implementation
@@ -114,10 +106,6 @@ protected:
 	///////////////////////////////////////
 	// callback handler
 	YAEditCallback *pCallback;
-
-	///////////////////////////////////////
-	// context menu
-	const YAEContextMenu *pContextMenu;
 
 	///////////////////////////////////////
 	// window related members
@@ -171,8 +159,6 @@ protected:
 	void ClearRegion();
 	void ClearSelectedRegion();
 
-	void ShowExecContextMenu(WORD x, WORD y);
-
 	BOOL SetWrapper();
 
 public:
@@ -182,7 +168,7 @@ public:
 	YAEditImpl(YAEditCallback *pCb);
 	virtual ~YAEditImpl();
 
-	BOOL Create(HINSTANCE hInst, HWND hWnd, DWORD nId, RECT &r, const YAEContextMenu* menu, BOOL bWrap);
+	BOOL Create(HINSTANCE hInst, HWND hWnd, DWORD nId, RECT &r, BOOL bWrap);
 	void SetFocus();
 
 	/////////////////////////////////

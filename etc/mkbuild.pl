@@ -1,7 +1,7 @@
 #
 # TOMBO Build program for ActivePerl(Win32)
 
-$version = "Tombo_2_0b2";
+$version = "Tombo_2_0b3";
 
 ##########################################################################
 # Tool definition
@@ -59,11 +59,6 @@ $builddir  = "C:\\temp\\Tombo-Rel";
 	["Bin\\HPCPro\\SH4", "$buildroot\\oniguruma\\sh4\\oniguruma.dll"],
 	["Bin\\HPCPro\\SH4", "$buildroot\\HpcPro\\RegErase\\SH4Rel\\RegErase.exe"],
 
-#	["Bin\\HPCPro\\Sig3", "$buildroot\\HpcPro\\Tombo\\ARMSig3\\Tombo.exe"],
-#	["Bin\\HPCPro\\Sig3", "$buildroot\\Src\\MsgRes\\TomboMsg\\jp\\TomboMsg.txt"],
-#	["Bin\\HPCPro\\Sig3", "$buildroot\\oniguruma\\arm\\oniguruma.dll"],
-#	["Bin\\HPCPro\\Sig3", "$buildroot\\HpcPro\\RegErase\\ARMRel\\RegErase.exe"],
-
 	["Bin\\PocketPC\\MIPS", "$buildroot\\PocketPC\\CabWiz\\Tombo.mips.CAB"],
 
 	["Bin\\PocketPC\\SH3", "$buildroot\\PocketPC\\CabWiz\\Tombo.sh3.CAB"],
@@ -96,23 +91,10 @@ $builddir  = "C:\\temp\\Tombo-Rel";
 	@docsJP
 );
 
-#@bin_sig3 = (
-#	["", "$buildroot\\HpcPro\\Tombo\\ARMSig3\\Tombo.exe"],
-#	["", "$buildroot\\Src\\MsgRes\\TomboMsg\\jp\\TomboMsg.txt"],
-#	["", "$buildroot\\oniguruma\\arm\\oniguruma.dll"],
-#	["", "$buildroot\\HpcPro\\RegErase\\ARMRel\\RegErase.exe"],
-#
-#	@docsJP
-#);
-
 @bin_win32_jp = (
-	["", "$buildroot\\Win32\\Tombo\\Release\\Tombo.exe"],
-	["", "$buildroot\\Src\\MsgRes\\TomboMsg\\jp\\TomboMsg.txt"],
-	["", "$buildroot\\oniguruma\\win32\\oniguruma.dll"],
-	["", "$buildroot\\Win32\\RegErase\\Release\\RegErase.exe"],
-	["", "$buildroot\\expat\\lib\\Win32\\libexpatw.dll"],
-
-	@docsJP
+	["", "C:\\temp\\TomboSetupJ\\*.*"],
+	["Files", "C:\\temp\\TomboSetupJ\\Files\\*.*"],
+	["", "$docroot\\Jp\\Readme.txt"],
 );
 
 @bin_ce_all_en = (
@@ -166,11 +148,14 @@ $builddir  = "C:\\temp\\Tombo-Rel";
 );
 
 @bin_win32_en = (
-	["", "$buildroot\\Win32\\Tombo\\Release\\Tombo.exe"],
-	["", "$buildroot\\Src\\MsgRes\\TomboMsg\\en\\TomboMsg.txt"],
-	["", "$buildroot\\oniguruma\\win32\\oniguruma.dll"],
-	["", "$buildroot\\Win32\\RegErase\\Release\\RegErase.exe"],
-	["", "$buildroot\\expat\\lib\\Win32\\libexpatw.dll"],
+	["", "C:\\temp\\TomboSetupE\\*.*"],
+	["Files", "C:\\temp\\TomboSetupE\\Files\\*.*"],
+	["", "$docroot\\En\\Readme.txt"],
+#	["", "$buildroot\\Win32\\Tombo\\Release\\Tombo.exe"],
+#	["", "$buildroot\\Src\\MsgRes\\TomboMsg\\en\\TomboMsg.txt"],
+#	["", "$buildroot\\oniguruma\\win32\\oniguruma.dll"],
+#	["", "$buildroot\\Win32\\RegErase\\Release\\RegErase.exe"],
+#	["", "$buildroot\\expat\\lib\\Win32\\libexpatw.dll"],
 
 	@docsEN
 );

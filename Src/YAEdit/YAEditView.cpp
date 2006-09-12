@@ -136,8 +136,8 @@ static DWORD CheckCharType(LPCTSTR pLine, LPDWORD pNumChar)
 
 static void DrawEOL(HDC hDC, LPRECT pRect, COLORREF color)
 {
-	WORD nHalfX = (pRect->right - pRect->left)/ 2;
-	WORD nHalfY = (pRect->bottom - pRect->top) / 2;
+	WORD nHalfX = (WORD)((pRect->right - pRect->left)/ 2);
+	WORD nHalfY = (WORD)((pRect->bottom - pRect->top) / 2);
 
 	int nW = pRect->right - pRect->left;
 	int nH = pRect->bottom - pRect->top;
@@ -165,7 +165,7 @@ static void DrawEOL(HDC hDC, LPRECT pRect, COLORREF color)
 
 static void DrawLEOL(HDC hDC, LPRECT pRect, COLORREF color)
 {
-	WORD nHalfX = (pRect->right - pRect->left)/ 2;
+	WORD nHalfX = (WORD)((pRect->right - pRect->left)/ 2);
 
 	int nH = pRect->bottom - pRect->top;
 	WORD w = (nH * 7) / 10;

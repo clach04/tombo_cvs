@@ -99,7 +99,7 @@ YAEditDoc *YAEditImpl::CreateDocument(const char *pStr, YAEditCallback* pCb)
 YAEditImpl::YAEditImpl(YAEditCallback *pCB) : 
 	pWrapper(NULL), bScrollTimerOn(FALSE), pView(NULL), 
 	bMouseDown(FALSE), pLineMgr(NULL), pCallback(pCB), 
-	pContextMenu(NULL), bInsertMode(FALSE)
+	bInsertMode(FALSE)
 {
 }
 
@@ -193,12 +193,10 @@ LRESULT CALLBACK YAEditWndProc(HWND hWnd, UINT nMessage, WPARAM wParam, LPARAM l
 // Create window
 /////////////////////////////////////////////////////////////////////////////
 
-BOOL YAEditImpl::Create(HINSTANCE hInst, HWND hParent, DWORD nId, RECT &r, const YAEContextMenu* menu, BOOL bWrap)
+BOOL YAEditImpl::Create(HINSTANCE hInst, HWND hParent, DWORD nId, RECT &r, BOOL bWrap)
 {
 	hInstance = hInst;
 	pDoc = NULL;
-
-	pContextMenu = menu;
 
 	pLineMgr = new LineManager();
 	if (!pLineMgr->Init(this)) return FALSE;
@@ -775,34 +773,6 @@ void YAEditImpl::CmdToggleInsertMode()
 //  RButton
 /////////////////////////////////////////////////////////////////////////////
 
-void YAEditImpl::ShowExecContextMenu(WORD x, WORD y)
-{
-	if (pContextMenu == NULL) return;
-
-	// create context menu
-	HMENU hMenu = CreatePopupMenu();
-	DWORD nItems = 1;
-
-	const YAEContextMenu *p = pContextMenu;
-	while (p->pItemName != NULL) {
-		if (*(p->pItemName) == TEXT('\0')) {
-			InsertMenu(hMenu, nItems - 1, MF_BYPOSITION | MF_SEPARATOR, 0, NULL);
-		} else {
-			InsertMenu(hMenu, nItems - 1, MF_BYPOSITION | MF_STRING, nItems, p->pItemName);
-		}
-		p++;
-		nItems++;
-	}
-
-	DWORD id = TrackPopupMenuEx(hMenu, TPM_RETURNCMD | TPM_TOPALIGN | TPM_LEFTALIGN, x, y, pView->hViewWnd, NULL);
-	if (id > 0 && id < nItems) {
-		YAEditCommandFunc f = pContextMenu[id - 1].pFunc;
-		(this->*f)();
-	}
-
-	DestroyMenu(hMenu);
-}
-
 void YAEditImpl::OnRbuttonDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
 	RECT rWinRect;
@@ -811,7 +781,9 @@ void YAEditImpl::OnRbuttonDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	WORD x = (WORD)(rWinRect.left + LOWORD(lParam));
 	WORD y = (WORD)(rWinRect.top + HIWORD(lParam));
 
-	ShowExecContextMenu(x, y);
+	OnLButtonDown(hWnd, wParam, lParam);
+	OnLButtonUp(hWnd, wParam, lParam);
+	pCallback->OnContextMenu(pView->hViewWnd, x, y);
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -820,12 +792,8 @@ void YAEditImpl::OnRbuttonDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 void YAEditImpl::OnLButtonDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
-	WORD nMouseDrgStartX, nMouseDrgStartY;	// LButton down point by WM_LBUTTONDOWN
 
 	SetFocus();
-
-	nMouseDrgStartX = LOWORD(lParam);
-	nMouseDrgStartY = HIWORD(lParam);
 
 #if defined(PLATFORM_PKTPC) || defined(PLATFORM_WM5)
 	// Tap&hold
@@ -840,11 +808,15 @@ void YAEditImpl::OnLButtonDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		RECT r;
 		GetWindowRect(hWnd, &r);
 
-		ShowExecContextMenu(r.left + rgi.ptDown.x, r.top + rgi.ptDown.y);
+		pCallback->OnContextMenu(pView->hViewWnd, r.left + rgi.ptDown.x, r.top + rgi.ptDown.y);
 		return;
 	}
 
 #endif
+
+	WORD nMouseDrgStartX, nMouseDrgStartY;	// LButton down point by WM_LBUTTONDOWN
+	nMouseDrgStartX = LOWORD(lParam);
+	nMouseDrgStartY = HIWORD(lParam);
 
 	// move caret
 	DWORD nNewRow = pView->DpLinePixelToLgLineNo(nMouseDrgStartY);
@@ -861,6 +833,7 @@ void YAEditImpl::OnLButtonDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		// crear previously selected region
 		RequestRedrawRegion(&rOldRgn);
 	}
+
 
 	// get mouse capture
 	SetCapture(hWnd);

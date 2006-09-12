@@ -218,3 +218,10 @@ Based on B217(TOMBO 1.17)
 
 * Add Shift+Home, Shift+End, Shift+Ctrl+Home, Shift+Ctrl+End key binding.
 - Add project to build installer (Win32).
+
+////////////////////////////////
+// B229 (TOMBO 2.0 beta 3)
+////////////////////////////////
+
+* Add Insert Date1/2 to context menu.
+* FIX: beta1/2 is depend on MSVCRT80.DLL, remove dependency.
