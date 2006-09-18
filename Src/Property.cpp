@@ -175,7 +175,8 @@ LPCTSTR GetString(UINT nID)
 // ctor
 //////////////////////////////////////////
 
-Property::Property() : pCmdlineAssignedTopDir(NULL), pBookMark(NULL), pSearchHistory(NULL), pTopDirHistory(NULL), pRepos(NULL), nNumRepos(0)
+Property::Property() : pCmdlineAssignedTopDir(NULL), pBookMark(NULL), pSearchHistory(NULL), pTopDirHistory(NULL), 
+	pDefaultRep(NULL), pRepos(NULL), nNumRepos(0)
 #if defined(PLATFORM_HPC)
 	,pCmdBarInfo(NULL)
 #endif
@@ -379,8 +380,9 @@ struct PropFileParseInfo {
 	BOOL bInTomboRoot;
 
 	TVector<RepositoryImpl*> vSubRepos;
+	LocalFileRepository *pDefaultRep;
 
-	PropFileParseInfo() : pMultiName(NULL), bInTomboRoot(FALSE) {}
+	PropFileParseInfo() : pMultiName(NULL), bInTomboRoot(FALSE), pDefaultRep(NULL) {}
 	~PropFileParseInfo() { delete[] pMultiName; }
 
 	void SetMultiName(LPTSTR p) { delete[] pMultiName; pMultiName = p; }
@@ -402,6 +404,10 @@ static void StartElement(void *userData, const XML_Char *name, const XML_Char **
 		RepositoryImpl *pImpl = Repository::CreateSubRepo((LPCWSTR)name, (const WCHAR **)atts);
 		if (pImpl != NULL) {
 			pParseInfo->vSubRepos.Add(&pImpl);
+		}
+		// XXX: in current version, default repository assumed as LocalFileRepository.
+		if (_tcscmp(TEXT("default"), pImpl->GetRepositoryName()) == 0) {
+			pParseInfo->pDefaultRep = (LocalFileRepository*)pImpl;
 		}
 	} else if (wcscmp(pName, L"tomboprop") == 0) {
 		// XXXX: NOP in current version
@@ -545,10 +551,11 @@ BOOL Property::Load()
 		LocalFileRepository *pLocalImpl = new LocalFileRepository();
 //		if (!pLocalImpl->Init(TEXT("default"), , pTopDir, bKeepTitle, bKeepCaret, bSafeFileName)) {
 		// XXXX : 
-		if (!pLocalImpl->Init(TEXT("default"), MSG_MEMO, pTopDir, FALSE, TRUE, TRUE)) {
+		if (!pLocalImpl->Init(TEXT("default"), MSG_MEMO, pTopDir, FALSE, FALSE, FALSE)) {
 			return FALSE;
 		}
 		pRepos[0] = pLocalImpl;
+		pDefaultRep = pLocalImpl;
 
 		VFolderRepository *pVImpl = new VFolderRepository();
 		if (!pVImpl->Init(TEXT("@vfolder"), MSG_VIRTUAL_FOLDER)) {
@@ -627,6 +634,7 @@ BOOL Property::LoadProperties()
 		RepositoryImpl *pImpl = *ppi.vSubRepos.GetUnit(i);
 		pRepos[i] = pImpl;
 	}
+	pDefaultRep = ppi.pDefaultRep;
 
 	bNeedAsk = FALSE;
 	bLoad = TRUE;
@@ -1052,7 +1060,7 @@ BOOL Property::GetWinSize(UINT *pFlags, UINT *pShowCmd, LPRECT pWinRect, LPWORD 
 		SetLastError(ERROR_INVALID_DATA);
 		return FALSE;
 	}
-	*pSelectViewWidth = n;
+	*pSelectViewWidth = (WORD)n;
 	// check and modify window position
 	if (pWinRect->left < 0) pWinRect->left = 0;
 	if (pWinRect->top < 0) pWinRect->top = 0;
@@ -1238,3 +1246,40 @@ RepositoryImpl *Property::GetSubRepository(DWORD nIndex)
 	if (pImpl == NULL) return NULL;
 	return pImpl->Clone(); 
 }
+
+DWORD Property::GetKeepCaret()
+{
+	if (pDefaultRep) return pDefaultRep->GetKeepCaret();
+	else return nPropsNum[PROP_N_DETAILSVIEW_KEEPCARET];
+}
+
+void Property::SetKeepCaret(DWORD n)
+{
+	if (pDefaultRep) pDefaultRep->SetKeepCaret(n);
+	nPropsNum[PROP_N_DETAILSVIEW_KEEPCARET] = n;
+}
+
+DWORD Property::GetUseSafeFileName()
+{
+	if (pDefaultRep) return pDefaultRep->GetSafeFileName();
+	else return nPropsNum[PROP_N_SAFEFILENAME];
+}
+
+void Property::SetUseSafeFileName(DWORD n)
+{
+	if (pDefaultRep) pDefaultRep->SetSafeFileName(n);
+	nPropsNum[PROP_N_SAFEFILENAME] = n;
+}
+
+DWORD Property::GetKeepTitle()
+{
+	if (pDefaultRep) return pDefaultRep->GetKeepTitle();
+	else return nPropsNum[PROP_N_KEEP_TITLE];
+}
+
+void Property::SetKeepTitle(DWORD n)
+{
+	if (pDefaultRep) pDefaultRep->SetKeepTitle(n);
+	nPropsNum[PROP_N_KEEP_TITLE] = n;
+}
+

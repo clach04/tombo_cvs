@@ -225,3 +225,11 @@ Based on B217(TOMBO 1.17)
 
 * Add Insert Date1/2 to context menu.
 * FIX: beta1/2 is depend on MSVCRT80.DLL, remove dependency.
+
+////////////////////////////////
+// B230
+////////////////////////////////
+
+* FIX: password timeout occures in serveral minutes even though timeout value is 60 min (#8952)
+* FIX: "Use random filename" option is always ON even though check is off (#8960)
+* FIX: PocketPC's menu is corrupt(#8961)

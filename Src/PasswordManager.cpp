@@ -192,18 +192,13 @@ void PasswordManager::ForgetPasswordIfNotAccessed()
 	GetSystemTime(&st);
 	SystemTimeToFileTime(&st, &ftNow);
 
-	// ftNow - ftLastAccess;
-	DWORD nDiffHigh, nDiffLow;
+	UINT64 utLastAccess = ((UINT64)ftLastAccess.dwHighDateTime << 32) | (UINT64)ftLastAccess.dwLowDateTime;
+	UINT64 utNow = ((UINT64)ftNow.dwHighDateTime << 32) | (UINT64)ftNow.dwLowDateTime;
 
-	nDiffLow = ftNow.dwLowDateTime - ftLastAccess.dwLowDateTime;
-	if (ftNow.dwLowDateTime < ftLastAccess.dwLowDateTime) {
-		nDiffLow += 0xFFFFFFFF;
-		nDiffLow += 1;
-		ftNow.dwHighDateTime--;
-	}
-	nDiffHigh = ftNow.dwHighDateTime - ftLastAccess.dwHighDateTime;
+	UINT64 utDiff = (utNow - utLastAccess) / 10000000;
+	utDiff /= 60;
 
-	if (nDiffLow > g_Property.GetPassTimeout() * 60 * 10000000) {
+	if (utDiff > g_Property.GetPassTimeout()) {
 		SendMessage(hParent, WM_TIMER, 0, 0);
 	}
 }

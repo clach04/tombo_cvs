@@ -161,6 +161,13 @@ public:
 
 	BOOL ExecuteAssoc(const TomboURI *pURI, ExeAppType nType);
 	BOOL MakeFolder(const TomboURI *pURI, LPCTSTR pFolderName);
+
+	BOOL GetKeepTitle() { return bKeepTitle; }
+	void SetKeepTitle(BOOL b) { bKeepTitle = b; }
+	BOOL GetKeepCaret() { return bKeepCaret; }
+	void SetKeepCaret(BOOL b) { bKeepCaret = b; }
+	BOOL GetSafeFileName() { return bSafeFileName; }
+	void SetSafeFileName(BOOL b) { bSafeFileName = b; }
 };
 
 ///////////////////////////////////////////////////////////////////

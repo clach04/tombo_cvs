@@ -42,7 +42,7 @@
 				UseUnicodeResponseFiles="false"
 				Optimization="0"
 				AdditionalIncludeDirectories="C:\work2\SF\Tombo\oniguruma;C:\work2\SF\Tombo\Src\YAEdit;C:\work2\SF\Tombo\expat\include;C:\work2\SF\Tombo\Win32\Tombo\res;C:\work2\SF\Tombo\Src\TomboLib;C:\work2\SF\Tombo\Src"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;TOMBO;PLATFORM_WIN32;MBCS;$(NOINHERIT)"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;TOMBO;PLATFORM_WIN32;MBCS;_CRT_SECURE_NO_DEPRECATE;$(NOINHERIT)"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"

@@ -75,9 +75,14 @@
 	DWORD Get##NAME##() { return nPropsNum[ATTR]; }\
 	void Set##NAME##(DWORD n) { nPropsNum[ATTR] = n; }
 
+#define NUM_ACCESSOR_DECL(NAME) \
+	DWORD Get##NAME##();\
+	void Set##NAME##(DWORD n);
+
 class File;
 class TomboURI;
 class RepositoryImpl;
+class LocalFileRepository;
 
 ////////////////////////////////////
 // Property data
@@ -113,6 +118,7 @@ class Property {
 	BOOL LoadDefaultProperties();
 
 	RepositoryImpl **pRepos;
+	LocalFileRepository *pDefaultRep;
 	DWORD nNumRepos;
 
 public:
@@ -139,6 +145,10 @@ public:
 	// GetTomboRoot 
 	LPCTSTR GetTomboRoot();
 
+	NUM_ACCESSOR_DECL(KeepCaret) // whether keep caret position or not
+	NUM_ACCESSOR_DECL(UseSafeFileName)	// change crypted file name random
+	NUM_ACCESSOR_DECL(KeepTitle) // keep file name even if headline has changed
+
 	STR_ACCESSOR(LastOpenURI, PROP_S_LAST_OPEN_URI) // notes store folder
 	NUM_ACCESSOR(KeepLastOpen, PROP_N_KEEP_LAST_OPEN)	// when starting, the note last open is opened.
 	STR_ACCESSOR(DefaultNote, PROP_S_DEFAULTNOTE)	// use this uri when starting tombo
@@ -157,21 +167,18 @@ public:
 	STR_ACCESSOR(DateFormat1, PROP_S_DETAILSVIEW_DATEFORMAT1)
 	STR_ACCESSOR(DateFormat2, PROP_S_DETAILSVIEW_DATEFORMAT2)
 	NUM_ACCESSOR(Tabstop, PROP_NDETAILSVIEW_TABSTOP)	// tab stop
-	NUM_ACCESSOR(KeepCaret, PROP_N_DETAILSVIEW_KEEPCARET) // whether keep caret position or not
 	NUM_ACCESSOR(WrapText, PROP_N_WRAPTEXT)	// text wrapping on editview
 	NUM_ACCESSOR(OpenReadOnly, PROP_N_OPENREADONLY)	// always read only mode when open the nots.
 	NUM_ACCESSOR(DisableSaveDlg, PROP_N_DISABLESAVEDLG)	// disable asking save when closing notes
 	NUM_ACCESSOR(CodePage, PROP_N_CODEPAGE) 	// Codepage selection
 
 	// crypt related
-	NUM_ACCESSOR(UseSafeFileName, PROP_N_SAFEFILENAME)	// change crypted file name random
 	NUM_ACCESSOR(PassTimeout, PROP_N_PASSTIMEOUT)	// password timeout	
 
 	// MainFrame related
 	NUM_ACCESSOR(AutoSelectMemo, PROP_N_AUTOSELECT_MODE)	// display note when treeview selection is moving
 	NUM_ACCESSOR(SingleClick, PROP_N_SINGLECLICK_MODE)	// display note when clicking the tree item 
 	NUM_ACCESSOR(SwitchWindowTitle, PROP_N_SWITCH_WINDOW_TITLE) // is sync window text to note's name?
-	NUM_ACCESSOR(KeepTitle, PROP_N_KEEP_TITLE) // keep file name even if headline has changed
 	NUM_ACCESSOR(UseTwoPane, PROP_N_USE_TWO_PANE) // is two pane mode?
 
 	// extapp related
