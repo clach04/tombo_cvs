@@ -1118,6 +1118,13 @@ void YAEditImpl::ResizeWindow(int x, int y, int width, int height)
 	MoveWindow(pView->hViewWnd, x, y, width, height, TRUE);
 }
 
+BOOL YAEditImpl::Show(int nCmdShow)
+{
+	ShowWindow(pView->hViewWnd, nCmdShow);
+	return TRUE;
+}
+
+
 /////////////////////////////////////////////////////////////////////////////
 // Region
 /////////////////////////////////////////////////////////////////////////////

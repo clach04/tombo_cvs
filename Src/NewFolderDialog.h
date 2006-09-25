@@ -5,14 +5,18 @@ class NewFolderDialog {
 	HWND hDialog;
 	HINSTANCE hInstance;
 	TCHAR aFolder[MAX_PATH];
+	LPCTSTR pBaseText;
+	DWORD nTitleID;
 public:
 	
-	NewFolderDialog() : hDialog(NULL), hInstance(NULL) { aFolder[0] = TEXT('\0'); }
+	NewFolderDialog();
 	void InitDialog(HWND hWnd);
 	BOOL OnOK(HWND hWnd);
 
 	DWORD Popup(HINSTANCE hInst, HWND hParent);
 	LPCTSTR FolderName() { return aFolder; }
+
+	void SetOption(DWORD nTitleID, LPCTSTR pText);
 };
 
 #endif

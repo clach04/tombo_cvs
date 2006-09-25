@@ -41,6 +41,7 @@ public:
 	virtual void SetFont(HFONT hFont) = 0;
 
 	virtual void ResizeWindow(int x, int y, int width, int height) = 0;
+	virtual BOOL Show(int nCmdShow) = 0;
 
 	///////////////////////////////////////
 	// document related funcs
@@ -256,6 +257,7 @@ public:
 	/////////////////////////////////
 	// Move/Resize window
 	void ResizeWindow(int x, int y, int width, int height);
+	BOOL Show(int nCmdShow);
 
 	/////////////////////////////////
 	// YAEditDoc callback

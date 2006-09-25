@@ -192,6 +192,15 @@ void YAEditor::ResetModify()
 BOOL YAEditor::OnCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
 	switch(LOWORD(wParam)) {
+	case IDM_CUT:
+		pEdit->CmdCut();
+		return TRUE;
+	case IDM_COPY:
+		pEdit->CmdCopy();
+		return TRUE;
+	case IDM_PASTE:
+		pEdit->CmdPaste();
+		return TRUE;
 	case IDM_INSDATE1:
 		InsertDate1();
 		return TRUE;
@@ -200,6 +209,7 @@ BOOL YAEditor::OnCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		return TRUE;
 	case IDM_UNDO:
 		pEdit->CmdUndo();
+		return TRUE;
 	}
 	return FALSE;
 }
@@ -274,4 +284,9 @@ void YAEditor::CmdBackSpace()
 void YAEditor::CmdSelAll()
 {
 	pEdit->CmdSelAll();
+}
+
+BOOL YAEditor::Show(int nCmdShow)
+{
+	return pEdit->Show(nCmdShow);
 }

@@ -233,3 +233,13 @@ Based on B217(TOMBO 1.17)
 * FIX: password timeout occures in serveral minutes even though timeout value is 60 min (#8952)
 * FIX: "Use random filename" option is always ON even though check is off (#8960)
 * FIX: PocketPC's menu is corrupt(#8961)
+
+////////////////////////////////
+// B231 (TOMBO 2.0 beta 4)
+////////////////////////////////
+
+* FIX: One pane mode is not worked(#8954)
+* FIX: Save new note failed when choosing virtual folder(#9013)
+* FIX: Cut/Copy/Paste is not worked when choosing from menu(WM5)(#9008)
+* FIX: Renaming is not worked on some WM5 devices(#9014)
+* FIX: Password timeout is not occured when displaying crypted notes and focus is in treeview.(#9050)

@@ -7,6 +7,13 @@
 #include "Message.h"
 #include "DialogTemplate.h"
 
+NewFolderDialog::NewFolderDialog() : 
+	hDialog(NULL), hInstance(NULL), pBaseText(NULL), 
+	nTitleID(MSG_ID_DLG_NEWFOLDER_TITLE)
+{
+	aFolder[0] = TEXT('\0'); 
+}
+
 //////////////////////////////////////////////////////////
 // Dialog procedure
 //////////////////////////////////////////////////////////
@@ -76,10 +83,14 @@ static DlgMsgRes aDlgRes[] = {
 
 void NewFolderDialog::InitDialog(HWND hDlg)
 {
-	OverrideDlgMsg(hDlg, MSG_ID_DLG_NEWFOLDER_TITLE, aDlgRes, sizeof(aDlgRes)/sizeof(DlgMsgRes));
+	OverrideDlgMsg(hDlg, nTitleID, aDlgRes, sizeof(aDlgRes)/sizeof(DlgMsgRes));
 
 	HWND hEdit = GetDlgItem(hDlg, IDC_NEWFOLDER_NAME);
-	SetWindowText(hEdit, TEXT(""));
+
+	if (pBaseText == NULL) {
+		pBaseText = TEXT("");
+	}
+	SetWindowText(hEdit, pBaseText);
 }
 
 //////////////////////////////////////////////////////////
@@ -95,4 +106,10 @@ BOOL NewFolderDialog::OnOK(HWND hDlg)
 	GetWindowText(hEdit, aFolder, n + 1);
 	aFolder[n] = TEXT('\0');
 	return TRUE;
+}
+
+void NewFolderDialog::SetOption(DWORD nID, LPCTSTR pText)
+{
+	nTitleID = nID;
+	pBaseText = pText;
 }

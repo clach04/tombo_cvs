@@ -71,7 +71,7 @@ public:
 	// location related members
 
 	void SetURI(const TomboURI *p);
-	const TomboURI *GetRealURI() const { return loc.getURI(); }
+	virtual const TomboURI *GetRealURI() const { return loc.getURI(); }
 
 	///////////////////////////////////////////////////////
 
@@ -163,7 +163,6 @@ public:
 
 	DWORD GetIcon(MemoSelectView *pView, DWORD nStatus);
 	DWORD ItemOrder();
-
 };
 
 /////////////////////////////////////////////
@@ -184,6 +183,7 @@ public:
 
 class TreeViewVirtualFolderRoot : public TreeViewFolderItem {
 	VFManager *pManager;
+	TomboURI *pDefaultURI;
 public:
 	TreeViewVirtualFolderRoot();
 	~TreeViewVirtualFolderRoot();
@@ -206,6 +206,8 @@ public:
 	BOOL IsOperationEnabled(MemoSelectView *pView, OpType op);
 
 	DWORD GetIcon(MemoSelectView *pView, DWORD nStatus);
+
+	const TomboURI *GetRealURI() const;
 };
 
 
@@ -217,6 +219,7 @@ class TreeViewVirtualFolder : public TreeViewFolderItem {
 protected:
 	VFDirectoryGenerator *pGenerator;
 	VFStore *pStore;
+	TomboURI *pDefaultURI;
 public:
 	TreeViewVirtualFolder();
 	~TreeViewVirtualFolder();
@@ -243,6 +246,8 @@ public:
 	BOOL IsOperationEnabled(MemoSelectView *pView, OpType op);
 
 	DWORD GetIcon(MemoSelectView *pView, DWORD nStatus);
+
+	const TomboURI *GetRealURI() const;
 };
 
 

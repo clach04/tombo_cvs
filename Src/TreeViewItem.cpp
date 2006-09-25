@@ -630,16 +630,19 @@ BOOL TreeViewFileLink::IsOperationEnabled(MemoSelectView *pView, OpType op)
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 
-TreeViewVirtualFolderRoot::TreeViewVirtualFolderRoot() : TreeViewFolderItem()
+TreeViewVirtualFolderRoot::TreeViewVirtualFolderRoot() : TreeViewFolderItem(), pDefaultURI(NULL)
 {
 }
 
 TreeViewVirtualFolderRoot::~TreeViewVirtualFolderRoot()
 {
+	delete pDefaultURI;
 }
 
 BOOL TreeViewVirtualFolderRoot::Init(const TomboURI *pURI, VFManager *p)
 {
+	pDefaultURI = new TomboURI();
+	pDefaultURI->Init(TEXT("tombo://default/"));
 	pManager = p;
 	SetURI(pURI);
 	return TRUE;
@@ -730,14 +733,21 @@ BOOL TreeViewVirtualFolderRoot::IsOperationEnabled(MemoSelectView *pView, OpType
 	return (nOpMatrix & op) != 0;
 }
 
+const TomboURI *TreeViewVirtualFolderRoot::GetRealURI() const
+{
+	return pDefaultURI;
+}
+
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 //  Virtual folder (non-root)
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 
-TreeViewVirtualFolder::TreeViewVirtualFolder() : TreeViewFolderItem(), pGenerator(NULL), pStore(NULL)
+TreeViewVirtualFolder::TreeViewVirtualFolder() : TreeViewFolderItem(), pGenerator(NULL), pStore(NULL), pDefaultURI(NULL)
 {
+	pDefaultURI = new TomboURI();
+	pDefaultURI->Init(TEXT("tombo://default/"));
 }
 
 TreeViewVirtualFolder::~TreeViewVirtualFolder()
@@ -746,6 +756,7 @@ TreeViewVirtualFolder::~TreeViewVirtualFolder()
 		pGenerator->FreeObject();
 		delete pGenerator;
 	}
+	delete pDefaultURI;
 }
 
 DWORD TreeViewVirtualFolder::GetIcon(MemoSelectView *pView, DWORD nStatus)
@@ -817,4 +828,9 @@ BOOL TreeViewVirtualFolder::IsOperationEnabled(MemoSelectView *pView, OpType op)
 {
 	DWORD nOpMatrix = OpNewMemo;
 	return (nOpMatrix & op) != 0;
+}
+
+const TomboURI *TreeViewVirtualFolder::GetRealURI() const
+{
+	return pDefaultURI;
 }

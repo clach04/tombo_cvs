@@ -1417,7 +1417,6 @@ void MainFrame::OnProperty()
 void MainFrame::OnTimer(WPARAM nTimerID)
 {
 	if (nTimerID == 0) {
-		if (!SelectViewActive()) {
 			if (pDetailsView->GetCurrentURI()) {
 				URIOption opt(NOTE_OPTIONMASK_ENCRYPTED);
 				if (!g_Repository.GetOption(pDetailsView->GetCurrentURI(), &opt)) return;
@@ -1425,7 +1424,6 @@ void MainFrame::OnTimer(WPARAM nTimerID)
 					LeaveDetailsView(FALSE);
 				}
 			}
-		}
 		pmPasswordMgr.ForgetPassword();
 	} else if (nTimerID == ID_PASSWORDTIMER) {
 		pmPasswordMgr.ForgetPasswordIfNotAccessed();

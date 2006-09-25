@@ -32,7 +32,7 @@ public:
 
 	LPTSTR GetMemo();
 
-	BOOL Show(int nCmdShow) { return TRUE; }
+	BOOL Show(int nCmdShow);
 
 	void SetTabstop() {}
 	BOOL SetFolding(BOOL bFold);

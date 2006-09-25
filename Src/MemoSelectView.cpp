@@ -74,8 +74,10 @@ BOOL MemoSelectView::Create(LPCTSTR pName, RECT &r, HWND hParent, DWORD nID, HIN
 	hSelectViewImgList = CreateSelectViewImageList(hInst);
 
 	DWORD nWndStyle;
-	nWndStyle = WS_CHILD | WS_VSCROLL | WS_HSCROLL | TVS_HASLINES | TVS_HASBUTTONS | TVS_SHOWSELALWAYS | TVS_EDITLABELS;
-
+	nWndStyle = WS_CHILD | WS_VSCROLL | WS_HSCROLL | TVS_HASLINES | TVS_HASBUTTONS | TVS_SHOWSELALWAYS;
+#if !defined(PLATFORM_WM5)
+	nWndStyle |= TVS_EDITLABELS;
+#endif
 
 #if defined(PLATFORM_WIN32) || defined(PLATFORM_HPC)
 	hViewWnd = CreateWindowEx(WS_EX_CLIENTEDGE, WC_TREEVIEW, pName, nWndStyle,
@@ -527,7 +529,7 @@ LRESULT MemoSelectView::OnNotify(HWND hWnd, WPARAM wParam, LPARAM lParam)
 			TreeCollapse(pHdr->itemNew.hItem);
 		}
 		return FALSE;
-
+#if !defined(PLATFORM_WM5)
 	case TVN_BEGINLABELEDIT:
 		{
 			TreeViewItem *pItem = (TreeViewItem*)(((LPNMTVDISPINFO)lParam)->item.lParam);
@@ -535,7 +537,11 @@ LRESULT MemoSelectView::OnNotify(HWND hWnd, WPARAM wParam, LPARAM lParam)
 			return FALSE;
 		}
 	case TVN_ENDLABELEDIT:
-		return EditLabel(&(((LPNMTVDISPINFO)lParam)->item));
+		{
+			LPNMTVDISPINFO p = (LPNMTVDISPINFO)lParam;
+			return EditLabel(&(p->item));
+		}
+#endif
 #if defined(PLATFORM_WIN32)
 	case NM_RCLICK:
 		{
@@ -752,9 +758,32 @@ void MemoSelectView::OnDecrypt(TreeViewItem *pItem)
 
 void MemoSelectView::OnEditLabel(HTREEITEM hItem)
 {
+#if defined(PLATFORM_WM5)
+	TCHAR buf[MAX_PATH];
+	TV_ITEM item;
+	item.mask = TVIF_TEXT | TVIF_PARAM;
+	item.hItem = hItem;
+	item.cchTextMax = MAX_PATH;
+	item.pszText = buf;
+	TreeView_GetItem(hViewWnd, &item);
+
+	NewFolderDialog dlg;
+	dlg.SetOption(MSG_ID_MENUITEM_MAIN_RENAME, buf);
+	if (dlg.Popup(g_hInstance, hViewWnd) == IDOK) {
+		TreeViewItem *pti = (TreeViewItem*)(item.lParam);
+		if (pti == NULL) return;
+		pti->Rename(pMemoMgr, this, dlg.FolderName());
+		
+		item.mask = TVIF_TEXT;
+		item.cchTextMax = _tcslen(dlg.FolderName());
+		item.pszText = (LPTSTR)dlg.FolderName();
+		TreeView_SetItem(hViewWnd, &item);
+	}
+#else
 	if (hItem == NULL) return;
 	TreeView_EditLabel(hViewWnd, hItem);
 	return;
+#endif
 }
 
 ///////////////////////////////////////////
