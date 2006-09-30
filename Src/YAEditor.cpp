@@ -165,6 +165,9 @@ BOOL YAEditor::SetMemo(LPCTSTR pMemoW, DWORD nPos, BOOL bReadOnly)
 	YAEditDoc *pDoc = pEdit->CreateDocument(pMemo, pYAECallback);
 	if (pDoc == NULL) return FALSE;
 
+	pDoc->SetReadOnly(bReadOnly);
+	pYAECallback->ChangeReadOnlyStatusNotify(bReadOnly);
+
 #if !defined(PLATFORM_WIN32)
 	delete [] pMemo;
 #endif
@@ -248,6 +251,11 @@ void YAEditor::SetSelectRegion(DWORD nStart, DWORD nEnd)
 void YAEditor::SetReadOnly(BOOL bReadOnly)
 {
 	pEdit->GetDoc()->SetReadOnly(bReadOnly);
+}
+
+BOOL YAEditor::IsReadOnly()
+{
+	return pEdit->GetDoc()->IsReadOnly();
 }
 
 BOOL YAEditor::SetFolding(BOOL bFold)

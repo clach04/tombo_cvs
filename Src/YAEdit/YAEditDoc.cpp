@@ -124,6 +124,9 @@ BOOL YAEditDoc::ReleaseDoc()
 
 BOOL YAEditDoc::ReplaceString(const Region *pDelRegion, LPCTSTR pString)
 {
+	// if read only mode, ignore editing.
+	if (bReadOnly) return TRUE;
+
 	DWORD nPhLinesBefore = pPhLineMgr->MaxLine();
 
 	LPTSTR pOldTxt = pPhLineMgr->GetRegionString(pDelRegion);

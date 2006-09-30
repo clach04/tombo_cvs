@@ -37,7 +37,7 @@ public:
 	void SetTabstop() {}
 	BOOL SetFolding(BOOL bFold);
 	void SetReadOnly(BOOL bReadOnly);
-	BOOL IsReadOnly() { return FALSE; }
+	BOOL IsReadOnly();
 
 	void SetModifyStatus() {}
 

@@ -243,3 +243,9 @@ Based on B217(TOMBO 1.17)
 * FIX: Cut/Copy/Paste is not worked when choosing from menu(WM5)(#9008)
 * FIX: Renaming is not worked on some WM5 devices(#9014)
 * FIX: Password timeout is not occured when displaying crypted notes and focus is in treeview.(#9050)
+
+////////////////////////////////
+// B232
+////////////////////////////////
+
+* FIX: view mode is not work(#9105)

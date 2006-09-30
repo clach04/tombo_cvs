@@ -38,6 +38,7 @@
 #define CHARA_ENTER 13
 #define CHARA_ESC 27
 #define CHARA_TAB 9
+#define CHARA_SPACE 32
 
 /////////////////////////////////////////////////////////////////////////////
 // static funcs/vars declarations
@@ -504,7 +505,11 @@ void YAEditImpl::OnChar(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
 	TCHAR ch = (TCHAR)wParam;
 
-	if (pDoc->IsReadOnly()) return;
+	if (pDoc->IsReadOnly()) {
+		if (ch == CHARA_BS) { CmdScrollUp(); return; }
+		if (ch == CHARA_SPACE) { CmdScrollDown(); return; }
+		return;
+	}
 
 	if (ch == CHARA_BS) { CmdBackSpace(); return; }
 	if (ch == CHARA_ENTER) { CmdReplaceString(TEXT("\n")); return; }
